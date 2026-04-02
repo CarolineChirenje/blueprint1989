@@ -94,7 +94,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable("Notifications");
             entity.HasKey(n => n.Id);
-            entity.HasOne<User>().WithMany().HasForeignKey(n => n.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(n => n.User).WithMany().HasForeignKey(n => n.UserId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 
@@ -104,7 +104,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable("PushSubscriptions");
             entity.HasKey(ps => ps.Id);
-            entity.HasOne<User>().WithMany().HasForeignKey(ps => ps.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(ps => ps.User).WithMany().HasForeignKey(ps => ps.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.Property(ps => ps.Endpoint).IsRequired();
         });
     }
@@ -115,7 +115,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable("UserDevices");
             entity.HasKey(ud => ud.Id);
-            entity.HasOne<User>().WithMany().HasForeignKey(ud => ud.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(ud => ud.User).WithMany().HasForeignKey(ud => ud.UserId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 
@@ -171,8 +171,8 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable("UserNotificationPreferences");
             entity.HasKey(unp => new { unp.UserId, unp.NotificationTypeId });
-            entity.HasOne<User>().WithMany().HasForeignKey(unp => unp.UserId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne<NotificationTypeEntity>().WithMany().HasForeignKey(unp => unp.NotificationTypeId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(unp => unp.User).WithMany().HasForeignKey(unp => unp.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(unp => unp.NotificationType).WithMany().HasForeignKey(unp => unp.NotificationTypeId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 
