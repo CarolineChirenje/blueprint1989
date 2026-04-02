@@ -130,7 +130,6 @@ export class ResetPasswordComponent implements OnInit {
           if (response.token) {
             this.authService.setToken(response.token);
             this.authService.setUserInfo(response.user);
-            this.authService.loadAccessibleConditions();
           }
 
           // Redirect to dashboard after brief delay

@@ -28,26 +28,3 @@ import { NotificationPreferencesComponent } from './components/notification-pref
   ]
 })
 export class ProfileModule { }
-
-
-@NgModule({
-  declarations: [
-    ProfileComponent,
-    MfaSetupComponent,
-    CareRecipientsComponent,
-    LinkedDevicesComponent,
-    MyConditionsComponent,
-    BiometricSetupComponent,
-    MyReportsComponent,
-    NotificationPreferencesComponent
-  ],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    RouterModule,
-    ProfileRoutingModule,
-    SharedModule
-  ]
-})
-export class ProfileModule { }

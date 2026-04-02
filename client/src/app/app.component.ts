@@ -772,7 +772,7 @@ export class AppComponent implements OnInit, OnDestroy {
   
   navigateToCycles(): void {
     this.closeManagementDropdown();
-    this.router.navigate(['/management/cycles']);
+    this.router.navigate(['/cycles']);
   }
 
   navigateToAppConfig(): void {
