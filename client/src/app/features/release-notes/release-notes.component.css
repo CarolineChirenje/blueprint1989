@@ -1,13 +1,13 @@
 /* ─── Page Layout ─────────────────────────────────────── */
 .rn-page {
   min-height: 100vh;
-  background: #f4f6f9;
+  background: var(--bg);
   padding-bottom: 3rem;
 }
 
 /* ─── Header ──────────────────────────────────────────── */
 .rn-header {
-  background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);
+  background: var(--primary);
   color: #fff;
   padding: 2.5rem 1.5rem 2rem;
   margin-bottom: 0;
@@ -91,8 +91,8 @@
 .rn-panel {
   margin-bottom: 1rem !important;
   border-radius: 10px !important;
-  border: 1px solid #e0e4ea !important;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.06) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
   overflow: hidden;
 }
 
@@ -108,7 +108,7 @@
   gap: 0.75rem;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #1565c0;
+  color: var(--primary);
 }
 
 .rn-panel-version {
@@ -164,13 +164,13 @@
   align-items: flex-start;
   gap: 0.6rem;
   padding: 1rem 1.25rem 1.2rem;
-  background: #f0f4ff;
-  border-left: 4px solid #1976d2;
+  background: var(--primary-subtle);
+  border-left: 4px solid var(--primary);
   margin: 0 0 0.5rem;
 }
 
 .rn-summary-icon {
-  color: #1976d2;
+  color: var(--primary);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -249,7 +249,7 @@
 }
 
 .rn-item-card:hover {
-  box-shadow: 0 4px 14px rgba(25, 118, 210, 0.12) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 .rn-item-content {
@@ -373,8 +373,8 @@
 .rn-tech-chip {
   height: 24px !important;
   font-size: 0.78rem !important;
-  background-color: #e0e7ff !important;
-  color: #3730a3 !important;
+  background-color: var(--primary-subtle) !important;
+  color: var(--primary) !important;
   font-weight: 500 !important;
   min-height: unset !important;
   padding: 0 10px !important;
@@ -424,11 +424,11 @@
   max-width: 900px;
   margin: 1.5rem auto 2rem;
   padding: 1rem 1.25rem 1rem 1.5rem;
-  background: #fff;
-  border: 1px solid #e0e4ea;
-  border-left: 4px solid #1976d2;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.06);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -436,7 +436,7 @@
 }
 
 .rn-wiki-icon {
-  color: #1976d2;
+  color: var(--primary);
   font-size: 2rem;
   width: 2rem;
   height: 2rem;
@@ -469,8 +469,8 @@
   flex-shrink: 0;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #1976d2 !important;
-  border-color: #1976d2 !important;
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
   text-decoration: none;
   white-space: nowrap;
 }

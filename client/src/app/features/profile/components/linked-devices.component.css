@@ -13,7 +13,7 @@
 .page-header h2 {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1a237e;
+  color: var(--text-primary);
   margin: 0 0 0.25rem;
 }
 
@@ -59,24 +59,24 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 
 .device-card.current-device {
-  border-color: #0056b3;
-  background: #f0f6ff;
+  border-color: var(--primary);
+  background: var(--primary-subtle);
 }
 
 .device-icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: #e8eaf6;
-  color: #3949ab;
+  background: var(--primary-light);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +89,7 @@
 }
 
 .device-card.current-device .device-icon {
-  background: #1a237e;
+  background: var(--primary-dark);
   color: #fff;
 }
 
@@ -101,7 +101,7 @@
 .device-name {
   font-weight: 600;
   font-size: 1rem;
-  color: #1a237e;
+  color: var(--text-primary);
 }
 
 .device-name-row {
@@ -113,7 +113,7 @@
 }
 
 .current-badge {
-  background: #0056b3;
+  background: var(--primary);
   color: #fff;
   font-size: 0.7rem;
   font-weight: 600;
@@ -170,8 +170,8 @@
 
 .reset-prompt-btn {
   background: none;
-  border: 1px solid #0056b3;
-  color: #0056b3;
+  border: 1px solid var(--primary);
+  color: var(--primary);
   border-radius: 6px;
   padding: 4px 12px;
   font-size: 0.78rem;
@@ -180,7 +180,7 @@
 }
 
 .reset-prompt-btn:hover {
-  background: #e8f0fe;
+  background: var(--primary-subtle);
 }
 
 .remove-btn {
@@ -205,7 +205,7 @@
 }
 
 .back-link a {
-  color: #0056b3;
+  color: var(--primary);
   text-decoration: none;
   font-size: 0.9rem;
 }
@@ -227,7 +227,7 @@
   line-height: 1;
 }
 
-.rename-btn:hover { color: #0056b3; }
+.rename-btn:hover { color: var(--primary); }
 
 .rename-btn .material-icons { font-size: 1rem; }
 
@@ -235,16 +235,16 @@
   flex: 1;
   min-width: 140px;
   padding: 4px 8px;
-  border: 1px solid #90caf9;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
 }
 
-.rename-input:focus { border-color: #0056b3; box-shadow: 0 0 0 2px rgba(0,86,179,.15); }
+.rename-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(35, 122, 73, 0.15); }
 
 .rename-save-btn {
-  background: #0056b3;
+  background: var(--primary);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -255,7 +255,7 @@
 }
 
 .rename-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.rename-save-btn:not(:disabled):hover { background: #003d80; }
+.rename-save-btn:not(:disabled):hover { background: var(--primary-hover); }
 
 .rename-cancel-btn {
   background: none;
@@ -284,6 +284,6 @@
 }
 
 .platform-badge-android  { background: #e8f5e9; color: #2e7d32; }
-.platform-badge-ios      { background: #e3f2fd; color: #1565c0; }
+.platform-badge-ios      { background: var(--info-bg); color: var(--info); }
 .platform-badge-desktop  { background: #ede7f6; color: #4527a0; }
 .platform-badge-unknown  { background: #e0e0e0; color: #757575; }

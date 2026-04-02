@@ -5,10 +5,10 @@
 }
 
 .oq-card {
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
 }
 
 .oq-header {
@@ -21,12 +21,12 @@
 
 .oq-header h1 {
   margin: 0 0 0.25rem;
-  color: #1a1a1a;
+  color: var(--text-primary);
   font-size: 1.75rem;
 }
 
 .oq-subtitle {
-  color: #666;
+  color: var(--text-secondary);
   margin: 0;
   font-size: 0.9rem;
 }
@@ -99,12 +99,12 @@
 }
 
 .btn-primary {
-  background: #4CAF50;
+  background: var(--primary);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #45a049;
+  background: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -143,7 +143,7 @@
 .oq-empty-icon {
   width: 64px;
   height: 64px;
-  color: #4CAF50;
+  color: var(--primary);
   margin-bottom: 1rem;
 }
 
@@ -160,7 +160,7 @@
 .oq-section h2 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-primary);
   margin: 0 0 0.75rem;
 }
 
@@ -186,9 +186,9 @@
   align-items: center;
   gap: 1rem;
   padding: 0.875rem 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #fafafa;
+  background: var(--surface-raised);
   flex-wrap: wrap;
 }
 
@@ -250,8 +250,8 @@
 }
 
 .badge-assessment {
-  background: #cce5ff;
-  color: #004085;
+  background: var(--info-bg);
+  color: var(--info);
 }
 
 .badge-incident {

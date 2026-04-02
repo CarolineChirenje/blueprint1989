@@ -14,7 +14,7 @@
 
 .welcome-section h1 {
   font-size: 2.5rem;
-  color: #1a237e;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
@@ -27,7 +27,7 @@
 
 .quick-actions h2 {
   font-size: 1.8rem;
-  color: #1a237e;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   font-weight: 600;
 }
@@ -40,15 +40,15 @@
 }
 
 .action-card {
-  background: white;
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
   padding: 2rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
   position: relative;
   overflow: hidden;
-  border: 2px solid transparent;
+  border: 1px solid var(--border);
 }
 
 .action-card::before {
@@ -58,12 +58,12 @@
   left: 0;
   right: 0;
   height: 4px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .action-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .card-icon {
@@ -73,13 +73,13 @@
 
 .action-card h3 {
   font-size: 1.4rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
 
 .action-card p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   line-height: 1.5;
   margin-bottom: 0;
@@ -91,8 +91,8 @@
   right: 1rem;
   font-size: 1.5rem;
   opacity: 0;
-  transition: all 0.3s ease;
-  color: #0056b3;
+  transition: all 0.2s ease;
+  color: var(--primary);
 }
 
 .action-card:hover .card-arrow {
@@ -100,97 +100,47 @@
   right: 1.5rem;
 }
 
-/* Card-specific colors */
-.bgl-card::before {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+/* Card accent colours — keep unique per card type for visual identity */
+.bgl-card::before { background: #237A49; }
+.bgl-card:hover   { border-color: #237A49; }
 
-.bgl-card:hover {
-  border-color: #667eea;
-}
+.history-card::before { background: #D98E04; }
+.history-card:hover   { border-color: #D98E04; }
 
-.history-card::before {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
+.meal-entry-card::before { background: var(--info); }
+.meal-entry-card:hover   { border-color: var(--info); }
 
-.history-card:hover {
-  border-color: #f093fb;
-}
+.meal-entry-history-card::before { background: #2E7D32; }
+.meal-entry-history-card:hover   { border-color: #2E7D32; }
 
-.meal-entry-card::before {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
+.incidents-card::before { background: #C62828; }
+.incidents-card:hover   { border-color: #C62828; }
 
-.meal-entry-card:hover {
-  border-color: #4facfe;
-}
+.blood-pressure-card::before { background: #AD1457; }
+.blood-pressure-card:hover   { border-color: #AD1457; }
 
-.meal-entry-history-card::before {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-}
+.record-card::before { background: #237A49; }
+.record-card:hover   { border-color: #237A49; }
 
-.meal-entry-history-card:hover {
-  border-color: #43e97b;
-}
+.terms-card::before { background: #5C6BC0; }
+.terms-card:hover   { border-color: #5C6BC0; }
 
-.incidents-card::before {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-}
+.users-card::before { background: #00838F; }
+.users-card:hover   { border-color: #00838F; }
 
-.incidents-card:hover {
-  border-color: #fa709a;
-}
-
-.blood-pressure-card::before {
-  background: linear-gradient(135deg, #f5515f 0%, #9f041b 100%);
-}
-
-.blood-pressure-card:hover {
-  border-color: #f5515f;
-}
-
-.record-card::before {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.record-card:hover {
-  border-color: #667eea;
-}
-
-.terms-card::before {
-  background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-}
-
-.terms-card:hover {
-  border-color: #30cfd0;
-}
-
-.users-card::before {
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-}
-
-.users-card:hover {
-  border-color: #a8edea;
-}
-
-.profile-card::before {
-  background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
-}
-
-.profile-card:hover {
-  border-color: #ff9a56;
-}
+.profile-card::before { background: #EF6C00; }
+.profile-card:hover   { border-color: #EF6C00; }
 
 .info-section {
   margin-top: 3rem;
 }
 
 .info-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary);
   color: white;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .info-card h3 {

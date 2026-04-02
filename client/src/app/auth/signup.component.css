@@ -12,8 +12,8 @@ body { background: transparent; }
   font-size: 0.9375rem; /* 15px – base for all descendants */
 }
 
-.signup-card h1 { 
-  color: #003d82; 
+.signup-card h1 {
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   font-size: 1.6rem;
 }
@@ -34,20 +34,20 @@ body { background: transparent; }
   font-size: 0.9375rem;
 }
 
-.signup-card input { 
-  width: 100%; 
-  padding: 0.75rem; 
-  margin-top: 0.375rem; 
-  border: 1px solid #b3d9ff; 
-  border-radius: 4px;
-  color: #1a1a1a;
+.signup-card input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.375rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
   box-sizing: border-box;
 }
 
 .signup-card input:focus {
   outline: none;
-  border-color: #0056b3;
-  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12);
 }
 
 .signup-card button { 
@@ -59,7 +59,7 @@ body { background: transparent; }
   display: block;
   text-align: center;
   margin-top: 1.5rem;
-  color: #0056b3;
+  color: var(--primary);
   text-decoration: none;
   font-size: 14px;
 }
@@ -116,8 +116,8 @@ body { background: transparent; }
 }
 
 .mfa-info {
-  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-  border: 2px solid #90caf9;
+  background: var(--primary-subtle);
+  border: 2px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -130,7 +130,7 @@ body { background: transparent; }
 }
 
 .mfa-info h3 {
-  color: #0056b3;
+  color: var(--primary);
   margin: 0 0 0.5rem 0;
   font-size: 18px;
 }
@@ -161,14 +161,14 @@ body { background: transparent; }
 }
 
 .btn-primary {
-  background: #0056b3;
+  background: var(--primary);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #003d82;
+  background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 86, 179, 0.3);
+  box-shadow: 0 4px 12px rgba(35, 122, 73, 0.3);
 }
 
 .btn-secondary {
@@ -184,7 +184,7 @@ body { background: transparent; }
 .login-link-btn {
   display: inline-block;
   padding: 0.75rem 2rem;
-  background: #0056b3;
+  background: var(--primary);
   color: white !important;
   text-decoration: none !important;
   border-radius: 6px;
@@ -192,12 +192,12 @@ body { background: transparent; }
   font-size: 0.9375rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 86, 179, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .login-link-btn:hover {
-  background: #003d82;
-  box-shadow: 0 4px 8px rgba(0, 86, 179, 0.3);
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
 
@@ -262,7 +262,7 @@ body { background: transparent; }
 .section-label {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #003d82;
+  color: var(--primary);
   margin-bottom: 0.75rem;
 }
 
@@ -283,7 +283,7 @@ body { background: transparent; }
   align-items: center;
   text-align: center;
   padding: 1rem 0.75rem;
-  border: 2px solid #b3d9ff;
+  border: 2px solid var(--border);
   border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
@@ -291,14 +291,14 @@ body { background: transparent; }
 }
 
 .role-card:hover {
-  border-color: #0056b3;
-  background: #f0f7ff;
+  border-color: var(--primary);
+  background: var(--primary-subtle);
 }
 
 .role-card.selected {
-  border-color: #003d82;
-  background: #e8f0fe;
-  box-shadow: 0 0 0 3px rgba(0, 61, 130, 0.15);
+  border-color: var(--primary-dark);
+  background: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.15);
 }
 
 .role-card-icon {
@@ -314,7 +314,7 @@ body { background: transparent; }
 
 .role-card-title {
   font-weight: 700;
-  color: #003d82;
+  color: var(--primary);
   font-size: 0.9375rem;
   font-family: inherit;
 }
@@ -335,14 +335,14 @@ body { background: transparent; }
 
 /* ── Conditional sections ── */
 .conditional-section {
-  background: #f8fbff;
-  border: 1px solid #c8e0ff;
+  background: var(--primary-subtle);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.25rem;
 }
 
 .conditional-heading {
-  color: #003d82;
+  color: var(--primary);
   font-size: 0.9375rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
@@ -360,18 +360,17 @@ body { background: transparent; }
   width: 100%;
   padding: 0.75rem;
   margin-top: 0.375rem;
-  border: 1px solid #b3d9ff;
+  border: 1px solid var(--border);
   border-radius: 4px;
-  background: white;
-  color: #1a1a1a;
+  background: var(--surface);
+  color: var(--text-primary);
   box-sizing: border-box;
-  /* font-family and font-size inherited from the shared rule above */
 }
 
 .signup-card select:focus {
   outline: none;
-  border-color: #0056b3;
-  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.1);
 }
 
 .submit-btn {
@@ -387,17 +386,17 @@ body { background: transparent; }
 }
 
 .submit-btn-blue {
-  background: #0056b3;
+  background: var(--primary);
   color: white;
 }
 
 .submit-btn-blue:hover:not(:disabled) {
-  background: #003d82;
+  background: var(--primary-hover);
   transform: translateY(-1px);
 }
 
 .submit-btn-blue:disabled {
-  background: #9ec3e8;
+  background: var(--primary-light);
   cursor: not-allowed;
 }
 
@@ -407,7 +406,7 @@ body { background: transparent; }
   margin-top: 1.25rem;
   font-weight: 700;
   font-size: 0.9rem;
-  color: #1a237e;
+  color: var(--primary);
 }
 
 .condition-row-signup {
@@ -451,15 +450,15 @@ body { background: transparent; }
 .medication-section {
   margin-top: 1.25rem;
   padding: 1rem;
-  background: #f5f9ff;
+  background: var(--primary-subtle);
   border-radius: 8px;
-  border: 1px solid #c3d7f5;
+  border: 1px solid var(--border);
 }
 
 .medication-heading {
   margin: 0 0 0.25rem;
   font-size: 0.95rem;
-  color: #1a237e;
+  color: var(--primary);
 }
 
 .med-row {

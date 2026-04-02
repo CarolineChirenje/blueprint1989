@@ -4,7 +4,7 @@ body { background: transparent; overflow-x: hidden; }
 .login-page {
   margin: -2rem;
   min-height: 100vh;
-  background: linear-gradient(160deg, #003d82 0%, #0056b3 55%, #1a7fd4 100%);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,9 +17,10 @@ body { background: transparent; overflow-x: hidden; }
   width: 100%;
   max-width: 520px;
   padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
 }
@@ -47,7 +48,7 @@ body { background: transparent; overflow-x: hidden; }
 
 .verify-icon {
   font-size: 44px;
-  color: #0056b3;
+  color: var(--primary);
   line-height: 1;
 }
 
@@ -55,8 +56,8 @@ body { background: transparent; overflow-x: hidden; }
   animation: spin 1.2s linear infinite;
 }
 
-.success-icon { color: #28a745; }
-.error-icon   { color: #dc3545; }
+.success-icon { color: var(--success); }
+.error-icon   { color: var(--error); }
 
 @keyframes spin {
   from { transform: rotate(0deg); }
@@ -106,15 +107,15 @@ body { background: transparent; overflow-x: hidden; }
 .resend-error   { color: #721c24; font-weight: 500; font-size: 0.88rem; }
 
 .submit-btn-outline {
-  background: white !important;
-  color: #0056b3 !important;
-  border: 2px solid #0056b3 !important;
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  border: 2px solid var(--primary) !important;
 }
 
 .submit-btn-outline:hover {
-  background: #f0f8ff !important;
-  color: #003d82 !important;
-  border-color: #003d82 !important;
+  background: var(--primary-subtle) !important;
+  color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
 }
 
 @media (max-width: 640px) {

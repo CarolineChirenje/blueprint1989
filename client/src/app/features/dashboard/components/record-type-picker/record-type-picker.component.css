@@ -9,17 +9,17 @@
 }
 
 .type-picker-card {
-  background: #fff;
+  background: var(--surface);
   border-radius: 12px;
   padding: 2rem 2.5rem;
   max-width: 560px;
   width: 90%;
-  box-shadow: 0 8px 32px rgba(0, 61, 130, 0.22);
+  box-shadow: var(--shadow-lg);
   text-align: center;
 }
 
 .type-picker-card h2 {
-  color: #0056b3;
+  color: var(--primary);
   font-size: 1.6rem;
   margin-bottom: 0.5rem;
   border: none;
@@ -49,15 +49,15 @@
   min-width: 170px;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
-  background: #f5f8ff;
+  background: var(--primary-subtle);
 }
 
 .type-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 86, 179, 0.18);
+  box-shadow: var(--shadow-md);
 }
 
-.diabetes-btn:hover { border-color: #0056b3; }
+.diabetes-btn:hover { border-color: var(--primary); }
 .bp-btn:hover       { border-color: #c0392b; }
 
 .type-icon  { font-size: 2.2rem; }
@@ -65,7 +65,7 @@
 .type-label {
   font-size: 1rem;
   font-weight: 600;
-  color: #003d82;
+  color: var(--primary);
 }
 
 .type-desc {
@@ -75,8 +75,8 @@
 
 .cancel-picker-btn {
   background: none;
-  border: 1px solid #b5c9e2;
-  color: #555;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
   border-radius: 6px;
   padding: 0.5rem 1.4rem;
   cursor: pointer;
@@ -85,5 +85,5 @@
 }
 
 .cancel-picker-btn:hover {
-  background: #f0f4f8;
+  background: var(--primary-subtle);
 }

@@ -4,7 +4,7 @@ body { background: transparent; overflow-x: hidden; }
 .login-page {
   margin: -2rem;                    /* cancel main's 2rem padding */
   min-height: 100vh;
-  background: linear-gradient(160deg, #003d82 0%, #0056b3 55%, #1a7fd4 100%);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -31,20 +31,21 @@ body { background: transparent; overflow-x: hidden; }
   width: 100%;
   max-width: 420px;
   padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
 }
 
-.login-card label { display:block; margin-top:1rem; color: #333; }
+.login-card label { display:block; margin-top:1rem; color: var(--text-primary); }
 .login-card input {
   width:100%;
   padding:0.75rem;
   margin-top:0.5rem;
-  border:1px solid #b3d9ff;
-  border-radius:4px;
-  background-color: white;
-  color: #333;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-md);
+  background-color: var(--primary-subtle);
+  color: var(--text-primary);
   color-scheme: light;
 }
 .login-card button { margin-top:1rem }
@@ -74,14 +75,14 @@ body { background: transparent; overflow-x: hidden; }
 
 .forgot-password-link {
   font-size: 0.9rem;
-  color: #0056b3;
+  color: var(--primary);
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .forgot-password-link:hover {
-  color: #003d82;
+  color: var(--primary-hover);
   text-decoration: underline;
 }
 
@@ -141,7 +142,7 @@ body { background: transparent; overflow-x: hidden; }
 
 .lock-icon {
   font-size: 80px;
-  color: #0056b3;
+  color: var(--primary);
   display: block;
 }
 
@@ -188,15 +189,15 @@ body { background: transparent; overflow-x: hidden; }
 }
 
 .submit-btn-outline {
-  background: white !important;
-  color: #0056b3 !important;
-  border: 2px solid #0056b3 !important;
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  border: 2px solid var(--primary) !important;
 }
 
 .submit-btn-outline:hover {
-  background: #f0f8ff !important;
-  color: #003d82 !important;
-  border-color: #003d82 !important;
+  background: var(--primary-subtle) !important;
+  color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
 }
 
 /* ── Email-unverified panel ─────────────────────────────────────────── */

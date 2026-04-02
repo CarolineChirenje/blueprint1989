@@ -12,7 +12,7 @@
 .page-header h2 {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1a237e;
+  color: var(--primary);
   margin: 0 0 0.25rem;
 }
 
@@ -69,7 +69,7 @@
 
 .section-icon {
   font-size: 1.5rem;
-  color: #1a237e;
+  color: var(--primary);
   margin-top: 2px;
   flex-shrink: 0;
 }
@@ -82,7 +82,7 @@
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 0.2rem;
-  color: #1a237e;
+  color: var(--primary);
 }
 
 .section-note {
@@ -205,7 +205,7 @@
 }
 
 .toggle input:checked + .slider {
-  background: #1a237e;
+  background: var(--primary);
 }
 
 .toggle input:checked + .slider::before {
@@ -222,7 +222,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: #1a237e;
+  background: var(--primary);
   color: white;
   border: none;
   padding: 0.65rem 1.5rem;
@@ -234,7 +234,7 @@
 }
 
 .save-btn:hover:not(:disabled) {
-  background: #283593;
+  background: var(--primary-hover);
 }
 
 .save-btn:disabled {
@@ -248,7 +248,7 @@
 }
 
 .back-link a {
-  color: #1a237e;
+  color: var(--primary);
   text-decoration: none;
 }
 

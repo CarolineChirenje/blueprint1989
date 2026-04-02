@@ -1,14 +1,15 @@
 .vitara-chart-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-left: 5px solid #3949ab;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--primary);
   overflow: hidden;
   margin-bottom: 1.5rem;
 }
 
 .vitara-chart-header {
-  background: linear-gradient(135deg, #1a237e, #3949ab);
+  background: var(--primary);
   color: #fff;
   padding: 0.65rem 1rem;
   display: flex;

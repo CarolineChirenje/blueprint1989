@@ -2,19 +2,19 @@
 .app-container {
   max-width: 1400px;
   margin: 0 auto;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f4f8 0%, #e8f1f7 100%);
+  background: var(--bg);
 }
 
 header {
-  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  background: var(--primary);
   color: white;
   padding: 0.75rem 2rem;
   text-align: center;
-  box-shadow: 0 2px 12px rgba(0, 86, 179, 0.25);
+  box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
 }
@@ -26,9 +26,9 @@ header::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(125, 184, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(77, 158, 255, 0.1) 0%, transparent 50%);
+  background:
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -55,9 +55,9 @@ header p {
 }
 
 nav {
-  background: linear-gradient(135deg, #003d82 0%, #002855 100%);
+  background: var(--primary-hover);
   padding: 0;
-  box-shadow: 0 4px 12px rgba(0, 86, 179, 0.15);
+  box-shadow: 0 4px 12px rgba(37, 49, 40, 0.15);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -93,7 +93,7 @@ nav {
 
 .nav-dropdown .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  border-bottom-color: #7db8ff;
+  border-bottom-color: rgba(255, 255, 255, 0.65);
 }
 
 .nav-dropdown .nav-link .dropdown-icon {
@@ -123,7 +123,7 @@ nav {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.25rem;
-  color: #333 !important;
+  color: var(--text-primary) !important;
   text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -133,14 +133,14 @@ nav {
 }
 
 .nav-dropdown-item:hover {
-  background: #f8f9fa;
-  color: #0056b3 !important;
+  background: var(--primary-light);
+  color: var(--primary) !important;
 }
 
 .nav-dropdown-item svg {
   width: 18px;
   height: 18px;
-  color: #0056b3;
+  color: var(--primary);
   flex-shrink: 0;
 }
 
@@ -159,8 +159,8 @@ nav {
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
   cursor: pointer;
-  background: #f8f9fa;
-  color: #444;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -170,14 +170,14 @@ nav {
 }
 
 .mgmt-group-header:hover {
-  background: #eef2f7;
-  color: #0056b3;
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .mgmt-group-header svg:first-child {
   width: 16px;
   height: 16px;
-  color: #0056b3;
+  color: var(--primary);
   flex-shrink: 0;
 }
 
@@ -208,7 +208,7 @@ nav {
 }
 
 .mgmt-group-items .nav-dropdown-item:hover {
-  border-left-color: #0056b3;
+  border-left-color: var(--primary);
 }
 
 .nav-dropdown-item--danger {
@@ -295,7 +295,7 @@ nav {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.25rem;
-  color: #333 !important;
+  color: var(--text-primary) !important;
   text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -306,12 +306,12 @@ nav {
 .dropdown-item svg {
   width: 18px;
   height: 18px;
-  color: #0056b3;
+  color: var(--primary);
   flex-shrink: 0;
 }
 
 .dropdown-item:hover {
-  background: #f8f9fa;
+  background: var(--primary-light);
 }
 
 .dropdown-item.logout svg {
@@ -333,11 +333,11 @@ nav {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7db8ff 0%, #4d9eff 100%);
+  background: var(--primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--primary);
   flex-shrink: 0;
 }
 
@@ -368,13 +368,13 @@ nav a {
 nav a:hover,
 nav a:focus {
   background-color: rgba(255, 255, 255, 0.1);
-  border-bottom-color: #7db8ff;
+  border-bottom-color: rgba(255, 255, 255, 0.65);
   outline: none;
 }
 
 nav a.active {
   background-color: rgba(255, 255, 255, 0.15);
-  border-bottom-color: #4d9eff;
+  border-bottom-color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
 }
 
@@ -458,7 +458,7 @@ nav a:active {
     display: none;
     flex-direction: column;
     width: 100%;
-    background: linear-gradient(135deg, #003d82 0%, #002855 100%);
+    background: var(--primary-dark);
     border-top: 1px solid rgba(255,255,255,0.1);
     max-height: 80vh;
     overflow-y: auto;
@@ -473,7 +473,7 @@ nav a:active {
     width: 100%;
     padding: 0;
     border-top: 1px solid rgba(255,255,255,0.1);
-    background: linear-gradient(135deg, #003d82 0%, #002855 100%);
+    background: var(--primary-dark);
   }
 
   .nav-actions.mobile-visible { display: flex; }
@@ -562,8 +562,8 @@ nav a:active {
   }
 
   .notification-header {
-    background: #f0f5ff;
-    border-bottom: 2px solid #0056b3;
+    background: var(--primary-light);
+    border-bottom: 2px solid var(--primary);
   }
 
   /* ── User menu section: inline block inside hamburger ── */
@@ -615,17 +615,17 @@ main {
   color-scheme: light;
   padding: 2rem;
   flex: 1;
-  background-color: #f0f4f8;
+  background-color: var(--bg);
 }
 
 footer {
-  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  background: var(--primary);
   color: white;
   text-align: center;
   padding: 1.5rem 2rem;
   margin-top: auto;
   font-size: 0.95rem;
-  border-top: 1px solid rgba(0, 86, 179, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   /* Break out of max-width container on wide screens */
   width: 100vw;
   position: relative;
@@ -728,11 +728,11 @@ footer p {
   align-items: center;
   gap: 0.75rem;
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid #e9ecef;
-  color: #0056b3;
+  border-bottom: 1px solid var(--divider);
+  color: var(--primary);
   position: sticky;
   top: 0;
-  background: #fff;
+  background: var(--surface);
   z-index: 1;
 }
 
@@ -755,8 +755,8 @@ footer p {
 
 .mark-all-btn {
   background: none;
-  border: 1px solid #0056b3;
-  color: #0056b3;
+  border: 1px solid var(--primary);
+  color: var(--primary);
   font-size: 0.75rem;
   padding: 0.28rem 0.55rem;
   border-radius: 999px;
@@ -765,7 +765,7 @@ footer p {
 }
 
 .mark-all-btn:hover {
-  background: #0056b3;
+  background: var(--primary);
   color: white;
 }
 
@@ -797,7 +797,7 @@ footer p {
 }
 
 .notification-item:hover {
-  background: #f8fbff;
+  background: var(--primary-subtle);
 }
 
 .notification-icon {
@@ -893,8 +893,8 @@ footer p {
 .notification-history-link {
   width: 100%;
   border: none;
-  background: #f6f8fb;
-  color: #0056b3;
+  background: var(--primary-subtle);
+  color: var(--primary);
   border-radius: 8px;
   padding: 0.65rem 0.75rem;
   font-weight: 700;
@@ -902,7 +902,7 @@ footer p {
 }
 
 .notification-history-link:hover {
-  background: #eaf1fb;
+  background: var(--primary-light);
 }
 
 @media (max-width: 768px) {
@@ -948,13 +948,13 @@ footer p {
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .app-container {
-    background: linear-gradient(135deg, #1a2f4d 0%, #0d1f33 100%);
+    background: var(--bg);
   }
-  
+
   main {
-    color: #e0e7ff;
+    background-color: var(--bg);
+    color: var(--text-primary);
   }
-  
 }
 /* ── PWA Install Banner ─────────────────────────────────────────────────── */
 .pwa-install-banner {
@@ -962,8 +962,8 @@ footer p {
   bottom: 0;
   left: 0;
   right: 0;
-  background: #fff;
-  border-top: 3px solid #0056b3;
+  background: var(--surface);
+  border-top: 3px solid var(--primary);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   padding: 12px 16px;
   display: flex;
@@ -972,7 +972,7 @@ footer p {
   z-index: 9999;
   flex-wrap: wrap;
   color-scheme: light;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .pwa-banner-icon {
@@ -989,12 +989,12 @@ footer p {
   min-width: 0;
   font-size: 0.9rem;
   line-height: 1.3;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .pwa-banner-text strong {
   font-weight: 600;
-  color: #1a237e;
+  color: var(--text-primary);
 }
 
 .pwa-banner-text span {
@@ -1003,7 +1003,7 @@ footer p {
 }
 
 .pwa-install-btn {
-  background: #0056b3;
+  background: var(--primary);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -1016,7 +1016,7 @@ footer p {
 }
 
 .pwa-install-btn:hover {
-  background: #003d82;
+  background: var(--primary-hover);
 }
 
 .pwa-dismiss-btn {
@@ -1096,7 +1096,7 @@ footer p {
 
 .pwa-update-text strong {
   font-weight: 600;
-  color: #1a237e;
+  color: var(--text-primary);
 }
 
 .pwa-update-banner.breaking .pwa-update-text strong {
@@ -1159,7 +1159,7 @@ footer p {
 .pwa-whats-new-btn {
   background: none;
   border: none;
-  color: #0056b3;
+  color: var(--primary);
   font-size: 0.82rem;
   cursor: pointer;
   text-decoration: underline;
@@ -1168,7 +1168,7 @@ footer p {
 }
 
 .pwa-whats-new-btn:hover {
-  color: #003d82;
+  color: var(--primary-hover);
 }
 
 @media (max-width: 480px) {
@@ -1234,7 +1234,7 @@ footer p {
   left: 0;
   width: 0;
   height: 3px;
-  background: linear-gradient(90deg, #1A237E 0%, #0056b3 50%, #1a7fd4 100%);
+  background: var(--primary-light);
   z-index: 10000;
   transition: none;
   pointer-events: none;
@@ -1242,6 +1242,7 @@ footer p {
 
 .nav-progress-bar.active {
   width: 85%;
+  background: var(--primary);
   transition: width 2s cubic-bezier(0.05, 0.8, 0.5, 1);
 }
 

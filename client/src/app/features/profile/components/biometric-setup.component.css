@@ -24,7 +24,7 @@
 }
 
 h1 {
-  color: #003d82;
+  color: var(--text-primary);
   font-size: 1.6rem;
   margin: 0 0 0.75rem 0;
 }
@@ -42,26 +42,26 @@ h1 {
   align-self: flex-start;
   background: transparent;
   border: none;
-  color: #0056b3;
+  color: var(--primary);
   cursor: pointer;
   font-size: 0.9rem;
   padding: 0.25rem 0;
   margin-bottom: 1.5rem;
   text-decoration: none;
 }
-.btn-back:hover { color: #003d82; text-decoration: underline; }
+.btn-back:hover { color: var(--primary-hover); text-decoration: underline; }
 
 /* ── Info box ─────────────────────────────────────────────────────────────── */
 .info-box {
   width: 100%;
-  background: #e8f0fe;
-  border-left: 4px solid #4285f4;
+  background: var(--info-bg);
+  border-left: 4px solid var(--info);
   padding: 0.85rem 1rem;
   border-radius: 4px;
   text-align: left;
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .info-box--warning {
@@ -149,11 +149,11 @@ h1 {
 .form-control {
   width: 100%;
   padding: 0.65rem 0.75rem;
-  border: 1px solid #b3d9ff;
+  border: 1px solid var(--border);
   border-radius: 4px;
   font-size: 0.95rem;
-  color: #333;
-  background: white;
+  color: var(--text-primary);
+  background: var(--surface);
   box-sizing: border-box;
 }
 
@@ -194,8 +194,8 @@ h1 {
 .spinner {
   width: 56px;
   height: 56px;
-  border: 5px solid #e0e0e0;
-  border-top-color: #0056b3;
+  border: 5px solid var(--divider);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.9s linear infinite;
   margin-bottom: 1.25rem;
