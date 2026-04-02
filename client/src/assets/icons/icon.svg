@@ -1,23 +1,68 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="100" fill="#1A237E"/>
-  <!-- Gauge arc background -->
-  <path d="M 100 320 A 165 165 0 0 1 412 320" fill="none" stroke="#37474F" stroke-width="32" stroke-linecap="round"/>
-  <!-- Low zone (green) -->
-  <path d="M 100 320 A 165 165 0 0 1 190 140" fill="none" stroke="#43A047" stroke-width="32" stroke-linecap="round"/>
-  <!-- Normal zone (green bright) -->
-  <path d="M 190 140 A 165 165 0 0 1 322 140" fill="none" stroke="#66BB6A" stroke-width="32" stroke-linecap="round"/>
-  <!-- High zone (amber) -->
-  <path d="M 322 140 A 165 165 0 0 1 412 320" fill="none" stroke="#FFA726" stroke-width="32" stroke-linecap="round"/>
-  <!-- Blood droplet in centre -->
-  <path d="M256 190 C238 228 200 268 200 300 A56 56 0 0 0 312 300 C312 268 274 228 256 190 Z" fill="#EF5350"/>
-  <!-- Shine on droplet -->
-  <ellipse cx="237" cy="263" rx="14" ry="24" fill="white" opacity="0.25" transform="rotate(-20 237 263)"/>
-  <!-- Separator line -->
-  <line x1="140" y1="388" x2="372" y2="388" stroke="white" stroke-width="1.5" opacity="0.35"/>
-  <!-- App name -->
-  <text x="256" y="418" text-anchor="middle" font-family="Arial, sans-serif"
-    font-size="38" font-weight="900" fill="white" letter-spacing="4">VITARA</text>
-  <!-- Tagline -->
-  <text x="256" y="452" text-anchor="middle" font-family="Georgia, serif"
-    font-size="22" font-style="italic" fill="white" opacity="0.85">Inspired by Arya</text>
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="icon-title icon-desc">
+  <title id="icon-title">Divvy - 6299 Home Finance</title>
+  <desc id="icon-desc">A green house with the number 6299 inside and a pink piggy bank in front, representing shared home finances.</desc>
+
+  <defs>
+    <style>
+      .house-fill   { fill: #237a49; }
+      .white-line   { stroke: #ffffff; stroke-width: 10; stroke-linejoin: round; stroke-linecap: round; fill: none; }
+      .num          { fill: #ffffff; font-family: Arial, Helvetica, sans-serif; font-weight: 800; font-size: 88px; }
+      .label        { fill: #237a49; font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 6; }
+      .pig-body     { fill: #ef8fa1; }
+      .pig-shadow   { fill: #e77f92; }
+      .pig-light    { fill: #f5a5b2; }
+      .pig-outline  { stroke: #ffffff; stroke-width: 7; stroke-linejoin: round; stroke-linecap: round; }
+      .pig-green    { stroke: #237a49; stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; fill: none; }
+      .pig-dark     { fill: #2f2f2f; }
+      .pig-nostril  { stroke: #d76e83; stroke-width: 3; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <!-- Background: white rounded square. id="icon-bg" used by regen script for maskable variant -->
+  <rect id="icon-bg" width="512" height="512" rx="72" fill="#ffffff"/>
+
+  <!-- House -->
+  <path class="house-fill" d="M91 215 L256 125 L321 159 L321 147 L355 147 L355 178 L421 215 L387 215 L387 364 L125 364 L125 215 Z"/>
+  <path class="white-line" d="M133 214 L256 151 L379 214"/>
+  <path class="white-line" d="M141 225 L141 349 L371 349 L371 225"/>
+
+  <!-- 6299 (white on green house body) -->
+  <text x="256" y="279" text-anchor="middle" class="num">6299</text>
+
+  <!-- Falling coin with motion trail -->
+  <line x1="326" y1="270" x2="326" y2="280" stroke="#B8860B" stroke-width="2" stroke-dasharray="3 3" opacity="0.7"/>
+  <circle cx="326" cy="295" r="13" fill="#FFD700"/>
+  <circle cx="326" cy="295" r="8"  fill="none" stroke="#B8860B" stroke-width="2.5"/>
+
+  <!-- Pig (sits over the house base) -->
+  <g transform="translate(0,8)">
+    <!-- Drop shadow -->
+    <ellipse cx="252" cy="357" rx="94" ry="14" class="pig-shadow" opacity="0.22"/>
+    <!-- Body -->
+    <ellipse cx="255" cy="320" rx="82" ry="58" class="pig-body pig-outline"/>
+    <!-- Top highlight -->
+    <ellipse cx="273" cy="304" rx="48" ry="18" class="pig-light" opacity="0.35"/>
+    <!-- Snout -->
+    <ellipse cx="181" cy="325" rx="25" ry="22" class="pig-body pig-outline"/>
+    <line x1="173" y1="317" x2="173" y2="333" class="pig-nostril"/>
+    <line x1="183" y1="317" x2="183" y2="333" class="pig-nostril"/>
+    <!-- Ear -->
+    <path d="M212 268 L228 246 L244 271 Z" class="pig-body pig-outline"/>
+    <!-- Legs -->
+    <rect x="214" y="367" width="24" height="35" rx="9" class="pig-body pig-outline"/>
+    <rect x="296" y="367" width="24" height="35" rx="9" class="pig-body pig-outline"/>
+    <!-- Eye -->
+    <circle cx="204" cy="309" r="7" class="pig-dark"/>
+    <circle cx="206" cy="307" r="2" fill="white" opacity="0.7"/>
+    <!-- Coin slot -->
+    <rect x="235" y="276" width="50" height="10" rx="5" class="pig-dark"/>
+    <!-- Tail -->
+    <path d="M335 329 C347 320,356 324,356 334 C356 343,348 347,341 342 C335 338,335 329,341 323 C350 314,367 317,369 333"
+          class="pig-outline" fill="none"/>
+    <!-- Green accent arc along base -->
+    <path d="M168 349 C175 381,328 384,339 352" class="pig-green"/>
+  </g>
+
+  <!-- DIVVY wordmark -->
+  <text x="256" y="500" text-anchor="middle" class="label">DIVVY</text>
 </svg>

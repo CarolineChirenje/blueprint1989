@@ -7,7 +7,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Vitara.Api": {
+    "Divvy.Api": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
