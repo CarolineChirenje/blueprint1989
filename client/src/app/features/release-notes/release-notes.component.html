@@ -1,0 +1,139 @@
+<div class="rn-page">
+
+  <!-- Release List -->
+  <div class="rn-content">
+    <mat-accordion class="rn-accordion" multi="false">
+
+      <mat-expansion-panel
+        *ngFor="let release of releases; let first = first"
+        [expanded]="first"
+        class="rn-panel">
+
+        <!-- Panel Header -->
+        <mat-expansion-panel-header class="rn-panel-header">
+          <mat-panel-title class="rn-panel-title">
+            <span class="rn-panel-version">v{{ release.version }}</span>
+            <mat-chip class="rn-status-chip" [ngClass]="'status-' + release.status">
+              {{ release.status | titlecase }}
+            </mat-chip>
+          </mat-panel-title>
+          <mat-panel-description class="rn-panel-description">
+            <mat-icon class="rn-date-icon">calendar_today</mat-icon>
+            {{ release.date | date:'d MMMM yyyy' }}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!-- Summary -->
+        <div class="rn-summary">
+          <mat-icon class="rn-summary-icon">info_outline</mat-icon>
+          <p class="rn-summary-text">{{ release.summary }}</p>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Change Sections -->
+        <div class="rn-sections">
+          <div
+            *ngFor="let section of release.sections"
+            class="rn-section">
+
+            <!-- Section Header -->
+            <div class="rn-section-header" [ngClass]="getTypeClass(section.type)">
+              <mat-icon class="rn-section-icon">{{ section.icon }}</mat-icon>
+              <span class="rn-section-label">{{ section.label }}</span>
+            </div>
+
+            <!-- Change Items -->
+            <mat-card
+              *ngFor="let item of section.items"
+              class="rn-item-card"
+              appearance="outlined">
+
+              <mat-card-content class="rn-item-content">
+                <div class="rn-item-title-row">
+                  <span class="rn-item-title">{{ item.title }}</span>
+                </div>
+                <p class="rn-item-description">{{ item.description }}</p>
+
+                <!-- Technical Detail -->
+                <div *ngIf="item.technical" class="rn-technical-block">
+                  <div class="rn-technical-header">
+                    <mat-icon class="rn-technical-icon">code</mat-icon>
+                    <span class="rn-technical-label">Technical Detail</span>
+                  </div>
+                  <p class="rn-technical-text">{{ item.technical }}</p>
+                </div>
+              </mat-card-content>
+
+            </mat-card>
+          </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <ng-container *ngIf="release.techStack">
+          <mat-divider></mat-divider>
+          <div class="rn-tech-stack">
+            <div class="rn-tech-stack-header">
+              <mat-icon>layers</mat-icon>
+              <span>Tech Stack</span>
+            </div>
+            <div class="rn-tech-groups">
+
+              <div *ngIf="release.techStack.frontend?.length" class="rn-tech-group">
+                <span class="rn-tech-group-label">
+                  <mat-icon class="rn-tech-label-icon">web</mat-icon>
+                  Frontend
+                </span>
+                <div class="rn-chip-row">
+                  <mat-chip *ngFor="let t of release.techStack.frontend" class="rn-tech-chip">{{ t }}</mat-chip>
+                </div>
+              </div>
+
+              <div *ngIf="release.techStack.backend?.length" class="rn-tech-group">
+                <span class="rn-tech-group-label">
+                  <mat-icon class="rn-tech-label-icon">dns</mat-icon>
+                  Backend
+                </span>
+                <div class="rn-chip-row">
+                  <mat-chip *ngFor="let t of release.techStack.backend" class="rn-tech-chip">{{ t }}</mat-chip>
+                </div>
+              </div>
+
+              <div *ngIf="release.techStack.infrastructure?.length" class="rn-tech-group">
+                <span class="rn-tech-group-label">
+                  <mat-icon class="rn-tech-label-icon">cloud</mat-icon>
+                  Infrastructure
+                </span>
+                <div class="rn-chip-row">
+                  <mat-chip *ngFor="let t of release.techStack.infrastructure" class="rn-tech-chip">{{ t }}</mat-chip>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </ng-container>
+
+      </mat-expansion-panel>
+
+    </mat-accordion>
+  </div>
+
+  <!-- Developer Wiki Link -->
+  <div *ngIf="canViewDocs" class="rn-wiki-banner">
+    <mat-icon class="rn-wiki-icon">menu_book</mat-icon>
+    <div class="rn-wiki-text">
+      <span class="rn-wiki-title">Developer Documentation</span>
+      <span class="rn-wiki-subtitle">In-depth technical docs for every feature — backend &amp; frontend.</span>
+    </div>
+    <a
+      [href]="docsUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      mat-stroked-button
+      class="rn-wiki-btn">
+      <mat-icon>open_in_new</mat-icon>
+      View Wiki
+    </a>
+  </div>
+
+</div>

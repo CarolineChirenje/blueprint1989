@@ -1,0 +1,164 @@
+<div class="detail-page">
+  @if (loading) {
+    <div class="loading">Loading…</div>
+  } @else if (error) {
+    <div class="error-msg">{{ error }} <button mat-button (click)="back()">Back</button></div>
+  } @else if (cycle) {
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <button mat-icon-button (click)="back()" aria-label="Back">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h1>{{ cycle.name }}</h1>
+          <span class="date-range">{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="badge" [ngClass]="cycle.status === 'Active' ? 'badge-active' : 'badge-closed'">{{ cycle.status }}</span>
+        @if (isAdmin && isActive()) {
+          <button mat-stroked-button color="warn" (click)="closeCycle()">Close Cycle</button>
+        }
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button [class.active]="activeTab==='expenses'" (click)="activeTab='expenses'">
+        Expenses ({{ expenses.length }})
+      </button>
+      <button [class.active]="activeTab==='payments'" (click)="activeTab='payments'">
+        Payments ({{ payments.length }})
+      </button>
+      <button [class.active]="activeTab==='balance'" (click)="activeTab='balance'">
+        Balance
+      </button>
+      <button [class.active]="activeTab==='members'" (click)="activeTab='members'">
+        Members ({{ cycle.members.length }})
+      </button>
+    </div>
+
+    <!-- Expenses Tab -->
+    @if (activeTab === 'expenses') {
+      <div class="tab-content">
+        @if (isActive()) {
+          <div class="tab-actions">
+            <button mat-raised-button color="primary" (click)="openAddExpense()">
+              <mat-icon>add</mat-icon> Add Expense
+            </button>
+          </div>
+        }
+        @if (expenses.length === 0) {
+          <div class="empty-state">No expenses yet.</div>
+        } @else {
+          <div class="expense-list">
+            @for (expense of expenses; track expense.id) {
+              <div class="expense-item">
+                <div class="expense-main">
+                  <span class="expense-title">{{ expense.title }}</span>
+                  <span class="expense-amount">${{ expense.amount | number:'1.2-2' }}</span>
+                </div>
+                <div class="expense-meta">
+                  <span class="category-badge">{{ expense.category }}</span>
+                  <span>Paid by {{ expense.paidByName }}</span>
+                  <span>{{ expense.createdAt | date:'mediumDate' }}</span>
+                  @if (expense.notes) {
+                    <span class="expense-notes">{{ expense.notes }}</span>
+                  }
+                </div>
+                <div class="obligation-list">
+                  @for (ob of expense.obligations; track ob.id) {
+                    <span class="obligation" [class.settled]="ob.isSettled">
+                      {{ ob.firstName }} owes ${{ ob.amountOwed | number:'1.2-2' }}
+                      @if (ob.isSettled) { <mat-icon class="settled-icon">check_circle</mat-icon> }
+                    </span>
+                  }
+                </div>
+                @if (isActive() && (isAdmin || expense.paidByUserId === currentUserId)) {
+                  <button mat-icon-button color="warn" (click)="deleteExpense(expense.id)" aria-label="Delete expense">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Payments Tab -->
+    @if (activeTab === 'payments') {
+      <div class="tab-content">
+        @if (isActive()) {
+          <div class="tab-actions">
+            <button mat-raised-button color="primary" (click)="openAddPayment()">
+              <mat-icon>send</mat-icon> Send Payment
+            </button>
+          </div>
+        }
+        @if (payments.length === 0) {
+          <div class="empty-state">No payments yet.</div>
+        } @else {
+          <div class="payment-list">
+            @for (payment of payments; track payment.id) {
+              <div class="payment-item">
+                <div class="payment-main">
+                  <span>{{ payment.payerFirstName }} → {{ payment.payeeFirstName }}</span>
+                  <span class="payment-amount">${{ payment.amount | number:'1.2-2' }}</span>
+                  <span class="status-badge" [ngClass]="'status-' + payment.status.toLowerCase()">{{ payment.status }}</span>
+                </div>
+                @if (payment.notes) {
+                  <div class="payment-notes">{{ payment.notes }}</div>
+                }
+                <div class="payment-date">{{ payment.createdAt | date:'mediumDate' }}</div>
+                <div class="payment-actions">
+                  @if (payment.status === 'Pending' && isPayee(payment)) {
+                    <button mat-stroked-button color="primary" (click)="openRespondPayment(payment)">Respond</button>
+                  }
+                  @if (payment.status === 'Pending' && isPayer(payment)) {
+                    <button mat-icon-button color="warn" (click)="deletePayment(payment.id)" aria-label="Cancel payment">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Balance Tab -->
+    @if (activeTab === 'balance') {
+      <div class="tab-content">
+        @if (!balance || balance.balances.length === 0) {
+          <div class="empty-state">All settled up!</div>
+        } @else {
+          <div class="balance-list">
+            @for (b of balance.balances; track b.userId) {
+              <div class="balance-item" [ngClass]="netBalanceClass(b.netBalance)">
+                <span class="balance-name">{{ b.firstName }} {{ b.lastName }}</span>
+                <span class="balance-amount">{{ netBalanceLabel(b.netBalance) }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Members Tab -->
+    @if (activeTab === 'members') {
+      <div class="tab-content">
+        <div class="member-list">
+          @for (m of cycle.members; track m.userId) {
+            <div class="member-item">
+              <span class="member-name">{{ m.firstName }} {{ m.lastName }}</span>
+              <span class="member-email">{{ m.email }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

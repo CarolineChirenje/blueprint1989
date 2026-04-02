@@ -1,0 +1,19 @@
+name: Weekly Supply Report
+
+on:
+  schedule:
+    # Every Saturday morning Melbourne time (AEDT UTC+11 / AEST UTC+10)
+    # Friday 22:00 UTC = Saturday 08:00 AEST / 09:00 AEDT
+    - cron: '0 22 * * 5'
+  workflow_dispatch:   # Allow manual trigger from GitHub UI
+
+jobs:
+  send-supply-report:
+    name: Send Weekly Supply Report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger supply report endpoint
+        run: |
+          curl --fail --silent --show-error \
+            -X POST "${{ vars.VITARA_API_URL }}/api/supply-report/send" \
+            -H "Authorization: Bearer ${{ secrets.SUPPLY_REPORT_TOKEN }}"

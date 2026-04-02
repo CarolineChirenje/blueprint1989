@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>New Expense Cycle</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    @if (error) { <div class="form-error">{{ error }}</div> }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cycle Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g. April 2026 House Expenses">
+    </mat-form-field>
+
+    <div class="date-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Start Date</mat-label>
+        <input matInput type="date" formControlName="startDate">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>End Date</mat-label>
+        <input matInput type="date" formControlName="endDate">
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Members</mat-label>
+      <mat-select formControlName="memberIds" multiple>
+        @for (user of users; track user.id) {
+          <mat-option [value]="user.id">{{ user.firstName }} {{ user.lastName }} ({{ user.email }})</mat-option>
+        }
+      </mat-select>
+      <mat-hint>Select all members who share expenses in this cycle</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || saving">
+    {{ saving ? 'Creating…' : 'Create Cycle' }}
+  </button>
+</mat-dialog-actions>

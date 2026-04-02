@@ -1,0 +1,67 @@
+site_name: Vitara Technical Docs
+site_description: Technical documentation for the Vitara health management platform
+site_author: Vitara Team
+docs_dir: "docs/technical documents"
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: light blue
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: Home.md
+  - Authentication:
+    - Authentication: Authentication.md
+    - Biometric Authentication: Biometric-Authentication.md
+  - Clinical Features:
+    - BGL Assessment: BGL-Assessment.md
+    - Blood Pressure Monitoring: Blood-Pressure-Monitoring.md
+    - Incidents (Diabetes): Incidents-Diabetes.md
+    - Incidents (Blood Pressure): Incidents-Blood-Pressure.md
+    - Meal Entry: Meal-Entry.md
+  - Core Features:
+    - Dashboard: Dashboard.md
+    - Profile: Profile.md
+    - Care Recipients: Care-Recipients.md
+    - Notifications: Notifications.md
+    - Supplies: Supplies.md
+    - Offline Queue: Offline-Queue.md
+  - Admin:
+    - Management: Management.md
+    - Classification Management: Classification-Management.md
+    - Cycles & Terms: Cycles-Terms.md
+    - Feature & Bug Reports: Feature-Bug-Reports.md
+    - App Configuration: App-Configuration.md
+  - Infrastructure:
+    - Push Notifications: Push-Notifications.md
+    - Export & Reports: Export-Reports.md
+    - Google Drive Integration: Google-Drive-Integration.md
+    - Cloudflare Wiki: Cloudflare-Wiki.md
+  - Business:
+    - Business Overview: Business-Overview.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - codehilite
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true

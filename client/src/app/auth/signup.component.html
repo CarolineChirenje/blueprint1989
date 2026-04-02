@@ -1,0 +1,238 @@
+<div class="signup-card">
+  <h1>Create Account</h1>
+
+  @if (signupSuccess) {
+    <div class="success-message">
+      <div class="success-icon">✓</div>
+      <h2>Account Created Successfully...</h2>
+      <p>Your account has been created. Secure it with Two-Factor Authentication?</p>
+      <div class="mfa-prompt">
+        <div class="mfa-info">
+          <span class="shield-icon">🛡️</span>
+          <h3>Recommended: Enable Two-Factor Authentication</h3>
+          <p>Add an extra layer of security by using your phone to verify logins.</p>
+        </div>
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="setupMfaNow()">Set Up Now (Recommended)</button>
+          <button type="button" class="btn btn-secondary" (click)="skipMfa()">Skip for Now</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    @if (errorMsg) {
+      <div class="error-message">
+        <div class="error-icon">✕</div>
+        <h2>Sign Up Failed</h2>
+        <p>{{ errorMsg }}</p>
+        <button type="button" class="retry-btn" (click)="errorMsg = ''">Try Again</button>
+      </div>
+    } @else {
+      <form [formGroup]="signupForm" (ngSubmit)="submit()">
+
+        <!-- Step 1: Role Selection -->
+        <div class="form-section">
+          <label class="section-label">I am a... <span class="required">*</span></label>
+          <div class="role-picker">
+            @for (opt of roleOptions; track opt.value) {
+              <label
+                class="role-card"
+                [class.selected]="selectedRole === opt.value"
+              >
+                <input
+                  type="radio"
+                  formControlName="role"
+                  [value]="opt.value"
+                  class="sr-only"
+                />
+                <span class="role-card-icon material-icons" [style.color]="opt.color" aria-hidden="true">{{ opt.icon }}</span>
+                <span class="role-card-title">{{ opt.label }}</span>
+                <span class="role-card-desc">{{ opt.description }}</span>
+              </label>
+            }
+          </div>
+          @if (signupForm.get('role')?.invalid && signupForm.get('role')?.touched) {
+            <div class="error">Please select a role</div>
+          }
+        </div>
+
+        @if (selectedRole !== null) {
+          <!-- Common fields -->
+          <div class="form-section">
+            <label>First Name <span class="required">*</span></label>
+            <input type="text" formControlName="firstName" placeholder="First name" />
+            @if (signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched) {
+              <div class="error">First name is required</div>
+            }
+
+            <label>Last Name <span class="required">*</span></label>
+            <input type="text" formControlName="lastName" placeholder="Last name" />
+            @if (signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched) {
+              <div class="error">Last name is required</div>
+            }
+
+            <label>Email <span class="required">*</span></label>
+            <input type="email" formControlName="email" placeholder="email@example.com" />
+            @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
+              <div class="error">Valid email is required</div>
+            }
+
+            <label>Password <span class="required">*</span></label>
+            <app-password-field formControlName="password" placeholder="At least 8 characters" [autocomplete]="'new-password'"></app-password-field>
+            @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
+              <div class="error">Password must be at least 8 characters with uppercase, lowercase and a number</div>
+            }
+
+            <label>Confirm Password <span class="required">*</span></label>
+            <app-password-field formControlName="confirmPassword" placeholder="Repeat password" [autocomplete]="'new-password'"></app-password-field>
+            @if (signupForm.errors?.['mismatch'] && signupForm.get('confirmPassword')?.touched) {
+              <div class="error">Passwords do not match</div>
+            }
+          </div>
+
+          @if (isSupportOrCarer) {
+            <div class="form-section conditional-section">
+              <h3 class="conditional-heading">Link to Care Recipient</h3>
+              <p class="conditional-hint">
+                Enter the email address of the Care Recipient this account will be linked to.
+                The Care Recipient must already have an account in the system.
+              </p>
+              <label>Care Recipient Email <span class="required">*</span></label>
+              <input type="email" formControlName="careRecipientEmail" placeholder="carerecipient@example.com" />
+              @if (signupForm.get('careRecipientEmail')?.invalid && signupForm.get('careRecipientEmail')?.touched) {
+                <div class="error">A valid Care Recipient email is required</div>
+              }
+            </div>
+          }
+
+          <!-- Care Recipient: profile fields -->
+          @if (isCareRecipient) {
+            <div class="form-section conditional-section">
+              <h3 class="conditional-heading">Care Recipient Profile</h3>
+
+              <label>Date of Birth</label>
+              <input type="date" formControlName="dateOfBirth" />
+
+              <label>Gender</label>
+              <select formControlName="gender">
+                <option [ngValue]="null">-- Select gender --</option>
+                @for (opt of genderOptions; track opt.value) {
+                  <option [ngValue]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+
+              <label>Height (cm) <span class="conditional-hint">– optional, used to calculate BMI</span></label>
+              <input type="number" formControlName="heightCm" step="0.5" min="50" max="300" placeholder="e.g. 170" />
+              @if (signupForm.get('heightCm')?.invalid && signupForm.get('heightCm')?.touched) {
+                <div class="error">Height must be between 50 and 300 cm.</div>
+              }
+
+              <label class="section-sublabel">Health Conditions</label>
+              <p class="conditional-hint">Select the conditions you have been diagnosed with.</p>
+              <div formArrayName="conditions">
+                @for (ctrl of conditionArray.controls; track $index) {
+                  <div [formGroupName]="$index" class="condition-row-signup">
+                    <label class="checkbox-label">
+                      <input type="checkbox" formControlName="selected" />
+                      {{ ctrl.value.label }}
+                    </label>
+                    @if (ctrl.value.selected) {
+                      <input type="number" formControlName="yearDiagnosed"
+                             placeholder="Year diagnosed (optional)" min="1900" [max]="2100"
+                             class="year-input" />
+                    }
+                  </div>
+                }
+              </div>
+
+              @if (hasHbpSelected) {
+                <div class="medication-section">
+                  <h4 class="medication-heading">Current BP Medication (optional)</h4>
+                  <p class="conditional-hint">You can add or update medications later in your profile.</p>
+
+                  <label>Medication Name</label>
+                  <input type="text" formControlName="medicationName" placeholder="e.g. Amlodipine" />
+
+                  <div class="med-row">
+                    <div class="med-col">
+                      <label>Dose</label>
+                      <input type="text" formControlName="medicationDose" placeholder="e.g. 5" />
+                    </div>
+                    <div class="med-col">
+                      <label>Unit</label>
+                      <input type="text" formControlName="medicationDoseUnit" placeholder="e.g. mg" />
+                    </div>
+                  </div>
+
+                  <label>Frequency</label>
+                  <input type="text" formControlName="medicationFrequency" placeholder="e.g. Once daily" />
+                </div>
+              }
+
+              @if (hasDiabetesSelected) {
+                <div class="medication-section">
+                  <h4 class="medication-heading">Current Diabetes Medication (optional)</h4>
+                  <p class="conditional-hint">You can add or update diabetes medications later in your profile.</p>
+
+                  <label>Medication Name</label>
+                  <input type="text" formControlName="diabetesMedName" placeholder="e.g. Metformin, Insulin Glargine" />
+
+                  <label>Delivery Route</label>
+                  <div class="radio-options">
+                    @for (route of DELIVERY_ROUTES; track route.value) {
+                      <label class="radio-label">
+                        <input type="radio" formControlName="diabetesDeliveryRoute" [value]="route.value" />
+                        {{ route.label }}
+                      </label>
+                    }
+                  </div>
+
+                  @if (hasInjectionSelected) {
+                    <label>Insulin Delivery Method</label>
+                    <div class="radio-options">
+                      @for (method of INSULIN_METHODS; track method.value) {
+                        <label class="radio-label">
+                          <input type="radio" formControlName="diabetesInsulinMethod" [value]="method.value" />
+                          {{ method.label }}
+                        </label>
+                      }
+                    </div>
+
+                    @if (hasPumpSelected) {
+                      <label>Pump Name (optional)</label>
+                      <input type="text" formControlName="diabetesPumpName" placeholder="e.g. Omnipod DASH" />
+                    }
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Administrator: PIN -->
+          @if (isAdmin) {
+            <div class="form-section conditional-section">
+              <h3 class="conditional-heading">Administrator Verification</h3>
+              <p class="conditional-hint">
+                You must provide the administration PIN to create an Admin account.
+              </p>
+              <label>Admin PIN <span class="required">*</span></label>
+              <input type="password" formControlName="adminPin" placeholder="Enter administration PIN" />
+              @if (signupForm.get('adminPin')?.invalid && signupForm.get('adminPin')?.touched) {
+                <div class="error">Admin PIN is required</div>
+              }
+            </div>
+          }
+
+          <button
+            type="submit"
+            class="submit-btn submit-btn-blue"
+            [disabled]="signupForm.invalid || isSubmitting"
+          >
+            {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
+          </button>
+        }
+
+      </form>
+      <a routerLink="/login">Already have an account? Login</a>
+    }
+  }
+</div>

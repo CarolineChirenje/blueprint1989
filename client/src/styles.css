@@ -1,0 +1,739 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import 'shepherd.js/dist/css/shepherd.css';
+
+/* ── Shepherd.js Tour Theme (Vitara Blue) ──────────────────────────────── */
+.shepherd-has-cancel-icon .shepherd-cancel-icon {
+  color: #666;
+}
+.shepherd-has-cancel-icon .shepherd-cancel-icon:hover {
+  color: #333;
+}
+
+.shepherd-element {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 86, 179, 0.18) !important;
+  border: 1px solid var(--border-blue) !important;
+  max-width: 340px !important;
+  font-family: inherit !important;
+}
+
+.shepherd-element.shepherd-mobile {
+  max-width: min(92vw, 360px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  position: fixed !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.shepherd-header {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%) !important;
+  border-radius: 7px 7px 0 0 !important;
+  padding: 14px 16px 12px !important;
+}
+
+.shepherd-title {
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+.shepherd-text {
+  padding: 14px 16px !important;
+  color: var(--text-dark) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+}
+
+.shepherd-footer {
+  padding: 0 16px 14px !important;
+  gap: 8px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
+/* Primary (Next / Start / Done) */
+.shepherd-btn-primary {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 7px 18px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+}
+.shepherd-btn-primary:hover {
+  background: linear-gradient(135deg, #003d82 0%, #002855 100%) !important;
+}
+
+/* Secondary (Back) */
+.shepherd-btn-secondary {
+  background: transparent !important;
+  color: var(--primary-blue) !important;
+  border: 1px solid var(--primary-blue) !important;
+  border-radius: 4px !important;
+  padding: 6px 16px !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
+}
+.shepherd-btn-secondary:hover {
+  background: var(--light-blue) !important;
+}
+
+/* Skip */
+.shepherd-btn-skip {
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border: none !important;
+  padding: 6px 10px !important;
+  font-size: 0.8rem !important;
+  cursor: pointer !important;
+  margin-right: auto !important;
+}
+.shepherd-btn-skip:hover {
+  color: var(--text-dark) !important;
+  text-decoration: underline !important;
+}
+
+/* Welcome / finish steps — slightly wider */
+.shepherd-welcome.shepherd-element {
+  max-width: 380px !important;
+}
+
+/* Inspired by Arya step */
+.shepherd-inspired.shepherd-element {
+  max-width: 320px !important;
+  text-align: center !important;
+}
+.shepherd-inspired .shepherd-title {
+  font-size: 1.2rem !important;
+  letter-spacing: 0.01em !important;
+  justify-content: center !important;
+}
+.shepherd-inspired .shepherd-text {
+  text-align: center !important;
+  padding: 8px 16px 12px !important;
+}
+.shepherd-inspired .shepherd-footer {
+  justify-content: center !important;
+}
+.inspired-heart {
+  font-size: 4rem;
+  display: block;
+  margin: 0 auto 10px;
+  animation: inspired-heartbeat 1.4s ease-in-out infinite;
+  transform-origin: center;
+  line-height: 1;
+}
+.inspired-tagline {
+  font-size: 0.88rem;
+  color: #555;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+@keyframes inspired-heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.2); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.12); }
+  70%       { transform: scale(1); }
+}
+
+/* Modal overlay */
+.shepherd-modal-overlay-container .shepherd-modal-overlay {
+  fill: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Arrow */
+.shepherd-arrow::before {
+  background: #0056b3 !important;
+}
+
+/* Responsive: ensure nav steps don't go off-screen on small viewports */
+@media (max-width: 767px) {
+  .shepherd-element:not(.shepherd-mobile) {
+    max-width: 92vw !important;
+  }
+}
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.submit-btn-blue {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%) !important;
+  color: white;
+}
+
+.submit-btn-blue:hover:not(:disabled) {
+  background: linear-gradient(135deg, #003d82 0%, #002855 100%) !important;
+}
+
+.submit-btn-green {
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%) !important;
+  color: white;
+}
+
+.submit-btn-green:hover:not(:disabled) {
+  background: linear-gradient(135deg, #218838 0%, #19692c 100%) !important;
+}
+/* Shared button and alert styles */
+.submit-btn {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.3);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #003d82 0%, #002855 100%);
+  box-shadow: 0 4px 12px rgba(0, 86, 179, 0.4);
+  transform: translateY(-2px);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 86, 179, 0.2);
+}
+
+.submit-btn:disabled {
+  background: #b3d9ff;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.text-danger {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  align-self: safe;
+}
+/* Global Styles - Blue Theme */
+
+/* Color Variables */
+:root {
+  color-scheme: light;
+  --primary-blue: #0056b3;
+  --primary-dark: #003d82;
+  --primary-darkest: #002855;
+  --light-blue: #e8f1f7;
+  --pale-blue: #f0f4f8;
+  --border-blue: #b3d9ff;
+  --sky-blue: #7db8ff;
+  --text-dark: #333;
+  --text-muted: #666;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ── Global Force-Dark prevention ──────────────────────────────────────────
+   Chrome Android "Force Dark" auto-inverts colours on native form controls
+   and Angular Material elements. color-scheme: light opts them out entirely.
+────────────────────────────────────────────────────────────────────────── */
+input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #333333;
+}
+
+/* Angular Material MDC form fields, selects, options, autocomplete */
+.mat-mdc-form-field,
+.mat-mdc-text-field-wrapper,
+.mat-mdc-input-element,
+.mat-mdc-select,
+.mat-mdc-select-trigger,
+.mat-mdc-select-value,
+.mat-mdc-option,
+.mat-mdc-autocomplete-panel,
+.mdc-text-field,
+.mdc-text-field--filled,
+.mdc-text-field--outlined {
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+  color: #333333 !important;
+}
+
+.mat-mdc-select-panel {
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+}
+
+.mat-mdc-option .mdc-list-item__primary-text {
+  color: #333333 !important;
+}
+
+html, body {
+  color-scheme: light;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-dark);
+  background: linear-gradient(135deg, var(--pale-blue) 0%, var(--light-blue) 100%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary-dark);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover,
+a:focus {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Container */
+.container {
+  width: min(90%, 1200px);
+  margin: auto;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.2);
+}
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+  color: white;
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: auto;
+  box-shadow: 0 -2px 8px rgba(0, 86, 179, 0.2);
+}
+
+/* Buttons */
+.button {
+  display: inline-block;
+  font-size: 1rem;
+  color: white;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.3);
+  font-weight: 600;
+}
+
+.button:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-darkest) 100%);
+  box-shadow: 0 4px 12px rgba(0, 86, 179, 0.4);
+  transform: translateY(-2px);
+}
+
+.button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 86, 179, 0.2);
+}
+
+.button:disabled {
+  background: var(--border-blue);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button.secondary {
+  background: linear-gradient(135deg, var(--sky-blue) 0%, var(--border-blue) 100%);
+  color: var(--primary-dark);
+}
+
+.button.danger {
+  background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+}
+
+/* Form Elements */
+.input-field,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 2px solid var(--border-blue);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  background-color: #f8fbff;
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+/* Section/Cards */
+.section,
+.card {
+  background: white;
+  padding: 2rem;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.1);
+  border-left: 5px solid var(--primary-blue);
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 86, 179, 0.15);
+}
+
+/* Comments Section */
+.comment-section {
+  margin-top: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.1);
+  border-left: 5px solid var(--primary-blue);
+}
+
+.comment {
+  padding: 1rem;
+  margin: 0.5rem 0;
+  background-color: var(--pale-blue);
+  border-radius: 4px;
+  border-left: 3px solid var(--primary-blue);
+}
+
+.comment-author {
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.comment-date {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.1);
+}
+
+thead {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-dark) 100%);
+}
+
+th {
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e7ff;
+}
+
+tbody tr:hover {
+  background-color: var(--pale-blue);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Messages */
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border-left: 5px solid #28a745;
+}
+
+.error,
+.danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border-left: 5px solid #dc3545;
+}
+
+.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border-left: 5px solid #ffc107;
+}
+
+.info {
+  background-color: #e7f3ff;
+  color: #004085;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border-left: 5px solid var(--primary-blue);
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: linear-gradient(135deg, #1a2f4d 0%, #0d1f33 100%);
+    color: #e0e7ff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #7db8ff;
+  }
+
+  .section,
+  .card,
+  .comment-section {
+    background: #1a2f4d;
+    border-left-color: #7db8ff;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select,
+  textarea {
+    background-color: #0d1f33;
+    border-color: #003d82;
+    color: #e0e7ff;
+  }
+
+  .comment {
+    background-color: #0d1f33;
+    color: #e0e7ff;
+  }
+
+  table {
+    background: #1a2f4d;
+  }
+
+  tbody tr:hover {
+    background-color: #0d1f33;
+  }
+
+  td {
+    border-bottom-color: #003d82;
+  }
+
+}
+
+/* Material Dialog Customization */
+.custom-dialog-container .mat-mdc-dialog-container {
+  padding: 24px;
+  overflow: visible;
+}
+
+.custom-dialog-container .mat-mdc-dialog-surface {
+  overflow: visible;
+}
+
+/* Mobile dialog — anchored near bottom with rounded top corners */
+.mobile-dialog .mat-mdc-dialog-container {
+  padding: 16px;
+  border-radius: 12px !important;
+}
+
+.mobile-dialog .mat-mdc-dialog-surface {
+  border-radius: 12px !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  overflow-y: visible !important;
+}
+
+.mat-mdc-dialog-content {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* Ensure dialog title styling */
+.mat-mdc-dialog-title {
+  padding: 0 !important;
+  margin-bottom: 16px;
+}
+
+/* Ensure dialog content doesn't scroll */
+.mat-mdc-dialog-content:not(.mat-mdc-dialog-content-scroll) {
+  overflow-y: visible !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE + TABLET RESPONSIVE — all rules here are additive only.
+   Desktop experience is unchanged (≥1024px).
+   Covers: phones (≤767px), tablets portrait+landscape (768–1023px).
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  /* Prevent iOS Safari zoom-on-focus (input font-size must be ≥16px) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Scale down oversized page headings */
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.2rem !important; }
+
+  /* Reduce the 2rem main padding so content fills the screen */
+  main { padding: 0.75rem !important; }
+
+  /* Material dialogs: constrain to mobile viewport width */
+  .mat-mdc-dialog-container,
+  .mat-dialog-container {
+    max-width: 95vw !important;
+    width: 95vw !important;
+  }
+
+  /* Full-screen dialog (used for supply form on mobile) */
+  .full-screen-dialog .mat-mdc-dialog-container,
+  .full-screen-dialog .mat-dialog-container {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Utility class: sticky submit bar (opt-in per form component) */
+  .mobile-sticky-actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 0.875rem 1rem;
+    margin: 1rem -1rem -1rem;
+    box-shadow: 0 -2px 8px rgba(0, 86, 179, 0.18);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mobile-sticky-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   REPORT DIALOG — panel class applied to all report dialogs.
+   The MDC dialog surface has no default padding, so the component
+   manages its own header/body/actions padding.
+   ═══════════════════════════════════════════════════════ */
+.report-dialog .mat-mdc-dialog-surface {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}

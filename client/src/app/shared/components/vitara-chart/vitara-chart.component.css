@@ -1,0 +1,36 @@
+.vitara-chart-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid #3949ab;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.vitara-chart-header {
+  background: linear-gradient(135deg, #1a237e, #3949ab);
+  color: #fff;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.vitara-chart-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.vitara-chart-body {
+  padding: 1rem;
+  height: 350px;
+  position: relative;
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+  .vitara-chart-body {
+    height: 250px;
+    padding: 0.75rem;
+  }
+}

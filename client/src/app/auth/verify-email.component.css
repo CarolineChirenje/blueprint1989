@@ -1,0 +1,166 @@
+body { background: transparent; overflow-x: hidden; }
+
+/* Full-page layout copied locally so this component is self-contained. */
+.login-page {
+  margin: -2rem;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #003d82 0%, #0056b3 55%, #1a7fd4 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  color-scheme: light;
+  width: 100%;
+  max-width: 520px;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+.login-brand {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.login-logo {
+  width: 132px;
+  height: 132px;
+  display: block;
+  margin: 0 auto;
+}
+
+.verify-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0.5rem;
+  gap: 0.9rem;
+}
+
+.verify-icon {
+  font-size: 44px;
+  color: #0056b3;
+  line-height: 1;
+}
+
+.verify-icon.spin {
+  animation: spin 1.2s linear infinite;
+}
+
+.success-icon { color: #28a745; }
+.error-icon   { color: #dc3545; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.verify-panel h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.verify-panel p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.verify-panel button {
+  width: 100%;
+}
+
+.resend-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.resend-form label {
+  font-size: 0.88rem;
+  color: #555;
+}
+
+.resend-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #b3d9ff;
+  border-radius: 4px;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.resend-success { color: #1e7e34; font-weight: 500; }
+.resend-error   { color: #721c24; font-weight: 500; font-size: 0.88rem; }
+
+.submit-btn-outline {
+  background: white !important;
+  color: #0056b3 !important;
+  border: 2px solid #0056b3 !important;
+}
+
+.submit-btn-outline:hover {
+  background: #f0f8ff !important;
+  color: #003d82 !important;
+  border-color: #003d82 !important;
+}
+
+@media (max-width: 640px) {
+  .login-page {
+    margin: -1rem;
+    padding: 1.25rem 0.85rem;
+  }
+
+  .login-card {
+    padding: 1.15rem;
+    border-radius: 10px;
+    max-height: calc(100vh - 2.5rem);
+  }
+
+  .login-logo {
+    width: 96px;
+    height: 96px;
+  }
+
+  .verify-icon {
+    font-size: 38px;
+  }
+
+  .verify-panel h3 {
+    font-size: 1.02rem;
+  }
+
+  .verify-panel p,
+  .resend-form label,
+  .resend-error {
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .login-card {
+    max-width: 560px;
+    padding: 1.75rem 2rem;
+  }
+
+  .login-logo {
+    width: 116px;
+    height: 116px;
+  }
+
+  .verify-icon {
+    font-size: 40px;
+  }
+}

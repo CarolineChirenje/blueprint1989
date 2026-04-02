@@ -1,0 +1,56 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
+import { ExpenseCycleService } from '../../../../core/services/expense-cycle.service';
+import { AuthService } from '../../../../core/services/auth.service';
+
+interface UserOption { id: number; firstName: string; lastName: string; email: string; }
+
+@Component({
+  selector: 'app-create-cycle-dialog',
+  templateUrl: './create-cycle-dialog.component.html',
+  standalone: false
+})
+export class CreateCycleDialogComponent implements OnInit {
+  form: FormGroup;
+  users: UserOption[] = [];
+  saving = false;
+  error = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<CreateCycleDialogComponent>,
+    private cycleService: ExpenseCycleService,
+    private auth: AuthService,
+    private http: HttpClient
+  ) {
+    this.form = this.fb.group({
+      name:      ['', [Validators.required, Validators.maxLength(150)]],
+      startDate: ['', Validators.required],
+      endDate:   ['', Validators.required],
+      memberIds: [[], Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    this.http.get<UserOption[]>(`${environment.apiUrl}/auth/users`).subscribe({
+      next: users => this.users = users,
+      error: () => {}
+    });
+  }
+
+  submit(): void {
+    if (this.form.invalid) return;
+    this.saving = true;
+    this.error = '';
+    const { name, startDate, endDate, memberIds } = this.form.value;
+    this.cycleService.create({ name, startDate, endDate, memberUserIds: memberIds }).subscribe({
+      next: () => this.dialogRef.close(true),
+      error: err => { this.error = err.error?.message || 'Failed to create cycle.'; this.saving = false; }
+    });
+  }
+
+  cancel(): void { this.dialogRef.close(false); }
+}

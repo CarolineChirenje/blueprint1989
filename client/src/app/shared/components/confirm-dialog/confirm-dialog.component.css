@@ -1,0 +1,114 @@
+/* ─── Base (mobile-first) ─────────────────────────────────────────── */
+.confirm-dialog {
+  width: 100%;
+  box-sizing: border-box;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+h2 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+mat-dialog-content {
+  padding: 0 0 16px 0;
+  margin: 0;
+  overflow: visible;
+  max-height: none;
+}
+
+mat-dialog-content p {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+mat-dialog-content p:last-child {
+  margin-bottom: 0;
+}
+
+mat-dialog-actions {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: 8px;
+  padding: 12px 0 0 0;
+  margin: 0;
+  min-height: unset;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+mat-dialog-actions button {
+  width: 100%;
+  margin: 0;
+  min-width: unset;
+  font-weight: 500;
+}
+
+/* ─── Mobile explicit breakpoint (max-width: 599px) ────────────────── */
+@media (max-width: 599px) {
+  .confirm-dialog {
+    padding: 2px;
+    border-radius: 6px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  mat-dialog-content p {
+    font-size: 14px;
+  }
+}
+
+/* ─── Desktop (min-width: 600px) ────────────────────────────────────── */
+@media (min-width: 600px) {
+  .confirm-dialog {
+    max-width: 500px;
+    padding: 4px;
+  }
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  mat-dialog-content {
+    padding-bottom: 24px;
+  }
+
+  mat-dialog-content p {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  mat-dialog-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0;
+    padding: 16px 0 0 0;
+    margin: 0 -4px 0 0;
+    min-height: 48px;
+  }
+
+  mat-dialog-actions button {
+    width: auto;
+    min-width: 80px;
+    margin-left: 12px;
+    margin-right: 4px;
+  }
+
+  mat-dialog-actions button:first-child {
+    margin-left: 0;
+  }
+
+  mat-dialog-actions button:last-child {
+    margin-right: 12px;
+  }
+}

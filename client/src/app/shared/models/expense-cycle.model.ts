@@ -1,0 +1,86 @@
+export interface CycleMemberDto {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface MemberBalanceDto {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  netBalance: number;
+}
+
+export interface CycleBalanceDto {
+  cycleId: number;
+  cycleName: string;
+  balances: MemberBalanceDto[];
+}
+
+export interface ExpenseCycleSummaryDto {
+  id: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  memberCount: number;
+  expenseCount: number;
+  totalAmount: number;
+  createdAt: string;
+}
+
+export interface ExpenseCycleDto {
+  id: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  createdByUserId: number;
+  createdAt: string;
+  members: CycleMemberDto[];
+}
+
+export interface MemberObligationDto {
+  id: number;
+  expenseId: number;
+  userId: number;
+  firstName: string;
+  lastName: string;
+  amountOwed: number;
+  isSettled: boolean;
+  settledAt: string | null;
+}
+
+export interface ExpenseDto {
+  id: number;
+  expenseCycleId: number;
+  title: string;
+  amount: number;
+  category: string;
+  paidByUserId: number;
+  paidByName: string;
+  notes: string | null;
+  createdAt: string;
+  obligations: MemberObligationDto[];
+}
+
+export interface PaymentDto {
+  id: number;
+  payerId: number;
+  payerFirstName: string;
+  payerLastName: string;
+  payeeId: number;
+  payeeFirstName: string;
+  payeeLastName: string;
+  expenseCycleId: number;
+  amount: number;
+  status: string;
+  notes: string | null;
+  createdAt: string;
+  confirmedAt: string | null;
+}
+
+export const EXPENSE_CATEGORIES = [
+  'Rent', 'Utilities', 'Groceries', 'Transport', 'Entertainment', 'Other'
+] as const;

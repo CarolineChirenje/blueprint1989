@@ -1,0 +1,195 @@
+<div class="profile-container">
+  <div class="profile-card">
+    <h1>My Profile</h1>
+    <p class="description">Update your personal information and password</p>
+
+    @if (successMessage) {
+      <div class="success-message">{{ successMessage }}</div>
+    }
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+      <div class="form-section">
+        <h2>Personal Information</h2>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            class="form-control"
+            readonly />
+          <small class="help-text">Email cannot be changed</small>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <input 
+            type="text" 
+            id="role" 
+            formControlName="role"
+            class="form-control"
+            readonly />
+          <small class="help-text">Your account role</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              formControlName="firstName"
+              class="form-control"
+              required />
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              formControlName="lastName"
+              class="form-control"
+              required />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>Change Password</h2>
+        <p class="section-description">Leave blank if you don't want to change your password</p>
+
+        <div class="form-group">
+          <label for="currentPassword">Current Password</label>
+          <app-password-field
+            formControlName="currentPassword"
+            [inputId]="'currentPassword'"
+            [autocomplete]="'current-password'"></app-password-field>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newPassword">New Password</label>
+            <app-password-field
+              formControlName="newPassword"
+              [inputId]="'newPassword'"
+              [autocomplete]="'new-password'"></app-password-field>
+            <small class="help-text">Minimum 8 characters, with uppercase, lowercase, and number</small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm New Password</label>
+            <app-password-field
+              formControlName="confirmPassword"
+              [inputId]="'confirmPassword'"
+              [autocomplete]="'new-password'"></app-password-field>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">
+          Update Profile
+        </button>
+      </div>
+    </form>
+
+    <!-- Height for BMI — for Care Recipients and worker roles (Carer / SupportWorker / HealthCareProvider) -->
+    @if (auth.isCareRecipient() || workerCareRecipients.length > 0) {
+      <div class="form-section" id="physical-information">
+        <h2>Physical Information</h2>
+        <p class="section-description">Height is used to calculate BMI when recording weight.</p>
+
+        @if (!auth.isCareRecipient()) {
+          <div class="form-group">
+            <label for="workerCrSelect">Care Recipient</label>
+            <select id="workerCrSelect" class="form-control" (change)="onWorkerCrChange($event)">
+              <option value="">-- Select a care recipient --</option>
+              @for (cr of workerCareRecipients; track cr.id) {
+                <option [value]="cr.id" [selected]="cr.id === selectedCrId">{{ cr.fullName }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (auth.isCareRecipient() || selectedCrId) {
+          @if (heightMessage) {
+            <div class="success-message">{{ heightMessage }}</div>
+          }
+          @if (heightError) {
+            <div class="error-message">{{ heightError }}</div>
+          }
+
+          <form [formGroup]="heightForm" (ngSubmit)="saveHeight()" novalidate>
+            <div class="form-group">
+              <label for="heightCm">Height (cm)</label>
+              <input
+                type="number"
+                id="heightCm"
+                formControlName="heightCm"
+                class="form-control"
+                step="0.5"
+                min="50"
+                max="272"
+                placeholder="e.g. 170"
+              />
+              @if (heightForm.get('heightCm')?.invalid && heightForm.get('heightCm')?.touched) {
+                <small class="field-error">Height must be between 50 and 272 cm.</small>
+              }
+            </div>
+            <button type="submit" class="btn-primary" [disabled]="heightForm.invalid || savingHeight">
+              {{ savingHeight ? 'Saving…' : 'Save Height' }}
+            </button>
+          </form>
+        }
+      </div>
+    }
+
+    <!-- Google Drive Integration — only for Care Recipients -->
+    @if (isCareRecipient) {
+      <div class="form-section drive-section">
+        <h2>Google Drive Integration</h2>
+        <p class="section-description">
+          Connect your Google Drive to enable uploading incident reports directly
+          to a <strong>Vitara</strong> folder in your drive.
+        </p>
+
+        @if (driveMessage) {
+          <div class="success-message">{{ driveMessage }}</div>
+        }
+        @if (driveError) {
+          <div class="error-message">{{ driveError }}</div>
+        }
+
+        <div class="drive-status">
+          @if (driveConnected) {
+            <span class="status-badge connected">&#10003; Connected</span>
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="disconnectDrive()"
+              [disabled]="driveLoading">
+              {{ driveLoading ? 'Disconnecting...' : 'Disconnect Google Drive' }}
+            </button>
+          } @else {
+            <span class="status-badge disconnected">Not connected</span>
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="connectDrive()"
+              [disabled]="driveLoading">
+              {{ driveLoading ? 'Connecting...' : 'Connect Google Drive' }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+
+  </div>
+</div>

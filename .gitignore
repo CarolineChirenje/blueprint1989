@@ -1,0 +1,69 @@
+# Node dependencies
+client/node_modules/
+
+# Angular build outputs
+client/dist/
+client/.angular/
+
+# Environment files (if secrets are present)
+client/src/environments/environment*.ts
+
+# VS Code settings
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+
+# Compiled output (all projects)
+bin/
+obj/
+Debug/
+server/BGLTracker.Api/bin/
+server/BGLTracker.Api/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Backup files
+*.bak
+*.tmp
+
+# Excel exports
+*.xlsx
+
+# Publish output
+server/BGLTracker.Api/publish/
+
+# DLL files
+*.dll
+
+# Misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.idea/
+*.iml
+# Ignore .env files if they exist
+.env    
+
+# Local dev secrets — never commit, use appsettings.Development.template.json as reference
+server/src/Vitara.Api/appsettings.Development.json
+
+# Ignore coverage reports
+coverage/
+
+# Ignore test result files
+test-results/
+
+# Ignore vs folders
+.vs/
+**/.vs/
+

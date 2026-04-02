@@ -1,0 +1,231 @@
+.biometric-container {
+  max-width: 680px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.biometric-card {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.icon-biometric, .icon-success, .icon-error {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  color: #003d82;
+  font-size: 1.6rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.description {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 520px;
+}
+
+/* ── Back button ──────────────────────────────────────────────────────────── */
+.btn-back {
+  align-self: flex-start;
+  background: transparent;
+  border: none;
+  color: #0056b3;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+  margin-bottom: 1.5rem;
+  text-decoration: none;
+}
+.btn-back:hover { color: #003d82; text-decoration: underline; }
+
+/* ── Info box ─────────────────────────────────────────────────────────────── */
+.info-box {
+  width: 100%;
+  background: #e8f0fe;
+  border-left: 4px solid #4285f4;
+  padding: 0.85rem 1rem;
+  border-radius: 4px;
+  text-align: left;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+}
+
+.info-box--warning {
+  background: #fff8e1;
+  border-left-color: #f59e0b;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+.empty-state {
+  padding: 2rem;
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.loading-text {
+  color: #888;
+  margin: 1rem 0;
+}
+
+/* ── Credential list ──────────────────────────────────────────────────────── */
+.credential-list {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.credential-list h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.credential-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  background: #fafafa;
+  gap: 1rem;
+}
+
+.credential-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.credential-name {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+}
+
+.credential-meta {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+/* ── Forms ────────────────────────────────────────────────────────────────── */
+.form-group {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #333;
+}
+
+.optional {
+  font-weight: 400;
+  color: #888;
+  font-size: 0.85em;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #b3d9ff;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: #333;
+  background: white;
+  box-sizing: border-box;
+}
+
+.help-text {
+  display: block;
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 0.35rem;
+}
+
+/* ── Button group ─────────────────────────────────────────────────────────── */
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* ── Remove button ────────────────────────────────────────────────────────── */
+.btn-remove {
+  background: white;
+  color: #c0392b;
+  border: 1px solid #c0392b;
+  border-radius: 4px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-remove:hover:not(:disabled) { background: #fdf2f2; }
+.btn-remove:disabled { opacity: 0.5; cursor: default; }
+
+/* ── Waiting spinner ──────────────────────────────────────────────────────── */
+.waiting-step { padding: 2rem 0; }
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 5px solid #e0e0e0;
+  border-top-color: #0056b3;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 1.25rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Messages ─────────────────────────────────────────────────────────────── */
+.error-message {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: left;
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .biometric-card { padding: 1.25rem; }
+  h1 { font-size: 1.35rem; }
+
+  .credential-item { flex-direction: column; align-items: flex-start; }
+  .btn-remove { width: 100%; text-align: center; }
+
+  .button-group { flex-direction: column; }
+  .button-group .btn { width: 100%; min-height: 44px; }
+}

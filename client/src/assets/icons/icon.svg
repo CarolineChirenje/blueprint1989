@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#1A237E"/>
+  <!-- Gauge arc background -->
+  <path d="M 100 320 A 165 165 0 0 1 412 320" fill="none" stroke="#37474F" stroke-width="32" stroke-linecap="round"/>
+  <!-- Low zone (green) -->
+  <path d="M 100 320 A 165 165 0 0 1 190 140" fill="none" stroke="#43A047" stroke-width="32" stroke-linecap="round"/>
+  <!-- Normal zone (green bright) -->
+  <path d="M 190 140 A 165 165 0 0 1 322 140" fill="none" stroke="#66BB6A" stroke-width="32" stroke-linecap="round"/>
+  <!-- High zone (amber) -->
+  <path d="M 322 140 A 165 165 0 0 1 412 320" fill="none" stroke="#FFA726" stroke-width="32" stroke-linecap="round"/>
+  <!-- Blood droplet in centre -->
+  <path d="M256 190 C238 228 200 268 200 300 A56 56 0 0 0 312 300 C312 268 274 228 256 190 Z" fill="#EF5350"/>
+  <!-- Shine on droplet -->
+  <ellipse cx="237" cy="263" rx="14" ry="24" fill="white" opacity="0.25" transform="rotate(-20 237 263)"/>
+  <!-- Separator line -->
+  <line x1="140" y1="388" x2="372" y2="388" stroke="white" stroke-width="1.5" opacity="0.35"/>
+  <!-- App name -->
+  <text x="256" y="418" text-anchor="middle" font-family="Arial, sans-serif"
+    font-size="38" font-weight="900" fill="white" letter-spacing="4">VITARA</text>
+  <!-- Tagline -->
+  <text x="256" y="452" text-anchor="middle" font-family="Georgia, serif"
+    font-size="22" font-style="italic" fill="white" opacity="0.85">Inspired by Arya</text>
+</svg>

@@ -1,0 +1,312 @@
+/* ── Page Layout ── */
+.about-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f4f8 0%, #e8f1f7 100%);
+}
+
+/* ── Header ── */
+.about-header {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+  padding: 36px 24px;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 61, 130, 0.25);
+}
+
+.about-header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.about-header-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.about-header-logo-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+
+.about-header-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
+.about-title {
+  margin: 0 0 4px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.about-subtitle {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.about-version-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 10px 18px;
+}
+
+.about-version-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+.about-version-number {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ── Content ── */
+.about-content {
+  max-width: 960px;
+  margin: 32px auto;
+  padding: 0 24px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 24px;
+}
+
+/* ── Cards ── */
+.about-card {
+  border-radius: 10px !important;
+  border-color: #b3d9ff !important;
+}
+
+.about-card mat-card-content {
+  padding: 20px !important;
+}
+
+.about-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.about-card-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.about-card-logo-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.app-icon-wrap {
+  background: #e8f1f7;
+  border: 1px solid #b3d9ff;
+}
+
+.about-card-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.app-icon     { color: #0056b3; }
+.dev-icon     { color: #003d82; }
+.tech-icon    { color: #0056b3; }
+.contact-icon { color: #28a745; }
+
+.about-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #003d82;
+}
+
+/* ── Info rows ── */
+.about-info-grid {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.about-info-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+}
+
+.about-info-label {
+  min-width: 110px;
+  font-weight: 600;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.about-info-value {
+  color: #222;
+  line-height: 1.5;
+}
+
+/* ── Description Block ── */
+.about-description-block {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.about-description-block p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.7;
+}
+
+.about-desc-intro {
+  font-size: 15px !important;
+  font-weight: 600;
+  color: #003d82 !important;
+  line-height: 1.6 !important;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e0ecf8;
+}
+
+.about-desc-tagline {
+  font-style: italic;
+  font-weight: 600;
+  color: #0056b3 !important;
+  font-size: 14px !important;
+  padding-top: 4px;
+  border-top: 1px solid #e0ecf8;
+}
+
+.about-version-pill {
+  display: inline-block;
+  background: #e8f1f7;
+  border: 1px solid #b3d9ff;
+  color: #0056b3;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 20px;
+  padding: 2px 12px;
+}
+
+.about-version-pill.secondary {
+  background: #f0f4f8;
+  border-color: #ccd6e0;
+  color: #4a6276;
+  font-weight: 500;
+}
+
+.about-company-name {
+  font-weight: 700;
+  color: #003d82;
+  font-size: 15px;
+}
+
+.about-link {
+  color: #0056b3;
+  text-decoration: none;
+}
+
+.about-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Tech Stack Grid ── */
+.about-tech-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.about-tech-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #e8f1f7;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.about-tech-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #0056b3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.about-tech-icon {
+  color: #fff;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.about-tech-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-tech-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #003d82;
+}
+
+.about-tech-desc {
+  font-size: 11px;
+  color: #666;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .about-content {
+    grid-template-columns: 1fr;
+    padding: 0 12px 32px;
+  }
+
+  .about-header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .about-version-badge {
+    align-items: flex-start;
+  }
+}

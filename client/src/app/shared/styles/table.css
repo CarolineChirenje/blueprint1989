@@ -1,0 +1,485 @@
+﻿/* Shared Table Styles - Blue Theme */
+
+/* Table Container */
+.entries-table {
+  background: white;
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.1);
+  margin-top: 1.5rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+/* Material Table Headers */
+.mat-mdc-header-cell,
+.mat-header-cell {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%) !important;
+  color: white !important;
+  padding: 1.25rem 1rem !important;
+  text-align: left !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.5px !important;
+  white-space: nowrap !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.mat-mdc-header-cell:last-child,
+.mat-header-cell:last-child {
+  border-right: none !important;
+}
+
+/* Material Table Cells */
+.mat-mdc-cell,
+.mat-cell {
+  padding: 1rem !important;
+  border-bottom: 1px solid #e0e7ff !important;
+  color: #333 !important;
+  font-size: 0.95rem !important;
+  vertical-align: middle !important;
+}
+
+/* Material Table Rows */
+.mat-mdc-row,
+.mat-row {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #e8f1f7;
+}
+
+.mat-mdc-row:hover,
+.mat-row:hover {
+  background-color: #f8fbff !important;
+  box-shadow: 0 2px 4px rgba(0, 86, 179, 0.05);
+}
+
+.mat-mdc-row:last-child,
+.mat-row:last-child {
+  border-bottom: none;
+}
+
+/* Regular table fallback styles */
+thead {
+  background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+}
+
+th {
+  color: white;
+  padding: 1.25rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+th:last-child {
+  border-right: none;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e7ff;
+  color: #333;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+tbody tr {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #e8f1f7;
+}
+
+tbody tr:hover {
+  background-color: #f8fbff;
+  box-shadow: 0 2px 4px rgba(0, 86, 179, 0.05);
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Icon Button Styles */
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  margin: 0 0.25rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #0056b3;
+  width: 32px;
+  height: 32px;
+}
+
+.icon-btn:hover {
+  background-color: #e8f1f7;
+  transform: scale(1.1);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-btn.edit-icon {
+  color: #0056b3;
+}
+
+.icon-btn.edit-icon:hover {
+  background-color: #e3f2fd;
+  color: #003d82;
+}
+
+.icon-btn.delete-icon {
+  color: #dc3545;
+}
+
+.icon-btn.delete-icon:hover {
+  background-color: #fee;
+  color: #c82333;
+}
+
+.icon-btn.save-icon {
+  color: #28a745;
+}
+
+.icon-btn.save-icon:hover {
+  background-color: #e8f5e9;
+  color: #1e7e34;
+}
+
+.icon-btn.cancel-icon {
+  color: #6c757d;
+}
+
+.icon-btn.cancel-icon:hover {
+  background-color: #f0f0f0;
+  color: #545b62;
+}
+
+.icon-btn.activate-icon {
+  color: #28a745;
+}
+
+.icon-btn.activate-icon:hover {
+  background-color: #e8f5e9;
+  color: #1e7e34;
+}
+
+.icon-btn.deactivate-icon {
+  color: #ffc107;
+}
+
+.icon-btn.deactivate-icon:hover {
+  background-color: #fff8e1;
+  color: #e0a800;
+}
+
+.icon-btn .material-icons {
+  font-size: 20px;
+}
+
+/* Actions column alignment */
+.mat-column-actions,
+td.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Editing row highlight */
+.editing-row {
+  background-color: #fff9e6 !important;
+  border-left: 4px solid #ffc107;
+}
+
+/* Edit form inputs in table */
+.edit-input,
+.edit-select,
+.edit-textarea {
+  width: 100%;
+  padding: 0.4rem;
+  border: 1px solid #b3d9ff;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background-color: #f8fbff;
+}
+
+.edit-input:focus,
+.edit-select:focus,
+.edit-textarea:focus {
+  outline: none;
+  border-color: #0056b3;
+  background-color: white;
+}
+
+.edit-textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+/* State and Severity Badges */
+.state-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.state-0 {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.state-1 {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.state-2 {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.severity-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.severity-0 {
+  background-color: #e7f3ff;
+  color: #004085;
+  border: 1px solid #b3d9ff;
+}
+
+.severity-1 {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.severity-2 {
+  background-color: #ffe0b2;
+  color: #e65100;
+  border: 1px solid #ffcc80;
+}
+
+.severity-3 {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.severity-4 {
+  background-color: #d32f2f;
+  color: white;
+  border: 1px solid #b71c1c;
+  font-weight: 700;
+}
+
+.severity-none {
+  color: #999;
+}
+
+/* Paginator Styling */
+::ng-deep .mat-mdc-paginator {
+  background: #f8fbff !important;
+  border-top: 2px solid #e0e7ff;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+  padding: 1rem !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size-label,
+::ng-deep .mat-mdc-paginator-range-label {
+  color: #003d82 !important;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TABLE → CARD VIEW  (mobile + tablet, ≤1023px)
+   Converts any table that imports this file into stacked
+   label/value cards on small/medium screens. Add data-label="…"
+   to every <td> / <td mat-cell> in the HTML template.
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  /* CRITICAL: force table to display:block so browser exits table layout engine */
+  table, .mat-mdc-table { display: block !important; min-width: 0 !important; max-width: 100% !important; width: 100% !important; box-sizing: border-box !important; }
+  tbody { display: block !important; width: 100% !important; }
+
+  /* Hide header row — labels come from data-label::before */
+  thead { display: none !important; }
+  .mat-mdc-header-row { display: none !important; }
+
+  /* Outer wrapper: hard-clip overflow so nothing bleeds past screen edge */
+  .entries-table { overflow-x: hidden !important; max-width: 100% !important; }
+  .table-wrapper { overflow-x: hidden !important; max-width: 100% !important; }
+
+  /* Each data row becomes a card */
+  tbody tr,
+  .mat-mdc-row {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    max-height: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 86, 179, 0.10) !important;
+    margin: 0 0 1rem 0 !important;
+    border: 1px solid #dce8f7 !important;
+    border-left: 4px solid #0056b3 !important;
+    padding: 0 !important;
+    background: white;
+    overflow: hidden;
+  }
+
+  /* Each cell: label LEFT (fixed 38%), value RIGHT */
+  td,
+  .mat-mdc-cell {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    padding: 0.5rem 0.85rem !important;
+    border-bottom: 1px solid #edf2f9 !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+    font-size: 0.9rem !important;
+    gap: 0.75rem;
+    white-space: normal !important;
+    word-break: break-word;
+    min-height: unset !important;
+    line-height: 1.45;
+  }
+
+  /* Alternating row tint within a card */
+  td:nth-child(even),
+  .mat-mdc-cell:nth-child(even) {
+    background-color: #f7faff;
+  }
+
+  td:last-child,
+  .mat-mdc-cell:last-child {
+    border-bottom: none !important;
+  }
+
+  /* Auto-label from data-label — fixed 38% width, never wraps */
+  td::before,
+  .mat-mdc-cell::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #0056b3;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    width: 38%;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 0.1rem;
+  }
+
+  /* Cell value takes the remaining 62% */
+  td > *,
+  .mat-mdc-cell > * {
+    flex: 1;
+    text-align: right;
+    min-width: 0;
+  }
+
+  /* Plain text nodes need right-alignment via the td itself */
+  td,
+  .mat-mdc-cell {
+    text-align: right;
+  }
+
+  /* But the ::before label must stay left-aligned */
+  td::before,
+  .mat-mdc-cell::before {
+    text-align: left !important;
+  }
+
+  /* Empty data-label → no label column */
+  td[data-label='']::before,
+  .mat-mdc-cell[data-label='']::before {
+    display: none;
+  }
+
+  /* Actions cell: right-aligned, no label, min-height for touch */
+  .actions-cell,
+  .mat-column-actions {
+    justify-content: flex-end !important;
+    border-bottom: none !important;
+    gap: 0.25rem;
+    min-height: 52px !important;
+    align-items: center !important;
+    background-color: #f0f5ff !important;
+  }
+
+  .actions-cell::before,
+  .mat-column-actions::before {
+    display: none !important;
+  }
+
+  /* Touch targets ≥44px */
+  .icon-btn {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+/* --- Diabetes Type Badges -------------------------------------------- */
+.diabetes-type-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  margin-right: 4px;
+  line-height: 1.5;
+}
+.diabetes-type-badge.t1d {
+  background-color: #1565C0;
+  color: #ffffff;
+}
+.diabetes-type-badge.t2d {
+  background-color: #00695C;
+  color: #ffffff;
+}
+
+/* Optional field label */
+.optional-label {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #666;
+  margin-left: 4px;
+}

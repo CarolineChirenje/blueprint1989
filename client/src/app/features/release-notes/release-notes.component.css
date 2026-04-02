@@ -1,0 +1,494 @@
+/* ─── Page Layout ─────────────────────────────────────── */
+.rn-page {
+  min-height: 100vh;
+  background: #f4f6f9;
+  padding-bottom: 3rem;
+}
+
+/* ─── Header ──────────────────────────────────────────── */
+.rn-header {
+  background: linear-gradient(135deg, #1565c0 0%, #1976d2 60%, #42a5f5 100%);
+  color: #fff;
+  padding: 2.5rem 1.5rem 2rem;
+  margin-bottom: 0;
+}
+
+.rn-header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.rn-header-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rn-header-icon {
+  font-size: 2.8rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  opacity: 0.92;
+}
+
+.rn-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.rn-subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  opacity: 0.82;
+  font-weight: 400;
+}
+
+.rn-current-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  backdrop-filter: blur(4px);
+}
+
+.rn-version-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  opacity: 0.75;
+}
+
+.rn-version-number {
+  font-size: 1.45rem;
+  font-weight: 700;
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+/* ─── Content Area ────────────────────────────────────── */
+.rn-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 0;
+}
+
+/* ─── Accordion & Panels ──────────────────────────────── */
+.rn-accordion {
+  display: block;
+}
+
+.rn-panel {
+  margin-bottom: 1rem !important;
+  border-radius: 10px !important;
+  border: 1px solid #e0e4ea !important;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.06) !important;
+  overflow: hidden;
+}
+
+.rn-panel-header {
+  height: auto !important;
+  min-height: 64px;
+  padding: 0.75rem 1.25rem !important;
+}
+
+.rn-panel-title {
+  display: flex !important;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1565c0;
+}
+
+.rn-panel-version {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.rn-panel-description {
+  display: flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.rn-date-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: middle;
+}
+
+/* ─── Status Chips ────────────────────────────────────── */
+.rn-status-chip {
+  height: 22px !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  min-height: unset !important;
+  padding: 0 8px !important;
+}
+
+.status-latest {
+  background-color: #f59e0b !important;
+  color: #fff !important;
+}
+
+.status-stable {
+  background-color: #22c55e !important;
+  color: #fff !important;
+}
+
+.status-alpha {
+  background-color: #ef4444 !important;
+  color: #fff !important;
+}
+
+/* ─── Summary Block ───────────────────────────────────── */
+.rn-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem 1.2rem;
+  background: #f0f4ff;
+  border-left: 4px solid #1976d2;
+  margin: 0 0 0.5rem;
+}
+
+.rn-summary-icon {
+  color: #1976d2;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.rn-summary-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.55;
+}
+
+/* ─── Change Sections ─────────────────────────────────── */
+.rn-sections {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rn-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.rn-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  width: fit-content;
+}
+
+.rn-section-icon {
+  font-size: 1.05rem;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+/* Section type colour bands */
+.type-added {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.type-changed {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.type-fixed {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.type-security {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.type-breaking {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ─── Change Item Cards ───────────────────────────────── */
+.rn-item-card {
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  transition: box-shadow 0.2s ease;
+}
+
+.rn-item-card:hover {
+  box-shadow: 0 4px 14px rgba(25, 118, 210, 0.12) !important;
+}
+
+.rn-item-content {
+  padding: 1rem 1.25rem 1rem !important;
+}
+
+.rn-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.rn-item-title {
+  font-size: 0.97rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.rn-item-description {
+  margin: 0 0 0.85rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.55;
+}
+
+/* ─── Technical Detail Block ──────────────────────────── */
+.rn-technical-block {
+  background: #0f172a;
+  border-radius: 7px;
+  padding: 0.7rem 1rem;
+}
+
+.rn-technical-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.rn-technical-icon {
+  font-size: 0.95rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: #64b5f6;
+}
+
+.rn-technical-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: #64b5f6;
+}
+
+.rn-technical-text {
+  margin: 0;
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ─── Tech Stack Section ──────────────────────────────── */
+.rn-tech-stack {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.rn-tech-stack-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #6b7280;
+  margin-bottom: 0.9rem;
+}
+
+.rn-tech-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rn-tech-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rn-tech-group-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  min-width: 100px;
+  padding-top: 4px;
+}
+
+.rn-tech-label-icon {
+  font-size: 0.95rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: #9ca3af;
+}
+
+.rn-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.rn-tech-chip {
+  height: 24px !important;
+  font-size: 0.78rem !important;
+  background-color: #e0e7ff !important;
+  color: #3730a3 !important;
+  font-weight: 500 !important;
+  min-height: unset !important;
+  padding: 0 10px !important;
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .rn-header {
+    padding: 1.5rem 1rem 1.25rem;
+  }
+
+  .rn-title {
+    font-size: 1.5rem;
+  }
+
+  .rn-header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rn-current-badge {
+    align-self: flex-start;
+  }
+
+  .rn-content {
+    padding: 1rem 0.5rem 0;
+  }
+
+  .rn-panel-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .rn-tech-group {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .rn-tech-group-label {
+    min-width: unset;
+  }
+}
+
+/* ─── Wiki Banner ─────────────────────────────────────── */
+.rn-wiki-banner {
+  max-width: 900px;
+  margin: 1.5rem auto 2rem;
+  padding: 1rem 1.25rem 1rem 1.5rem;
+  background: #fff;
+  border: 1px solid #e0e4ea;
+  border-left: 4px solid #1976d2;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rn-wiki-icon {
+  color: #1976d2;
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+.rn-wiki-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.rn-wiki-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.rn-wiki-subtitle {
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+.rn-wiki-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1976d2 !important;
+  border-color: #1976d2 !important;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.rn-wiki-btn mat-icon {
+  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 600px) {
+  .rn-wiki-banner {
+    margin: 1rem 0.5rem 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rn-wiki-btn {
+    align-self: flex-end;
+  }
+}

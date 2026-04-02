@@ -1,0 +1,52 @@
+<div class="cycles-page">
+  <div class="page-header">
+    <h1>Expense Cycles</h1>
+    @if (isAdmin) {
+      <button mat-raised-button color="primary" (click)="openCreate()">
+        <mat-icon>add</mat-icon> New Cycle
+      </button>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="loading">Loading cycles…</div>
+  } @else if (error) {
+    <div class="error-msg">{{ error }} <button mat-button (click)="load()">Retry</button></div>
+  } @else if (cycles.length === 0) {
+    <div class="empty-state">
+      <span class="material-icons empty-icon">loop</span>
+      <p>No cycles yet.</p>
+      @if (isAdmin) {
+        <button mat-raised-button color="primary" (click)="openCreate()">Create the first cycle</button>
+      }
+    </div>
+  } @else {
+    <div class="cycle-grid">
+      @for (cycle of cycles; track cycle.id) {
+        <div class="cycle-card" (click)="viewDetail(cycle.id)">
+          <div class="cycle-card-header">
+            <span class="cycle-name">{{ cycle.name }}</span>
+            <span class="badge" [ngClass]="statusClass(cycle.status)">{{ cycle.status }}</span>
+          </div>
+          <div class="cycle-card-meta">
+            <span>{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="cycle-card-stats">
+            <div class="stat">
+              <span class="stat-value">{{ cycle.memberCount }}</span>
+              <span class="stat-label">Members</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{{ cycle.expenseCount }}</span>
+              <span class="stat-label">Expenses</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">${{ cycle.totalAmount | number:'1.2-2' }}</span>
+              <span class="stat-label">Total</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

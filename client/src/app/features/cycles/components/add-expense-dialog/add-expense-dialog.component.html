@@ -1,0 +1,37 @@
+<h2 mat-dialog-title>Add Expense</h2>
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    @if (error) { <div class="form-error">{{ error }}</div> }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" placeholder="e.g. Electricity Bill">
+    </mat-form-field>
+
+    <div class="amount-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Amount ($)</mat-label>
+        <input matInput type="number" min="0.01" step="0.01" formControlName="amount">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category">
+          @for (cat of categories; track cat) {
+            <mat-option [value]="cat">{{ cat }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes (optional)</mat-label>
+      <textarea matInput formControlName="notes" rows="2"></textarea>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || saving">
+    {{ saving ? 'Adding…' : 'Add Expense' }}
+  </button>
+</mat-dialog-actions>

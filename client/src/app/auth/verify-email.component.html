@@ -1,0 +1,52 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="assets/icons/icon.svg" alt="Logo" class="login-logo" />
+    </div>
+
+    @if (state === 'verifying') {
+      <div class="verify-panel">
+        <span class="material-icons verify-icon spin">sync</span>
+        <p>Verifying your email address…</p>
+      </div>
+    } @else if (state === 'success') {
+      <div class="verify-panel">
+        <span class="material-icons verify-icon success-icon">verified</span>
+        <h3>Email verified</h3>
+        <p>Your email address has been confirmed. You can now log in to your account.</p>
+        <button class="submit-btn submit-btn-blue" (click)="goToLogin()">Log In</button>
+      </div>
+    } @else {
+      <div class="verify-panel">
+        <span class="material-icons verify-icon error-icon">error_outline</span>
+        <h3>Verification failed</h3>
+        <p>{{ errorMessage }}</p>
+
+        @if (resendState !== 'sent') {
+          <div class="resend-form">
+            <label for="resend-email">Enter your email to receive a new link</label>
+            <input
+              id="resend-email"
+              type="email"
+              [(ngModel)]="resendEmail"
+              placeholder="you@example.com"
+              autocomplete="email" />
+            <button
+              class="submit-btn submit-btn-blue"
+              (click)="resendVerification()"
+              [disabled]="resendState === 'sending' || !resendEmail.trim()">
+              {{ resendState === 'sending' ? 'Sending…' : 'Resend Verification Email' }}
+            </button>
+            @if (resendMessage) {
+              <p class="resend-error">{{ resendMessage }}</p>
+            }
+          </div>
+        } @else {
+          <p class="resend-success">{{ resendMessage }}</p>
+        }
+
+        <button class="submit-btn submit-btn-outline" (click)="goToLogin()">Back to Login</button>
+      </div>
+    }
+  </div>
+</div>

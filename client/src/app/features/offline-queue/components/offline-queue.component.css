@@ -1,0 +1,317 @@
+.oq-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.oq-card {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.oq-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.oq-header h1 {
+  margin: 0 0 0.25rem;
+  color: #1a1a1a;
+  font-size: 1.75rem;
+}
+
+.oq-subtitle {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Online / Offline status pill */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+.status-pill.online {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pill.offline {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Messages */
+.success-message {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+/* Action toolbar */
+.oq-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.65rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #545b62;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.oq-offline-notice {
+  color: #856404;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+/* Empty state */
+.oq-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+}
+
+.oq-empty-icon {
+  width: 64px;
+  height: 64px;
+  color: #4CAF50;
+  margin-bottom: 1rem;
+}
+
+.oq-empty-text {
+  color: #666;
+  padding: 2rem 0;
+}
+
+/* Sections */
+.oq-section {
+  margin-bottom: 2rem;
+}
+
+.oq-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.75rem;
+}
+
+.oq-section-expired h2 {
+  color: #856404;
+}
+
+.section-description {
+  color: #666;
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
+/* Queue item list */
+.oq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.oq-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fafafa;
+  flex-wrap: wrap;
+}
+
+.oq-item.expiring-soon {
+  border-color: #ffc107;
+  background: #fffbf0;
+}
+
+.oq-item-expired {
+  opacity: 0.65;
+  border-color: #e0e0e0;
+  background: #f5f5f5;
+}
+
+.oq-item-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.oq-item-label {
+  font-weight: 500;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oq-item-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #666;
+  flex-wrap: wrap;
+}
+
+.oq-expiry {
+  font-weight: 500;
+}
+
+.oq-expiry.warning {
+  color: #856404;
+}
+
+.oq-expiry.expired {
+  color: #721c24;
+}
+
+/* Type badges */
+.oq-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-assessment {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.badge-incident {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.badge-meal {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-expired {
+  background: #e0e0e0;
+  color: #555;
+}
+
+.badge-default {
+  background: #e0e0e0;
+  color: #333;
+}
+
+/* Discard button */
+.btn-discard {
+  padding: 4px 12px;
+  border: 1px solid #dc3545;
+  background: transparent;
+  color: #dc3545;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-discard:hover:not(:disabled) {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-discard:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .oq-card {
+    padding: 1.25rem;
+  }
+
+  .oq-header {
+    flex-direction: column;
+  }
+
+  .oq-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .oq-item-main {
+    width: 100%;
+  }
+}

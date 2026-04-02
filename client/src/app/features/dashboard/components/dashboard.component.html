@@ -1,0 +1,58 @@
+<div class="dashboard-container">
+
+  <!-- Record Type Picker Overlay -->
+  <app-record-type-picker
+    [visible]="showRecordPicker"
+    (typeSelected)="onRecordTypeSelected($event)"
+    (pickCancelled)="onRecordPickerCancelled()">
+  </app-record-type-picker>
+
+  <div class="welcome-section">
+    <h1>{{ getGreeting() }}, {{ userName }}!</h1>
+    <p class="current-time">{{ currentTime | date: 'fullDate' }} - {{ currentTime | date: 'shortTime' }}</p>
+  </div>
+
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    
+    <div class="cards-grid">
+
+      <!-- New Recording Card — single entry point for BGL or BP recording -->
+      @if (showRecordCard()) {
+        <div class="action-card record-card" (click)="openRecordCard()">
+          <div class="card-icon">➕</div>
+          <h3>New Recording</h3>
+          <p>Start a new BGL assessment or blood pressure session</p>
+          <div class="card-arrow">→</div>
+        </div>
+      }
+
+      <!-- BGL Reading Card — diabetes-related -->
+     
+
+      <!-- Carb Counting   Card -->
+    
+        <div class="action-card meal-entry-history-card" (click)="navigateTo('meal-entry-history')">
+          <div class="card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:3rem;height:3rem;">
+              <path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-8.15-15.03-8.15-15.03 0h15.03zM1.02 17h15v2h-15z"/>
+            </svg>
+          </div>
+          <h3>Carb Counting</h3>
+          <p>Store food item nutrition information accurately for quick referral</p>
+          <div class="card-arrow">→</div>
+        </div>
+      
+
+      <!-- Incidents Card — diabetes and/or BP related -->
+      @if (showIncidentsCard()) {
+        <div class="action-card incidents-card" (click)="navigateTo('incidents')">
+          <div class="card-icon">📋</div>
+          <h3>Incidents</h3>
+          <p>View and log health incidents for your care recipient</p>
+          <div class="card-arrow">→</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

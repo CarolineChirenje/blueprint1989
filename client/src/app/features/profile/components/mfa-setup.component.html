@@ -1,0 +1,254 @@
+<div class="mfa-setup-container">
+  <div class="mfa-card">
+    <!-- Security hub (landing view) -->
+    @if (step === 'hub') {
+      <div class="step-content">
+        <div class="icon-shield">🔒</div>
+        <h1>Security</h1>
+        <p class="description">Manage two-factor authentication and biometric login.</p>
+
+        <div class="security-cards">
+          <a class="security-card" (click)="openMfaFlow()">
+            <span class="security-card__icon">🛡️</span>
+            <div>
+              <div class="security-card__title">Two-Factor Authentication</div>
+              <div class="security-card__desc">Require an authenticator code at login</div>
+            </div>
+            <span class="security-card__arrow">›</span>
+          </a>
+          <a class="security-card" routerLink="/profile/biometric">
+            <span class="security-card__icon">🔏</span>
+            <div>
+              <div class="security-card__title">Biometric Login</div>
+              <div class="security-card__desc">Log in with fingerprint, Face ID, or Windows Hello</div>
+            </div>
+            <span class="security-card__arrow">›</span>
+          </a>
+        </div>
+
+        <div class="button-group" style="margin-top: 2rem;">
+          <button type="button" class="btn btn-secondary" routerLink="/profile">← Back to Profile</button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 1: Introduction -->
+    @if (step === 'intro') {
+      <div class="step-content">
+        <div class="icon-shield">🛡️</div>
+        <h1>Enable Two-Factor Authentication</h1>
+        <p class="description">
+          Add an extra layer of security to your account by requiring a verification code from your phone in addition to your password.
+        </p>
+        
+        <div class="info-box">
+          <h3>What you'll need:</h3>
+          <ul>
+            <li>A smartphone or tablet</li>
+            <li>An authenticator app like:
+              <ul>
+                <li>Google Authenticator</li>
+                <li>Microsoft Authenticator</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-message">{{ errorMessage }}</div>
+        }
+
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="startSetup()">Get Started</button>
+          <button type="button" class="btn btn-secondary" (click)="cancel()">Maybe Later</button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 2: Scan QR Code -->
+    @if (step === 'scan') {
+      <div class="step-content">
+        <h1>Scan QR Code</h1>
+        <p class="step-number">Step 1 of 3</p>
+        
+        <div class="instructions-box">
+          <h3>📱 How to Link Your Authenticator App:</h3>
+          <ol>
+            <li>Open your authenticator app on your phone</li>
+            <li>Tap the <strong>"+" button</strong> or <strong>"Add account"</strong></li>
+            <li>Select <strong>"Scan a QR code"</strong></li>
+            <li>Point your camera at the QR code below</li>
+            <li>Your app will automatically add "Vitara"</li>
+          </ol>
+        </div>
+
+        <div class="qr-code-container">
+          @if (qrCodeUrl) {
+            <img [src]="qrCodeUrl" alt="QR Code" class="qr-code" />
+          }
+          <p class="qr-label">Scan this with your authenticator app</p>
+        </div>
+
+        <div class="secret-box">
+          <p><strong>Can't Scan the Code?</strong></p>
+          <p>Choose "Enter a setup key" in your app and type:</p>
+          <div class="secret-code">{{ secret }}</div>
+          <p class="help-text">Account name: Vitara<br>Time-based: Yes</p>
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="proceedToVerify()">Verify & Enable MFA</button>
+          <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Verify Code -->
+    @if (step === 'verify') {
+      <div class="step-content">
+        <h1>Verify Your Code</h1>
+        <p class="step-number">Step 2 of 3</p>
+        
+        <div class="instructions-box">
+          <h3>🔢 Test Your Setup:</h3>
+          <ol>
+            <li>Open your authenticator app</li>
+            <li>Find the "Vitara" entry</li>
+            <li>Look at the 6-digit code (it changes every 30 seconds)</li>
+            <li>Enter it below before it expires</li>
+          </ol>
+        </div>
+
+        <form [formGroup]="verificationForm" (ngSubmit)="verifyCode()">
+          <div class="code-input-container">
+            <input 
+              type="text" 
+              formControlName="code"
+              placeholder="000000"
+              maxlength="6"
+              class="code-input"
+              autocomplete="off" />
+          </div>
+
+          @if (errorMessage) {
+            <div class="error-message">{{ errorMessage }}</div>
+          }
+
+          <div class="button-group">
+            <button type="submit" class="btn btn-primary" [disabled]="verificationForm.invalid">
+              Verify & Enable MFA
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="step = 'scan'">Back</button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- Step 4: Save Backup Codes -->
+    @if (step === 'backup') {
+      <div class="step-content">
+        <h1>Save Your Backup Codes</h1>
+        <p class="step-number">Step 3 of 3</p>
+        
+        <p class="description warning">
+          ⚠️ <strong>Important:</strong> Save these backup codes in a secure place. Each code can only be used once if you lose access to your authenticator app.
+        </p>
+
+        <div class="backup-codes-container">
+          @for (code of backupCodes; track code) {
+            <div class="backup-code">{{ code }}</div>
+          }
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="downloadBackupCodes()">
+            📥 Download Codes
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="copyBackupCodes()">
+            📋 Copy to Clipboard
+          </button>
+        </div>
+
+        <div class="button-group" style="margin-top: 2rem;">
+          <button type="button" class="btn btn-success" (click)="acknowledgeBackupCodes()">
+           aved My Codes
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 5: Complete -->
+    @if (step === 'complete') {
+      <div class="step-content">
+        <div class="icon-success"></div>
+        <h1>All Set!</h1>
+        
+        <p class="description success">
+          Two-Factor Authentication has been enabled on your account. You'll need to enter a code from your authenticator app each time you log in.
+        </p>
+
+        @if (successMessage) {
+          <div class="success-message">{{ successMessage }}</div>
+        }
+
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="goBack()">
+            Back to Security
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- MFA Status (When Already Enabled) -->
+    @if (step === 'status') {
+      <div class="step-content">
+        <div class="icon-shield">🛡️</div>
+        <h1>Two-Factor Authentication Status</h1>
+        
+        <div class="status-box enabled">
+          <div class="status-indicator">
+            <span class="status-dot active"></span>
+            <strong>MFA is ENABLED</strong>
+          </div>
+          @if (mfaEnabledAt) {
+            <p class="status-detail">Enabled on: {{ mfaEnabledAt | date: 'medium' }}</p>
+          }
+        </div>
+
+        <div class="info-box">
+          <h3>Your account is protected</h3>
+          <p>
+            Two-Factor Authentication adds an extra layer of security to your account. 
+            You'll need to enter a code from your authenticator app each time you log in.
+          </p>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-message">{{ errorMessage }}</div>
+        }
+
+        @if (successMessage) {
+          <div class="success-message">{{ successMessage }}</div>
+        }
+
+        <div class="button-group">
+          <button type="button" class="btn btn-danger" (click)="disableMfa()" [disabled]="isDisabling">
+            @if (isDisabling) {
+              <span>Disabling...</span>
+            } @else {
+              <span>🔓 Disable MFA</span>
+            }
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="goBack()">
+            Back to Security
+          </button>
+        </div>
+
+        <div class="warning-box">
+          <p><strong>⚠️ Warning:</strong> Disabling Two-Factor Authentication will make your account less secure. 
+          You will only need your password to log in.</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>
