@@ -16,7 +16,7 @@ import { CreateCycleDialogComponent } from '../../cycles/components/create-cycle
 @Component({
   selector: 'app-group-detail',
   templateUrl: './group-detail.component.html',
-  styleUrls: ['./group-detail.component.css'],
+  styleUrls: ['./group-detail.component.css', '../../../shared/styles/table.css'],
   standalone: false
 })
 export class GroupDetailComponent implements OnInit {

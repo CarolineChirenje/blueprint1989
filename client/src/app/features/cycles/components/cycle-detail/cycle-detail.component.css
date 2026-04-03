@@ -84,3 +84,55 @@
 .expense-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; }
 .col-center { text-align: center !important; }
 .col-right { text-align: right !important; }
+
+/* ── Searchable paginated tables ── */
+.table-summary-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.strip-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--surface-raised, #f0f4f8);
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.strip-chip.secondary { color: var(--text-secondary, #666); font-weight: 400; }
+.strip-action { margin-left: auto; }
+.table-filter-field { width: 100%; max-width: 400px; margin-bottom: 4px; }
+.table-wrap { overflow-x: auto; }
+.full-width-table { width: 100%; }
+.no-data-row { text-align: center; padding: 24px !important; color: var(--text-secondary, #888); }
+
+/* Expandable expense detail row */
+.detail-row > td { padding: 0 !important; border-bottom: none !important; }
+.detail-cell { padding: 0 !important; }
+.expense-expanded {
+  padding: 10px 16px 16px;
+  background: var(--surface, #fafafa);
+  border-bottom: 1px solid var(--border, #e0e0e0);
+}
+.expanded-row > td { border-bottom: none !important; }
+.clickable-row { cursor: pointer; }
+.clickable-row:hover { background: var(--surface-raised, #f5f5f5); }
+
+/* Inline payment notes */
+.payment-notes-inline { font-size: 0.78rem; color: var(--text-secondary, #777); margin-top: 2px; }
+
+/* Arrow icon in payments table */
+.arrow-icon { font-size: 14px; vertical-align: middle; line-height: 1; }
+
+/* Sort header: button text and arrow must stay white on the green header */
+.mat-sort-header-button { color: inherit !important; }
+.mat-mdc-sort-header-arrow,
+.mat-sort-header-arrow { color: white !important; opacity: 0.8 !important; }
+
+/* Filter field: ensure label and input text are always visible */
+.table-filter-field .mdc-floating-label,
+.table-filter-field .mat-mdc-floating-label { color: var(--text-secondary) !important; }
+.table-filter-field input.mat-mdc-input-element { color: var(--text-primary) !important; }

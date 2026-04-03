@@ -1,4 +1,7 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ExpenseCycleService } from '../../../../core/services/expense-cycle.service';
@@ -22,7 +25,7 @@ import { DisputeExpenseDialogComponent } from '../dispute-expense-dialog/dispute
 @Component({
   selector: 'app-cycle-detail',
   templateUrl: './cycle-detail.component.html',
-  styleUrls: ['./cycle-detail.component.css'],
+  styleUrls: ['./cycle-detail.component.css', '../../../../shared/styles/table.css'],
   standalone: false
 })
 export class CycleDetailComponent implements OnInit {
@@ -38,6 +41,27 @@ export class CycleDetailComponent implements OnInit {
   activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' = 'expenses';
   isAdmin = false;
   currentUserId: number | null = null;
+
+  expenseDataSource = new MatTableDataSource<ExpenseDto>([]);
+  paymentDataSource = new MatTableDataSource<PaymentDto>([]);
+  expenseColumns = ['title', 'amount', 'category', 'loggedByName', 'date', 'actions'];
+  paymentColumns = ['parties', 'amount', 'status', 'date', 'actions'];
+  expenseFilter = '';
+  paymentFilter = '';
+  expandedExpense: ExpenseDto | null = null;
+
+  @ViewChild('expensePaginator') set expensePaginatorRef(p: MatPaginator) {
+    if (p) this.expenseDataSource.paginator = p;
+  }
+  @ViewChild('expenseSort') set expenseSortRef(s: MatSort) {
+    if (s) this.expenseDataSource.sort = s;
+  }
+  @ViewChild('paymentPaginator') set paymentPaginatorRef(p: MatPaginator) {
+    if (p) this.paymentDataSource.paginator = p;
+  }
+  @ViewChild('paymentSort') set paymentSortRef(s: MatSort) {
+    if (s) this.paymentDataSource.sort = s;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -77,14 +101,35 @@ export class CycleDetailComponent implements OnInit {
   loadExpenses(): void {
     if (!this.cycle) return;
     this.expenseService.getByCycle(this.cycle.id).subscribe({
-      next: e => { this.expenses = e; this.cdr.detectChanges(); }
+      next: e => {
+        this.expenses = e;
+        this.expenseDataSource.data = e;
+        this.expenseDataSource.filterPredicate = (row, filter) => {
+          const f = filter.toLowerCase();
+          return row.title.toLowerCase().includes(f)
+            || row.category.toLowerCase().includes(f)
+            || row.loggedByName.toLowerCase().includes(f);
+        };
+        this.cdr.detectChanges();
+      }
     });
   }
 
   loadPayments(): void {
     if (!this.cycle) return;
     this.paymentService.getByCycle(this.cycle.id).subscribe({
-      next: p => { this.payments = p; this.cdr.detectChanges(); }
+      next: p => {
+        this.payments = p;
+        this.paymentDataSource.data = p;
+        this.paymentDataSource.filterPredicate = (row, filter) => {
+          const f = filter.toLowerCase();
+          return `${row.payerFirstName} ${row.payerLastName}`.toLowerCase().includes(f)
+            || `${row.payeeFirstName} ${row.payeeLastName}`.toLowerCase().includes(f)
+            || row.status.toLowerCase().includes(f)
+            || (row.notes ?? '').toLowerCase().includes(f);
+        };
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -223,6 +268,32 @@ export class CycleDetailComponent implements OnInit {
 
   isPayer(payment: PaymentDto): boolean { return payment.payerId === this.currentUserId; }
   isPayee(payment: PaymentDto): boolean { return payment.payeeId === this.currentUserId; }
+
+  get totalExpenses(): number {
+    return this.expenses.reduce((sum, e) => sum + e.amount, 0);
+  }
+
+  get totalPayments(): number {
+    return this.payments.reduce((sum, p) => sum + p.amount, 0);
+  }
+
+  get confirmedPaymentsTotal(): number {
+    return this.payments
+      .filter(p => p.status === 'Confirmed')
+      .reduce((sum, p) => sum + p.amount, 0);
+  }
+
+  applyExpenseFilter(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.expenseFilter = val;
+    this.expenseDataSource.filter = val.trim().toLowerCase();
+  }
+
+  applyPaymentFilter(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.paymentFilter = val;
+    this.paymentDataSource.filter = val.trim().toLowerCase();
+  }
 
   removeCycleMember(userId: number): void {
     if (!this.cycle) return;
