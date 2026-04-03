@@ -316,8 +316,8 @@ input[type="time"],
 textarea,
 select {
   color-scheme: light;
-  background-color: #ffffff;
-  color: #333333;
+  background-color: var(--surface);
+  color: var(--text-primary);
 }
 
 /* Angular Material MDC form fields, selects, options, autocomplete */
@@ -333,17 +333,16 @@ select {
 .mdc-text-field--filled,
 .mdc-text-field--outlined {
   color-scheme: light !important;
-  background-color: #ffffff !important;
-  color: #333333 !important;
+  color: var(--text-primary) !important;
 }
 
 .mat-mdc-select-panel {
   color-scheme: light !important;
-  background-color: #ffffff !important;
+  background-color: var(--surface) !important;
 }
 
 .mat-mdc-option .mdc-list-item__primary-text {
-  color: #333333 !important;
+  color: var(--text-primary) !important;
 }
 
 html, body {
@@ -351,6 +350,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 body {
@@ -483,7 +483,7 @@ textarea {
   border-radius: var(--radius-md);
   font-family: inherit;
   font-size: 1rem;
-  background-color: var(--primary-subtle);
+  background-color: var(--surface);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -822,4 +822,377 @@ tbody tr:last-child td {
   border-radius: 8px !important;
   overflow: hidden !important;
   padding: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   GLOBAL FORM SYSTEM — single source of truth for all forms.
+   Auth, profile, and page forms use the raw-input classes below.
+   Dialogs use mat-form-field which is restyled via the MDC overrides further down.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Labels ─────────────────────────────────────────────────────────── */
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.375rem;
+}
+
+.required-star {
+  color: var(--error);
+  margin-left: 0.1rem;
+}
+
+/* ── Inputs, textareas, selects (brand-styled) ───────────────────────
+   Note: Global .input-field already applies most of this for type=* inputs.
+   .form-control is the explicit opt-in class for any element needing the
+   brand treatment: correct background, border weight, radius and focus ring.
+   ─────────────────────────────────────────────────────────────────── */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--primary-subtle);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color-scheme: light;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12);
+}
+
+.form-control.ng-invalid.ng-touched,
+.form-control.is-invalid {
+  border-color: var(--error);
+}
+
+.form-control[readonly],
+.form-control:read-only {
+  background-color: var(--surface-raised);
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.form-control:disabled {
+  background-color: var(--surface-raised);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ── Form group & row ────────────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 520px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Inline field-level feedback messages ──────────────────────────── */
+.field-error {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--error);
+  margin-top: 0.25rem;
+}
+
+.field-hint,
+.help-text {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* ── Alert / status banners ──────────────────────────────────────────
+   Replaces the Bootstrap .alert-danger / .alert-success scattered throughout.
+   Usage: <div class="alert alert--error">…</div>
+   ─────────────────────────────────────────────────────────────────── */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+
+.alert strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.alert--success {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success);
+}
+
+.alert--error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error);
+}
+
+.alert--warning {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+  color: var(--warning-text);
+}
+
+.alert--info {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+  color: var(--info);
+}
+
+/* ── Auth / centered-page wrappers ───────────────────────────────────
+   Replaces the 5+ per-component copies of the full-page centering pattern.
+   ─────────────────────────────────────────────────────────────────── */
+.auth-page {
+  margin: -2rem;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+@media (max-width: 599px) {
+  .auth-page {
+    margin: -1rem;
+    padding: 1.5rem 1rem;
+  }
+}
+
+.auth-card {
+  color-scheme: light;
+  width: 100%;
+  max-width: 460px;
+  padding: 2rem 2.5rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 499px) {
+  .auth-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.auth-card__header {
+  text-align: center;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.auth-card__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+}
+
+.auth-card__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 520px) {
+  .auth-page {
+    margin: -0.75rem;
+    padding: 1.25rem 0.85rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    max-width: 100%;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ANGULAR MATERIAL mat-form-field BRAND OVERRIDES
+   Keeps mat-form-field appearance="outline" in dialogs but aligns it
+   with the app's green design system: border color/weight/radius,
+   brand-tinted background, matching label typography.
+   Uses :host-context-free global CSS so it works in ng-deep-free components.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Outline border — idle */
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
+  border-width: 1.5px !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading {
+  border-radius: var(--radius-md) 0 0 var(--radius-md) !important;
+  min-width: var(--radius-md) !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+}
+
+/* Outline border — hover */
+.mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__trailing {
+  border-color: var(--border-focus) !important;
+}
+
+/* Outline border — focused */
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--border-focus) !important;
+  border-width: 2px !important;
+}
+
+/* Background fill inside mat-form-field — clean white at rest, subtle tint on focus */
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-text-field--outlined {
+  background-color: var(--surface) !important;
+  border-radius: var(--radius-md) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-text-field--outlined {
+  background-color: var(--primary-subtle) !important;
+}
+
+/* Label color */
+.mat-mdc-form-field.mat-form-field-appearance-outline .mat-mdc-floating-label {
+  color: var(--text-secondary) !important;
+  font-size: 0.9375rem !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mat-mdc-floating-label {
+  color: var(--border-focus) !important;
+}
+
+/* Input / textarea text */
+.mat-mdc-form-field .mat-mdc-input-element {
+  color: var(--text-primary) !important;
+  font-family: inherit !important;
+  font-size: 0.9375rem !important;
+  caret-color: var(--border-focus) !important;
+}
+
+/* mat-select value text */
+.mat-mdc-select-value-text {
+  color: var(--text-primary) !important;
+  font-family: inherit !important;
+  font-size: 0.9375rem !important;
+}
+
+/* mat-select arrow */
+.mat-mdc-select-arrow {
+  color: var(--text-secondary) !important;
+}
+
+/* Error state outline */
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-form-field-invalid .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-form-field-invalid .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-form-field-invalid .mdc-notched-outline__trailing {
+  border-color: var(--error) !important;
+}
+
+/* Hint / error helper text */
+.mat-mdc-form-field .mat-mdc-form-field-hint,
+.mat-mdc-form-field .mat-mdc-form-field-error {
+  font-size: 0.8rem !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-error {
+  color: var(--error) !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-hint {
+  color: var(--text-secondary) !important;
+}
+
+/* Consistent bottom padding so form rows don't collapse */
+.mat-mdc-form-field {
+  font-family: inherit !important;
+}
+
+/* Dialog sizing — responsive */
+.mat-mdc-dialog-container {
+  border-radius: var(--radius-lg) !important;
+}
+
+@media (max-width: 599px) {
+  .cdk-overlay-pane:not(.full-screen-dialog) {
+    max-width: 96vw !important;
+  }
+}
+
+/* ── Dialog form layout — responsive ────────────────────────────────── */
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.dialog-form .full-width,
+.dialog-form mat-form-field.full-width {
+  width: 100%;
+}
+
+/* Side-by-side field row used in dialogs (e.g. amount + category) */
+.amount-row,
+.field-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.amount-row .mat-mdc-form-field,
+.field-row .mat-mdc-form-field {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .amount-row,
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .amount-row .mat-mdc-form-field,
+  .field-row .mat-mdc-form-field {
+    width: 100%;
+  }
 }

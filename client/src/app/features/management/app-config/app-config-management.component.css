@@ -49,9 +49,9 @@
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
-.alert--success { background: #e8f5e9; color: #2e7d32; border-left: 3px solid #2e7d32; }
-.alert--error   { background: #fdecea; color: #c62828; border-left: 3px solid #c62828; }
-.alert--warning { background: #fff8e1; color: #e65100; border-left: 3px solid #e65100; }
+.alert--success { background: var(--success-bg); color: var(--success); border-left: 3px solid var(--success); }
+.alert--error   { background: var(--error-bg); color: var(--error); border-left: 3px solid var(--error); }
+.alert--warning { background: var(--warning-bg); color: var(--warning); border-left: 3px solid var(--warning); }
 
 .state-message {
   padding: 2rem;
@@ -101,26 +101,26 @@
   letter-spacing: 0.04em;
   margin-top: 0.3rem;
 }
-.badge--warning { background: #fff8e1; color: #e65100; }
+.badge--warning { background: var(--warning-bg); color: var(--warning); }
 .badge--muted   { background: var(--primary-subtle); color: var(--text-secondary); }
 .badge--type    { background: var(--primary-subtle); color: var(--primary); font-family: monospace; }
 
 .value-input {
   width: 100%;
   padding: 0.4rem 0.6rem;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   font: inherit;
   font-size: 0.875rem;
-  background: var(--bg-surface);
+  background: var(--primary-subtle);
   color: var(--text-primary);
   min-width: 180px;
 }
 
 .value-input:focus {
   outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px var(--primary-subtle);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12);
 }
 
 .value-readonly {

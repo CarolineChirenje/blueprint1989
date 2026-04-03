@@ -39,18 +39,19 @@
 
 .filter-select {
   padding: 0.45rem 0.75rem;
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   font: inherit;
   font-size: 0.875rem;
-  background: var(--bg-surface);
+  background: var(--primary-subtle);
   color: var(--text-primary);
   cursor: pointer;
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12);
 }
 
 .alert {
@@ -59,8 +60,8 @@
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
-.alert--success { background: #e8f5e9; color: #2e7d32; border-left: 3px solid #2e7d32; }
-.alert--error   { background: #fdecea; color: #c62828; border-left: 3px solid #c62828; }
+.alert--success { background: var(--success-bg); color: var(--success); border-left: 3px solid var(--success); }
+.alert--error   { background: var(--error-bg); color: var(--error); border-left: 3px solid var(--error); }
 
 .state-message {
   padding: 2rem;
@@ -78,8 +79,8 @@
   letter-spacing: 0.04em;
 }
 .badge-new    { background: #e3f2fd; color: #1565c0; }
-.badge-review { background: #fff8e1; color: #e65100; }
-.badge-closed { background: #e8f5e9; color: #2e7d32; }
+.badge-review { background: var(--warning-bg); color: var(--warning); }
+.badge-closed { background: var(--success-bg); color: var(--success); }
 
 .link-btn {
   background: none;
@@ -122,11 +123,11 @@
 
 .btn--danger-ghost {
   background: transparent;
-  color: #c62828;
-  border-color: #c62828;
+  color: var(--error);
+  border-color: var(--error-border);
 }
 .btn--danger-ghost:hover:not(:disabled) {
-  background: #fdecea;
+  background: var(--error-bg);
 }
 
 .btn:disabled {

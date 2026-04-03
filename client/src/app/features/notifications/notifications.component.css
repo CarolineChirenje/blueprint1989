@@ -128,9 +128,9 @@
 }
 
 .notifications-page__state--error {
-  color: #a12622;
-  background: #fff5f5;
-  border-color: #f2c4c1;
+  color: var(--error);
+  background: var(--error-bg);
+  border-color: var(--error-border);
 }
 
 .notifications-page__list {
@@ -153,7 +153,7 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #6c757d;
+  color: var(--text-secondary);
 }
 
 .notifications-page__item {
@@ -199,19 +199,19 @@
 }
 
 .notifications-page__item[data-tone='alert'] .notifications-page__icon {
-  background: #fdecea;
+  background: var(--error-bg);
 }
 
 .notifications-page__item[data-tone='warning'] .notifications-page__icon {
-  background: #fff4db;
+  background: var(--warning-bg);
 }
 
 .notifications-page__item[data-tone='success'] .notifications-page__icon {
-  background: #e9f8ef;
+  background: var(--success-bg);
 }
 
 .notifications-page__item[data-tone='info'] .notifications-page__icon {
-  background: #e8f1ff;
+  background: var(--info-bg);
 }
 
 .notifications-page__item-body {
@@ -268,13 +268,14 @@
 }
 
 .notifications-page__action-btn--danger {
-  color: #a12622;
-  background: #fff5f5;
-  border-color: #f2c4c1;
+  color: var(--error);
+  background: var(--error-bg);
+  border-color: var(--error-border);
 }
 
 .notifications-page__action-btn--danger:hover {
-  background: #fdecea;
+  background: var(--error-bg);
+  opacity: 0.85;
 }
 
 .notifications-page__purge-archived {
@@ -283,9 +284,9 @@
   gap: 0.4rem;
   padding: 0.55rem 0.9rem;
   border-radius: 999px;
-  background: #fff5f5;
-  color: #a12622;
-  border: 1px solid #f2c4c1;
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-border);
   font: inherit;
   font-weight: 700;
   cursor: pointer;

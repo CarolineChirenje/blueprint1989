@@ -12,6 +12,13 @@ body { background: transparent; overflow-x: hidden; }
   padding: 2rem 1rem;
 }
 
+@media (max-width: 599px) {
+  .login-page {
+    margin: -1rem;
+    padding: 1.5rem 1rem;
+  }
+}
+
 /* ── Brand block ───────────────────────────────────────────────────────── */
 .login-brand {
   margin-bottom: 1.5rem;
@@ -47,6 +54,13 @@ body { background: transparent; overflow-x: hidden; }
   background-color: var(--primary-subtle);
   color: var(--text-primary);
   color-scheme: light;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12);
 }
 .login-card button { margin-top:1rem }
 
@@ -93,13 +107,13 @@ body { background: transparent; overflow-x: hidden; }
 }
 
 .error-message {
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error);
   padding: 0.75rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   margin-top: 1rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 

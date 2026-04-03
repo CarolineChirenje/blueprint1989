@@ -6,9 +6,10 @@
 
 .oq-card {
   background: var(--surface);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
   box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
 }
 
 .oq-header {
@@ -45,13 +46,13 @@
 }
 
 .status-pill.online {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .status-pill.offline {
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--error-bg);
+  color: var(--error);
 }
 
 .status-dot {
@@ -63,20 +64,20 @@
 
 /* Messages */
 .success-message {
-  background: #d4edda;
-  border: 1px solid #c3e6cb;
-  color: #155724;
+  background: var(--success-bg);
+  border: 1.5px solid var(--success-border);
+  color: var(--success);
   padding: 0.75rem 1rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
 }
 
 .error-message {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  color: #721c24;
+  background: var(--error-bg);
+  border: 1.5px solid var(--error-border);
+  color: var(--error);
   padding: 0.75rem 1rem;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
 }
 
@@ -91,9 +92,9 @@
 .btn {
   padding: 0.65rem 1.5rem;
   border: none;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  font-weight: 500;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -106,16 +107,17 @@
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: white;
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #545b62;
+  background: var(--primary-subtle);
 }
 
 .btn:disabled {
@@ -124,10 +126,10 @@
 }
 
 .oq-offline-notice {
-  color: #856404;
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 4px;
+  color: var(--warning);
+  background: var(--warning-bg);
+  border: 1.5px solid var(--warning-border);
+  border-radius: var(--radius-sm);
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
   font-size: 0.875rem;
@@ -137,7 +139,7 @@
 .oq-empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .oq-empty-icon {
@@ -148,7 +150,7 @@
 }
 
 .oq-empty-text {
-  color: #666;
+  color: var(--text-secondary);
   padding: 2rem 0;
 }
 
@@ -165,11 +167,11 @@
 }
 
 .oq-section-expired h2 {
-  color: #856404;
+  color: var(--warning);
 }
 
 .section-description {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.875rem;
   margin: 0 0 0.75rem;
 }
@@ -186,21 +188,21 @@
   align-items: center;
   gap: 1rem;
   padding: 0.875rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
   background: var(--surface-raised);
   flex-wrap: wrap;
 }
 
 .oq-item.expiring-soon {
-  border-color: #ffc107;
-  background: #fffbf0;
+  border-color: var(--warning);
+  background: var(--warning-bg);
 }
 
 .oq-item-expired {
   opacity: 0.65;
-  border-color: #e0e0e0;
-  background: #f5f5f5;
+  border-color: var(--border);
+  background: var(--surface-raised);
 }
 
 .oq-item-main {
@@ -213,7 +215,7 @@
 
 .oq-item-label {
   font-weight: 500;
-  color: #1a1a1a;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -223,7 +225,7 @@
   display: flex;
   gap: 1rem;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
   flex-wrap: wrap;
 }
 
@@ -232,11 +234,11 @@
 }
 
 .oq-expiry.warning {
-  color: #856404;
+  color: var(--warning);
 }
 
 .oq-expiry.expired {
-  color: #721c24;
+  color: var(--error);
 }
 
 /* Type badges */
@@ -255,32 +257,32 @@
 }
 
 .badge-incident {
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--error-bg);
+  color: var(--error);
 }
 
 .badge-meal {
-  background: #d4edda;
-  color: #155724;
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .badge-expired {
-  background: #e0e0e0;
-  color: #555;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
 }
 
 .badge-default {
-  background: #e0e0e0;
-  color: #333;
+  background: var(--surface-raised);
+  color: var(--text-primary);
 }
 
 /* Discard button */
 .btn-discard {
   padding: 4px 12px;
-  border: 1px solid #dc3545;
+  border: 1.5px solid var(--error-border);
   background: transparent;
-  color: #dc3545;
-  border-radius: 4px;
+  color: var(--error);
+  border-radius: var(--radius-sm);
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -288,8 +290,8 @@
 }
 
 .btn-discard:hover:not(:disabled) {
-  background: #dc3545;
-  color: white;
+  background: var(--error-bg);
+  color: var(--error);
 }
 
 .btn-discard:disabled {

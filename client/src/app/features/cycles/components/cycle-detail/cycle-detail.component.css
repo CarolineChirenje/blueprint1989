@@ -1,14 +1,14 @@
 .detail-page { max-width: 900px; margin: 0 auto; padding: 2rem; }
-.loading, .error-msg, .empty-state { text-align: center; padding: 3rem; color: #666; }
+.loading, .error-msg, .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); }
 .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; gap: 1rem; }
 .header-left { display: flex; align-items: center; gap: .75rem; }
 .header-left h1 { font-size: 1.8rem; color: var(--text-primary); margin: 0; }
-.date-range { font-size: .85rem; color: #777; }
+.date-range { font-size: .85rem; color: var(--text-secondary); }
 .header-right { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
 .badge { padding: .25rem .75rem; border-radius: 12px; font-size: .8rem; font-weight: 600; }
 .badge-active { background: var(--success-bg); color: var(--success); }
 .badge-closed { background: var(--surface-raised); color: var(--text-secondary); }
-.tabs { display: flex; gap: .25rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e0e0e0; }
+.tabs { display: flex; gap: .25rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
 .tabs button { background: none; border: none; padding: .75rem 1.25rem; cursor: pointer; font-size: .95rem; color: var(--text-secondary); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
 .tabs button.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
 .tab-content { padding: 1rem 0; }
@@ -25,8 +25,8 @@
 .expense-notes { font-style: italic; }
 .category-badge { background: var(--info-bg); color: var(--info); padding: .1rem .5rem; border-radius: 8px; font-size: .78rem; }
 .obligation-list { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; }
-.obligation { font-size: .8rem; background: #fff3e0; color: #e65100; padding: .15rem .55rem; border-radius: 8px; display: inline-flex; align-items: center; gap: .2rem; }
-.obligation.settled { background: #e8f5e9; color: #388e3c; }
+.obligation { font-size: .8rem; background: var(--warning-bg); color: var(--warning); padding: .15rem .55rem; border-radius: 8px; display: inline-flex; align-items: center; gap: .2rem; }
+.obligation.settled { background: var(--success-bg); color: var(--success); }
 .settled-icon { font-size: 1rem; }
 .status-badge { padding: .15rem .55rem; border-radius: var(--radius-sm); font-size: .8rem; font-weight: 600; }
 .status-pending  { background: var(--warning-bg);  color: var(--warning-text); }

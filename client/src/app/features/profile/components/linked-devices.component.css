@@ -3,7 +3,7 @@
   margin: 2rem auto;
   padding: 0 1rem;
   color-scheme: light;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .page-header {
@@ -18,35 +18,35 @@
 }
 
 .subtitle {
-  color: #555;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   margin: 0;
 }
 
 .alert {
   padding: 0.75rem 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .alert-success {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #a5d6a7;
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1.5px solid var(--success-border);
 }
 
 .alert-error {
-  background: #ffebee;
-  color: #c62828;
-  border: 1px solid #ef9a9a;
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1.5px solid var(--error-border);
 }
 
 .loading-state,
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .devices-list {
@@ -123,7 +123,7 @@
 
 .device-meta {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-secondary);
   margin-top: 0.25rem;
 }
 
@@ -140,28 +140,28 @@
   font-weight: 600;
   padding: 2px 10px;
   border-radius: 12px;
-  background: #e0e0e0;
-  color: #555;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
 }
 
 .install-status-installed {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .install-status-neveraskagain {
-  background: #fce4ec;
-  color: #880e4f;
+  background: var(--error-bg);
+  color: var(--error);
 }
 
 .install-status-remindlater {
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 
 .last-seen {
   font-size: 0.75rem;
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .reset-prompt-row {
@@ -170,9 +170,9 @@
 
 .reset-prompt-btn {
   background: none;
-  border: 1px solid var(--primary);
+  border: 1.5px solid var(--primary);
   color: var(--primary);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 4px 12px;
   font-size: 0.78rem;
   cursor: pointer;
@@ -185,9 +185,9 @@
 
 .remove-btn {
   background: none;
-  border: 1px solid #e57373;
-  color: #c62828;
-  border-radius: 6px;
+  border: 1.5px solid var(--error-border);
+  color: var(--error);
+  border-radius: var(--radius-sm);
   padding: 6px 14px;
   font-size: 0.8rem;
   cursor: pointer;
@@ -197,7 +197,7 @@
 }
 
 .remove-btn:hover {
-  background: #ffebee;
+  background: var(--error-bg);
 }
 
 .back-link {
@@ -220,10 +220,10 @@
   border: none;
   cursor: pointer;
   padding: 2px;
-  color: #888;
+  color: var(--text-secondary);
   display: inline-flex;
   align-items: center;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   line-height: 1;
 }
 
@@ -235,19 +235,19 @@
   flex: 1;
   min-width: 140px;
   padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 0.9rem;
   outline: none;
 }
 
-.rename-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(35, 122, 73, 0.15); }
+.rename-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12); }
 
 .rename-save-btn {
   background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 4px 12px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -259,15 +259,15 @@
 
 .rename-cancel-btn {
   background: none;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 4px 10px;
   font-size: 0.8rem;
   cursor: pointer;
-  color: #555;
+  color: var(--text-secondary);
 }
 
-.rename-cancel-btn:hover { background: #f5f5f5; }
+.rename-cancel-btn:hover { background: var(--surface-raised); }
 
 /* ── Platform badge ───────────────────────────────── */
 .platform-badge {
@@ -276,14 +276,14 @@
   font-weight: 700;
   padding: 1px 8px;
   border-radius: 10px;
-  background: #e0e0e0;
-  color: #555;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   margin-right: 4px;
 }
 
-.platform-badge-android  { background: #e8f5e9; color: #2e7d32; }
+.platform-badge-android  { background: var(--success-bg); color: var(--success); }
 .platform-badge-ios      { background: var(--info-bg); color: var(--info); }
 .platform-badge-desktop  { background: #ede7f6; color: #4527a0; }
-.platform-badge-unknown  { background: #e0e0e0; color: #757575; }
+.platform-badge-unknown  { background: var(--surface-raised); color: var(--text-secondary); }

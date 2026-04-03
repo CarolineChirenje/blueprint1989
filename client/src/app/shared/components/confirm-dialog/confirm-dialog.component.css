@@ -2,8 +2,8 @@
 .confirm-dialog {
   width: 100%;
   box-sizing: border-box;
-  border: 2px solid rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 4px;
 }
 
@@ -11,7 +11,7 @@ h2 {
   margin: 0 0 12px 0;
   font-size: 20px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.87);
+  color: var(--text-primary);
 }
 
 mat-dialog-content {
@@ -25,7 +25,7 @@ mat-dialog-content p {
   margin: 0 0 10px 0;
   font-size: 15px;
   line-height: 1.5;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--text-secondary);
 }
 
 mat-dialog-content p:last-child {
@@ -40,7 +40,7 @@ mat-dialog-actions {
   padding: 12px 0 0 0;
   margin: 0;
   min-height: unset;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 1px solid var(--divider);
 }
 
 mat-dialog-actions button {
@@ -54,7 +54,7 @@ mat-dialog-actions button {
 @media (max-width: 599px) {
   .confirm-dialog {
     padding: 2px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 
   h2 {

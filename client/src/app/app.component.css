@@ -7,6 +7,7 @@
   flex-direction: column;
   min-height: 100vh;
   background: var(--bg);
+  overflow-x: hidden;
 }
 
 header {
@@ -618,6 +619,12 @@ main {
   background-color: var(--bg);
 }
 
+@media (max-width: 599px) {
+  main {
+    padding: 1rem;
+  }
+}
+
 footer {
   background: var(--primary);
   color: white;
@@ -626,11 +633,10 @@ footer {
   margin-top: auto;
   font-size: 0.95rem;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
-  /* Break out of max-width container on wide screens */
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Break out of max-width container on wide screens — use negative margins
+     instead of 100vw to avoid horizontal scroll on mobile */
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
 }
 
 footer p {
