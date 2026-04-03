@@ -6,7 +6,8 @@ public record CreateExpenseCycleRequest(
     string Name,
     DateTime StartDate,
     DateTime EndDate,
-    List<int> MemberUserIds);
+    List<int> MemberUserIds,
+    int GroupId);
 
 public record UpdateExpenseCycleRequest(
     string Name,
@@ -34,7 +35,9 @@ public record ExpenseCycleSummaryDto(
     int MemberCount,
     int ExpenseCount,
     decimal TotalAmount,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    int GroupId,
+    string GroupName);
 
 public record CycleMemberDto(
     int UserId,

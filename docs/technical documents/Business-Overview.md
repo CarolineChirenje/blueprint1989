@@ -2,13 +2,13 @@
 
 ## What is Divvy?
 
-**Divvy** is a cloud-hosted, mobile-first expense-sharing application for households and groups. It replaces informal spreadsheets and manual IOUs with a structured, offline-capable Progressive Web App that tracks shared expenses, calculates member obligations, and guides payments.
+**Divvy** is a cloud-hosted, mobile-first expense-sharing application for groups and groups. It replaces informal spreadsheets and manual IOUs with a structured, offline-capable Progressive Web App that tracks shared expenses, calculates member obligations, and guides payments.
 
 ---
 
 ## The Problem We Solve
 
-Groups that share living costs — flatmates, families, travel groups, shared households — face a recurring challenge:
+Groups that share living costs — flatmates, families, travel groups face a recurring challenge:
 
 | Pain Point | Impact |
 |---|---|
@@ -45,9 +45,9 @@ Divvy connects **Admins** and **Members** in one role-gated platform. Every expe
 
 ### Primary
 
-- **Shared households and flatmates** splitting rent, utilities, and groceries
+- **Shared groups and flatmates** splitting rent, utilities, and groceries
 - **Travel groups** tracking trip expenses and splitting costs
-- **Family units** managing a shared household budget
+- **Family units** managing a shared group budget
 
 ### Secondary
 
@@ -109,4 +109,4 @@ Divvy is positioned as a **SaaS subscription platform**:
 
 ## Summary
 
-> Divvy is the shared expense platform that households and groups need — structured billing cycles, automated obligation calculation, real-time alerts, and offline resilience — delivered as a modern PWA that works on any device with no app store required.
+> Divvy is the shared expense platform that  groups need — structured billing cycles, automated obligation calculation, real-time alerts, and offline resilience — delivered as a modern PWA that works on any device with no app store required.

@@ -472,3 +472,111 @@
     font-size: 1.1rem;
   }
 }
+
+/* ---- Group invite banner ---- */
+
+.notifications-page__invites {
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  background: var(--primary-subtle, #eef2ff);
+  overflow: hidden;
+}
+
+.notifications-page__invites-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.notifications-page__invites-heading .material-icons {
+  font-size: 1.1rem;
+}
+
+.notifications-page__invite-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.notifications-page__invite-item:first-of-type {
+  border-top: none;
+}
+
+.notifications-page__invite-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.notifications-page__invite-group {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.97rem;
+}
+
+.notifications-page__invite-meta {
+  color: var(--text-secondary);
+  font-size: 0.83rem;
+}
+
+.notifications-page__invite-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.notifications-page__invite-btn {
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 0.15s;
+}
+
+.notifications-page__invite-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.notifications-page__invite-btn--accept {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.notifications-page__invite-btn--accept:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.notifications-page__invite-btn--decline {
+  background: transparent;
+  color: var(--error);
+  border-color: var(--error-border, #f5c6cb);
+}
+
+.notifications-page__invite-btn--decline:hover:not(:disabled) {
+  background: var(--error-bg, #fff0f0);
+}
+
+@media (max-width: 520px) {
+  .notifications-page__invite-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .notifications-page__invite-actions {
+    justify-content: flex-end;
+  }
+}

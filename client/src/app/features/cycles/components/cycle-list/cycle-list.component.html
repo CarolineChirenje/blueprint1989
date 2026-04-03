@@ -8,6 +8,19 @@
     }
   </div>
 
+  @if (groups.length > 0) {
+    <div class="cycles-group-filter">
+      <button type="button" class="cycles-group-filter__btn" [class.is-active]="selectedGroupId === null" (click)="setGroupFilter(null)">
+        All groups
+      </button>
+      @for (group of groups; track group.id) {
+        <button type="button" class="cycles-group-filter__btn" [class.is-active]="selectedGroupId === group.id" (click)="setGroupFilter(group.id)">
+          {{ group.name }}
+        </button>
+      }
+    </div>
+  }
+
   @if (loading) {
     <div class="loading">Loading cycles…</div>
   } @else if (error) {
@@ -28,6 +41,12 @@
             <span class="cycle-name">{{ cycle.name }}</span>
             <span class="badge" [ngClass]="statusClass(cycle.status)">{{ cycle.status }}</span>
           </div>
+          @if (cycle.groupName) {
+            <div class="cycle-card-group">
+              <span class="material-icons" aria-hidden="true">group</span>
+              <span>{{ cycle.groupName }}</span>
+            </div>
+          }
           <div class="cycle-card-meta">
             <span>{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
           </div>

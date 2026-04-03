@@ -22,6 +22,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; } = null!;
 
     // ── Divvy domain ──────────────────────────────────────────────────────────
+    public DbSet<Group>            Groups            { get; set; } = null!;
+    public DbSet<GroupMember>      GroupMembers      { get; set; } = null!;
     public DbSet<ExpenseCycle>     ExpenseCycles     { get; set; } = null!;
     public DbSet<CycleMember>      CycleMembers      { get; set; } = null!;
     public DbSet<Expense>          Expenses          { get; set; } = null!;
@@ -45,6 +47,8 @@ public class ApplicationDbContext : DbContext
         ConfigureUserNotificationPreferenceEntity(modelBuilder);
 
         // Divvy domain
+        ConfigureGroupEntity(modelBuilder);
+        ConfigureGroupMemberEntity(modelBuilder);
         ConfigureExpenseCycleEntity(modelBuilder);
         ConfigureCycleMemberEntity(modelBuilder);
         ConfigureExpenseEntity(modelBuilder);
@@ -178,6 +182,30 @@ public class ApplicationDbContext : DbContext
 
     // ── Divvy domain configure methods ────────────────────────────────────────
 
+    private static void ConfigureGroupEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Group>(entity =>
+        {
+            entity.ToTable("Groups");
+            entity.HasKey(g => g.Id);
+            entity.Property(g => g.Name).IsRequired().HasMaxLength(150);
+            entity.Property(g => g.Description).HasMaxLength(500);
+            entity.HasOne<User>().WithMany().HasForeignKey(g => g.CreatedByUserId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    private static void ConfigureGroupMemberEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<GroupMember>(entity =>
+        {
+            entity.ToTable("GroupMembers");
+            entity.HasKey(gm => new { gm.GroupId, gm.UserId });
+            entity.HasOne<Group>().WithMany().HasForeignKey(gm => gm.GroupId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(gm => gm.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(gm => gm.InvitedByUserId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
     private static void ConfigureExpenseCycleEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ExpenseCycle>(entity =>
@@ -186,6 +214,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(c => c.Id);
             entity.Property(c => c.Name).IsRequired().HasMaxLength(150);
             entity.HasOne<User>().WithMany().HasForeignKey(c => c.CreatedByUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Group>().WithMany().HasForeignKey(c => c.GroupId).IsRequired(true).OnDelete(DeleteBehavior.Restrict);
         });
     }
 

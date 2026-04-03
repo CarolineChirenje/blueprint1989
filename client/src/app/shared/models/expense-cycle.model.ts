@@ -28,6 +28,8 @@ export interface ExpenseCycleSummaryDto {
   expenseCount: number;
   totalAmount: number;
   createdAt: string;
+  groupId: number;
+  groupName: string;
 }
 
 export interface ExpenseCycleDto {

@@ -27,3 +27,9 @@ export interface UserManagementDto {
     isMfaEnabled: boolean;
     createdAt: string;
 }
+
+export interface UserGroupMembershipDto {
+    groupId: number;
+    groupName: string;
+    groupRole: 'GroupAdmin' | 'GroupMember';
+}

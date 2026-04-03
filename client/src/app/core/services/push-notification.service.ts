@@ -21,11 +21,12 @@ export interface TestPushRequest {
 
 /** Enum mirroring server-side NotificationType — kept in sync with the server enum values. */
 export enum NotificationType {
-  General          = 1,
-  PaymentDue       = 2,
-  PaymentReceived  = 3,
-  CycleCreated     = 4,
-  SystemRestart    = 5,
+  General              = 1,
+  PaymentDue           = 2,
+  PaymentReceived      = 3,
+  CycleCreated         = 4,
+  SystemRestart        = 5,
+  GroupInviteReceived  = 6,
 }
 
 @Injectable({ providedIn: 'root' })

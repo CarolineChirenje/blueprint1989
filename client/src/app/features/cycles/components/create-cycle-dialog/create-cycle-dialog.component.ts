@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { ExpenseCycleService } from '../../../../core/services/expense-cycle.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { GroupService } from '../../../../core/services/group.service';
+import { GroupDto } from '../../../../shared/models/group.model';
 
 interface UserOption { id: number; firstName: string; lastName: string; email: string; }
 
@@ -16,6 +18,7 @@ interface UserOption { id: number; firstName: string; lastName: string; email: s
 export class CreateCycleDialogComponent implements OnInit {
   form: FormGroup;
   users: UserOption[] = [];
+  groups: GroupDto[] = [];
   saving = false;
   error = '';
 
@@ -24,13 +27,15 @@ export class CreateCycleDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<CreateCycleDialogComponent>,
     private cycleService: ExpenseCycleService,
     private auth: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private groupService: GroupService
   ) {
     this.form = this.fb.group({
       name:      ['', [Validators.required, Validators.maxLength(150)]],
       startDate: ['', Validators.required],
       endDate:   ['', Validators.required],
-      memberIds: [[], Validators.required]
+      memberIds: [[], Validators.required],
+      groupId:   [null, Validators.required]
     });
   }
 
@@ -39,14 +44,18 @@ export class CreateCycleDialogComponent implements OnInit {
       next: users => this.users = users,
       error: () => {}
     });
+    this.groupService.getGroups().subscribe({
+      next: groups => { this.groups = groups; },
+      error: () => {}
+    });
   }
 
   submit(): void {
     if (this.form.invalid) return;
     this.saving = true;
     this.error = '';
-    const { name, startDate, endDate, memberIds } = this.form.value;
-    this.cycleService.create({ name, startDate, endDate, memberUserIds: memberIds }).subscribe({
+    const { name, startDate, endDate, memberIds, groupId } = this.form.value;
+    this.cycleService.create({ name, startDate, endDate, memberUserIds: memberIds, groupId }).subscribe({
       next: () => this.dialogRef.close(true),
       error: err => { this.error = err.error?.message || 'Failed to create cycle.'; this.saving = false; }
     });

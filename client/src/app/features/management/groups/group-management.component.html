@@ -1,0 +1,67 @@
+<div class="page-header">
+  <h2>Groups</h2>
+  <button mat-raised-button color="primary" (click)="openCreateDialog()">
+    <mat-icon>add</mat-icon> New Group
+  </button>
+</div>
+
+<mat-card class="content-card">
+  <mat-card-content>
+
+    <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+
+    <div *ngIf="isLoading" class="loading-wrap">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+
+    <table mat-table [dataSource]="groups" class="shared-table" *ngIf="!isLoading">
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let g">{{ g.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="memberCount">
+        <th mat-header-cell *matHeaderCellDef>Members</th>
+        <td mat-cell *matCellDef="let g">{{ g.memberCount }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let g">
+          <span class="status-chip" [class.active]="g.isActive" [class.inactive]="!g.isActive">
+            {{ g.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <td mat-cell *matCellDef="let g">{{ g.createdAt | date:'mediumDate' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let g" class="actions-cell">
+          <button mat-icon-button matTooltip="Manage members" (click)="openMembersDialog(g)">
+            <mat-icon>people</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Edit group" (click)="editGroup(g)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Delete group" color="warn" (click)="deleteGroup(g)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-data" colspan="5">No groups yet. Create one to get started.</td>
+      </tr>
+    </table>
+
+  </mat-card-content>
+</mat-card>

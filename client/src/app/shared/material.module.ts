@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatDividerModule } from '@angular/material/divider';
 
 const MATERIAL_MODULES = [
   MatTableModule,
@@ -36,7 +37,8 @@ const MATERIAL_MODULES = [
   MatTooltipModule,
   MatSnackBarModule,
   MatCheckboxModule,
-  MatRadioModule
+  MatRadioModule,
+  MatDividerModule
 ];
 
 @NgModule({

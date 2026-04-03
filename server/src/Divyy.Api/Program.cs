@@ -204,6 +204,7 @@ builder.Services.AddScoped<TimeZoneService>();
 builder.Services.AddScoped<ExpenseCycleService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
 
 // WebAuthn / Biometric authentication
 builder.Services.AddMemoryCache();

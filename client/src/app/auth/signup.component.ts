@@ -22,7 +22,7 @@ export class SignupComponent implements OnInit {
 
   roleOptions = [
     { value: Role.Admin,  label: 'Admin',  description: 'System administrator', icon: 'admin_panel_settings', color: '#F57C00' },
-    { value: Role.Member, label: 'Member', description: 'Household member',     icon: 'person',               color: '#237A49' }
+    { value: Role.Member, label: 'Member', description: 'Group member',     icon: 'person',               color: '#237A49' }
   ];
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {

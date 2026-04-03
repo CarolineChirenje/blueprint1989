@@ -32,11 +32,12 @@ public static class DatabaseSeeder
         if (!await context.NotificationTypes.AnyAsync())
         {
             context.NotificationTypes.AddRange(
-                new NotificationTypeEntity { Id = 1, Name = "General",         Description = "General or test notification" },
-                new NotificationTypeEntity { Id = 2, Name = "PaymentDue",      Description = "A payment obligation is due" },
-                new NotificationTypeEntity { Id = 3, Name = "PaymentReceived", Description = "A payment has been recorded" },
-                new NotificationTypeEntity { Id = 4, Name = "CycleCreated",    Description = "A new expense cycle has been created" },
-                new NotificationTypeEntity { Id = 5, Name = "SystemRestart",   Description = "System is restarting" }
+                new NotificationTypeEntity { Id = 1, Name = "General",             Description = "General or test notification" },
+                new NotificationTypeEntity { Id = 2, Name = "PaymentDue",            Description = "A payment obligation is due" },
+                new NotificationTypeEntity { Id = 3, Name = "PaymentReceived",       Description = "A payment has been recorded" },
+                new NotificationTypeEntity { Id = 4, Name = "CycleCreated",          Description = "A new expense cycle has been created" },
+                new NotificationTypeEntity { Id = 5, Name = "SystemRestart",         Description = "System is restarting" },
+                new NotificationTypeEntity { Id = 6, Name = "GroupInviteReceived",   Description = "A user has been invited to join a group" }
             );
             await context.SaveChangesAsync();
         }

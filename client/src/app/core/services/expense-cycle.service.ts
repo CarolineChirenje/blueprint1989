@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
@@ -14,8 +14,9 @@ export class ExpenseCycleService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<ExpenseCycleSummaryDto[]> {
-    return this.http.get<ExpenseCycleSummaryDto[]>(this.url);
+  getAll(groupId?: number | null): Observable<ExpenseCycleSummaryDto[]> {
+    const params = groupId ? new HttpParams().set('groupId', groupId) : undefined;
+    return this.http.get<ExpenseCycleSummaryDto[]>(this.url, { params });
   }
 
   getById(id: number): Observable<ExpenseCycleDto> {
@@ -26,7 +27,7 @@ export class ExpenseCycleService {
     return this.http.get<CycleBalanceDto>(`${this.url}/${id}/balance`);
   }
 
-  create(payload: { name: string; startDate: string; endDate: string; memberUserIds: number[] }): Observable<ExpenseCycleDto> {
+  create(payload: { name: string; startDate: string; endDate: string; memberUserIds: number[]; groupId?: number | null }): Observable<ExpenseCycleDto> {
     return this.http.post<ExpenseCycleDto>(this.url, payload);
   }
 

@@ -25,4 +25,8 @@ public class ExpenseCycle
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>Group this cycle belongs to. Every cycle must belong to a group.</summary>
+    [Required]
+    public int GroupId { get; set; }
 }

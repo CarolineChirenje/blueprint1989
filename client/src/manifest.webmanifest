@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Divvy",
   "short_name": "Divvy",
-  "description": "Divvy — household expense tracker",
+  "description": "Divvy — Group expense tracker",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#237A49",

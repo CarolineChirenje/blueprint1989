@@ -1,0 +1,39 @@
+.loading-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.error-banner {
+  color: #d32f2f;
+  padding: 8px 0;
+}
+
+.empty-msg {
+  color: #757575;
+  text-align: center;
+  padding: 16px 0;
+}
+
+.roles-table {
+  width: 100%;
+}
+
+.role-chip {
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f5f5f5;
+  color: #757575;
+}
+
+.role-chip.admin {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.action-cell {
+  text-align: right;
+  white-space: nowrap;
+}

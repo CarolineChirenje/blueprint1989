@@ -16,45 +16,47 @@ public class ExpenseCycleService
 
     // ── Queries ───────────────────────────────────────────────────────────────
 
-    public async Task<List<ExpenseCycleSummaryDto>> GetAllAsync()
+    public async Task<List<ExpenseCycleSummaryDto>> GetAllAsync(int? groupId = null)
     {
-        var cycles = await _context.ExpenseCycles
+        var query = _context.ExpenseCycles.AsQueryable();
+
+        if (groupId.HasValue)
+            query = query.Where(c => c.GroupId == groupId.Value);
+
+        var cycles = await query
             .OrderByDescending(c => c.StartDate)
             .ToListAsync();
 
-        var summaries = new List<ExpenseCycleSummaryDto>();
-
-        foreach (var cycle in cycles)
-        {
-            var memberCount = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycle.Id);
-            var expenses    = await _context.Expenses.Where(e => e.ExpenseCycleId == cycle.Id).ToListAsync();
-
-            summaries.Add(new ExpenseCycleSummaryDto(
-                cycle.Id,
-                cycle.Name,
-                cycle.StartDate,
-                cycle.EndDate,
-                cycle.Status.ToString(),
-                memberCount,
-                expenses.Count,
-                expenses.Sum(e => e.Amount),
-                cycle.CreatedAt));
-        }
-
-        return summaries;
+        return await BuildSummariesAsync(cycles);
     }
 
-    public async Task<List<ExpenseCycleSummaryDto>> GetForUserAsync(int userId)
+    public async Task<List<ExpenseCycleSummaryDto>> GetForUserAsync(int userId, int? groupId = null)
     {
         var cycleIds = await _context.CycleMembers
             .Where(m => m.UserId == userId)
             .Select(m => m.ExpenseCycleId)
             .ToListAsync();
 
-        var cycles = await _context.ExpenseCycles
-            .Where(c => cycleIds.Contains(c.Id))
+        var query = _context.ExpenseCycles.Where(c => cycleIds.Contains(c.Id));
+
+        if (groupId.HasValue)
+            query = query.Where(c => c.GroupId == groupId.Value);
+
+        var cycles = await query
             .OrderByDescending(c => c.StartDate)
             .ToListAsync();
+
+        return await BuildSummariesAsync(cycles);
+    }
+
+    private async Task<List<ExpenseCycleSummaryDto>> BuildSummariesAsync(List<ExpenseCycle> cycles)
+    {
+        var groupIds   = cycles.Select(c => c.GroupId).Distinct().ToList();
+        var groupNames = groupIds.Any()
+            ? await _context.Groups
+                .Where(g => groupIds.Contains(g.Id))
+                .ToDictionaryAsync(g => g.Id, g => g.Name)
+            : new Dictionary<int, string>();
 
         var summaries = new List<ExpenseCycleSummaryDto>();
 
@@ -62,6 +64,7 @@ public class ExpenseCycleService
         {
             var memberCount = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycle.Id);
             var expenses    = await _context.Expenses.Where(e => e.ExpenseCycleId == cycle.Id).ToListAsync();
+            groupNames.TryGetValue(cycle.GroupId, out var groupName);
 
             summaries.Add(new ExpenseCycleSummaryDto(
                 cycle.Id,
@@ -72,7 +75,9 @@ public class ExpenseCycleService
                 memberCount,
                 expenses.Count,
                 expenses.Sum(e => e.Amount),
-                cycle.CreatedAt));
+                cycle.CreatedAt,
+                cycle.GroupId,
+                groupName ?? "(Unknown group)"));
         }
 
         return summaries;
@@ -162,10 +167,24 @@ public class ExpenseCycleService
 
     // ── Mutations ─────────────────────────────────────────────────────────────
 
+    /// <summary>Returns the GroupId of a cycle, or null if the cycle does not exist.</summary>
+    public async Task<int?> GetCycleGroupIdAsync(int cycleId)
+        => await _context.ExpenseCycles
+            .Where(c => c.Id == cycleId)
+            .Select(c => (int?)c.GroupId)
+            .FirstOrDefaultAsync();
+
     public async Task<(ExpenseCycleDto? dto, string? error)> CreateAsync(int createdByUserId, CreateExpenseCycleRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
             return (null, "Name is required.");
+
+        if (request.GroupId <= 0)
+            return (null, "A valid group is required.");
+
+        var groupExists = await _context.Groups.AnyAsync(g => g.Id == request.GroupId && g.IsActive);
+        if (!groupExists)
+            return (null, "Group not found or is inactive.");
 
         if (request.StartDate >= request.EndDate)
             return (null, "EndDate must be after StartDate.");
@@ -180,6 +199,7 @@ public class ExpenseCycleService
             EndDate          = request.EndDate,
             Status           = CycleStatus.Active,
             CreatedByUserId  = createdByUserId,
+            GroupId          = request.GroupId,
             CreatedAt        = DateTime.UtcNow,
             UpdatedAt        = DateTime.UtcNow
         };

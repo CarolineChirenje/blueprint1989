@@ -16,6 +16,7 @@ import { OfflineQueueService } from './core/services/offline-queue.service';
 import { SyncService } from './core/services/sync.service';
 import { SystemService } from './shared/services/system.service';
 import { DialogService } from './shared/services/dialog.service';
+import { GroupService } from './core/services/group.service';
 
 type BellNotificationItem = {
   ids: number[];
@@ -81,6 +82,7 @@ export class AppComponent implements OnInit, OnDestroy {
   showUpdatePrompt = false;
   isBreakingUpdate = false;
   year = new Date().getFullYear();
+  canManageGroups = false;
 
   private notifSub?: Subscription;
   private pollSub?: Subscription;
@@ -96,7 +98,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private syncService: SyncService,
     private http: HttpClient,
     private systemService: SystemService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private groupService: GroupService
   ) {}
   
   ngOnInit() {
@@ -160,6 +163,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn()) {
       this.initPush();
       this.registerDevice();
+      this.loadGroupAccess();
     }
 
     // Initialise push after each successful login navigation
@@ -172,6 +176,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.loadNotifications();
         this.initPush();
         this.registerDevice();
+        this.loadGroupAccess();
       }
     });
 
@@ -659,6 +664,18 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.auth.isAdminOrAbove();
   }
 
+  canManageGroupsOrAdmin(): boolean {
+    return this.auth.isAdminOrAbove() || this.canManageGroups;
+  }
+
+  private loadGroupAccess(): void {
+    if (this.auth.isAdminOrAbove()) { this.canManageGroups = true; return; }
+    this.groupService.getGroups().subscribe({
+      next: groups => { this.canManageGroups = groups.some(g => g.canManage); },
+      error: () => {}
+    });
+  }
+
 
   
   toggleDropdown(): void {
@@ -770,6 +787,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.router.navigate(['/management/users']);
   }
   
+  navigateToGroups(): void {
+    this.closeManagementDropdown();
+    this.router.navigate(['/management/groups']);
+  }
+
   navigateToCycles(): void {
     this.closeManagementDropdown();
     this.router.navigate(['/cycles']);

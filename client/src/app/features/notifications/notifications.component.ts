@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { NotificationDto, NotificationService } from '../../core/services/notification.service';
 import { NotificationType } from '../../core/services/push-notification.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { GroupService } from '../../core/services/group.service';
+import { GroupInviteDto } from '../../shared/models/group.model';
 
 type NotificationFilter = 'all' | 'unread' | 'archived';
 
@@ -30,10 +32,15 @@ export class NotificationsComponent implements OnInit {
   isLoadingMore = false;
   error = '';
 
+  pendingInvites: GroupInviteDto[] = [];
+  inviteError = '';
+  inviteResponding = false;
+
   constructor(
     private notificationService: NotificationService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private groupService: GroupService
   ) {}
 
   get hasReadNotifications(): boolean {
@@ -42,6 +49,23 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadNotifications(true);
+    this.loadPendingInvites();
+  }
+
+  loadPendingInvites(): void {
+    this.groupService.getMyInvites().subscribe({
+      next: invites => { this.pendingInvites = invites; },
+      error: () => {}
+    });
+  }
+
+  respondToInvite(invite: GroupInviteDto, accept: boolean): void {
+    this.inviteError = '';
+    this.inviteResponding = true;
+    this.groupService.respondToInvite(invite.groupId, { accept }).subscribe({
+      next: () => { this.inviteResponding = false; this.loadPendingInvites(); },
+      error: err => { this.inviteError = err.error?.message || 'Failed to respond to invite.'; this.inviteResponding = false; }
+    });
   }
 
   setFilter(filter: NotificationFilter): void {
@@ -268,6 +292,8 @@ export class NotificationsComponent implements OnInit {
         return '🔄';
       case NotificationType.SystemRestart:
         return '🔧';
+      case NotificationType.GroupInviteReceived:
+        return '👥';
       default:
         return '🔔';
     }
@@ -282,6 +308,8 @@ export class NotificationsComponent implements OnInit {
       case NotificationType.CycleCreated:
         return 'info';
       case NotificationType.SystemRestart:
+        return 'info';
+      case NotificationType.GroupInviteReceived:
         return 'info';
       default:
         return 'neutral';

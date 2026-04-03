@@ -421,6 +421,23 @@ namespace Divvy.Api.Controllers
             return Ok(new { message = "User deleted successfully" });
         }
 
+        [HttpGet("users/{userId}/group-memberships")]
+        [Authorize(Policy = "AdminOrAbove")]
+        public async Task<IActionResult> GetUserGroupMemberships(int userId)
+        {
+            var memberships = await _context.GroupMembers
+                .Where(gm => gm.UserId == userId && gm.Status == GroupInviteStatus.Accepted)
+                .Join(_context.Groups, gm => gm.GroupId, g => g.Id, (gm, g) => new UserGroupMembershipDto
+                {
+                    GroupId = gm.GroupId,
+                    GroupName = g.Name,
+                    GroupRole = gm.GroupRole.ToString()
+                })
+                .ToListAsync();
+
+            return Ok(memberships);
+        }
+
         [HttpPost("register")]
         [Authorize(Policy = "AdminOrAbove")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)

@@ -12,10 +12,12 @@ namespace Divvy.Api.Controllers;
 public class ExpenseCycleController : ControllerBase
 {
     private readonly ExpenseCycleService _cycleService;
+    private readonly IGroupService _groupService;
 
-    public ExpenseCycleController(ExpenseCycleService cycleService)
+    public ExpenseCycleController(ExpenseCycleService cycleService, IGroupService groupService)
     {
-        _cycleService = cycleService;
+        _cycleService  = cycleService;
+        _groupService  = groupService;
     }
 
     private int? GetCurrentUserId()
@@ -24,19 +26,44 @@ public class ExpenseCycleController : ControllerBase
         return claim != null && int.TryParse(claim.Value, out var id) ? id : null;
     }
 
-    /// <summary>Returns all cycles. Admins see all; Members see only their own.</summary>
+    private Role GetCurrentUserRole()
+    {
+        var roleStr = User.FindFirst("role")?.Value ?? "";
+        return roleStr == nameof(Role.SuperAdmin) ? Role.SuperAdmin
+             : roleStr == nameof(Role.Admin)      ? Role.Admin
+             : Role.Member;
+    }
+
+    private bool IsAdminOrAbove() => GetCurrentUserRole() is Role.SuperAdmin or Role.Admin;
+
+    private async Task<bool> CanManageCycleAsync(int cycleId)
+    {
+        if (IsAdminOrAbove()) return true;
+        var userId = GetCurrentUserId();
+        if (userId == null) return false;
+        var groupId = await _cycleService.GetCycleGroupIdAsync(cycleId);
+        if (groupId == null) return false;
+        return await _groupService.IsGroupAdminOfGroupAsync(groupId.Value, userId.Value);
+    }
+
+    private async Task<bool> CanManageGroupAsync(int groupId)
+    {
+        if (IsAdminOrAbove()) return true;
+        var userId = GetCurrentUserId();
+        if (userId == null) return false;
+        return await _groupService.IsGroupAdminOfGroupAsync(groupId, userId.Value);
+    }
+
+    /// <summary>Returns all cycles. Admins see all; Members see only their own. Optionally filter by groupId.</summary>
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int? groupId = null)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
 
-        var roleStr  = User.FindFirst("role")?.Value ?? "";
-        var isAdmin  = roleStr == nameof(Role.SuperAdmin) || roleStr == nameof(Role.Admin);
-
-        var cycles = isAdmin
-            ? await _cycleService.GetAllAsync()
-            : await _cycleService.GetForUserAsync(userId.Value);
+        var cycles = IsAdminOrAbove()
+            ? await _cycleService.GetAllAsync(groupId)
+            : await _cycleService.GetForUserAsync(userId.Value, groupId);
 
         return Ok(cycles);
     }
@@ -62,13 +89,15 @@ public class ExpenseCycleController : ControllerBase
         return Ok(balance);
     }
 
-    /// <summary>Creates a new expense cycle. Admin or above only.</summary>
+    /// <summary>Creates a new expense cycle. Admin/SuperAdmin or GroupAdmin of the target group.</summary>
     [HttpPost]
-    [Authorize(Policy = "AdminOrAbove")]
     public async Task<IActionResult> Create([FromBody] CreateExpenseCycleRequest request)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
+
+        if (!await CanManageGroupAsync(request.GroupId))
+            return Forbid();
 
         var (dto, error) = await _cycleService.CreateAsync(userId.Value, request);
         if (error != null) return BadRequest(new { message = error });
@@ -76,11 +105,12 @@ public class ExpenseCycleController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = dto!.Id }, dto);
     }
 
-    /// <summary>Updates cycle name and dates. Admin or above only.</summary>
+    /// <summary>Updates cycle name and dates. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
     [HttpPut("{id:int}")]
-    [Authorize(Policy = "AdminOrAbove")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateExpenseCycleRequest request)
     {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
         var (dto, error) = await _cycleService.UpdateAsync(id, request);
         if (error != null)
             return error == "Cycle not found." ? NotFound(new { message = error }) : BadRequest(new { message = error });
@@ -88,11 +118,12 @@ public class ExpenseCycleController : ControllerBase
         return Ok(dto);
     }
 
-    /// <summary>Closes a cycle to prevent further expense entries. Admin or above only.</summary>
+    /// <summary>Closes a cycle. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
     [HttpPost("{id:int}/close")]
-    [Authorize(Policy = "AdminOrAbove")]
     public async Task<IActionResult> Close(int id)
     {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
         var error = await _cycleService.CloseAsync(id);
         if (error != null)
             return error == "Cycle not found." ? NotFound(new { message = error }) : BadRequest(new { message = error });
@@ -100,22 +131,24 @@ public class ExpenseCycleController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Deletes a cycle and all its expenses. Admin or above only.</summary>
+    /// <summary>Deletes a cycle and all its expenses. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
     [HttpDelete("{id:int}")]
-    [Authorize(Policy = "AdminOrAbove")]
     public async Task<IActionResult> Delete(int id)
     {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
         var error = await _cycleService.DeleteAsync(id);
         if (error != null) return NotFound(new { message = error });
 
         return NoContent();
     }
 
-    /// <summary>Adds a user to a cycle. Admin or above only.</summary>
+    /// <summary>Adds a user to a cycle. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
     [HttpPost("{id:int}/members/{userId:int}")]
-    [Authorize(Policy = "AdminOrAbove")]
     public async Task<IActionResult> AddMember(int id, int userId)
     {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
         var error = await _cycleService.AddMemberAsync(id, userId);
         if (error != null)
             return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
@@ -123,11 +156,12 @@ public class ExpenseCycleController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Removes a user from a cycle. Admin or above only.</summary>
+    /// <summary>Removes a user from a cycle. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
     [HttpDelete("{id:int}/members/{userId:int}")]
-    [Authorize(Policy = "AdminOrAbove")]
     public async Task<IActionResult> RemoveMember(int id, int userId)
     {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
         var error = await _cycleService.RemoveMemberAsync(id, userId);
         if (error != null)
             return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
@@ -135,3 +169,4 @@ public class ExpenseCycleController : ControllerBase
         return NoContent();
     }
 }
+

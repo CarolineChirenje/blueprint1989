@@ -47,3 +47,10 @@ public class UpdateUserRequest
     [Required]
     public Role Role { get; set; }
 }
+
+public class UserGroupMembershipDto
+{
+    public int GroupId { get; set; }
+    public string GroupName { get; set; } = string.Empty;
+    public string GroupRole { get; set; } = string.Empty;  // "GroupAdmin" | "GroupMember"
+}

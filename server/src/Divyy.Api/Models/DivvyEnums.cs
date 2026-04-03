@@ -22,3 +22,16 @@ public enum PaymentStatus
     Confirmed = 2,
     Rejected  = 3
 }
+
+public enum GroupRole
+{
+    GroupAdmin  = 1,
+    GroupMember = 2
+}
+
+public enum GroupInviteStatus
+{
+    Pending  = 1,
+    Accepted = 2,
+    Declined = 3
+}

@@ -20,5 +20,8 @@ public enum NotificationType
 
     /// <summary>The API service is about to restart; all users are notified before shutdown.</summary>
     SystemRestart = 5,
+
+    /// <summary>A user has been invited to join a group.</summary>
+    GroupInviteReceived = 6,
 }
 

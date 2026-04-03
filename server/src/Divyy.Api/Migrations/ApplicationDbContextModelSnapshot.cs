@@ -252,6 +252,10 @@ namespace Divvy.Api.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("end_date");
 
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer")
+                        .HasColumnName("group_id");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -276,7 +280,97 @@ namespace Divvy.Api.Migrations
                     b.HasIndex("CreatedByUserId")
                         .HasDatabaseName("ix_expense_cycles_created_by_user_id");
 
+                    b.HasIndex("GroupId")
+                        .HasDatabaseName("ix_expense_cycles_group_id");
+
                     b.ToTable("ExpenseCycles", (string)null);
+                });
+
+            modelBuilder.Entity("Divvy.Api.Models.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CreatedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("created_by_user_id");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_groups");
+
+                    b.HasIndex("CreatedByUserId")
+                        .HasDatabaseName("ix_groups_created_by_user_id");
+
+                    b.ToTable("Groups", (string)null);
+                });
+
+            modelBuilder.Entity("Divvy.Api.Models.GroupMember", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer")
+                        .HasColumnName("group_id");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.Property<int>("GroupRole")
+                        .HasColumnType("integer")
+                        .HasColumnName("group_role");
+
+                    b.Property<DateTime>("InvitedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("invited_at");
+
+                    b.Property<int>("InvitedByUserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("invited_by_user_id");
+
+                    b.Property<DateTime?>("RespondedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("responded_at");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.HasKey("GroupId", "UserId")
+                        .HasName("pk_group_members");
+
+                    b.HasIndex("InvitedByUserId")
+                        .HasDatabaseName("ix_group_members_invited_by_user_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_group_members_user_id");
+
+                    b.ToTable("GroupMembers", (string)null);
                 });
 
             modelBuilder.Entity("Divvy.Api.Models.MemberObligation", b =>
@@ -916,6 +1010,47 @@ namespace Divvy.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_expense_cycles_users_created_by_user_id");
+
+                    b.HasOne("Divvy.Api.Models.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_expense_cycles_groups_group_id");
+                });
+
+            modelBuilder.Entity("Divvy.Api.Models.Group", b =>
+                {
+                    b.HasOne("Divvy.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_groups_users_created_by_user_id");
+                });
+
+            modelBuilder.Entity("Divvy.Api.Models.GroupMember", b =>
+                {
+                    b.HasOne("Divvy.Api.Models.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_group_members_groups_group_id");
+
+                    b.HasOne("Divvy.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("InvitedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_group_members_users_invited_by_user_id");
+
+                    b.HasOne("Divvy.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_group_members_users_user_id");
                 });
 
             modelBuilder.Entity("Divvy.Api.Models.MemberObligation", b =>

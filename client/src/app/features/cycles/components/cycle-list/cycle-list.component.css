@@ -21,3 +21,46 @@
 .badge { padding: .2rem .7rem; border-radius: var(--radius-full); font-size: .75rem; font-weight: 600; }
 .badge-active { background: var(--success-bg); color: var(--success); }
 .badge-closed { background: var(--surface-raised); color: var(--text-secondary); }
+
+/* Group filter bar */
+.cycles-group-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.cycles-group-filter__btn {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.cycles-group-filter__btn.is-active,
+.cycles-group-filter__btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* Group badge on cycle card */
+.cycle-card-group {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.cycle-card-group .material-icons {
+  font-size: 0.9rem;
+}
