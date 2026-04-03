@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Dashboard is the default landing page for all authenticated users. It presents a personalised greeting and a grid of navigation cards that direct users to the features available for their role. The cards shown are conditionally rendered based on the user's role and the care recipient's active health conditions, ensuring that users only see features relevant to their scope of care.
+The Dashboard is the default landing page for all authenticated users. It presents a personalised greeting and a grid of navigation cards that direct users to the features available for their role.
 
 ---
 
@@ -15,8 +15,7 @@ The Dashboard is accessible to all authenticated roles. The set of cards visible
 ## Backend
 
 The Dashboard itself has no dedicated backend endpoint. It reads data from:
-- The authenticated user's JWT claims (role, firstName, termId).
-- `GET /auth/my-conditions` (or conditions embedded in the login response) — used to populate the `AuthService.accessibleConditions$` BehaviorSubject.
+- The authenticated user's JWT claims (role, firstName).
 
 No server call is made on Dashboard load beyond what is cached from login.
 
@@ -43,45 +42,28 @@ This is the **default route** — navigating to `/` redirects to `/dashboard` af
 
 #### Navigation Cards
 
-Each card is a clickable tile linking to a feature route. Cards are displayed and hidden based on:
+Each card is a clickable tile linking to a feature route. Cards are displayed based on the user's role, evaluated via `AuthService.getUserRoleId()`.
 
-1. **Role** — evaluated via `AuthService.getUserRoleId()`.
-2. **Conditions** — evaluated via `AuthService.hasDiabetesConditions()` and `AuthService.hasHbpConditions()`, which read from `localStorage` conditions data set on login.
-
-| Card | Required Role / Condition | Target Route |
+| Card | Required Role | Target Route |
 |---|---|---|
-| BGL Assessment | SuperAdmin / Admin, OR `hasDiabetesConditions()` | `/assessment` |
-| Meal Entry | SuperAdmin / Admin, OR `hasDiabetesConditions()` | `/meal-entry/history` |
-| Incidents | SuperAdmin / Admin, OR `hasDiabetesConditions()` OR `hasHbpConditions()` | `/incidents` |
-| Blood Pressure | SuperAdmin / Admin, OR `hasHbpConditions()` | `/blood-pressure` |
-| Supplies | All except HealthCareProvider | `/supplies` |
+| Active Cycle | All roles | `/cycles` |
+| My Obligations | All roles | `/cycles/obligations` |
+| Expenses | All roles | `/expenses` |
+| Payments | All roles | `/payments` |
 | Users | SuperAdmin / Admin only | `/management/users` |
-| Terms/Cycles | SuperAdmin / Admin only | `/management/cycles` |
-
-`showDiabetes()`, `showIncidentsCard()`, `showBloodPressure()` are helper methods on the component.
-
-#### `showIncidentsCard()`
-```typescript
-showIncidentsCard(): boolean {
-  return this.isAdminOrHigher()
-    || this.hasDiabetesConditions()
-    || this.hasHbpConditions();
-}
-```
-The Incidents card is rendered outside the diabetes-only block so it appears for HBP-only care recipients.
+| Manage Cycles | SuperAdmin / Admin only | `/management/cycles` |
 
 #### Route Map
 A `routeMap` object in the component maps string card keys to Angular router paths, keeping the template clean:
 
 ```typescript
 routeMap = {
-  assessment: '/assessment',
-  mealEntry: '/meal-entry/history',
-  incidents: '/incidents',
-  bloodPressure: '/blood-pressure',
-  supplies: '/supplies',
+  cycles: '/cycles',
+  obligations: '/cycles/obligations',
+  expenses: '/expenses',
+  payments: '/payments',
   users: '/management/users',
-  cycles: '/management/cycles'
+  manageCycles: '/management/cycles'
 };
 ```
 
@@ -89,20 +71,6 @@ routeMap = {
 Clicking a card calls `this.router.navigate([routeMap[key]])`.
 
 ---
-
-## Condition Gating Logic
-
-Conditions are stored in `localStorage` as a JSON array under the `userConditions` key after login. The `AuthService` provides:
-
-```typescript
-hasDiabetesConditions(): boolean
-  // returns true if any condition in userConditions is T1D or T2D
-
-hasHbpConditions(): boolean
-  // returns true if any condition in userConditions is HBP
-```
-
-For Admin and SuperAdmin roles, both `hasDiabetesConditions()` and `hasHbpConditions()` return `true` unconditionally — admins see all feature cards.
 
 ---
 
@@ -117,7 +85,6 @@ User (any role)             Angular                      API
   |                         |                             |
   | Dashboard renders       |                             |
   |                         | read role from JWT          |
-  |                         | read conditions from localStorage|
   |                         | compute visible cards       |
   |                         |                             |
   |<-- greeting + cards ----|                             |

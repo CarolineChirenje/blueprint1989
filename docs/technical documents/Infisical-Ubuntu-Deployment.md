@@ -1,6 +1,6 @@
-# Deploying the Vitara API with Infisical on Ubuntu
+﻿# Deploying the Divvy API with Infisical on Ubuntu
 
-This guide covers setting up the Vitara API on an Ubuntu server using Infisical to manage secrets. The API runs as a systemd service under .NET 10, with secrets (DB connection string, JWT keys, Vapid keys, WebAuthn config) fetched from Infisical at startup.
+This guide covers setting up the Divvy API on an Ubuntu server using Infisical to manage secrets. The API runs as a systemd service under .NET 10, with secrets (DB connection string, JWT keys, Vapid keys, WebAuthn config) fetched from Infisical at startup.
 
 ---
 
@@ -9,7 +9,7 @@ This guide covers setting up the Vitara API on an Ubuntu server using Infisical 
 - Ubuntu 22.04+ server
 - PostgreSQL installed and running
 - .NET 10 SDK/Runtime installed
-- A published build of `Vitara.Api`
+- A published build of `Divvy.Api`
 - Infisical project with secrets configured (environment slug: `prod`)
 - Infisical Machine Identity created with Universal Auth (see [Machine Identity setup](#machine-identity-setup))
 
@@ -23,7 +23,7 @@ In development, Infisical is **not used**. Secrets are stored in `dotnet user-se
 
 - .NET 10 SDK installed
 - PostgreSQL running locally
-- A copy of `appsettings.Development.json` populated from the template (or user-secrets set individually — see below)
+- A copy of `appsettings.Development.json` populated from the template (or user-secrets set individually â€” see below)
 
 ---
 
@@ -40,13 +40,13 @@ winget install Microsoft.DotNet.SDK.10
 **2. Navigate to the API project**
 
 ```powershell
-cd C:\DEV\Vitara\server\src\Vitara.Api
+cd C:\DEV\Divvy\server\src\Divvy.Api
 ```
 
 **3. Set secrets using `dotnet user-secrets`**
 
 ```powershell
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=vitara;Username=postgres;Password=YOUR_PG_PASSWORD"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=Divvy;Username=postgres;Password=YOUR_PG_PASSWORD"
 dotnet user-secrets set "Jwt:Key" "YOUR_JWT_KEY"
 dotnet user-secrets set "Jwt:MfaTempKey" "YOUR_MFA_TEMP_KEY"
 dotnet user-secrets set "Vapid:Subject" "mailto:admin@elroitec.com"
@@ -56,7 +56,7 @@ dotnet user-secrets set "WebAuthn:RelyingPartyId" "localhost"
 dotnet user-secrets set "WebAuthn:Origin" "http://localhost:4200"
 ```
 
-> Tip: You can also copy `appsettings.Development.template.json` to `appsettings.Development.json` and fill in the values — that file is gitignored and loaded automatically in the Development environment.
+> Tip: You can also copy `appsettings.Development.template.json` to `appsettings.Development.json` and fill in the values â€” that file is gitignored and loaded automatically in the Development environment.
 
 **4. Run the API**
 
@@ -97,13 +97,13 @@ sudo apt-get install -y dotnet-sdk-10.0
 **2. Navigate to the API project**
 
 ```bash
-cd ~/DEV/Vitara/server/src/Vitara.Api
+cd ~/DEV/Divvy/server/src/Divvy.Api
 ```
 
 **3. Set secrets using `dotnet user-secrets`**
 
 ```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=vitara;Username=postgres;Password=YOUR_PG_PASSWORD"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=Divvy;Username=postgres;Password=YOUR_PG_PASSWORD"
 dotnet user-secrets set "Jwt:Key" "YOUR_JWT_KEY"
 dotnet user-secrets set "Jwt:MfaTempKey" "YOUR_MFA_TEMP_KEY"
 dotnet user-secrets set "Vapid:Subject" "mailto:admin@elroitec.com"
@@ -113,7 +113,7 @@ dotnet user-secrets set "WebAuthn:RelyingPartyId" "localhost"
 dotnet user-secrets set "WebAuthn:Origin" "http://localhost:4200"
 ```
 
-Secrets are stored in `~/.microsoft/usersecrets/<UserSecretsId>/secrets.json` — never inside the project directory.
+Secrets are stored in `~/.microsoft/usersecrets/<UserSecretsId>/secrets.json` â€” never inside the project directory.
 
 **4. Run the API**
 
@@ -172,11 +172,11 @@ dotnet --version
 
 ```bash
 # Create a dedicated non-root user to run the service
-sudo useradd -m -s /bin/bash vitara
+sudo useradd -m -s /bin/bash Divvy
 
 # Create the deployment directory
-sudo mkdir -p /var/www/vitara-api
-sudo chown vitara:vitara /var/www/vitara-api
+sudo mkdir -p /var/www/Divvy-api
+sudo chown Divvy:Divvy /var/www/Divvy-api
 ```
 
 ---
@@ -186,21 +186,21 @@ sudo chown vitara:vitara /var/www/vitara-api
 On your **development machine**, publish a production build:
 
 ```bash
-cd server/src/Vitara.Api
+cd server/src/Divvy.Api
 dotnet publish -c Release -r linux-x64 --self-contained false -o ./publish
 ```
 
 Copy the output to the server (replace `your-server-ip`):
 
 ```bash
-scp -r ./publish/* user@your-server-ip:/var/www/vitara-api/
+scp -r ./publish/* user@your-server-ip:/var/www/Divvy-api/
 ```
 
 ---
 
 ## 4. Configure `appsettings.json` on the Server
 
-The committed `appsettings.json` and `appsettings.Production.json` already contain all non-secret config and are part of the published output — no changes needed on the server.
+The committed `appsettings.json` and `appsettings.Production.json` already contain all non-secret config and are part of the published output â€” no changes needed on the server.
 
 Key values already committed:
 
@@ -210,7 +210,7 @@ Key values already committed:
 | `appsettings.json` | `Infisical:EnvironmentSlug` | `prod` |
 | `appsettings.Production.json` | `Infisical:ClientId` | `df238a64-86b5-439d-a3a0-4bed86065119` |
 
-> **`ClientId` is an identifier, not a credential.** It cannot authenticate on its own. Only `ClientSecret` must be kept out of source control — it is injected via the systemd unit file.
+> **`ClientId` is an identifier, not a credential.** It cannot authenticate on its own. Only `ClientSecret` must be kept out of source control â€” it is injected via the systemd unit file.
 
 ---
 
@@ -218,46 +218,46 @@ Key values already committed:
 
 In the Infisical dashboard:
 
-1. Go to your project → **Access Control** → **Machine Identities**
-2. Click **Create Identity** → name it `vitara-api-production` → Auth method: **Universal Auth**
+1. Go to your project â†’ **Access Control** â†’ **Machine Identities**
+2. Click **Create Identity** â†’ name it `Divvy-api-production` â†’ Auth method: **Universal Auth**
 3. Click **Create**
-4. On the identity page → **Client Secrets** tab → **Generate Client Secret**
+4. On the identity page â†’ **Client Secrets** tab â†’ **Generate Client Secret**
 5. Copy the **Client ID** (always visible) and **Client Secret** (shown once only)
-6. Go to **Project Access** tab → **Add Project** → select the Vitara project → select **Production** environment → role: **Viewer**
+6. Go to **Project Access** tab â†’ **Add Project** â†’ select the Divvy project â†’ select **Production** environment â†’ role: **Viewer**
 
 ---
 
 ## 6. Create the systemd Service Unit
 
 ```bash
-sudo nano /etc/systemd/system/vitara-api.service
+sudo nano /etc/systemd/system/Divvy-api.service
 ```
 
 Paste the following (replace credential values):
 
 ```ini
 [Unit]
-Description=Vitara API
+Description=Divvy API
 After=network.target postgresql.service
 
 [Service]
 Type=notify
-User=vitara
-WorkingDirectory=/var/www/vitara-api
-ExecStart=/usr/bin/dotnet /var/www/vitara-api/Vitara.Api.dll
+User=Divvy
+WorkingDirectory=/var/www/Divvy-api
+ExecStart=/usr/bin/dotnet /var/www/Divvy-api/Divvy.Api.dll
 
 # ASP.NET Core environment
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://localhost:5000
 
 # Infisical Machine Identity credential
-# ClientId is in appsettings.Production.json — only the secret goes here
+# ClientId is in appsettings.Production.json â€” only the secret goes here
 Environment=Infisical__ClientSecret=YOUR_CLIENT_SECRET
 
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
-SyslogIdentifier=vitara-api
+SyslogIdentifier=Divvy-api
 
 [Install]
 WantedBy=multi-user.target
@@ -266,8 +266,8 @@ WantedBy=multi-user.target
 Secure the unit file (it contains the `ClientSecret`):
 
 ```bash
-sudo chmod 600 /etc/systemd/system/vitara-api.service
-sudo chown root:root /etc/systemd/system/vitara-api.service
+sudo chmod 600 /etc/systemd/system/Divvy-api.service
+sudo chown root:root /etc/systemd/system/Divvy-api.service
 ```
 
 ---
@@ -279,13 +279,13 @@ sudo chown root:root /etc/systemd/system/vitara-api.service
 sudo systemctl daemon-reload
 
 # Enable the service to start on boot
-sudo systemctl enable vitara-api
+sudo systemctl enable Divvy-api
 
 # Start the service
-sudo systemctl start vitara-api
+sudo systemctl start Divvy-api
 
 # Check status
-sudo systemctl status vitara-api
+sudo systemctl status Divvy-api
 ```
 
 ---
@@ -295,7 +295,7 @@ sudo systemctl status vitara-api
 Check the startup logs:
 
 ```bash
-sudo journalctl -u vitara-api -n 50 --no-pager
+sudo journalctl -u Divvy-api -n 50 --no-pager
 ```
 
 You should see output like:
@@ -307,7 +307,7 @@ You should see output like:
 [Infisical] Loaded 8 secrets from environment 'prod'.
 ```
 
-If you see `[Infisical] Infisical:ClientId not set — falling back to appsettings.`, the `Environment=` lines in the systemd unit are not being read — double-check for typos and run `sudo systemctl daemon-reload` again.
+If you see `[Infisical] Infisical:ClientId not set â€” falling back to appsettings.`, the `Environment=` lines in the systemd unit are not being read â€” double-check for typos and run `sudo systemctl daemon-reload` again.
 
 ---
 
@@ -315,13 +315,13 @@ If you see `[Infisical] Infisical:ClientId not set — falling back to appsettin
 
 ```bash
 sudo apt-get install -y nginx
-sudo nano /etc/nginx/sites-available/vitara-api
+sudo nano /etc/nginx/sites-available/Divvy-api
 ```
 
 ```nginx
 server {
     listen 80;
-    server_name vitarapi.elroitec.com;
+    server_name divvyapi.elroitec.com;
 
     location / {
         proxy_pass         http://localhost:5000;
@@ -337,7 +337,7 @@ server {
 ```
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/vitara-api /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/Divvy-api /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -348,10 +348,10 @@ sudo systemctl reload nginx
 
 ```bash
 sudo apt-get install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d vitarapi.elroitec.com
+sudo certbot --nginx -d divvyapi.elroitec.com
 ```
 
-Certbot automatically renews — verify the renewal timer:
+Certbot automatically renews â€” verify the renewal timer:
 
 ```bash
 sudo systemctl status certbot.timer
@@ -366,13 +366,13 @@ sudo systemctl status certbot.timer
 dotnet publish -c Release -r linux-x64 --self-contained false -o ./publish
 
 # Copy to server
-scp -r ./publish/* user@your-server-ip:/var/www/vitara-api/
+scp -r ./publish/* user@your-server-ip:/var/www/Divvy-api/
 
 # On server: restart the service
-sudo systemctl restart vitara-api
+sudo systemctl restart Divvy-api
 
 # Watch logs to confirm clean startup
-sudo journalctl -u vitara-api -f
+sudo journalctl -u Divvy-api -f
 ```
 
 ---
@@ -381,13 +381,13 @@ sudo journalctl -u vitara-api -f
 
 If the client secret is compromised or expired:
 
-1. In Infisical → Machine Identity → **Client Secrets** → revoke the old secret → generate a new one
+1. In Infisical â†’ Machine Identity â†’ **Client Secrets** â†’ revoke the old secret â†’ generate a new one
 2. On the server, update the systemd unit:
    ```bash
-   sudo nano /etc/systemd/system/vitara-api.service
+   sudo nano /etc/systemd/system/Divvy-api.service
    # Update Environment=Infisical__ClientSecret=NEW_SECRET
    sudo systemctl daemon-reload
-   sudo systemctl restart vitara-api
+   sudo systemctl restart Divvy-api
    ```
 
 No code changes or redeployment needed.
@@ -400,7 +400,7 @@ Follow these steps whenever you need to expose a new configuration value through
 
 ### Naming Convention
 
-ASP.NET Core uses `:` as the hierarchy separator in `IConfiguration` (e.g. `Jwt:Key`). Because `:` is not valid in most shell/environment variable names, Infisical secrets use **double-underscore `__`** as the separator. The provider maps `__` → `:` automatically at load time.
+ASP.NET Core uses `:` as the hierarchy separator in `IConfiguration` (e.g. `Jwt:Key`). Because `:` is not valid in most shell/environment variable names, Infisical secrets use **double-underscore `__`** as the separator. The provider maps `__` â†’ `:` automatically at load time.
 
 | Config key | Infisical secret name |
 |---|---|
@@ -418,7 +418,7 @@ Rules:
 
 **1. Add the secret in Infisical**
 
-1. Open [app.infisical.com](https://app.infisical.com) → your project → **Secrets** → select the **prod** environment
+1. Open [app.infisical.com](https://app.infisical.com) â†’ your project â†’ **Secrets** â†’ select the **prod** environment
 2. Click **Add Secret**
 3. Enter the secret name using the `__` convention (e.g. `MyService__ApiKey`)
 4. Enter the secret value
@@ -441,7 +441,7 @@ Commit this change.
 Each developer stores their own value in `dotnet user-secrets`:
 
 ```bash
-cd server/src/Vitara.Api
+cd server/src/Divvy.Api
 dotnet user-secrets set "MyService:ApiKey" "your-local-dev-value"
 ```
 
@@ -461,7 +461,7 @@ Commit this change.
 
 **5. Use the value in code**
 
-Inject `IConfiguration` as normal — no Infisical-specific code needed:
+Inject `IConfiguration` as normal â€” no Infisical-specific code needed:
 
 ```csharp
 var apiKey = _configuration["MyService:ApiKey"];
@@ -474,7 +474,7 @@ The Infisical provider transparently populates it in production; user-secrets po
 After deploying, check logs for the new secret:
 
 ```bash
-sudo journalctl -u vitara-api -n 100 --no-pager | grep Infisical
+sudo journalctl -u Divvy-api -n 100 --no-pager | grep Infisical
 ```
 
 You should see a line like:
@@ -498,3 +498,4 @@ Secrets must be named exactly as below in the Infisical **prod** environment:
 | `Vapid__Subject` | `Vapid:Subject` |
 | `WebAuthn__Origin` | `WebAuthn:Origin` |
 | `WebAuthn__RelyingPartyId` | `WebAuthn:RelyingPartyId` |
+

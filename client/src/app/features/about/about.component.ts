@@ -20,7 +20,7 @@ interface AppVersionDto {
   standalone: false
 })
 export class AboutComponent implements OnInit {
-  readonly appName = 'Vitara';
+  readonly appName = 'Divvy';
   readonly currentYear = 2026;
   readonly contactEmail = 'carochire@gmail.com';
   readonly companyName = 'elroitec';

@@ -2,17 +2,14 @@
 
 ## Overview
 
-The Offline Queue enables the application to capture clinical data entries when the device has no internet connectivity, then automatically (or manually) synchronise them to the server once connectivity is restored. It uses the browser's **IndexedDB** as a persistent local store, with a 24-hour time-to-live (TTL) per entry so stale data is not silently submitted after prolonged disconnection.
+The Offline Queue enables the application to capture expense and payment entries when the device has no internet connectivity, then automatically (or manually) synchronise them to the server once connectivity is restored. It uses the browser's **IndexedDB** as a persistent local store, with a 24-hour time-to-live (TTL) per entry so stale data is not silently submitted after prolonged disconnection.
 
-Five data types are supported in the queue:
+Two data types are supported in the queue:
 
 | Type Key | Feature |
 |---|---|
-| `assessment` | BGL Assessment |
-| `incident` | Diabetes Incident |
-| `meal-entry` | Meal Entry |
-| `blood-pressure` | Blood Pressure Session |
-| `bp-incident` | Blood Pressure Incident |
+| `expense` | Expense Entry |
+| `payment` | Payment Submission |
 
 ---
 
@@ -40,7 +37,7 @@ Connectivity restored
 
 ### IndexedDB Store
 
-- **Database name:** `vitaraDb` (or similar app-wide name).
+- **Database name:** `divvyDb`.
 - **Store name:** `offlineQueue`.
 - **Key:** auto-increment integer.
 
@@ -49,7 +46,7 @@ Connectivity restored
 ```ts
 interface OfflineQueueEntry {
   id?: number;           // Auto-assigned by IndexedDB
-  type: 'assessment' | 'incident' | 'meal-entry' | 'blood-pressure' | 'bp-incident';
+  type: 'expense' | 'payment';
   payload: unknown;      // The full DTO that would have been POSTed
   createdAt: number;     // Unix timestamp (ms) — used for TTL checks
   retryCount: number;    // Incremented on each failed sync attempt
@@ -88,11 +85,8 @@ The `SyncService` orchestrates the replay of queued entries against the live API
 
    | Type | Endpoint |
    |---|---|
-   | `assessment` | `POST /api/assessment` |
-   | `incident` | `POST /api/incident` |
-   | `meal-entry` | `POST /api/meal-entry` |
-   | `blood-pressure` | `POST /api/blood-pressure` |
-   | `bp-incident` | `POST /api/bp-incident` |
+   | `expense` | `POST /api/expense` |
+   | `payment` | `POST /api/payment` |
 
 3. On **success** (HTTP 2xx): calls `OfflineQueueService.remove(entry.id)`.
 4. On **failure**: increments `retryCount`. If `retryCount >= 3`, marks the entry as permanenly failed (left in expired state rather than retried again automatically).

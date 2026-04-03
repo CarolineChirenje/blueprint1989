@@ -1,8 +1,8 @@
-# Vitara Deployment Guide
+﻿# Divvy Deployment Guide
 
-**Frontend:** `https://vitara.elroitec.com`  
-**Backend API:** `https://vitarapi.elroitec.com`  
-**Stack:** .NET 10 · PostgreSQL · Angular 21 PWA · Nginx · Let's Encrypt · Ubuntu 22.04
+**Frontend:** `https://divvy.elroitec.com`  
+**Backend API:** `https://divvyapi.elroitec.com`  
+**Stack:** .NET 10 Â· PostgreSQL Â· Angular 21 PWA Â· Nginx Â· Let's Encrypt Â· Ubuntu 22.04
 
 ---
 
@@ -10,8 +10,8 @@
 
 | What | Domain | Served by |
 |------|--------|-----------|
-| Angular PWA (frontend) | `vitara.elroitec.com` | Nginx (static files) |
-| .NET API (backend) | `vitarapi.elroitec.com` | Nginx → Kestrel on port 5000 |
+| Angular PWA (frontend) | `divvy.elroitec.com` | Nginx (static files) |
+| .NET API (backend) | `divvyapi.elroitec.com` | Nginx â†’ Kestrel on port 5000 |
 | PostgreSQL | localhost only | PostgreSQL 15+ |
 
 ---
@@ -20,27 +20,27 @@
 
 ---
 
-## Part 1 — DNS (Namesilo)
+## Part 1 â€” DNS (Namesilo)
 
-Do this **first** — propagation can take up to 30 minutes.
+Do this **first** â€” propagation can take up to 30 minutes.
 
 In your **Namesilo DNS Manager** for `elroitec.com`, add two A records:
 
 | Type | Host | Value | TTL |
 |------|------|-------|-----|
-| A | `vitara` | `<your-server-ip>` | 3600 |
-| A | `vitarapi` | `<your-server-ip>` | 3600 |
+| A | `Divvy` | `<your-server-ip>` | 3600 |
+| A | `divvyapi` | `<your-server-ip>` | 3600 |
 
 Verify propagation before continuing:
 ```bash
-nslookup vitara.elroitec.com
-nslookup vitarapi.elroitec.com
+nslookup divvy.elroitec.com
+nslookup divvyapi.elroitec.com
 ```
 Both should resolve to your server IP.
 
 ---
 
-## Part 2 — Server Setup (Ubuntu)
+## Part 2 â€” Server Setup (Ubuntu)
 
 SSH into your server:
 ```bash
@@ -75,13 +75,13 @@ sudo -u postgres psql
 ```
 Inside the `psql` prompt:
 ```sql
-CREATE USER "Vitara" WITH PASSWORD '3lr01tec2024##';
-CREATE DATABASE "Vitara" OWNER "Vitara";
-GRANT ALL PRIVILEGES ON DATABASE "Vitara" TO "Vitara";
+CREATE USER "Divvy" WITH PASSWORD '3lr01tec2024##';
+CREATE DATABASE "Divvy" OWNER "Divvy";
+GRANT ALL PRIVILEGES ON DATABASE "Divvy" TO "Divvy";
 \q
 ```
 
-### 2.5 Allow password authentication for the Vitara user
+### 2.5 Allow password authentication for the Divvy user
 
 Open the PostgreSQL host-based authentication config:
 ```bash
@@ -126,40 +126,40 @@ sudo ufw status
 
 ---
 
-## Part 3 — Connect to PostgreSQL via DBeaver
+## Part 3 â€” Connect to PostgreSQL via DBeaver
 
-DBeaver connects through an **SSH tunnel** — PostgreSQL is never exposed on a public port.
+DBeaver connects through an **SSH tunnel** â€” PostgreSQL is never exposed on a public port.
 
-1. Open DBeaver → **New Database Connection** → choose **PostgreSQL**
+1. Open DBeaver â†’ **New Database Connection** â†’ choose **PostgreSQL**
 2. In the **Main** tab:
    - **Host:** `localhost`
    - **Port:** `5432`
-   - **Database:** `Vitara`
-   - **Username:** `Vitara`
+   - **Database:** `Divvy`
+   - **Username:** `Divvy`
    - **Password:** `3lr01tec2024##`
-3. Click the **SSH** tab → enable **Use SSH tunnel**:
+3. Click the **SSH** tab â†’ enable **Use SSH tunnel**:
    - **Host/IP:** `<your-server-ip>`
    - **Port:** `22`
    - **Username:** `ubuntu`
    - **Authentication:** Public Key (browse to your `.pem` file) or Password
-4. Click **Test Connection** → should say "Connected"
+4. Click **Test Connection** â†’ should say "Connected"
 5. Click **Finish**
 
 You can now browse tables, run SQL queries, and inspect data directly.
 
 ---
 
-## Part 4 — Frontend — Settings to Update Before Building
+## Part 4 â€” Frontend â€” Settings to Update Before Building
 
 ### 4.1 `client/src/environments/environment.prod.ts`
 
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://vitarapi.elroitec.com/api',           // ← backend API domain
-  excelExportUrl: 'https://vitarapi.elroitec.com/api/export/excel',
+  apiUrl: 'https://divvyapi.elroitec.com/api',           // â† backend API domain
+  excelExportUrl: 'https://divvyapi.elroitec.com/api/export/excel',
   googleDriveFolderId: 'your-google-drive-folder-id',
-  vapidPublicKey: 'BFEfRC079NVJZjR3LC5-a7Jajc3tFvJtjaVdq9ClWX-uLuP58nTRhnYXYuivaGiFIeq9Z2lcrKZ9hx1uOhoIyVU',  // ← must match Vapid:PublicKey on server
+  vapidPublicKey: 'BFEfRC079NVJZjR3LC5-a7Jajc3tFvJtjaVdq9ClWX-uLuP58nTRhnYXYuivaGiFIeq9Z2lcrKZ9hx1uOhoIyVU',  // â† must match Vapid:PublicKey on server
   version: '1.0.0',
 };
 ```
@@ -168,41 +168,41 @@ export const environment = {
 
 ### 4.2 Build the Angular app
 ```powershell
-cd C:\DEV\Vitara\client
+cd C:\dev\6299\client
 npx ng build --configuration production
 ```
-Output: `client\dist\Vitara\browser\`
+Output: `client\dist\Divvy\browser\`
 
 ### 4.3 Copy the frontend to the server
 ```powershell
-scp -r C:\DEV\Vitara\client\dist\Vitara\browser\* ubuntu@<your-server-ip>:/home/elroitecProjects/app/
+scp -r C:\dev\6299\client\dist\Divvy\browser\* ubuntu@<your-server-ip>:/home/elroitecProjects/app/
 ```
-Or use **WinSCP** / **FileZilla** (SFTP) — drag the contents of `browser\` into `/home/elroitecProjects/app/`.
+Or use **WinSCP** / **FileZilla** (SFTP) â€” drag the contents of `browser\` into `/home/elroitecProjects/app/`.
 
 ---
 
-## Part 5 — Backend — Settings to Update Before Deploying
+## Part 5 â€” Backend â€” Settings to Update Before Deploying
 
-### 5.1 `server/src/Vitara.Api/appsettings.Production.json`
+### 5.1 `server/src/Divvy.Api/appsettings.Production.json`
 
 This is the **only** file that needs updating for a production deploy:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=Vitara;Username=Vitara;Password=3lr01tec2024##"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=Divvy;Username=Divvy;Password=3lr01tec2024##"
   },
   "AppSettings": {
-    "AppName": "Vitara",
+    "AppName": "Divvy",
     "PasswordExpirationDays": 30,
     "TimeZone": "AUS Eastern Standard Time",
     "AdminSignupPin": "42115"
   },
   "Jwt": {
-    "Key": "Production2026SecureJwtKeyForVitaraAuthenticationChangeInProductionMin32Chars3K9P",
+    "Key": "Production2026SecureJwtKeyForDivvyAuthenticationChangeInProductionMin32Chars3K9P",
     "MfaTempKey": "ProductionMfaTempKey2026SecureForTwoFactorAuthChangeInProductionMinimum32CharsLongRequired6W",
-    "Issuer": "vitarapi.elroitec.com",
-    "Audience": "vitarapi.elroitec.com",
+    "Issuer": "divvyapi.elroitec.com",
+    "Audience": "divvyapi.elroitec.com",
     "ExpirationMinutes": 30
   },
   "Vapid": {
@@ -211,21 +211,21 @@ This is the **only** file that needs updating for a production deploy:
     "PrivateKey": "YOUR_VAPID_PRIVATE_KEY"
   },
   "WebAuthn": {
-    "RelyingPartyId": "vitara.elroitec.com",
-    "RelyingPartyName": "Vitara",
-    "Origin": "https://vitara.elroitec.com"
+    "RelyingPartyId": "divvy.elroitec.com",
+    "RelyingPartyName": "Divvy",
+    "Origin": "https://divvy.elroitec.com"
   },
-  "AllowedHosts": "vitarapi.elroitec.com;vitara.elroitec.com;localhost;127.0.0.1",
+  "AllowedHosts": "divvyapi.elroitec.com;divvy.elroitec.com;localhost;127.0.0.1",
   "Cors": {
     "AllowedOrigins": [
-      "https://vitara.elroitec.com",
-      "https://vitarapi.elroitec.com"
+      "https://divvy.elroitec.com",
+      "https://divvyapi.elroitec.com"
     ]
   },
   "GoogleDrive": {
     "ClientId": "PRODUCTION_CLIENT_ID",
     "ClientSecret": "PRODUCTION_CLIENT_SECRET",
-    "RedirectUri": "https://vitara.elroitec.com/api/auth/google-callback"
+    "RedirectUri": "https://divvy.elroitec.com/api/auth/google-callback"
   },
   "Logging": {
     "LogLevel": {
@@ -242,64 +242,64 @@ This is the **only** file that needs updating for a production deploy:
 | Setting | Why it matters |
 |---------|----------------|
 | `ConnectionStrings:DefaultConnection` | Must match the PostgreSQL user/password created in Part 2.4 |
-| `Jwt:Issuer` + `Jwt:Audience` | **Must both be set** — the API validates these on every request. Set to `vitarapi.elroitec.com` |
-| `Jwt:Key` | Must be at least 32 characters — keep it secret |
+| `Jwt:Issuer` + `Jwt:Audience` | **Must both be set** â€” the API validates these on every request. Set to `divvyapi.elroitec.com` |
+| `Jwt:Key` | Must be at least 32 characters â€” keep it secret |
 | `Vapid:PublicKey` | Must match `vapidPublicKey` in `environment.prod.ts` |
-| `Cors:AllowedOrigins` | Must include `https://vitara.elroitec.com` (the frontend origin) |
+| `Cors:AllowedOrigins` | Must include `https://divvy.elroitec.com` (the frontend origin) |
 | `AllowedHosts` | Must include both subdomains, semicolon-separated |
 | `WebAuthn:RelyingPartyId` | Must be the **frontend** domain, not the API domain |
 
 ### 5.2 Publish the .NET API
 ```powershell
-cd C:\DEV\Vitara\server\src\Vitara.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\DEV\Vitara\publish\api
+cd C:\dev\6299\server\src\Divvy.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\6299\publish\api
 ```
 
 ### 5.3 Copy the API to the server
 ```powershell
-scp -r C:\DEV\Vitara\publish\api\* ubuntu@<your-server-ip>:/home/elroitecProjects/api/
+scp -r C:\dev\6299\publish\api\* ubuntu@<your-server-ip>:/home/elroitecProjects/api/
 ```
 Or use **WinSCP** / **FileZilla** and drag `publish\api\` contents into `/home/elroitecProjects/api/`.
 
 ---
 
-## Part 6 — Run Database Migrations
+## Part 6 â€” Run Database Migrations
 
-**Option A — From Windows (recommended for first deploy):**
+**Option A â€” From Windows (recommended for first deploy):**
 ```powershell
-cd C:\DEV\Vitara\server\src\Vitara.Api
-$env:ConnectionStrings__DefaultConnection = "Host=<your-server-ip>;Port=5432;Database=Vitara;Username=Vitara;Password=3lr01tec2024##"
+cd C:\dev\6299\server\src\Divvy.Api
+$env:ConnectionStrings__DefaultConnection = "Host=<your-server-ip>;Port=5432;Database=Divvy;Username=Divvy;Password=3lr01tec2024##"
 dotnet ef database update
 ```
 
-**Option B — From the server after deploying:**
+**Option B â€” From the server after deploying:**
 ```bash
 cd /home/elroitecProjects/api
 export ASPNETCORE_ENVIRONMENT=Production
-dotnet Vitara.Api.dll --migrate
+dotnet Divvy.Api.dll --migrate
 ```
 
 ---
 
-## Part 7 — Create the systemd Service
+## Part 7 â€” Create the systemd Service
 
 On the server:
 ```bash
-sudo nano /etc/systemd/system/vitara-api.service
+sudo nano /etc/systemd/system/divvy-api.service
 ```
 Paste:
 ```ini
 [Unit]
-Description=Vitara .NET API
+Description=Divvy .NET API
 After=network.target postgresql.service
 
 [Service]
 WorkingDirectory=/home/elroitecProjects/api
-ExecStart=/usr/bin/dotnet /home/elroitecProjects/api/Vitara.Api.dll
+ExecStart=/usr/bin/dotnet /home/elroitecProjects/api/Divvy.Api.dll
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
-SyslogIdentifier=vitara-api
+SyslogIdentifier=divvy-api
 User=ubuntu
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://localhost:5000
@@ -312,9 +312,9 @@ WantedBy=multi-user.target
 Enable and start:
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable vitara-api
-sudo systemctl start vitara-api
-sudo systemctl status vitara-api
+sudo systemctl enable divvy-api
+sudo systemctl start divvy-api
+sudo systemctl status divvy-api
 ```
 
 Confirm the API is responding:
@@ -324,22 +324,22 @@ curl -s http://localhost:5000/api/health
 
 ---
 
-## Part 8 — Configure Nginx
+## Part 8 â€” Configure Nginx
 
-### 8.1 Frontend site (`vitara.elroitec.com`)
+### 8.1 Frontend site (`divvy.elroitec.com`)
 ```bash
-sudo nano /etc/nginx/sites-available/vitara
+sudo nano /etc/nginx/sites-available/Divvy
 ```
 Paste:
 ```nginx
 server {
     listen 80;
-    server_name vitara.elroitec.com;
+    server_name divvy.elroitec.com;
 
     root /home/elroitecProjects/app;
     index index.html;
 
-    # Service worker — no cache
+    # Service worker â€” no cache
     location = /ngsw-worker.js {
         add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
         add_header Service-Worker-Allowed "/";
@@ -358,29 +358,29 @@ server {
         try_files $uri =404;
     }
 
-    # Static assets — long cache
+    # Static assets â€” long cache
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
         try_files $uri =404;
     }
 
-    # Angular router — fallback to index.html
+    # Angular router â€” fallback to index.html
     location / {
         try_files $uri $uri/ /index.html;
     }
 }
 ```
 
-### 8.2 Backend site (`vitarapi.elroitec.com`)
+### 8.2 Backend site (`divvyapi.elroitec.com`)
 ```bash
-sudo nano /etc/nginx/sites-available/vitarapi
+sudo nano /etc/nginx/sites-available/Divvypi
 ```
 Paste:
 ```nginx
 server {
     listen 80;
-    server_name vitarapi.elroitec.com;
+    server_name divvyapi.elroitec.com;
 
     location / {
         proxy_pass         http://127.0.0.1:5000;
@@ -401,19 +401,19 @@ server {
 
 ### 8.3 Enable both sites
 ```bash
-sudo ln -s /etc/nginx/sites-available/vitara   /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/vitarapi /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/Divvy   /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/divvyapi /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
 ---
 
-## Part 9 — SSL Certificates (Let's Encrypt)
+## Part 9 â€” SSL Certificates (Let's Encrypt)
 
 Get certificates for both domains in one command:
 ```bash
-sudo certbot --nginx -d vitara.elroitec.com -d vitarapi.elroitec.com
+sudo certbot --nginx -d divvy.elroitec.com -d divvyapi.elroitec.com
 ```
 
 Follow the prompts:
@@ -421,7 +421,7 @@ Follow the prompts:
 - Agree to terms (`A`)
 - Choose **Redirect** (option 2) to force HTTPS on both domains
 
-Certbot automatically updates both Nginx configs to add port 443 and HTTP→HTTPS redirects.
+Certbot automatically updates both Nginx configs to add port 443 and HTTPâ†’HTTPS redirects.
 
 Verify auto-renewal:
 ```bash
@@ -430,29 +430,29 @@ sudo certbot renew --dry-run
 
 ---
 
-## Part 10 — Verify Everything
+## Part 10 â€” Verify Everything
 
 ```bash
 # Services running
-sudo systemctl status vitara-api
+sudo systemctl status divvy-api
 sudo systemctl status nginx
 
 # API on localhost
 curl -s http://localhost:5000/api/health
 
 # Frontend HTTPS (should return 200)
-curl -s -o /dev/null -w "%{http_code}" https://vitara.elroitec.com/
+curl -s -o /dev/null -w "%{http_code}" https://divvy.elroitec.com/
 
 # API HTTPS (should return 200 or 404, not 502/504)
-curl -s -o /dev/null -w "%{http_code}" https://vitarapi.elroitec.com/api/health
+curl -s -o /dev/null -w "%{http_code}" https://divvyapi.elroitec.com/api/health
 
 # Live API logs
-sudo journalctl -u vitara-api -f
+sudo journalctl -u divvy-api -f
 ```
 
 Open a browser:
-- `https://vitara.elroitec.com` → Angular login screen 
-- `https://vitarapi.elroitec.com/api/swagger` → Swagger UI 
+- `https://divvy.elroitec.com` â†’ Angular login screen 
+- `https://divvyapi.elroitec.com/api/swagger` â†’ Swagger UI 
 
 ---
 
@@ -460,33 +460,33 @@ Open a browser:
 
 ### Frontend only
 ```powershell
-cd C:\DEV\Vitara\client
+cd C:\dev\6299\client
 npx ng build --configuration production
-scp -r .\dist\Vitara\browser\* ubuntu@<your-server-ip>:/home/elroitecProjects/app/
+scp -r .\dist\Divvy\browser\* ubuntu@<your-server-ip>:/home/elroitecProjects/app/
 ```
-No restart needed — Nginx serves files directly.
+No restart needed â€” Nginx serves files directly.
 
 ### Backend only
 ```powershell
-cd C:\DEV\Vitara\server\src\Vitara.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\DEV\Vitara\publish\api
-scp -r C:\DEV\Vitara\publish\api\* ubuntu@<your-server-ip>:/home/elroitecProjects/api/
+cd C:\dev\6299\server\src\Divvy.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\6299\publish\api
+scp -r C:\dev\6299\publish\api\* ubuntu@<your-server-ip>:/home/elroitecProjects/api/
 ```
 Then on the server:
 ```bash
-sudo systemctl restart vitara-api
-sudo systemctl status vitara-api
+sudo systemctl restart divvy-api
+sudo systemctl status divvy-api
 ```
 
 ### Config only (no rebuild)
 ```bash
 nano /home/elroitecProjects/api/appsettings.Production.json
-sudo systemctl restart vitara-api
+sudo systemctl restart divvy-api
 ```
 
 ### Generate new VAPID keys
 ```powershell
-cd C:\DEV\Vitara\server\vapid-keygen
+cd C:\dev\6299\server\vapid-keygen
 dotnet run
 ```
 Copy the output into `appsettings.Production.json` (`Vapid` section) **and** `environment.prod.ts` (`vapidPublicKey`), then rebuild and redeploy both.
@@ -497,19 +497,19 @@ Copy the output into `appsettings.Production.json` (`Vapid` section) **and** `en
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
-| `504 Gateway Timeout` | API not running | `sudo systemctl restart vitara-api` ; check `sudo journalctl -u vitara-api -n 50` |
+| `504 Gateway Timeout` | API not running | `sudo systemctl restart divvy-api` ; check `sudo journalctl -u divvy-api -n 50` |
 | `400 Bad Request - Invalid Hostname` | Domain missing from `AllowedHosts` | Add domain to `AllowedHosts` in `appsettings.Production.json`, restart API |
-| `401 Unauthorized` on all API calls | `Jwt:Issuer`/`Jwt:Audience` not set in token | Ensure both are set in `appsettings.Production.json` and match — `vitarapi.elroitec.com` |
-| `CORS error` in browser | Frontend origin not in allowed list | Add `https://vitara.elroitec.com` to `Cors:AllowedOrigins`, restart API |
-| `styles.css 404` | Stale service worker cache | DevTools → Application → Service Workers → Unregister → hard refresh |
-| `404` on page refresh | Nginx missing Angular fallback | Ensure `try_files $uri $uri/ /index.html;` in `vitara` Nginx config |
+| `401 Unauthorized` on all API calls | `Jwt:Issuer`/`Jwt:Audience` not set in token | Ensure both are set in `appsettings.Production.json` and match â€” `divvyapi.elroitec.com` |
+| `CORS error` in browser | Frontend origin not in allowed list | Add `https://divvy.elroitec.com` to `Cors:AllowedOrigins`, restart API |
+| `styles.css 404` | Stale service worker cache | DevTools â†’ Application â†’ Service Workers â†’ Unregister â†’ hard refresh |
+| `404` on page refresh | Nginx missing Angular fallback | Ensure `try_files $uri $uri/ /index.html;` in `Divvy` Nginx config |
 | DB connection error | Wrong credentials or DB not created | Check `ConnectionStrings` in `appsettings.Production.json`; verify DB via DBeaver |
 | SSL certificate error | Cert not issued or expired | `sudo certbot certificates` ; `sudo certbot renew` |
-| API not starting | Missing config or .NET not installed | `sudo journalctl -u vitara-api -n 100 --no-pager` ; `dotnet --version` |
+| API not starting | Missing config or .NET not installed | `sudo journalctl -u divvy-api -n 100 --no-pager` ; `dotnet --version` |
 
 ---
 
-## Part 1 — Prepare the Linux Server
+## Part 1 â€” Prepare the Linux Server
 
 SSH into your server:
 
@@ -558,9 +558,9 @@ sudo -u postgres psql
 Inside the psql prompt:
 
 ```sql
-CREATE USER Vitara WITH PASSWORD '3lr01tec2024##';
-CREATE DATABASE "Vitara" OWNER Vitara;
-GRANT ALL PRIVILEGES ON DATABASE "Vitara" TO Vitara;
+CREATE USER Divvy WITH PASSWORD '3lr01tec2024##';
+CREATE DATABASE "Divvy" OWNER Divvy;
+GRANT ALL PRIVILEGES ON DATABASE "Divvy" TO Divvy;
 \q
 ```
 
@@ -588,7 +588,7 @@ sudo chown -R deploy:deploy /home/elroitecProjects
 
 ---
 
-## Part 2 — Build & Publish on Windows (your laptop)
+## Part 2 â€” Build & Publish on Windows (your laptop)
 
 ### 2.1 Update environment.prod.ts
 
@@ -597,8 +597,8 @@ In `client/src/environments/environment.prod.ts`:
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://vitara.elroitec.com/api',
-  excelExportUrl: 'https://vitara.elroitec.com/api/export',
+  apiUrl: 'https://divvy.elroitec.com/api',
+  excelExportUrl: 'https://divvy.elroitec.com/api/export',
   googleDriveFolderId: 'your-google-drive-folder-id',
   vapidPublicKey: 'YOUR_ACTUAL_VAPID_PUBLIC_KEY',  // from server appsettings.json Vapid:PublicKey
 };
@@ -607,22 +607,22 @@ export const environment = {
 ### 2.2 Build the Angular app
 
 ```powershell
-cd C:\DEV\Vitara\client
+cd C:\dev\6299\client
 npx ng build --configuration production
 ```
 
-Output will be in: `client\dist\Vitara\browser\`
+Output will be in: `client\dist\Divvy\browser\`
 
 ### 2.3 Publish the .NET API
 
 ```powershell
-cd C:\DEV\Vitara\server\src\Vitara.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\DEV\Vitara\publish\api
+cd C:\dev\6299\server\src\Divvy.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\6299\publish\api
 ```
 
 ---
 
-## Part 3 — Copy Files to the Server
+## Part 3 â€” Copy Files to the Server
 
 You can copy files to the server using either the command line (SCP) or a graphical tool like WinSCP or FileZilla.
 If you prefer a UI:
@@ -637,18 +637,18 @@ Replace `deploy@<server-ip>` with your actual user and IP if using SCP.
 ### 3.1 Copy the Angular app
 
 ```powershell
-scp -r C:\DEV\Vitara\client\dist\Vitara\browser\* deploy@<server-ip>:/home/elroitecProjects/app/
+scp -r C:\dev\6299\client\dist\Divvy\browser\* deploy@<server-ip>:/home/elroitecProjects/app/
 ```
 
 ### 3.2 Copy the API
 
 ```powershell
-scp -r C:\DEV\Vitara\publish\api\* deploy@<server-ip>:/home/elroitecProjects/api/
+scp -r C:\dev\6299\publish\api\* deploy@<server-ip>:/home/elroitecProjects/api/
 ```
 
 ---
 
-## Part 4 — Configure the API on the Server
+## Part 4 â€” Configure the API on the Server
 
 SSH back into the server:
 
@@ -661,7 +661,7 @@ ssh deploy@<server-ip>
 The published folder already contains `appsettings.Production.json`. Edit it with the real values:
 
 ```bash
-nano /var/www/vitara/api/appsettings.Production.json
+nano /var/www/Divvy/api/appsettings.Production.json
 ```
 
 Replace the contents with:
@@ -669,10 +669,10 @@ Replace the contents with:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=Vitara;Username=Vitara;Password=YourStrongPasswordHere"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=Divvy;Username=Divvy;Password=YourStrongPasswordHere"
   },
   "AppSettings": {
-    "AppName": "Vitara - Elroitec",
+    "AppName": "Divvy",
     "PasswordExpirationDays": 30,
     "TimeZone": "AUS Eastern Standard Time",
     "AdminSignupPin": "CHANGE-THIS-TO-A-SECRET-PIN"
@@ -680,8 +680,8 @@ Replace the contents with:
   "Jwt": {
     "Key": "CHANGE-THIS-TO-A-LONG-RANDOM-SECRET-AT-LEAST-32-CHARS",
     "MfaTempKey": "CHANGE-THIS-TO-ANOTHER-LONG-RANDOM-SECRET-AT-LEAST-32-CHARS",
-    "Issuer": "Vitara",
-    "Audience": "VitaraApp",
+    "Issuer": "divvyapi.elroitec.com",
+    "Audience": "divvyapi.elroitec.com",
     "ExpirationMinutes": 30
   },
   "Vapid": {
@@ -692,9 +692,9 @@ Replace the contents with:
   "GoogleDrive": {
     "ClientId": "YOUR_PRODUCTION_CLIENT_ID",
     "ClientSecret": "YOUR_PRODUCTION_CLIENT_SECRET",
-    "RedirectUri": "https://vitara.elroitec.com/api/auth/google-callback"
+    "RedirectUri": "https://divvy.elroitec.com/api/auth/google-callback"
   },
-  "AllowedHosts": "vitara.elroitec.com",
+  "AllowedHosts": "divvy.elroitec.com",
   "Logging": {
     "LogLevel": {
       "Default": "Warning",
@@ -716,8 +716,8 @@ After the API has started for the first time (code-first will create the databas
 sudo -u postgres psql
 
 # Inside psql prompt:
-CREATE USER Vitara WITH PASSWORD '3lr01tec2024##';
-GRANT ALL PRIVILEGES ON DATABASE "Vitara" TO Vitara;
+CREATE USER Divvy WITH PASSWORD '3lr01tec2024##';
+GRANT ALL PRIVILEGES ON DATABASE "Divvy" TO Divvy;
 \q
 ```
 
@@ -729,42 +729,42 @@ cd /home/elroitecProjects/api
 # Set the environment so the API uses Production appsettings
 export ASPNETCORE_ENVIRONMENT=Production
 
-dotnet Vitara.Api.dll -- --migrate
+dotnet Divvy.Api.dll -- --migrate
 ```
 
 > **Note:** If the above `--migrate` flag is not wired up, run migrations from your Windows machine using the EF CLI against the production database instead:
 >
 > ```powershell
 > # On Windows, pointing at the production DB
-> cd C:\DEV\Vitara\server\src\Vitara.Api
-> $env:ConnectionStrings__DefaultConnection = "Host=<server-ip>;Port=5432;Database=Vitara;Username=Vitara;Password=YourStrongPasswordHere"
+> cd C:\dev\6299\server\src\Divvy.Api
+> $env:ConnectionStrings__DefaultConnection = "Host=<server-ip>;Port=5432;Database=Divvy;Username=Divvy;Password=YourStrongPasswordHere"
 > dotnet ef database update
 > ```
 
 ---
 
-## Part 5 — Create the systemd Service
+## Part 5 â€” Create the systemd Service
 
 This keeps the API running and restarts it on failure.
 
 ```bash
-sudo nano /etc/systemd/system/vitara-api.service
+sudo nano /etc/systemd/system/divvy-api.service
 ```
 
 Paste:
 
 ```ini
 [Unit]
-Description=Vitara .NET API
+Description=Divvy .NET API
 After=network.target postgresql.service
 
 [Service]
 WorkingDirectory=/home/elroitecProjects/api
-ExecStart=/usr/bin/dotnet /home/elroitecProjects/api/Vitara.Api.dll
+ExecStart=/usr/bin/dotnet /home/elroitecProjects/api/Divvy.Api.dll
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
-SyslogIdentifier=vitara-api
+SyslogIdentifier=divvy-api
 User=deploy
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
@@ -777,14 +777,14 @@ Save and exit, then enable and start the service:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable vitara-api
-sudo systemctl start vitara-api
+sudo systemctl enable divvy-api
+sudo systemctl start divvy-api
 ```
 
 Check it is running:
 
 ```bash
-sudo systemctl status vitara-api
+sudo systemctl status divvy-api
 ```
 
 You should see `Active: active (running)`. Also confirm it is listening:
@@ -795,12 +795,12 @@ curl http://localhost:5000/api/health   # or any valid endpoint
 
 ---
 
-## Part 6 — Configure Nginx
+## Part 6 â€” Configure Nginx
 
 ### 6.1 Create the site config
 
 ```bash
-sudo nano /etc/nginx/sites-available/Vitara
+sudo nano /etc/nginx/sites-available/Divvy
 ```
 
 Paste:
@@ -808,10 +808,10 @@ Paste:
 ```nginx
 server {
     listen 80;
-    server_name vitara.elroitec.com;
+    server_name divvy.elroitec.com;
 
     # ------------------------------------------------------------
-    # Angular PWA — served from /home/elroitecProjects/app
+    # Angular PWA â€” served from /home/elroitecProjects/app
     # ------------------------------------------------------------
     root /home/elroitecProjects/app;
     index index.html;
@@ -835,7 +835,7 @@ server {
       try_files $uri =404;
     }
 
-    # API — proxied to Kestrel on port 5000
+    # API â€” proxied to Kestrel on port 5000
     location /api/ {
       proxy_pass         http://localhost:5000/api/;
       proxy_http_version 1.1;
@@ -849,12 +849,12 @@ server {
       proxy_read_timeout 120s;
     }
 
-    # Angular router — fallback all non-file requests to index.html
+    # Angular router â€” fallback all non-file requests to index.html
     location / {
       try_files $uri $uri/ /index.html;
     }
 
-    # Static assets — long cache
+    # Static assets â€” long cache
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
       expires 1y;
       add_header Cache-Control "public, immutable";
@@ -866,28 +866,28 @@ server {
 ### 6.2 Enable the site
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/Vitara /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/Divvy /etc/nginx/sites-enabled/
 sudo nginx -t          # must say "syntax is ok"
 sudo systemctl reload nginx
 ```
 
 ---
 
-## Part 7 — SSL with Let's Encrypt
+## Part 7 â€” SSL with Let's Encrypt
 
 ```bash
-sudo certbot --nginx -d vitara.elroitec.com
+sudo certbot --nginx -d divvy.elroitec.com
 ```
 
 Follow the prompts:
 - Enter your email address
 - Agree to terms of service (`A`)
-- Choose `2` (Redirect HTTP → HTTPS)
+- Choose `2` (Redirect HTTP â†’ HTTPS)
 
 Certbot will automatically:
 - Obtain the certificate
 - Update your nginx config to listen on port 443
-- Set up HTTP → HTTPS redirect
+- Set up HTTP â†’ HTTPS redirect
 
 Verify auto-renewal works:
 
@@ -897,7 +897,7 @@ sudo certbot renew --dry-run
 
 ---
 
-## Part 8 — Configure Firewall
+## Part 8 â€” Configure Firewall
 
 ```bash
 sudo ufw allow OpenSSH
@@ -908,11 +908,11 @@ sudo ufw status
 
 ---
 
-## Part 9 — Verify Everything is Running
+## Part 9 â€” Verify Everything is Running
 
 ```bash
 # API service status
-sudo systemctl status vitara-api
+sudo systemctl status divvy-api
 
 # Nginx status
 sudo systemctl status nginx
@@ -921,12 +921,12 @@ sudo systemctl status nginx
 curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health
 
 # Tail the API logs
-sudo journalctl -u vitara-api -f
+sudo journalctl -u divvy-api -f
 ```
 
 Open a browser and visit:
-- **https://vitara.elroitec.com** — Angular app should load
-- **https://vitara.elroitec.com/api/swagger** — Swagger UI (if enabled in production)
+- **https://divvy.elroitec.com** â€” Angular app should load
+- **https://divvy.elroitec.com/api/swagger** â€” Swagger UI (if enabled in production)
 
 ---
 
@@ -936,60 +936,62 @@ Open a browser and visit:
 
 ```powershell
 # On Windows
-cd C:\DEV\Vitara\client
+cd C:\dev\6299\client
 npx ng build --configuration production
-scp -r .\dist\Vitara\browser\* deploy@<server-ip>:/home/elroitecProjects/app/
+scp -r .\dist\Divvy\browser\* deploy@<server-ip>:/home/elroitecProjects/app/
 ```
 
-No service restart needed — Nginx serves files directly.
+No service restart needed â€” Nginx serves files directly.
 
 ### Update the API only
 
 ```powershell
 # On Windows
-cd C:\DEV\Vitara\server\src\Vitara.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\DEV\Vitara\publish\api
-scp -r C:\DEV\Vitara\publish\api\* deploy@<server-ip>:/var/www/vitara/api/
+cd C:\dev\6299\server\src\Divvy.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\6299\publish\api
+scp -r C:\dev\6299\publish\api\* deploy@<server-ip>:/var/www/Divvy/api/
 ```
 
 Then restart the service:
 
 ```bash
 # On server
-sudo systemctl restart vitara-api
-sudo systemctl status vitara-api
+sudo systemctl restart divvy-api
+sudo systemctl status divvy-api
 ```
 
 ### Update config only (e.g. CORS origins, VAPID keys)
 
 ```bash
-# On server — edit the file, then restart
-nano /var/www/vitara/api/appsettings.Production.json
-sudo systemctl restart vitara-api
+# On server â€” edit the file, then restart
+nano /var/www/Divvy/api/appsettings.Production.json
+sudo systemctl restart divvy-api
 ```
 
 ### Apply only migrations that have not been applied 
 
 dotnet ef migrations script --idempotent -o 20260321.sql
 
-Run this command in the vitarapi folder
+Run this command in the divvyapi folder
 
 ---
 
 ### Troubleshoot deployed API
-sudo journalctl -u vitara-api.service -n 200 --no-pager
-dotnet /home/elroitecProjects/api/Vitara.Api.dll
+sudo journalctl -u divvy-api.service -n 200 --no-pager
+dotnet /home/elroitecProjects/api/Divvy.Api.dll
 dotnet --info
-sudo cat /etc/systemd/system/vitara-api.service
+sudo cat /etc/systemd/system/divvy-api.service
 
 ## Troubleshooting
 
 | Problem | Command to investigate |
 |---------|----------------------|
-| API not starting | `sudo journalctl -u vitara-api -n 50 --no-pager` |
-| Nginx 502 Bad Gateway | Check API is running: `sudo systemctl status vitara-api` |
+| API not starting | `sudo journalctl -u divvy-api -n 50 --no-pager` |
+| Nginx 502 Bad Gateway | Check API is running: `sudo systemctl status divvy-api` |
 | CORS errors in browser | Confirm `AllowedHosts` in `appsettings.Production.json` matches the domain |
-| SSL not working | `sudo certbot certificates` — check expiry and domain |
-| DB connection errors | `sudo -u postgres psql -c "\l"` — verify Vitara DB exists |
+| SSL not working | `sudo certbot certificates` â€” check expiry and domain |
+| DB connection errors | `sudo -u postgres psql -c "\l"` â€” verify Divvy DB exists |
 | Service worker not updating | Hard reload (Ctrl+Shift+R) or clear site data in DevTools > Application |
 | 404 on page refresh | Confirm `try_files $uri $uri/ /index.html;` is in nginx config |
+
+

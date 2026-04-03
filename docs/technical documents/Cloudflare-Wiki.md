@@ -1,8 +1,8 @@
-# Cloudflare — Technical Documentation Wiki
+﻿# Cloudflare â€” Technical Documentation Wiki
 
 ## Overview
 
-Vitara uses **Cloudflare Pages** to host and serve the MkDocs-generated technical documentation site. The wiki is the single source of truth for all developer, architectural, and feature documentation for the platform.
+Divvy uses **Cloudflare Pages** to host and serve the MkDocs-generated technical documentation site. The wiki is the single source of truth for all developer, architectural, and feature documentation for the platform.
 
 ---
 
@@ -22,11 +22,11 @@ The documentation site is built from the `docs/` directory using [MkDocs](https:
 
 ## Why Cloudflare Pages
 
-- **Zero-config CDN** — documentation is served globally with low latency from Cloudflare's edge network.
-- **Free static hosting** — no server or container maintenance required for documentation.
-- **Automatic deployments** — Cloudflare Pages can be connected to the GitHub repository and rebuild the site on every push to the main branch.
-- **Access control** — Cloudflare Access (Zero Trust) can gate the wiki behind an identity provider, restricting it to team members only without any application-level auth code.
-- **Custom domain** — the wiki can be served under a subdomain (e.g., `docs.vitara.elroitec.com`) managed through Cloudflare DNS.
+- **Zero-config CDN** â€” documentation is served globally with low latency from Cloudflare's edge network.
+- **Free static hosting** â€” no server or container maintenance required for documentation.
+- **Automatic deployments** â€” Cloudflare Pages can be connected to the GitHub repository and rebuild the site on every push to the main branch.
+- **Access control** â€” Cloudflare Access (Zero Trust) can gate the wiki behind an identity provider, restricting it to team members only without any application-level auth code.
+- **Custom domain** â€” the wiki can be served under a subdomain (e.g., `docs.Divvy.elroitec.com`) managed through Cloudflare DNS.
 
 ---
 
@@ -34,17 +34,17 @@ The documentation site is built from the `docs/` directory using [MkDocs](https:
 
 ```
 Developer pushes to main branch
-        │
-        ▼
+        â”‚
+        â–¼
 GitHub Actions (or Cloudflare Pages CI)
-        │
-        ├─ pip install mkdocs-material
-        ├─ mkdocs build  →  outputs to site/
-        │
-        ▼
+        â”‚
+        â”œâ”€ pip install mkdocs-material
+        â”œâ”€ mkdocs build  â†’  outputs to site/
+        â”‚
+        â–¼
 Cloudflare Pages
-        │
-        └─ Deploys site/ to CDN edge nodes globally
+        â”‚
+        â””â”€ Deploys site/ to CDN edge nodes globally
 ```
 
 ### Manual Build (Local)
@@ -72,10 +72,9 @@ The nav is defined in `mkdocs.yml`. All source files live in `docs/technical doc
 |---|---|
 | Home | `Home.md` |
 | Authentication | `Authentication.md`, `Biometric-Authentication.md` |
-| Clinical Features | `BGL-Assessment.md`, `Blood-Pressure-Monitoring.md`, `Incidents-Diabetes.md`, `Incidents-Blood-Pressure.md`, `Meal-Entry.md` |
-| Core Features | `Dashboard.md`, `Profile.md`, `Care-Recipients.md`, `Notifications.md`, `Supplies.md`, `Offline-Queue.md` |
-| Admin | `Management.md`, `Classification-Management.md`, `Cycles-Terms.md`, `Feature-Bug-Reports.md`, `App-Configuration.md` |
-| Infrastructure | `Push-Notifications.md`, `Export-Reports.md`, `Google-Drive-Integration.md`, `Cloudflare-Wiki.md` |
+| Core Features | `Dashboard.md`, `Cycles.md`, `Profile.md`, `Notifications.md`, `Offline-Queue.md` |
+| Admin | `Management.md`, `Feature-Bug-Reports.md`, `App-Configuration.md` |
+| Infrastructure | `Push-Notifications.md`, `Cloudflare-Wiki.md` |
 | Business | `Business-Overview.md` |
 
 ---
@@ -84,7 +83,7 @@ The nav is defined in `mkdocs.yml`. All source files live in `docs/technical doc
 
 1. Create or edit a `.md` file in `docs/technical documents/`.
 2. If it is a new file, register it in the `nav:` section of `mkdocs.yml`.
-3. Push to the main branch — Cloudflare Pages picks up the change and rebuilds automatically.
+3. Push to the main branch â€” Cloudflare Pages picks up the change and rebuilds automatically.
 
 ### Markdown Conventions Used in This Wiki
 
@@ -104,7 +103,7 @@ If the wiki needs to be restricted to team members only, **Cloudflare Access** (
 
 - Gate the site behind a Google Workspace or GitHub SSO login.
 - No changes to the MkDocs source or Angular app are required.
-- Configured entirely in the Cloudflare dashboard under **Zero Trust → Access → Applications**.
+- Configured entirely in the Cloudflare dashboard under **Zero Trust â†’ Access â†’ Applications**.
 
 ---
 
@@ -112,6 +111,7 @@ If the wiki needs to be restricted to team members only, **Cloudflare Access** (
 
 | File | Purpose |
 |---|---|
-| [`mkdocs.yml`](../../../../mkdocs.yml) | MkDocs configuration — theme, nav, plugins |
+| [`mkdocs.yml`](../../../../mkdocs.yml) | MkDocs configuration â€” theme, nav, plugins |
 | [`requirements.txt`](../../../../requirements.txt) | Python dependencies for the docs build (MkDocs, Material theme) |
 | `docs/technical documents/` | All wiki Markdown source files |
+

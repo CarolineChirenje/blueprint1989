@@ -1,210 +1,225 @@
-# Service Worker Background Notifications
+﻿# Service Worker Notifications
 
 ## Overview
 
-The Vitara now uses a **custom Service Worker** to handle background notifications for the 2-hour ketone monitoring protocol. This means notifications will be sent even if:
-- The browser tab is in the background
-- The browser window is minimized
-- The browser is closed (notification will show when system is active)
-- The page has been refreshed
+Divvy uses a **custom Service Worker** (`custom-sw.js`) layered on top of Angular's generated `ngsw-worker.js` to handle push notification display and deep-link navigation. The service worker runs in the background and processes push events sent from the Divvy API via the Web Push Protocol.
 
-## How It Works
+---
 
-### Architecture
+## Table of Contents
 
-1. **Service Worker (`custom-sw.js`)**: Runs independently in the background, checks for scheduled notifications every minute using IndexedDB
-2. **Notification Service (`sw-notification.service.ts`)**: Angular service that handles communication with the service worker
-3. **BGL Reading Component**: Uses the notification service to schedule and manage timers
-4. **localStorage Persistence**: Backup mechanism to restore timer state if page refreshes
-5. **IndexedDB Storage**: Persistent storage for scheduled notifications managed by service worker
+1. [Architecture](#1-architecture)
+2. [Push Event Handling](#2-push-event-handling)
+3. [Notification Click Handling](#3-notification-click-handling)
+4. [Subscription Change Handling](#4-subscription-change-handling)
+5. [IndexedDB Usage](#5-indexeddb-usage)
+6. [Testing](#6-testing)
+7. [Troubleshooting](#7-troubleshooting)
 
-### Flow Diagram
+---
+
+## 1. Architecture
 
 ```
-User submits ketone ≤ 0.6
-    ↓
-Component schedules notification (2 hours)
-    ↓
-├─→ Service Worker: Stores in IndexedDB
-└─→ localStorage: Stores timer state (backup)
-    ↓
-Service Worker checks every 60 seconds
-    ↓
-When time reached:
-├─→ Shows browser notification
-└─→ Sends message to app to update UI
+Divvy API (divvyapi.elroitec.com)
+    │
+    │  Web Push Protocol (RFC 8030)
+    │  VAPID-authenticated POST to push endpoint
+    ▼
+Browser Push Service (e.g. FCM, Mozilla)
+    │
+    │  push message delivered to browser
+    ▼
+custom-sw.js  (Service Worker)
+    │
+    ├── push event  ──► showNotification()
+    │
+    ├── notificationclick  ──► clients.openWindow(deepLinkUrl)
+    │
+    └── pushsubscriptionchange  ──► re-subscribe + POST /api/push/subscribe
 ```
 
-## Key Features
+The custom service worker imports the Angular NGSW worker to preserve offline caching and app-update behaviour:
 
-### 1. **True Background Operation**
-- Service Worker runs independently of the web page
-- Checks scheduled notifications every 60 seconds
-- Works even when browser is closed (on supported systems)
-
-### 2. **Persistent State**
-- **IndexedDB**: Stores scheduled notifications in browser database
-- **localStorage**: Backup for quick timer restoration
-- Survives page refreshes, tab closures, browser restarts
-
-### 3. **Notification Actions**
-- **Open App**: Focuses existing tab or opens new one
-- **Dismiss**: Closes notification
-- Clicking notification navigates to BGL reading page
-
-### 4. **Timer Restoration**
-- If user refreshes page during 2-hour wait, timer automatically restores
-- Shows time remaining
-- Continues countdown seamlessly
-
-## Files Modified/Created
-
-### New Files
-- `client/src/custom-sw.js` - Custom service worker implementation
-- `client/src/app/shared/services/sw-notification.service.ts` - Service worker communication service
-
-### Modified Files
-- `client/src/app/admin/bgl-reading.component.ts` - Integrated service worker notifications
-- `client/angular.json` - Added custom-sw.js to build assets
-
-## Testing Instructions
-
-### Prerequisites
-1. Build the application: `ng build`
-2. Serve from dist folder (service workers only work with HTTPS or localhost)
-3. Use Chrome DevTools > Application > Service Workers to monitor
-
-### Test Scenarios
-
-#### Test 1: Basic Notification
-1. Start BGL assessment with reading > 14.9
-2. Enter ketone level ≤ 0.6
-3. Observe 2-hour timer starts
-4. Check DevTools > Application > IndexedDB > VitaraNotifications
-5. Verify notification is scheduled
-6. Wait or fast-forward time (modify NOTIFICATION_CHECK_INTERVAL in custom-sw.js to 10000ms for faster testing)
-7. Verify notification appears
-
-#### Test 2: Page Refresh During Timer
-1. Start ketone monitoring with timer active
-2. Note the remaining time
-3. Refresh the page
-4. Verify timer restores with correct remaining time
-5. Verify countdown continues
-
-#### Test 3: Browser Tab Closed
-1. Start ketone monitoring with timer
-2. Close the browser tab (or entire browser)
-3. Wait for scheduled time (or adjust timer for testing)
-4. Open browser - notification should appear
-5. Click notification to reopen app
-
-#### Test 4: Skip Timer
-1. Start ketone monitoring
-2. Click "Skip Timer & Recheck Now"
-3. Verify scheduled notification is cancelled
-4. Check IndexedDB - notification should be removed
-5. Verify localStorage is cleared
-
-#### Test 5: Multiple Sessions
-1. Start monitoring in one tab
-2. Open another tab with same app
-3. Verify timer state syncs
-4. Complete assessment in one tab
-5. Verify other tab updates
-
-### Fast Testing Mode
-
-To test without waiting 2 hours, modify these values:
-
-**In `custom-sw.js`:**
 ```javascript
-const NOTIFICATION_CHECK_INTERVAL = 10000; // Check every 10 seconds instead of 60
+importScripts('./ngsw-worker.js');
 ```
 
-**In `bgl-reading.component.ts`:**
-```typescript
-start2HourTimer() {
-  // Change 2 * 60 * 60 to 120 (2 minutes) for testing
-  this.remainingSeconds = 120; // 2 minutes instead of 2 hours
-  // ... rest of code
+---
+
+## 2. Push Event Handling
+
+When the API sends a push message, the service worker fires the `push` event. The payload is a JSON object with these fields:
+
+| Field         | Type   | Description                                    |
+|---------------|--------|------------------------------------------------|
+| `type`        | number | Notification type enum (1–5)                   |
+| `title`       | string | Notification title                             |
+| `body`        | string | Notification body text                         |
+| `deepLinkUrl` | string | In-app route to open on click (optional)       |
+
+### Code (custom-sw.js)
+
+```javascript
+self.addEventListener('push', event => {
+  if (!event.data) return;
+
+  const data = event.data.json();
+  const { title, body, deepLinkUrl, type } = data;
+
+  const options = {
+    body,
+    icon: '/assets/icons/icon-192x192.png',
+    badge: '/assets/icons/badge-72x72.png',
+    data: { deepLinkUrl },
+    requireInteraction: isPriorityType(type),
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+function isPriorityType(type) {
+  return [].includes(type); // no priority types currently defined
 }
 ```
 
-**IMPORTANT:** Revert these changes before production deployment!
+### Notification Types
 
-## Browser Compatibility
+| ID | Name              | Description                          |
+|----|-------------------|--------------------------------------|
+| 1  | General           | General-purpose system messages      |
+| 2  | PaymentDue        | A payment obligation is outstanding  |
+| 3  | PaymentReceived   | A payment has been confirmed         |
+| 4  | CycleCreated      | A new expense cycle was opened       |
+| 5  | SystemRestart     | Server restart / maintenance notice  |
 
-### Fully Supported
-- ✅ Chrome 40+
-- ✅ Edge 17+
-- ✅ Firefox 44+
-- ✅ Opera 27+
-- ✅ Safari 11.1+ (limited - may not work when browser closed)
+---
 
-### Limitations
-- **iOS Safari**: Service Workers have limited support, notifications may not work in background
-- **Private/Incognito**: Service Workers may be disabled
-- **HTTP (non-HTTPS)**: Service Workers only work on localhost or HTTPS
+## 3. Notification Click Handling
 
-## Production Deployment Checklist
+When a user taps a notification, the `notificationclick` event fires. The service worker closes the notification and navigates to the `deepLinkUrl` (if provided), or focuses an existing app window.
 
-- [ ] Ensure HTTPS is enabled on production server
-- [ ] Verify service worker scope is correct for deployment path
-- [ ] Test on target browsers (Chrome, Firefox, Safari)
-- [ ] Configure notification permission prompts for best UX
-- [ ] Set NOTIFICATION_CHECK_INTERVAL to 60000 (1 minute)
-- [ ] Set timer duration to 2 hours (7200 seconds)
-- [ ] Test notification icons are accessible
-- [ ] Monitor service worker updates and cache management
+```javascript
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
 
-## Troubleshooting
+  const deepLinkUrl = event.notification.data?.deepLinkUrl;
+  const targetUrl = deepLinkUrl
+    ? new URL(deepLinkUrl, self.location.origin).href
+    : self.location.origin;
 
-### Service Worker Not Registering
-- Check browser console for errors
-- Verify custom-sw.js is accessible at `/custom-sw.js`
-- Ensure HTTPS or localhost
-- Check DevTools > Application > Service Workers
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+      for (const client of windowClients) {
+        if (client.url === targetUrl && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      return clients.openWindow(targetUrl);
+    })
+  );
+});
+```
 
-### Notifications Not Appearing
-- Check Notification permission in browser settings
-- Verify notification scheduled in IndexedDB
-- Check service worker is active and running
-- Review service worker console logs
-- Ensure NOTIFICATION_CHECK_INTERVAL is reasonable
+### Deep Link Examples
 
-### Timer Not Restoring After Refresh
-- Check localStorage contains 'bgl-ketone-timer' key
-- Verify dates/times are not expired
-- Check console for restoration errors
+| Notification Type | deepLinkUrl example              |
+|-------------------|----------------------------------|
+| PaymentDue        | `/cycles/3/obligations`          |
+| PaymentReceived   | `/cycles/3/payments`             |
+| CycleCreated      | `/cycles/5`                      |
+| General           | `/notifications`                 |
 
-### Notification Appears on Wrong Page
-- Service worker opens `/admin/bgl-reading` by default
-- Modify `notificationclick` event handler in custom-sw.js if needed
+---
 
-## Future Enhancements
+## 4. Subscription Change Handling
 
-Potential improvements for future versions:
+If the push subscription expires or is rotated by the browser, the `pushsubscriptionchange` event fires. The service worker re-subscribes and sends the new subscription to the API.
 
-1. **Push Server Integration**: Backend push server for more reliable delivery
-2. **Multiple Timers**: Support multiple concurrent BGL monitoring sessions
-3. **Notification History**: Log all sent notifications
-4. **Custom Sounds**: Add audio alerts for critical notifications
-5. **Reminder Preferences**: User-configurable reminder intervals
-6. **Offline Support**: Enhanced offline functionality with service worker caching
+```javascript
+self.addEventListener('pushsubscriptionchange', event => {
+  const applicationServerKey = urlBase64ToUint8Array('<VAPID_PUBLIC_KEY>');
 
-## Security Considerations
+  event.waitUntil(
+    self.registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey,
+    }).then(subscription => {
+      return fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(subscription),
+        credentials: 'include',
+      });
+    })
+  );
+});
+```
 
-- Service Workers require HTTPS in production
-- Notification permissions are per-origin
-- IndexedDB data is sandboxed per origin
-- Service Workers can be unregistered by users
-- localStorage can be cleared by users
+> **Note:** The VAPID public key is injected at build time via Angular environment variables. See [App-Configuration.md](App-Configuration.md) for details.
 
-## Performance Notes
+---
 
-- Service Worker check interval: 60 seconds (configurable)
-- IndexedDB operations are async and non-blocking
-- Minimal battery impact (1 check per minute)
-- No network requests for local notifications
-- Timer restoration is instantaneous (<50ms)
+## 5. IndexedDB Usage
+
+The Divvy service worker does **not** use IndexedDB for notification scheduling. Push notifications are server-initiated — the API triggers them when business events occur (payment recorded, cycle created, etc.). There is no client-side timer or local notification queue.
+
+Angular NGSW uses its own internal IndexedDB (`ngsw`) for caching; this is managed automatically and does not require manual intervention.
+
+---
+
+## 6. Testing
+
+### Using the Dev Push Test Page
+
+Navigate to `/dev/push-test` in the Divvy app (available in development builds). Enter a notification type and message, then click **Send Test Push** to trigger a push via `POST /api/push/test`.
+
+### Using curl / Postman
+
+```http
+POST https://divvyapi.elroitec.com/api/push/test
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "type": 2,
+  "title": "Payment Due",
+  "body": "You owe Jane £25.00 in cycle January 2026.",
+  "deepLinkUrl": "/cycles/1/obligations"
+}
+```
+
+### Verifying in DevTools
+
+1. Open **Application → Service Workers** in Chrome DevTools.
+2. Confirm `custom-sw.js` status is **Activated and running**.
+3. Click **Push** (with a JSON payload) to simulate a push event without going through the API.
+4. The notification should appear within 1–2 seconds.
+
+### Inspecting Registered Subscriptions
+
+```http
+GET /api/push/subscriptions
+Authorization: Bearer <admin-token>
+```
+
+Returns the list of `UserPushSubscription` rows for all users.
+
+---
+
+## 7. Troubleshooting
+
+| Symptom | Likely Cause | Fix |
+|---------|-------------|-----|
+| Notifications not appearing | Permission blocked in browser | Ask user to allow notifications in Site Settings |
+| Notification shows but click does nothing | `deepLinkUrl` is null or incorrect | Verify the API is populating `deepLinkUrl` in the push payload |
+| Subscription expires silently | `pushsubscriptionchange` not re-subscribing | Check that the VAPID public key in service worker matches `appsettings.json` |
+| Service worker stuck on "waiting to activate" | Old NGSW tab still open | Close all app tabs and reload |
+| Push delivers but no notification shown | Service worker event handler not registered | Confirm `custom-sw.js` is imported via `ngsw-config.json` `custom-sw.js` property |
+
+---
+
+*For full push notification architecture including server-side components, see [push-notifications.md](push-notifications.md).*
+*For VAPID key generation and rotation, see [push-notifications-reference.md](push-notifications-reference.md).*

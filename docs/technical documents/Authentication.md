@@ -1,8 +1,8 @@
-# Authentication
+﻿# Authentication
 
 ## Overview
 
-The authentication feature handles all aspects of user identity in Vitara, including account registration, email/password login, multi-factor authentication (TOTP), password expiry enforcement, forgot/reset password flows, and JWT issuance. Every request to a protected API endpoint is authorised via a JWT Bearer token. The JWT embeds the user's `id`, `email`, `role`, `termId` (active cycle), `firstName`, and `lastName` claims.
+The authentication feature handles all aspects of user identity in Divvy, including account registration, email/password login, multi-factor authentication (TOTP), password expiry enforcement, forgot/reset password flows, and JWT issuance. Every request to a protected API endpoint is authorised via a JWT Bearer token. The JWT embeds the user's `id`, `email`, `role`, `firstName`, and `lastName` claims.
 
 ---
 
@@ -11,17 +11,14 @@ The authentication feature handles all aspects of user identity in Vitara, inclu
 | ID | Name | Description |
 |---|---|---|
 | 1 | SuperAdmin | Full system access |
-| 2 | Administrator | Manages users, config, reports |
-| 3 | Carer | Links to care recipients, records health data |
-| 4 | SupportWorker | Same capabilities as Carer |
-| 5 | CareRecipient | Self-service; own health records |
-| 6 | HealthCareProvider | Read-only access to linked CR data |
+| 2 | Admin | Manages users, cycles, config |
+| 3 | Member | Standard user; joins expense cycles |
 
 ---
 
 ## Backend
 
-### Controller: `AuthController` — `/api/auth`
+### Controller: `AuthController` â€” `/api/auth`
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
@@ -46,14 +43,8 @@ email            string       Required
 firstName        string       Required
 lastName         string       Required
 password         string       Min 8 chars, upper + lower + digit
-role             int          2=Admin, 3=Carer, 4=SupportWorker, 5=CareRecipient, 6=HealthCareProvider
-careRecipientEmail  string?   Required for Carer, SupportWorker, HealthCareProvider
-adminPin         string?      Required for Administrator role
-dateOfBirth      DateTime?    Required for CareRecipient
-gender           int?         CareRecipient only
-conditions       object[]?    CareRecipient only — T1D, T2D, HBP with yearDiagnosed
-initialMedication          object?  Optional BP medication on registration
-initialDiabetesMedication  object?  Optional diabetes medication on registration
+role             int          2=Admin, 3=Member
+adminPin         string?      Required for Admin role
 ```
 
 **`LoginRequest`**
@@ -88,29 +79,26 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 
 ### Service: `AuthService`
 
-**Dependencies:** `ApplicationDbContext`, `IConfiguration`, `MfaService`, `CycleService`, `IPasswordHashingService`, `AppConfigService`, `IEmailService`
+**Dependencies:** `ApplicationDbContext`, `IConfiguration`, `MfaService`, `IPasswordHashingService`, `AppConfigService`, `IEmailService`
 
 #### `LoginByEmailAsync`
 1. Looks up user by email (case-insensitive).
 2. Verifies `PasswordHash` via `IPasswordHashingService`.
-3. Checks `PasswordExpirationDays` from `AppConfigService`; if elapsed since `PasswordLastChanged`, sets `isPasswordExpired = true` — no JWT issued, returns userId for change-expired-password flow.
+3. Checks `PasswordExpirationDays` from `AppConfigService`; if elapsed since `PasswordLastChanged`, sets `isPasswordExpired = true` â€” no JWT issued, returns userId for change-expired-password flow.
 4. If user has `IsMfaEnabled = true`, returns `requiresMfa = true` with no full token; client must call `/verify-mfa`.
 5. On success, calls `GenerateJwtToken` and returns `AuthResponse`.
 
 #### `GenerateJwtToken`
 - Reads `JwtExpirationMinutes` from `AppConfigService`.
-- Fetches the default `Cycle` via `CycleService.GetDefaultTermAsync()`.
-- Creates claims: `id`, `email`, `role` (numeric), `termId` (default cycle ID), `firstName`, `lastName`.
+- Creates claims: `id`, `email`, `role` (name), `firstName`, `lastName`.
 - Signs with HMAC-SHA256 using `JWT_KEY` environment variable.
 
 #### `SignupAsync`
 1. Validates email uniqueness (case-insensitive), password strength (min 8 chars, at least one uppercase, one lowercase, one digit).
 2. Creates `User` entity with hashed password.
-3. If `careRecipientEmail` provided: looks up CR, creates `UserCareRecipient` link, sends push to CR (`CareRecipientLinked` notification).
-4. If `role == Administrator`: validates `adminPin` against `AdminSignupPin` in `AppConfigService`.
-5. For CareRecipient with conditions: inserts `UserCondition` rows, and optional `BpMedication` / `DiabetesMedication` rows.
-6. Seeds all 12 `UserNotificationPreference` rows with `IsEnabled = true`.
-7. Returns JWT via `GenerateJwtToken`.
+3. If `role == Admin`: validates `adminPin` against `AdminSignupPin` in `AppConfigService`.
+4. Seeds all `UserNotificationPreference` rows with `IsEnabled = true`.
+5. Returns JWT via `GenerateJwtToken`.
 
 #### `EnableMfaAsync` / `ConfirmMfaAsync` / `DisableMfaAsync`
 - `EnableMfaAsync`: Generates TOTP secret via `MfaService`, generates 10 backup codes as JSON, stores temporarily (not yet saved until `ConfirmMfaAsync`).
@@ -138,14 +126,12 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 | `LastName` | string | |
 | `PasswordHash` | string | BCrypt or PBKDF2 |
 | `PasswordLastChanged` | DateTime? | Null = never changed |
-| `Role` | enum (1–6) | |
+| `Role` | enum (1–3) | |
 | `IsActive` | bool | |
 | `IsMfaEnabled` | bool | |
 | `MfaSecret` | string? | Base32 TOTP secret |
 | `MfaEnabledAt` | DateTime? | |
 | `BackupCodesJson` | string? | JSON array of backup codes |
-| `DateOfBirth` | DateTime? | CareRecipient only |
-| `Gender` | enum? | |
 | `CreatedAt` | DateTime | |
 | `UpdatedAt` | DateTime | |
 
@@ -154,7 +140,7 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 | Field | Type | Notes |
 |---|---|---|
 | `Id` | int | PK |
-| `UserId` | int | FK → User |
+| `UserId` | int | FK â†’ User |
 | `Token` | string | Secure random token |
 | `ExpiresAt` | DateTime | From `PasswordResetTokenValidityMinutes` |
 | `UsedAt` | DateTime? | Null = still valid |
@@ -165,9 +151,8 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 - **Password strength:** minimum 8 characters, at least one uppercase letter, one lowercase letter, one digit. Enforced on signup, reset, and profile change.
 - **Email uniqueness:** checked case-insensitively against the `Users` table before any insert.
 - **Password expiry:** `PasswordExpirationDays` from `AppConfig`. If `PasswordLastChanged` (or `CreatedAt` if null) is more than this many days ago, login is blocked and the change-expired-password flow is triggered.
-- **MFA bypass on biometric login:** WebAuthn assertions skip the MFA challenge step entirely (handled in `WebAuthnController`).
-- **Admin PIN:** required when registering with `role = Administrator`. Compared against `AdminSignupPin` AppConfig key.
-- **Rate limiting on password reset:** limited to `PasswordResetRequestLimitPerHour` requests per email per hour. No-reveal design — identical response returned for known and unknown emails.
+- **Admin PIN:** required when registering with `role = Admin`. Compared against `AdminSignupPin` AppConfig key.
+- **Rate limiting on password reset:** limited to `PasswordResetRequestLimitPerHour` requests per email per hour. No-reveal design â€” identical response returned for known and unknown emails.
 
 ---
 
@@ -185,7 +170,7 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 
 All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 
-### `LoginComponent` — `/login`
+### `LoginComponent` â€” `/login`
 
 **File:** `client/src/app/auth/login.component.ts`
 
@@ -193,8 +178,8 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 1. Displays an email + password form.
 2. If the user has previously registered a biometric credential (`localStorage` key `bgl_biometric_email` matches the typed email) AND the browser has a platform authenticator available (`PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()`), a biometric login button appears and the password field becomes optional.
 3. On standard login, calls `POST /auth/login`:
-   - If `isPasswordExpired` is returned → navigates to `/change-expired-password?userId=…`.
-   - If `requiresMfa` is returned → reveals the inline MFA step with a 6-digit TOTP code input.
+   - If `isPasswordExpired` is returned â†’ navigates to `/change-expired-password?userId=â€¦`.
+   - If `requiresMfa` is returned â†’ reveals the inline MFA step with a 6-digit TOTP code input.
 4. **MFA step:** calls `POST /auth/verify-mfa` with the code; on success stores the JWT via `AuthService`.
 5. On successful login (either path), calls `PushNotificationService.subscribeToServer()` to register/refresh the browser push subscription.
 6. "Remember Me" checkbox persists login state.
@@ -203,23 +188,21 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 **Service calls:**
 - `AuthService.login(email, password)`
 - `AuthService.verifyMfa(code)`
-- `BiometricService.authenticate(email)` — triggers OS biometric prompt
+- `BiometricService.authenticate(email)` â€” triggers OS biometric prompt
 - `PushNotificationService.subscribeToServer()`
 
-### `SignupComponent` — `/signup`
+### `SignupComponent` â€” `/signup`
 
 **File:** `client/src/app/auth/signup.component.ts`
 
 **Behaviour:**
 - Multi-section reactive form that adapts based on the selected role.
 - **All roles:** first name, last name, email, password (with strength indicator).
-- **CareRecipient only:** date of birth, gender, conditions (T1D, T2D, HBP, each with year diagnosed), optional initial BP medication (name, dose, frequency), optional initial diabetes medication (name, delivery route `Pills|Injection`, insulin delivery method `Pump|Injections`, pump name).
-- **Carer / SupportWorker / HealthCareProvider:** linked care-recipient email field.
-- **Administrator:** admin PIN field.
+- **Admin:** admin PIN field.
 - Password strength enforced client-side: minimum 8 chars, uppercase, lowercase, digit.
-- Calls `POST /auth/register` and navigates to `/login` on success.
+- Calls `POST /auth/signup` and navigates to `/login` on success.
 
-### `ForgotPasswordComponent` — `/forgot-password`
+### `ForgotPasswordComponent` â€” `/forgot-password`
 
 **File:** `client/src/app/auth/forgot-password.component.ts`
 
@@ -227,20 +210,20 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 - Calls `POST /auth/forgot-password`.
 - Displays the same success message regardless of whether the email exists (no-reveal design).
 
-### `ResetPasswordComponent` — `/reset-password`
+### `ResetPasswordComponent` â€” `/reset-password`
 
 **File:** `client/src/app/auth/reset-password.component.ts`
 
-- Reads `?token=…` from query params on init.
-- Validates the token via `GET /auth/validate-reset-token?token=…`; shows an error message if invalid or expired.
+- Reads `?token=â€¦` from query params on init.
+- Validates the token via `GET /auth/validate-reset-token?token=â€¦`; shows an error message if invalid or expired.
 - New password input with real-time strength indicator (Weak / Medium / Strong) and a confirmation field.
 - Calls `POST /auth/reset-password` with token + new password; navigates to `/login` on success.
 
-### `ChangeExpiredPasswordComponent` — `/change-expired-password`
+### `ChangeExpiredPasswordComponent` â€” `/change-expired-password`
 
 **File:** `client/src/app/auth/change-expired-password.component.ts`
 
-- Reads `?userId=…` from query params.
+- Reads `?userId=â€¦` from query params.
 - New password form (no current-password required; the userId acts as the credential for this one-time change).
 - Calls `POST /auth/change-expired-password`; on success stores the returned JWT (full login) and navigates to `/dashboard`.
 
@@ -250,11 +233,9 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 
 **Responsibilities:**
 - Stores JWT and user claims in `localStorage`.
-- Exposes `getUserRole()`, `getUserRoleId()`, `getUserId()`, `getEmail()`, `getUserName()`, `getTermId()` helpers parsed from the JWT payload.
-- `hasDiabetesConditions()` / `hasHbpConditions()` — reads a `userConditions` key in `localStorage` (populated after login) for condition-gated navigation decisions.
+- Exposes `getUserRole()`, `getUserRoleId()`, `getUserId()`, `getEmail()`, `getUserName()` helpers parsed from the JWT payload.
 - `isAuthenticated()` — checks for a non-expired token.
 - `logout()` — clears `localStorage`, navigates to `/login`.
-- `accessibleConditions$` — `BehaviorSubject` that emits the current user's condition list.
 
 ---
 
@@ -307,3 +288,4 @@ Browser          Angular              API                Email Server
   |               |<-- 200 OK --------|                     |
   |<-- navigate /login                |                     |
 ```
+

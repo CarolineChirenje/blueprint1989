@@ -1,12 +1,12 @@
 # App Update Workflow
 
-Vitara is a PWA (Progressive Web App). Unlike traditional app-store apps, the browser controls when cached assets are refreshed. This document describes how app updates are detected, surfaced to the user, and applied.
+Divvy is a PWA (Progressive Web App). Unlike traditional app-store apps, the browser controls when cached assets are refreshed. This document describes how app updates are detected, surfaced to the user, and applied.
 
 ---
 
 ## Overview
 
-When a new build is deployed to the server, the Angular Service Worker (SW) running in the user's browser detects that the cached assets have changed. At that point Vitara shows an update banner at the bottom of the screen. The banner has two modes depending on whether the update is routine or breaking.
+When a new build is deployed to the server, the Angular Service Worker (SW) running in the user's browser detects that the cached assets have changed. At that point Divvy shows an update banner at the bottom of the screen. The banner has two modes depending on whether the update is routine or breaking.
 
 ---
 
@@ -70,7 +70,7 @@ Shown when `breaking: false` and the running version satisfies `minRequired`.
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  ▶  New version available                               │
-│     A new version of Vitara is ready to install.        │
+│     A new version of Divvy is ready to install.         │
 │                  [Update Now]  [Later]  [What's New?]   │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -96,7 +96,7 @@ Shown when `breaking: true` **or** the running version is older than `minRequire
 
 - **No "Later" button** — the update cannot be deferred.
 - The banner persists until the user taps **Update Now**.
-- Relevant for mobile users where stale API contracts can silently break data submissions (e.g. incident reports, BGL entries).
+- Relevant for mobile users where stale API contracts can silently break data submissions (e.g. expense entries, payments).
 
 ---
 

@@ -1,8 +1,8 @@
-# Vitara — System Architecture
+# Divvy — System Architecture
 
 ## Overview
 
-Vitara is a Progressive Web Application (PWA) for chronic disease management, built with an Angular 21 frontend and a .NET 10 REST API backend, backed by PostgreSQL and hosted on Ubuntu 22.04.
+Divvy is a Progressive Web Application (PWA) for shared expense management, built with an Angular 21 frontend and a .NET 10 REST API backend, backed by PostgreSQL and hosted on Ubuntu 22.04.
 
 ---
 
@@ -11,8 +11,7 @@ Vitara is a Progressive Web Application (PWA) for chronic disease management, bu
 ```mermaid
 graph TB
     subgraph Users["👤 Users"]
-        U1[Care Recipient\nBrowser / PWA]
-        U2[Carer / Admin\nBrowser]
+        U1[Admin / Member\nBrowser / PWA]
     end
 
     subgraph DNS["🌐 DNS"]
@@ -21,26 +20,25 @@ graph TB
 
     subgraph CF["☁️ Cloudflare"]
         CFCDN[Cloudflare CDN\nDDoS + WAF]
-        CFPAGES[Cloudflare Pages\nvitara-docs.pages.dev]
+        CFPAGES[Cloudflare Pages\ndivvy-docs.pages.dev]
         CFZT[Cloudflare Zero Trust\nOptional SSO gate on docs]
     end
 
     subgraph Server["🖥️ Ubuntu 22.04 VPS"]
         NGINX[Nginx Reverse Proxy\nTLS — Let's Encrypt]
 
-        subgraph Frontend["Angular 21 PWA — vitara.elroitec.com"]
+        subgraph Frontend["Angular 21 PWA — divvy.elroitec.com"]
             FE_PWA[PWA Shell\nService Worker + Offline Queue]
             FE_AUTH[Auth Module\nLogin · Signup · MFA · Biometric]
-            FE_FEAT[Feature Modules\nDashboard · BGL · BP · Incidents\nMeals · Supplies · Weight · Temp\nProfile · Reports · Management]
-            FE_CORE[Core Services\nHTTP Interceptor · Push · Sync\nNotifications · Google Drive]
+            FE_FEAT[Feature Modules\nDashboard · Cycles · Expenses\nPayments · Profile · Management]
+            FE_CORE[Core Services\nHTTP Interceptor · Push · Sync\nNotifications]
         end
 
-        subgraph API[".NET 10 API — vitarapi.elroitec.com"]
+        subgraph API[".NET 10 API — divvyapi.elroitec.com"]
             KESTREL[Kestrel :5000]
-            CTRL[31 REST Controllers\nAuth · Clinical · Admin\nNotifications · Integrations]
-            SVC[Domain Services\nBGL · BP · Incidents · Supplies\nExport · Push · MFA · WebAuthn\nEmail · Cycle · CareRecipient]
-            BGHOST[BgTimerHostedService\nBackground timer jobs]
-        end
+            CTRL[REST Controllers\nAuth · ExpenseCycle · Expense\nPayment · Notifications · Push]
+            SVC[Domain Services\nExpenseCycle · Expense · Payment\nPush · MFA · WebAuthn\nEmail · AppConfig]
+            end
 
         subgraph DB["Database"]
             PG[(PostgreSQL 15+\nEF Core 10 — snake_case\nlocalhost only)]
@@ -49,7 +47,6 @@ graph TB
 
     subgraph ExtServices["🔌 External Services"]
         INFISICAL[Infisical\nSecrets Manager\nSDK v3.0.4]
-        GDRIVE[Google Drive API v3\nOAuth 2.0 Offline\nClinical report upload]
         VAPID[Web Push — VAPID\nLib.Net.Http.WebPush\nBrowser push notifications]
         EMAIL[Email Service\nPassword reset\nNotifications]
     end
@@ -60,7 +57,6 @@ graph TB
 
     %% User flows
     U1 -->|HTTPS| NS
-    U2 -->|HTTPS| NS
     NS -->|DNS resolution| CFCDN
     CFCDN -->|Proxied HTTPS| NGINX
 
@@ -76,7 +72,6 @@ graph TB
     %% API internal
     KESTREL --> CTRL
     CTRL --> SVC
-    SVC --> BGHOST
     SVC --> PG
 
     %% Auth mechanisms
@@ -84,7 +79,6 @@ graph TB
 
     %% External service connections
     API -->|Fetch secrets at startup\nDB conn · JWT keys · VAPID keys\nWebAuthn config| INFISICAL
-    SVC -->|OAuth2 token exchange\nFile upload| GDRIVE
     SVC -->|VAPID push dispatch\nPer user-device subscription| VAPID
     SVC -->|SMTP / transactional email| EMAIL
 
@@ -94,7 +88,6 @@ graph TB
 
     %% Push to browser
     VAPID -->|Push notification| U1
-    VAPID -->|Push notification| U2
 ```
 
 ---
@@ -112,23 +105,19 @@ graph TB
 | **PWA** | Custom service worker (`custom-sw.js`), `ngsw-config.json`, `manifest.webmanifest` |
 | **Offline** | Offline queue service — defers mutations when offline |
 | **Auth** | JWT interceptor (`AuthInterceptor`), TOTP MFA, WebAuthn biometric |
-| **Hosting** | Nginx serving static build at `vitara.elroitec.com` |
+| **Hosting** | Nginx serving static build at `divvy.elroitec.com` |
 
 **Feature Modules**
 
 | Module | Functionality |
 |---|---|
-| `assessment` | Blood glucose level (BGL) assessment |
-| `blood-pressure` | BP session recording, history, charts |
-| `dashboard` | Summary cards, recent health data |
-| `incident` | Diabetes & BP incident logging |
-| `management` | Admin user management |
-| `meal-entry` | Meal / carbohydrate logging |
+| `expense-cycle` | Expense cycle management, member balances, close workflow |
+| `expense` | Expense entry and history within a cycle |
+| `payment` | Payment submission, confirmation, and history |
+| `dashboard` | Summary cards, quick navigation |
 | `offline-queue` | View and manage queued offline actions |
-| `profile` | User profile, MFA, biometric, notifications, Google Drive, care recipients |
-| `supplies` | Supplies tracking and projection |
-| `temperature` | Body temperature recording |
-| `weight` | Weight tracking |
+| `profile` | User profile, MFA, biometric, notifications, devices |
+| `management` | Admin hub: users, cycles, reports, app config |
 | `report-feature-bug` | In-app bug and feature reporting |
 | `release-notes` | App changelog |
 | `push-test` | Push notification testing (dev/admin) |
@@ -146,22 +135,16 @@ graph TB
 | **MFA** | TOTP via `MfaService` + `QRCoder` v1.7.0 |
 | **Biometric** | FIDO2/WebAuthn via `Fido2NetLib` v3.0.1 |
 | **Documentation** | Swagger / OpenAPI via `Swashbuckle.AspNetCore` v10.1.4 |
-| **Hosting** | Nginx reverse proxy → Kestrel at `vitarapi.elroitec.com` |
+| **Hosting** | Nginx reverse proxy → Kestrel at `divvyapi.elroitec.com` |
 
 **Controller Groups**
 
 | Domain | Controllers |
 |---|---|
-| Auth / Users | `AuthController`, `WebAuthnController`, `RoleController`, `UserConditionsController`, `UserDeviceController` |
-| Clinical | `AssessmentController`, `BloodPressureController`, `TemperatureController`, `WeightController`, `MealEntryController` |
-| Incidents | `IncidentController`, `BpIncidentController` |
-| Medications | `DiabetesMedicationController`, `BpMedicationController` |
-| Classifications | `BglClassificationController`, `BpClassificationRangeController`, `PulseRateClassificationRangeController`, `TemperatureClassificationRangeController` |
-| Care | `CareRecipientController`, `CycleController`, `ConditionController`, `DelinkRequestController` |
-| Supplies | `SupplyController`, `SupplyItemController`, `SupplyReportController` |
-| Admin | `AppConfigController`, `FeatureBugReportController` |
+| Auth / Users | `AuthController`, `WebAuthnController`, `RoleController`, `UserDeviceController` |
+| Expenses | `ExpenseCycleController`, `ExpenseController`, `PaymentController` |
+| Admin | `AppConfigController`, `FeatureBugReportController`, `SystemController` |
 | Notifications | `NotificationController`, `NotificationPreferenceController`, `PushController` |
-| Integrations | `GoogleDriveAuthController`, `ExportController` |
 
 ---
 
@@ -173,7 +156,7 @@ graph TB
 | **ORM** | EF Core 10 with `UseSnakeCaseNamingConvention()` |
 | **Connection** | `localhost` only; remote access via SSH tunnel |
 | **Retry policy** | `EnableRetryOnFailure(maxRetry: 5, delay: 30s)` |
-| **Key tables** | `users`, BGL entries, blood pressure sessions, temperature, weight, meals, incidents, supplies, care_recipients, conditions, cycles, notifications, user_devices, webauthn_credentials, user_google_drive_tokens, app_config, notification_type, user_notification_preferences |
+| **Key tables** | `users`, expense_cycles, cycle_members, expenses, payments, member_obligations, notifications, user_devices, webauthn_credentials, app_config, notification_type, user_notification_preferences |
 
 ---
 
@@ -191,13 +174,7 @@ graph TB
 
 #### Google Drive API v3
 
-| Detail | Value |
-|---|---|
-| **SDK** | `Google.Apis.Drive.v3` v1.73.0.4045 |
-| **Auth flow** | OAuth 2.0 — offline access (refresh token) |
-| **OAuth callback** | `vitarapi.elroitec.com/api/google-drive/callback` |
-| **Token storage** | `UserGoogleDriveTokens` table in PostgreSQL |
-| **Use case** | Upload ClosedXML-generated Excel clinical reports |
+Not used in Divvy.
 
 #### Web Push (VAPID)
 
@@ -206,7 +183,7 @@ graph TB
 | **Library** | `Lib.Net.Http.WebPush` v3.3.1 |
 | **Keys** | VAPID public/private keys managed by Infisical |
 | **Subscriptions** | Stored per user-device in PostgreSQL |
-| **Trigger** | `PushNotificationSender` dispatches on health alerts and incidents |
+| **Trigger** | `PushNotificationSender` dispatches on payment events and cycle creation |
 | **Browser** | Delivered via browser push API to PWA service worker |
 
 #### Cloudflare
@@ -215,7 +192,7 @@ graph TB
 |---|---|
 | **CDN / WAF** | Cloudflare proxies all traffic to the VPS — DDoS protection, caching |
 | **DNS** | Domain registered at Namesilo; Cloudflare nameservers manage `elroitec.com` |
-| **Pages** | Hosts MkDocs documentation site at `vitara-docs.pages.dev` |
+| **Pages** | Hosts MkDocs documentation site at `divvy-docs.pages.dev` |
 | **Zero Trust** | Optional Google Workspace / GitHub IdP SSO gate on the docs site |
 
 ---
@@ -257,7 +234,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[Health event recorded\ne.g. Incident / BGL alert] --> B[Domain Service\nBpIncidentService etc.]
+    A[Divvy event\ne.g. Payment due / Cycle created] --> B[Domain Service\nExpenseCycleService etc.]
     B --> C{Check UserNotificationPreference}
     C -->|IsEnabled = true| D[PushNotificationSender]
     C -->|IsEnabled = false| E[In-app bell only]
@@ -300,9 +277,9 @@ flowchart TD
                                 │       │
                     ┌───────────┘       └──────────────┐
                     │                                  │
-          vitara.elroitec.com             vitarapi.elroitec.com
+          divvy.elroitec.com              divvyapi.elroitec.com
           Angular 21 static build         Kestrel :5000 (.NET 10)
-          /var/www/vitara                 systemd service
+          /var/www/divvy                 systemd service
                                                │
                                          PostgreSQL 15
                                          (localhost:5432)

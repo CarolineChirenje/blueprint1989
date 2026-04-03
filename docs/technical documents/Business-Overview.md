@@ -1,48 +1,43 @@
-# Business Overview
+﻿# Business Overview
 
-## What is Vitara?
+## What is Divvy?
 
-**Vitara** is a cloud-hosted, mobile-first health management platform purpose-built for the disability and aged care sector. It digitises the clinical workflows that support workers, carers, and healthcare providers perform every day — replacing paper forms, spreadsheets, and siloed apps with a single, secure, offline-capable Progressive Web App.
+**Divvy** is a cloud-hosted, mobile-first expense-sharing application for households and groups. It replaces informal spreadsheets and manual IOUs with a structured, offline-capable Progressive Web App that tracks shared expenses, calculates member obligations, and guides payments.
 
 ---
 
 ## The Problem We Solve
 
-The disability and aged care industry manages the health of hundreds of thousands of vulnerable people. The current reality for most providers is:
+Groups that share living costs — flatmates, families, travel groups, shared households — face a recurring challenge:
 
 | Pain Point | Impact |
 |---|---|
-| Paper-based incident logging | Data entry lag, illegible records, audit risk |
-| Manual blood glucose & BP tracking | No early-warning signals, reactive care only |
-| Disconnected meal / insulin records | No cross-referencing against incidents |
-| No real-time carer alerts | Critical events go unnoticed for hours |
-| Spreadsheet-based reporting to health providers | Error-prone, time-consuming, non-standardised |
-| No supply visibility | Running out of consumables mid-cycle |
+| Informal expense tracking (spreadsheets, notes, memory) | Disputes, forgotten debts, social friction |
+| No structured repayment workflow | Obligations never clearly settled |
+| No visibility into who owes what | Repeated manual calculations |
+| Multiple disconnected payment apps | No single source of truth |
+| No offline capability | Can't add expenses without internet |
 
-These gaps increase clinical risk, drive regulatory non-compliance, and add administrative burden to already stretched care teams.
+These gaps lead to financial ambiguity and social tension within groups.
 
 ---
 
-## The Vitara Solution
+## The Divvy Solution
 
-Vitara connects **Care Recipients**, **Carers**, **Support Workers**, **Administrators**, and **Healthcare Providers** in one role-gated platform. Every clinical interaction is recorded, classified, and surfaced in real time.
+Divvy connects **Admins** and **Members** in one role-gated platform. Every expense is recorded, attributed, and surfaced as a concrete obligation.
 
 ### Core Capabilities
 
 | Capability | What It Does |
 |---|---|
-| **Diabetes Incident Management** | Records hypo/hyper events, auto-classifies severity, fires push alerts to linked carers |
-| **Blood Pressure Monitoring** | Multi-reading sessions with AHA-standard classification and incident logging |
-| **BGL Assessment** | Guided state-machine assessment (symptoms → BGL reading → ketone check → intervention) with configurable severity thresholds |
-| **Meal & Bolus Tracking** | Carbohydrate and insulin dose logging with full history and exportable bolus report |
-| **Real-Time Push Notifications** | VAPID web push to mobile devices; background reminder timers for missed readings |
-| **Excel Report Export** | One-click generation of Diabetes, BP, BGL, or All-Data reports scoped to a date range |
-| **Google Drive Integration** | Automatic upload of generated reports to a `Vitara` folder in the Care Recipient's Google Drive |
-| **Offline-First Architecture** | IndexedDB queue captures entries when offline; auto-syncs when connectivity returns |
-| **Supply Tracking** | Consumable inventory with quantity projection and weekly low-stock email alerts |
-| **Biometric / Passwordless Login** | WebAuthn/FIDO2 fingerprint and face-ID login — no password fatigue for field staff |
-| **MFA (TOTP)** | Optional time-based one-time password second factor for administrator accounts |
-| **Classification Management** | Administrators configure BGL, ketone, BP, and pulse rate severity ranges without a code deploy |
+| **Expense Cycle Management** | Define a billing period with a start and end date, add members, and track all shared expenses within that window |
+| **Expense Tracking** | Record expenses by category (Rent, Utilities, Groceries, Transport, Entertainment, Other) with amount, description, and payer |
+| **Obligation Calculation** | On cycle close, the system automatically calculates each member's net balance and generates the minimum set of payment transfers |
+| **Payment Workflow** | Members submit payments against their obligations; Admins confirm or reject |
+| **Real-Time Push Notifications** | VAPID web push notifies members on payment due, payment received, and cycle creation events |
+| **Offline-First Architecture** | IndexedDB queue captures expense and payment entries when offline; auto-syncs on reconnect |
+| **Biometric / Passwordless Login** | WebAuthn/FIDO2 fingerprint and Face ID login — fast access for everyday use |
+| **MFA (TOTP)** | Optional TOTP second factor for Admin accounts |
 
 ---
 
@@ -50,100 +45,68 @@ Vitara connects **Care Recipients**, **Carers**, **Support Workers**, **Administ
 
 ### Primary
 
-- **Registered disability service providers**
-- **Residential aged care providers** and **home care package managers**
-- **Group homes** supporting adults with type 1 or type 2 diabetes and/or cardiovascular conditions
+- **Shared households and flatmates** splitting rent, utilities, and groceries
+- **Travel groups** tracking trip expenses and splitting costs
+- **Family units** managing a shared household budget
 
 ### Secondary
 
-- **Individual families** coordinating care for a relative under a self-managed plan
-- **Healthcare providers** (GPs, endocrinologists, cardiologists) who review data for multiple clients
+- **Small businesses** managing shared team expenses
+- **Event organisers** tracking and settling event costs across contributors
+
 ---
 
 ## Competitive Advantage
 
-| Dimension | Vitara | Generic Health Apps | Paper / Spreadsheets |
+| Dimension | Divvy | Spreadsheets | Generic expense apps |
 |---|---|---|---|
-| Purpose-built for carer workflows | Yes | No | No |
-| Multi-role, role-gated access | Yes | Rarely | No |
-| Offline-first (works without internet) | Yes | Rarely | Yes (sort of) |
-| Real-time push alerts to carers | Yes | Sometimes | No |
-| Automated classification & escalation | Yes | No | No |
-| Configurable severity thresholds | Yes | No | No |
-| One-click Google Drive report delivery | Yes | No | No |
-| Biometric login for field staff | Yes | Rarely | No |
-| Aged care workflow alignment | Yes | No | No |
+| Structured cycle-based periods | Yes | No | Rarely |
+| Role-based access (Admin / Member) | Yes | No | No |
+| Offline-first (works without internet) | Yes | Yes (sort of) | Rarely |
+| Real-time push alerts | Yes | No | Sometimes |
+| Automated obligation calculation | Yes | Manual | Sometimes |
+| Biometric login | Yes | No | Rarely |
+| PWA — no app store required | Yes | No | No |
 
 ---
 
 ## Technology Foundation
 
-Vitara is built on proven, enterprise-grade open standards:
+Divvy is built on proven, enterprise-grade open standards:
 
 | Layer | Technology | Why |
 |---|---|---|
 | Frontend | Angular 21 PWA | Installable on any device, offline-capable, single codebase |
 | Backend | ASP.NET Core 10 (.NET 10) | High-performance, cross-platform, long-term Microsoft support |
-| Database | PostgreSQL | Robust, open-source, HIPAA-aligned encryption at rest |
+| Database | PostgreSQL | Robust, open-source |
 | Authentication | JWT + WebAuthn/FIDO2 + TOTP | Industry-leading identity standards |
 | Push Notifications | VAPID Web Push | No proprietary notification vendor lock-in |
-| Export | ClosedXML + Google Drive API v3 | Standards-based, works with the tools care providers already use |
 | Hosting | Cloud-hosted API (elroitec.com) | Managed infrastructure, always up-to-date |
 
-Zero dependency on proprietary mobile SDKs — Vitara runs in any modern browser, on any device, without an app store.
+Zero dependency on proprietary mobile SDKs — Divvy runs in any modern browser, on any device, without an app store.
 
 ---
 
 ## Revenue Model
 
-Vitara is positioned as a **SaaS subscription platform**:
+Divvy is positioned as a **SaaS subscription platform**:
 
 | Tier | Target | Pricing Model |
 |---|---|---|
-| **Starter** | Individual families / small providers (1–5 Care Recipients) | Per Care Recipient / month |
-| **Professional** | Mid-size providers (6–50 Care Recipients) | Per Care Recipient / month (volume discount) |
-| **Enterprise** | Large providers (50+ Care Recipients) | Annual contract, white-label option |
-
-Additional revenue opportunities:
-- **Onboarding & training services**
-- **Integration services** (connecting to portals, aged care management software)
-- **Compliance reporting add-ons** (automated regulatory report packs)
-
----
-
-## Regulatory & Compliance Alignment
-
-| Framework | How Vitara Helps |
-|---|---|
-| Quality & Safeguards Commission | Timestamped incident records with classification and carer acknowledgement |
-| Aged Care Quality Standards | Documented care interactions, supply tracking, healthcare provider access |
-| My Health Record (future roadmap) | Structured export data compatible with HL7 FHIR mapping |
-| Privacy Principals | JWT-scoped data access, role-based visibility, no data cross-contamination between providers |
+| **Free** | Small groups (up to 5 members) | Free |
+| **Pro** | Larger groups or multiple cycles | Per group / month |
+| **Team** | Organisations managing multiple groups | Annual contract |
 
 ---
 
 ## Traction & Validation
 
-- Fully functional platform deployed to  `vitara.elroitec.com`
+- Fully functional platform deployed to `divvy.elroitec.com`
 - Angular 21 PWA installable to phone home screen; service worker confirmed working
-- Aligned clinical workflows to be validated against real support worker use cases
-- 20 documented features across clinical, administrative, and infrastructure domains
-
----
-
-## Investment Ask
-
-Vitara is seeking investment to:
-
-1. **Accelerate sales & onboarding** 
-2. **Achieve compliance certification** — formal registration as a clinical software provider
-3. **Build the integration layer** — API connectors to leading aged care platforms
-4. **Expand the clinical module set** — wound care, medication management, and behaviour support plans
-
-Vitara has the working product and the deep domain knowledge. Investment unlocks the distribution and certification that turns a strong technical foundation into a scalable business.
+- Complete expense cycle workflow: create → add members → add expenses → close → obligations → payments
 
 ---
 
 ## Summary
 
-> Vitara is the care coordination platform that disability and aged care providers need but don't yet have purpose-built workflows, real-time alerts, offline resilience, and clinical-grade data quality, delivered as a modern PWA that works on any device with no app store required.
+> Divvy is the shared expense platform that households and groups need — structured billing cycles, automated obligation calculation, real-time alerts, and offline resilience — delivered as a modern PWA that works on any device with no app store required.

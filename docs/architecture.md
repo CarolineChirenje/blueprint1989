@@ -1,7 +1,7 @@
-# Architecture of Vitara PWA
+# Architecture of Divvy PWA
 
 ## Overview
-Vitara is a Progressive Web Application (PWA) designed to facilitate the management of BGL entries and comments by school administrators and parents. The application is built using Angular for the front end and .NET for the backend API, ensuring a robust and scalable solution.
+Divvy is a Progressive Web Application (PWA) designed to facilitate shared expense management for households and groups. The application is built using Angular for the front end and .NET for the backend API, ensuring a robust and scalable solution.
 
 ## Architecture Components
 
@@ -10,43 +10,60 @@ Vitara is a Progressive Web Application (PWA) designed to facilitate the managem
 - **Language**: TypeScript
 - **Structure**:
   - **Modules**:
-    - `AdminModule`: Handles functionalities for school administrators, including login and BGL entry management.
-    - `ParentModule`: Allows parents to add comments related to BGL entries.
+    - `AuthModule`: Handles login, signup, MFA, and biometric authentication.
+    - `DashboardModule`: Landing page with navigation cards and greeting.
+    - `ExpenseCycleModule`: Manage expense cycles, members, and balances.
+    - `ExpenseModule`: Create and view expense entries within a cycle.
+    - `PaymentModule`: Submit and confirm payment obligations.
+    - `ProfileModule`: User settings, MFA, biometric, notification preferences.
+    - `ManagementModule`: Admin hub for users, cycles, reports, and config.
   - **Services**:
     - `AuthService`: Manages user authentication and session management.
-    - `BglService`: Handles operations related to BGL entries and comments.
-    - `ExportService`: Manages the generation of Excel sheets for BGL history.
+    - `ExpenseService`: Handles expense creation and retrieval.
+    - `PaymentService`: Manages payment submissions and confirmations.
+    - `NotificationService`: In-app notification inbox and preferences.
+    - `PushNotificationService`: Web Push subscription and dispatch.
   - **Models**:
-    - `BglEntry`: Represents a BGL entry with properties such as value, timestamp, and comments.
-    - `Comment`: Represents a comment with properties like content and timestamp.
-    - `User`: Represents user data including username and password.
+    - `ExpenseCycle`: Represents a billing period with start/end date and member list.
+    - `Expense`: An expenditure entry with category, amount, and payer.
+    - `Payment`: A payment obligation between two members.
+    - `MemberObligation`: A member's calculated share within a cycle.
+    - `User`: Represents a user with role (SuperAdmin, Admin, Member).
 
 ### Backend
-- **Framework**: .NET (Latest LTS)
-- **Language**: C# 11
+- **Framework**: ASP.NET Core (.NET 10)
+- **Language**: C#
 - **Structure**:
   - **Controllers**:
-    - `AuthController`: Handles authentication requests.
-    - `BglController`: Manages BGL entries and related operations.
-    - `ParentController`: Manages comments from parents.
-    - `ExportController`: Handles the generation and export of Excel sheets.
+    - `AuthController`: Handles authentication and registration.
+    - `ExpenseCycleController`: Manages expense cycles.
+    - `ExpenseController`: Manages expense entries.
+    - `PaymentController`: Handles payment submissions and confirmations.
+    - `NotificationController`: In-app notifications.
+    - `PushController`: VAPID web push subscriptions and dispatch.
+    - `AppConfigController`: Runtime application configuration.
+    - `SystemController`: System health and restart triggers.
   - **Models**:
-    - `User`: Represents user data for authentication.
-    - `BglEntry`: Represents BGL entries in the backend.
-    - `Comment`: Represents comments submitted by parents.
+    - `User`: Authentication and role data.
+    - `ExpenseCycle`: A cycle with start date, end date, and status (Active/Closed).
+    - `Expense`: An expense entry linked to a cycle and payer.
+    - `Payment`: A payment with status (Pending/Confirmed/Rejected).
+    - `MemberObligation`: A member's share within a cycle.
   - **Services**:
-    - `AuthService`: Implements authentication logic.
-    - `BglService`: Manages BGL-related operations.
-    - `ExportService`: Handles Excel generation and integration with Google Drive.
+    - `AuthService`: Authentication and JWT issuance.
+    - `ExpenseCycleService`: Cycle lifecycle and balance calculation.
+    - `ExpenseService`: Expense CRUD and categorisation.
+    - `PaymentService`: Payment workflow.
+    - `PushNotificationSender`: VAPID push dispatch.
 
 ## Data Flow
-1. **User Authentication**: Users log in through the Angular frontend, which communicates with the `AuthController` in the backend.
-2. **BGL Entry Management**: Administrators can enter BGL values and comments, which are processed by the `BglController` and stored in the database.
-3. **Parent Comments**: Parents can submit comments via the `ParentController`, which are also stored in the database.
-4. **Excel Generation**: The `ExportService` generates an Excel sheet containing all BGL history, which can be uploaded to a shared Google Drive.
+1. **User Authentication**: Users log in through the Angular frontend, which communicates with the `AuthController` and receives a JWT.
+2. **Expense Entry**: Members add expenses within an active cycle. The `ExpenseController` stores the entry and recalculates member obligations.
+3. **Payment Workflow**: Members submit payments against their obligations. Admins confirm or reject via the `PaymentController`.
+4. **Push Notifications**: On key events (payment due, cycle created), `PushNotificationSender` dispatches VAPID pushes to subscribed devices.
 
 ## Deployment
-The application is designed to be deployed as a PWA, allowing users to install it on their devices and access it offline. The backend API can be hosted on cloud platforms that support .NET applications.
+The application is deployed as a PWA on Ubuntu 22.04, served through Nginx as a reverse proxy. The backend API runs on Kestrel behind Nginx. TLS is handled by Let's Encrypt via Cloudflare.
 
 ## Conclusion
-Vitara provides a comprehensive solution for managing BGL entries and comments, leveraging modern web technologies to ensure a seamless user experience for both administrators and parents.
+Divvy provides a streamlined solution for shared expense tracking, leveraging modern web technologies to deliver a fast, offline-capable Progressive Web App for both administrators and members.

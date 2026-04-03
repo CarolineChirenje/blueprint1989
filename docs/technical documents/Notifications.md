@@ -2,7 +2,7 @@
 
 ## Overview
 
-Vitara uses a dual-channel notification system: an in-app notification inbox (the bell icon in the navigation bar) and browser Web Push notifications. Every notification is always persisted to the in-app inbox first; a push is sent additionally if the user has a registered subscription and has not opted out of that notification type. Users can configure which types of push notifications they receive from Profile → Notifications. Administrators can override a user's preferences for health-alert types that are designated as admin-controlled.
+Divvy uses a dual-channel notification system: an in-app notification inbox (the bell icon in the navigation bar) and browser Web Push notifications. Every notification is always persisted to the in-app inbox first; a push is sent additionally if the user has a registered subscription and has not opted out of that notification type. Users can configure which types of push notifications they receive from Profile → Notifications.
 
 ---
 
@@ -12,31 +12,21 @@ Vitara uses a dual-channel notification system: an in-app notification inbox (th
 |---|---|---|
 | View in-app notifications | ✓ | — |
 | Mark notifications read | ✓ | — |
-| Configure own non-health preferences | ✓ | — |
-| Configure health-alert preferences | — | ✓ (via admin panel) |
+| Configure own preferences | ✓ | — |
 | Manage any user's preferences | — | ✓ |
-| Send test push | ✓ (self, any type) | Required in production |
+| Send test push | ✓ (self) | Required in production |
 
 ---
 
 ## Notification Types
 
-| ID | Name | Admin-Controlled |
-|---|---|---|
-| 1 | General | No |
-| 2 | IncidentSeverity | Yes |
-| 3 | AssessmentSeverity | Yes |
-| 4 | CarerRemoved | No |
-| 5 | CareRecipientRemoved | No |
-| 6 | BgTimerReminder | Yes |
-| 7 | DelinkApproved | No |
-| 8 | DelinkDenied | No |
-| 9 | BloodPressureAlert | Yes |
-| 10 | FeatureBugReportResolved | No |
-| 11 | SupplyRunningLow | No |
-| 12 | BpIncidentSeverity | Yes |
-
-Admin-controlled types (IDs 2, 3, 6, 9, 12) can only be toggled by Administrators and SuperAdmins, not by the users themselves.
+| ID | Name |
+|---|---|
+| 1 | General |
+| 2 | PaymentDue |
+| 3 | PaymentReceived |
+| 4 | CycleCreated |
+| 5 | SystemRestart |
 
 ---
 
@@ -49,14 +39,13 @@ Admin-controlled types (IDs 2, 3, 6, 9, 12) can only be toggled by Administrator
 | GET | `/api/notification` | Authorized | Get all notifications + unread count for current user |
 | PUT | `/api/notification/{id}/read` | Authorized | Mark one notification as read |
 | PUT | `/api/notification/read-all` | Authorized | Mark all notifications as read |
-| POST | `/api/notification/ketone-alert` | SupportOrHigher | Manually trigger ketone alert for a care recipient |
 
 ### Controller: `NotificationPreferenceController`
 
 | Method | Route | Auth Policy | Description |
 |---|---|---|---|
-| GET | `/api/notification-preferences` | Authorized | Get own preferences (all 12 types) |
-| PUT | `/api/notification-preferences` | Authorized | Update own non-admin-controlled preferences |
+| GET | `/api/notification-preferences` | Authorized | Get own preferences (all 5 types) |
+| PUT | `/api/notification-preferences` | Authorized | Update own preferences |
 | GET | `/api/admin/notification-preferences/{userId}` | AdminOrHigher | Get any user's preferences |
 | PUT | `/api/admin/notification-preferences/{userId}` | AdminOrHigher | Update any type for any user |
 
@@ -68,8 +57,6 @@ Admin-controlled types (IDs 2, 3, 6, 9, 12) can only be toggled by Administrator
 | POST | `/api/push/subscribe` | Authorized | Register or refresh a browser push subscription |
 | DELETE | `/api/push/unsubscribe` | Authorized | Remove a push subscription by endpoint |
 | POST | `/api/push/test` | Authorized (Admin in prod) | Send a test push notification to self |
-| POST | `/api/push/bg-timer/schedule` | AllRoles | Schedule a BGL recheck timer reminder |
-| DELETE | `/api/push/bg-timer/cancel` | AllRoles | Cancel a pending BG timer reminder |
 
 #### `POST /api/push/subscribe` — Upsert Subscription
 ```
@@ -80,16 +67,9 @@ userAgent    string?   Browser user agent
 ```
 Finds existing `PushSubscription` by `endpoint` or creates a new one. Updates the `Auth` and `P256dh` keys if they changed.
 
-#### `POST /api/push/bg-timer/schedule`
-```
-careRecipientId   int    Target care recipient
-delayMinutes      int?   Default 120 min, max 480 min
-```
-Cancels any existing pending `BgTimerReminder` for the same `(userId, careRecipientId)` pair, then inserts a new one with `ScheduledAt = now + delayMinutes`.
-
 ### Service: `NotificationService`
 
-**File:** `server/src/Vitara.Api/Services/NotificationService.cs`
+**File:** `server/src/Divvy.Api/Services/NotificationService.cs`
 
 **Dependencies:** `ApplicationDbContext`
 
@@ -101,7 +81,7 @@ Operations:
 
 ### Service: `PushNotificationSender`
 
-**File:** `server/src/Vitara.Api/Services/PushNotificationSender.cs`
+**File:** `server/src/Divvy.Api/Services/PushNotificationSender.cs`
 
 **Dependencies:** `ApplicationDbContext`, `NotificationService`, VAPID settings, `HttpClient`
 
@@ -120,15 +100,13 @@ Operations:
 **File:** `server/src/Vitara.Api/Services/NotificationPreferenceService.cs`
 
 **`GetPreferencesAsync(userId)`**
-- Loads all 12 `NotificationTypeEntity` rows.
+- Loads all 5 `NotificationTypeEntity` rows.
 - Joins with `UserNotificationPreference` rows for the user.
 - For types with no stored preference row, defaults to `IsEnabled = true`.
-- Returns a complete list of 12 `NotificationPreferenceDto` items.
+- Returns a complete list of 5 `NotificationPreferenceDto` items.
 
-**`UpdatePreferencesAsync(userId, items, isAdmin)`**
-- For each item in the request:
-  - If `isAdmin = false` and the type's `IsAdminControlled = true`, skips the item silently.
-  - Otherwise, upserts the `UserNotificationPreference` row for `(userId, typeId)`.
+**`UpdatePreferencesAsync(userId, items)`**
+- Upserts the `UserNotificationPreference` row for each `(userId, typeId)` pair in the request.
 
 ### Model: `Notification`
 
@@ -139,9 +117,9 @@ Operations:
 | `Message` | string | Notification text |
 | `IsRead` | bool | |
 | `CreatedAt` | DateTime | |
-| `Type` | NotificationType | Enum 1–12 |
+| `Type` | NotificationType | Enum 1–5 |
 | `DeepLinkUrl` | string? | Angular route to navigate on click |
-| `RelatedEntityId` | int? | ID of the related entity (incident, etc.) |
+| `RelatedEntityId` | int? | ID of the related entity (expense, payment, cycle) |
 | `SentViaPush` | bool | Whether a push was dispatched |
 
 ### Model: `PushSubscription`
@@ -201,10 +179,8 @@ Operations:
 **Route:** `/profile/notifications`
 
 - Loads `GET /notification-preferences` on init.
-- **Health Alerts section:** Types with `isAdminControlled = true` shown as read-only labels with their current state (enabled/disabled).
-- **Timer Alarm Sound section:** Device-local toggle that mutes/unmutes the in-browser audio alarm played when a health timer (BGL or blood pressure) expires. Stored in `localStorage` under key `vitara-alarm-muted`. Not synced to the server — preference is per-device.
-- **My Preferences section:** Types with `isAdminControlled = false` shown as toggle switches.
-- **Save button:** Calls `PUT /notification-preferences` with the array of changed preferences (timer alarm mute is saved immediately, not via this button).
+- All 5 notification types shown as toggle switches.
+- **Save button:** Calls `PUT /notification-preferences` with the array of changed preferences.
 
 ### Admin: Per-User Notification Preferences
 
@@ -212,42 +188,14 @@ Operations:
 
 - Bell icon button per user row in the User Management table.
 - Opens a modal panel loaded with `GET /admin/notification-preferences/{userId}`.
-- Displays all 12 notification types with individual toggle switches.
+- Displays all 5 notification types with individual toggle switches.
 - Save calls `PUT /admin/notification-preferences/{userId}`.
 
 ---
 
 ## Notification Seeding on Registration
 
-When a new user registers (`AuthService.SignupAsync`), all 12 `UserNotificationPreference` rows are inserted with `IsEnabled = true` to ensure the user receives all notifications by default until they explicitly opt out.
-
----
-
-## Timer Alarm System (In-Browser)
-
-Health timers in Vitara play an audio alarm, vibrate the device, and show a dismissible overlay when they expire. This is separate from push notifications and works within the open browser tab.
-
-### Covered Timers
-
-| Timer | Location | Duration | Notes |
-|---|---|---|---|
-| BGL Hypo recheck | `bgl-reading.component` | 10 or 15 min | 10 min for check-only cycles (BGL 3.9 after cycle 2) |
-| BGL Ketone monitoring | `bgl-reading.component` | 2 hours | Saves in-progress state to server so any device can resume |
-| BP rest between readings | `bp-entry.component` | 2 min | No server persistence — too short to need it |
-
-### Features
-
-| Feature | Detail |
-|---|---|
-| Audio alarm | 3 × 880 Hz sine-wave beeps via Web Audio API. iOS Safari requires the `AudioContext` to be unlocked during a user gesture — handled automatically on "Start Timer" tap. |
-| Vibration | `navigator.vibrate([500, 100, 500, 100, 500])` — silently ignored on iOS and desktop. |
-| Screen wake lock | `navigator.wakeLock.request('screen')` acquired when a timer starts; released on completion/skip/cancel. Re-acquired after browser tab returns to foreground (OS releases the sentinel automatically on background). |
-| Urgency colours | Timer turns amber at ≤ 60 s remaining, red at ≤ 10 s. Each timer shape has its own CSS: BGL hypo uses a gradient `div` circle; BGL ketone uses plain text; BP uses an SVG ring (stroke colour). |
-| Pulse animation | `@keyframes timerPulse` (scale 1→1.05) applied at critical threshold. Named `timerPulse` to avoid collision with the existing `pulse` keyframes used by `.emergency-icon`. |
-| Alarm overlay | Dismissible bottom-sheet on mobile (≤ 600 px), centred card modal on desktop (> 600 px). Backdrop click or Escape key dismisses. |
-| Screen reader | `aria-live="assertive"` span announces "Less than 1 minute remaining" and "Less than 10 seconds remaining" at urgency transitions. |
-| Touch targets | Skip-timer buttons get `min-height: 48px` via `.btn-skip-timer` class. |
-| Mute preference | Stored in `localStorage` key `vitara-alarm-muted`. Toggle available in **Profile → Notification Preferences** under "Timer Alarm Sound". |
+When a new user registers (`AuthService.SignupAsync`), all 5 `UserNotificationPreference` rows are inserted with `IsEnabled = true` to ensure the user receives all notifications by default until they explicitly opt out.
 
 ### Services
 
