@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 
@@ -26,7 +26,8 @@ export class ResetPasswordComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -35,6 +36,7 @@ export class ResetPasswordComponent implements OnInit {
       if (!token) {
         this.validating = false;
         this.errorMessage = 'No reset token provided';
+        this.cdr.detectChanges();
         return;
       }
 
@@ -54,10 +56,12 @@ export class ResetPasswordComponent implements OnInit {
         } else {
           this.errorMessage = 'Invalid or expired password reset token. Please request a new one.';
         }
+        this.cdr.detectChanges();
       },
       (error: any) => {
         this.validating = false;
         this.errorMessage = error?.error?.message || 'Failed to validate token. Please try again.';
+        this.cdr.detectChanges();
       }
     );
   }
@@ -132,17 +136,20 @@ export class ResetPasswordComponent implements OnInit {
             this.authService.setUserInfo(response.user);
           }
 
+          this.cdr.detectChanges();
           // Redirect to dashboard after brief delay
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
           }, 1500);
         } else {
           this.errorMessage = response.error || 'Failed to reset password';
+          this.cdr.detectChanges();
         }
       },
       (error: any) => {
         this.loading = false;
         this.errorMessage = error?.error?.error || error?.error?.message || 'An error occurred. Please try again.';
+        this.cdr.detectChanges();
       }
     );
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AppConfigService } from '../../../shared/services/app-config.service';
 import { SystemService } from '../../../shared/services/system.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -31,7 +31,8 @@ export class AppConfigManagementComponent implements OnInit {
     private appConfigService: AppConfigService,
     private systemService: SystemService,
     private authService: AuthService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   get canRestart(): boolean {
@@ -52,10 +53,12 @@ export class AppConfigManagementComponent implements OnInit {
         this.revealedKeys.clear();
         data.forEach(e => (this.editedValues[e.key] = e.value));
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to load configuration settings.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

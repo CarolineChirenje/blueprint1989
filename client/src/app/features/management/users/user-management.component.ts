@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
@@ -19,7 +19,8 @@ export class UserManagementComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -30,8 +31,8 @@ export class UserManagementComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     this.http.get<UserManagementDto[]>(`${environment.apiUrl}/auth/users`).subscribe({
-      next: users => { this.users = users; this.isLoading = false; },
-      error: () => { this.errorMessage = 'Failed to load users.'; this.isLoading = false; }
+      next: users => { this.users = users; this.isLoading = false; this.cdr.detectChanges(); },
+      error: () => { this.errorMessage = 'Failed to load users.'; this.isLoading = false; this.cdr.detectChanges(); }
     });
   }
 

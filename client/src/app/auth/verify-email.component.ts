@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 
@@ -19,7 +19,8 @@ export class VerifyEmailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -38,6 +39,7 @@ export class VerifyEmailComponent implements OnInit {
         this.state = 'error';
         this.errorMessage = res?.error ?? 'Verification failed. The link may have expired.';
       }
+      this.cdr.detectChanges();
     });
   }
 
@@ -53,10 +55,12 @@ export class VerifyEmailComponent implements OnInit {
       next: (r: any) => {
         this.resendState = 'sent';
         this.resendMessage = r?.message ?? 'If your account exists and is unverified, a new link has been sent.';
+        this.cdr.detectChanges();
       },
       error: () => {
         this.resendState = 'idle';
         this.resendMessage = 'Could not send verification email. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }

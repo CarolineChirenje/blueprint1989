@@ -1,4 +1,4 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
@@ -19,7 +19,8 @@ export class ProfileComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    public auth: AuthService
+    public auth: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.profileForm = this.fb.group({
       email: [{ value: '', disabled: true }],
@@ -88,10 +89,12 @@ export class ProfileComponent implements OnInit {
         user.lastName = lastName;
         this.auth.setUserInfo(user);
         this.profileForm.patchValue({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Failed to update profile';
         this.successMessage = '';
+        this.cdr.detectChanges();
       }
     });
   }

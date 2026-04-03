@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ExpenseService } from '../../../core/services/expense.service';
@@ -24,7 +24,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private auth: AuthService,
     private router: Router,
-    private expenseService: ExpenseService
+    private expenseService: ExpenseService,
+    private cdr: ChangeDetectorRef
   ) {}
   
   ngOnInit() {
@@ -38,10 +39,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (summary) => {
         this.obligationsSummary = summary;
         this.summaryLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.summaryError = true;
         this.summaryLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

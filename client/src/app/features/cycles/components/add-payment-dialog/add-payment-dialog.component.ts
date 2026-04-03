@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { PaymentService } from '../../../../core/services/payment.service';
@@ -26,7 +26,8 @@ export class AddPaymentDialogComponent {
       cycleId: number;
       members: CycleMemberDto[];
       currentUserId: number | null;
-    }
+    },
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       payeeId: [null, Validators.required],
@@ -47,7 +48,7 @@ export class AddPaymentDialogComponent {
       notes: notes || undefined
     }).subscribe({
       next: () => this.dialogRef.close(true),
-      error: err => { this.error = err.error?.message || 'Failed to submit payment.'; this.saving = false; }
+      error: err => { this.error = err.error?.message || 'Failed to submit payment.'; this.saving = false; this.cdr.detectChanges(); }
     });
   }
 

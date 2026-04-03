@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   PushNotificationService,
   NotificationType,
@@ -41,11 +41,11 @@ export class PushTestComponent implements OnInit {
     { value: NotificationType.SystemRestart,   label: 'System Restart' },
   ];
 
-  constructor(private pushService: PushNotificationService) {}
+  constructor(private pushService: PushNotificationService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.pushService.permission$.subscribe(p => (this.permission = p));
-    this.pushService.isSubscribed$.subscribe(s => (this.isSubscribed = s));
+    this.pushService.permission$.subscribe(p => { this.permission = p; this.cdr.detectChanges(); });
+    this.pushService.isSubscribed$.subscribe(s => { this.isSubscribed = s; this.cdr.detectChanges(); });
   }
 
   async requestPermission(): Promise<void> {
@@ -87,11 +87,13 @@ export class PushTestComponent implements OnInit {
       next: res => {
         this.loading = false;
         this.setStatus(res.message, 'success');
+        this.cdr.detectChanges();
       },
       error: err => {
         this.loading = false;
         const msg = err?.error?.message ?? err?.message ?? 'Unknown error';
         this.setStatus(msg, 'error');
+        this.cdr.detectChanges();
       }
     });
   }

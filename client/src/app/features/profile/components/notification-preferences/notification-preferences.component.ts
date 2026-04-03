@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NotificationPreferenceService } from '../../../../core/services/notification-preference.service';
 import {
   NotificationPreferenceDto,
@@ -19,7 +19,8 @@ export class NotificationPreferencesComponent implements OnInit {
   successMessage = '';
 
   constructor(
-    private prefService: NotificationPreferenceService
+    private prefService: NotificationPreferenceService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -27,10 +28,12 @@ export class NotificationPreferencesComponent implements OnInit {
       next: prefs => {
         this.preferences = prefs;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to load notification preferences.';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -62,11 +65,13 @@ export class NotificationPreferencesComponent implements OnInit {
         this.saving = false;
         this.successMessage = 'Notification preferences saved.';
         setTimeout(() => this.successMessage = '', 3000);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.saving = false;
         this.errorMessage = 'Failed to save preferences. Please try again.';
         setTimeout(() => this.errorMessage = '', 5000);
+        this.cdr.detectChanges();
       }
     });
   }

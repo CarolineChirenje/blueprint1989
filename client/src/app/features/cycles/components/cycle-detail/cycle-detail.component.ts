@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ExpenseCycleService } from '../../../../core/services/expense-cycle.service';
@@ -39,7 +39,8 @@ export class CycleDetailComponent implements OnInit {
     private expenseService: ExpenseService,
     private paymentService: PaymentService,
     private auth: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -58,29 +59,30 @@ export class CycleDetailComponent implements OnInit {
         this.loadPayments();
         this.loadBalance();
         this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: () => { this.error = 'Cycle not found.'; this.loading = false; }
+      error: () => { this.error = 'Cycle not found.'; this.loading = false; this.cdr.detectChanges(); }
     });
   }
 
   loadExpenses(): void {
     if (!this.cycle) return;
     this.expenseService.getByCycle(this.cycle.id).subscribe({
-      next: e => this.expenses = e
+      next: e => { this.expenses = e; this.cdr.detectChanges(); }
     });
   }
 
   loadPayments(): void {
     if (!this.cycle) return;
     this.paymentService.getByCycle(this.cycle.id).subscribe({
-      next: p => this.payments = p
+      next: p => { this.payments = p; this.cdr.detectChanges(); }
     });
   }
 
   loadBalance(): void {
     if (!this.cycle) return;
     this.cycleService.getBalance(this.cycle.id).subscribe({
-      next: b => this.balance = b
+      next: b => { this.balance = b; this.cdr.detectChanges(); }
     });
   }
 
@@ -124,6 +126,7 @@ export class CycleDetailComponent implements OnInit {
     if (!this.cycle || !confirm('Close this cycle? No more expenses can be added.')) return;
     this.cycleService.close(this.cycle.id).subscribe(() => {
       if (this.cycle) this.cycle.status = 'Closed';
+      this.cdr.detectChanges();
     });
   }
 

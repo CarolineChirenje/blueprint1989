@@ -214,14 +214,18 @@ export class AppComponent implements OnInit, OnDestroy {
     setTimeout(() => splash.remove(), 400);
   }
 
-  /** Subscribe to server push (silent — only fires if not already subscribed). */
+  /** Subscribe to server push (silent — only fires if permission is already granted). */
   private pushInitialised = false;
   private async initPush() {
     if (this.pushInitialised) return;
     this.pushInitialised = true;
+    // Skip silently when permission hasn't been granted yet — the login flow requests it
+    // via a user gesture. Calling subscribeToServer() without permission would trigger a
+    // browser permission prompt outside of a gesture context (and log a noisy warning).
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const subscribed = await this.pushService.subscribeToServer();
     if (!subscribed) {
-      console.log('AppComponent: Push subscription not established (permission may be pending).');
+      console.warn('AppComponent: Push subscription failed despite granted permission.');
     }
   }
 
@@ -255,6 +259,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   @HostListener('window:beforeinstallprompt', ['$event'])
   onBeforeInstallPrompt(event: Event): void {
+    // On desktop we never call .prompt(), so don't call preventDefault() — letting the
+    // browser handle the event natively avoids the Chrome DevTools warning
+    // "Banner not shown: beforeinstallpromptevent.preventDefault() called".
+    if (!DeviceService.isMobileOrTablet) return;
     event.preventDefault();
     this.installPromptEvent = event;
     // Status may not be loaded yet if device registration hasn't returned — that's fine,

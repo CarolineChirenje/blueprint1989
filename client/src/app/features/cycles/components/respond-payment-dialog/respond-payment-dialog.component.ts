@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { PaymentService } from '../../../../core/services/payment.service';
@@ -17,7 +17,8 @@ export class RespondPaymentDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<RespondPaymentDialogComponent>,
     private paymentService: PaymentService,
-    @Inject(MAT_DIALOG_DATA) public data: { payment: PaymentDto }
+    @Inject(MAT_DIALOG_DATA) public data: { payment: PaymentDto },
+    private cdr: ChangeDetectorRef
   ) {}
 
   respond(confirm: boolean): void {
@@ -25,7 +26,7 @@ export class RespondPaymentDialogComponent {
     this.error = '';
     this.paymentService.respond(this.data.payment.id, confirm, this.notes.value || undefined).subscribe({
       next: () => this.dialogRef.close(true),
-      error: err => { this.error = err.error?.message || 'Failed to respond to payment.'; this.saving = false; }
+      error: err => { this.error = err.error?.message || 'Failed to respond to payment.'; this.saving = false; this.cdr.detectChanges(); }
     });
   }
 

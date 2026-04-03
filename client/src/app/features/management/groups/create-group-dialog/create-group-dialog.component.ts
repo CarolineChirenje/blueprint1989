@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, Optional } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GroupService } from '../../../../core/services/group.service';
@@ -21,7 +21,8 @@ export class CreateGroupDialogComponent implements OnInit {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<CreateGroupDialogComponent>,
     private groupService: GroupService,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: DialogData
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private cdr: ChangeDetectorRef
   ) {
     this.isEdit = !!data?.group;
     this.form = this.fb.group({
@@ -45,7 +46,7 @@ export class CreateGroupDialogComponent implements OnInit {
 
     obs.subscribe({
       next: () => this.dialogRef.close(true),
-      error: err => { this.error = err.error?.message || 'Failed to save group.'; this.saving = false; }
+      error: err => { this.error = err.error?.message || 'Failed to save group.'; this.saving = false; this.cdr.detectChanges(); }
     });
   }
 

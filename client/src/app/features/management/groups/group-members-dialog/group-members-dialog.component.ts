@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { GroupService } from '../../../../core/services/group.service';
@@ -18,7 +18,6 @@ interface UserOption { id: number; firstName: string; lastName: string; email: s
 export class GroupMembersDialogComponent implements OnInit {
   members: GroupMemberDto[] = [];
   users: UserOption[] = [];
-  isLoading = false;
   isSendingInvite = false;
   error = '';
   inviteError = '';
@@ -33,7 +32,8 @@ export class GroupMembersDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<GroupMembersDialogComponent>,
     private groupService: GroupService,
     private dialogService: DialogService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -45,10 +45,9 @@ export class GroupMembersDialogComponent implements OnInit {
   }
 
   loadMembers(): void {
-    this.isLoading = true;
     this.groupService.getGroupMembers(this.data.groupId).subscribe({
-      next: members => { this.members = members; this.isLoading = false; },
-      error: () => { this.error = 'Failed to load members.'; this.isLoading = false; }
+      next: members => { this.members = members; this.cdr.detectChanges(); },
+      error: () => { this.error = 'Failed to load members.'; this.cdr.detectChanges(); }
     });
   }
 

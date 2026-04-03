@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { DeviceService } from '../../../core/services/device.service';
 import { UserDeviceDto, InstallPromptStatus } from '../../../shared/models/device.model';
 
@@ -19,7 +19,7 @@ export class LinkedDevicesComponent implements OnInit {
   renamingDeviceId: number | null = null;
   renameValue = '';
 
-  constructor(private deviceService: DeviceService) {
+  constructor(private deviceService: DeviceService, private cdr: ChangeDetectorRef) {
     this.currentClientId = this.deviceService.getClientId();
   }
 
@@ -33,10 +33,12 @@ export class LinkedDevicesComponent implements OnInit {
       next: devices => {
         this.devices = devices;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to load devices.';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -62,8 +64,9 @@ export class LinkedDevicesComponent implements OnInit {
         }
         this.successMessage = 'Install prompt reset — you will be asked again on your next visit.';
         setTimeout(() => { this.successMessage = ''; }, 4000);
+        this.cdr.detectChanges();
       },
-      error: () => { this.errorMessage = 'Failed to reset install prompt.'; }
+      error: () => { this.errorMessage = 'Failed to reset install prompt.'; this.cdr.detectChanges(); }
     });
   }
 
@@ -76,9 +79,11 @@ export class LinkedDevicesComponent implements OnInit {
         this.devices = this.devices.filter(d => d.id !== device.id);
         this.successMessage = 'Device removed successfully.';
         setTimeout(() => { this.successMessage = ''; }, 3000);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to remove device.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -111,9 +116,11 @@ export class LinkedDevicesComponent implements OnInit {
         this.cancelRename();
         this.successMessage = 'Device renamed successfully.';
         setTimeout(() => { this.successMessage = ''; }, 3000);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to rename device.';
+        this.cdr.detectChanges();
       }
     });
   }

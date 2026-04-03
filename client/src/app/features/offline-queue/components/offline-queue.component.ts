@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { OfflineQueueService, OfflineQueueItem } from '../../../core/services/offline-queue.service';
 import { SyncService, SyncResult } from '../../../core/services/sync.service';
@@ -21,14 +21,15 @@ export class OfflineQueueComponent implements OnInit, OnDestroy {
   constructor(
     private offlineQueue: OfflineQueueService,
     private syncService: SyncService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.subs.add(
-      this.syncService.isSyncing$.subscribe(v => this.isSyncing = v)
+      this.syncService.isSyncing$.subscribe(v => { this.isSyncing = v; this.cdr.detectChanges(); })
     );
     this.subs.add(
-      this.syncService.lastResult$.subscribe(r => this.syncResult = r)
+      this.syncService.lastResult$.subscribe(r => { this.syncResult = r; this.cdr.detectChanges(); })
     );
     this.loadItems();
   }
@@ -110,9 +111,11 @@ export class OfflineQueueComponent implements OnInit, OnDestroy {
         if (result.failed > 0) {
           this.syncError = `${result.failed} entr${result.failed === 1 ? 'y' : 'ies'} could not be uploaded — please try again.`;
         }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.syncError = 'Sync failed. Please check your connection and try again.';
+        this.cdr.detectChanges();
       }
     });
   }

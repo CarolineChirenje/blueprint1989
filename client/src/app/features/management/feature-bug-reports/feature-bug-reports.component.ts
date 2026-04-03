@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { FeatureBugReportService } from '../../../core/services/feature-bug-report.service';
 import { FeatureBugReportResponseDto, DropdownOption, ReportStatus } from '../../../shared/models/feature-bug-report.model';
@@ -32,7 +32,8 @@ export class FeatureBugReportsComponent implements OnInit {
   constructor(
     private featureBugReportService: FeatureBugReportService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -59,12 +60,14 @@ export class FeatureBugReportsComponent implements OnInit {
       next: (data) => {
         this.filteredReports = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.isLoading = false;
         const errorMsg = error?.error?.message || 'Failed to load reports';
         this.errorMessage = errorMsg;
         this.snackBar.open(errorMsg, 'Dismiss', { duration: 4000 });
+        this.cdr.detectChanges();
       }
     });
   }
@@ -91,10 +94,12 @@ export class FeatureBugReportsComponent implements OnInit {
         this.processingIds.delete(id);
         this.loadReports();
         this.snackBar.open('Report marked as in review', 'Dismiss', { duration: 3000 });
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.processingIds.delete(id);
         this.snackBar.open(error?.error?.message || 'Failed to update report', 'Dismiss', { duration: 4000 });
+        this.cdr.detectChanges();
       }
     });
   }
@@ -117,10 +122,12 @@ export class FeatureBugReportsComponent implements OnInit {
         this.processingIds.delete(id);
         this.loadReports();
         this.snackBar.open(`Report closed with version ${versionNumber}`, 'Dismiss', { duration: 3000 });
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.processingIds.delete(id);
         this.snackBar.open(error?.error?.message || 'Failed to close report', 'Dismiss', { duration: 4000 });
+        this.cdr.detectChanges();
       }
     });
   }
@@ -152,10 +159,12 @@ export class FeatureBugReportsComponent implements OnInit {
           this.processingIds.delete(id);
           this.loadReports();
           this.snackBar.open('Report deleted', 'Dismiss', { duration: 3000 });
+          this.cdr.detectChanges();
         },
         error: (error) => {
           this.processingIds.delete(id);
           this.snackBar.open(error?.error?.message || 'Failed to delete report', 'Dismiss', { duration: 4000 });
+          this.cdr.detectChanges();
         }
       });
     });

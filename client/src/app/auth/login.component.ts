@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
@@ -38,7 +38,8 @@ export class LoginComponent implements OnInit {
     private biometric: BiometricService,
     private pushNotifications: PushNotificationService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -61,6 +62,7 @@ export class LoginComponent implements OnInit {
 
     this.route.queryParams.subscribe(params => {
       this.shouldPromptMfa = params['promptMfa'] === 'true';
+      this.cdr.detectChanges();
     });
 
     // Check if this device supports biometrics and has a registered credential hint
@@ -114,52 +116,59 @@ submit() {
   this.errorMessage = '';
   this.loginState = 'processing';
 
-  this.auth.login(email, password).subscribe({
-    next: (r: any) => {
-      if (r?.emailUnverified) {
-        this.loginState = 'idle';
-        this.emailUnverified = true;
-        this.emailForResend = email;
-        return;
-      }
+    this.auth.login(email, password).subscribe({
+      next: (r: any) => {
+        if (r?.emailUnverified) {
+          this.loginState = 'idle';
+          this.emailUnverified = true;
+          this.emailForResend = email;
+          this.cdr.detectChanges();
+          return;
+        }
 
-      if (r?.passwordExpired) {
-        this.loginState = 'idle';
-        this.router.navigate(['/change-expired-password'], {
-          queryParams: { userId: r.id }
-        });
-        return;
-      }
+        if (r?.passwordExpired) {
+          this.loginState = 'idle';
+          this.cdr.detectChanges();
+          this.router.navigate(['/change-expired-password'], {
+            queryParams: { userId: r.id }
+          });
+          return;
+        }
 
-      if (r?.isMfaRequired) {
-        this.loginState = 'idle';
-        this.mfaFormVisible = true;
-        this.tempUserId = r.id;
-        return;
-      }
+        if (r?.isMfaRequired) {
+          this.loginState = 'idle';
+          this.mfaFormVisible = true;
+          this.tempUserId = r.id;
+          this.cdr.detectChanges();
+          return;
+        }
 
-      if (!r?.token) {
-        this.loginState = 'idle';
-        this.errorMessage = 'Login failed.';
-        return;
-      }
+        if (!r?.token) {
+          this.loginState = 'idle';
+          this.errorMessage = 'Login failed.';
+          this.cdr.detectChanges();
+          return;
+        }
 
-      this.loginState = 'unlocked';
-      this.completeLogin(r, rememberMe);
-    },
-    error: (err) => {
-      this.loginState = 'idle';
-      if (err?.error?.emailUnverified) {
-        this.emailUnverified = true;
-        this.emailForResend = email;
-        return;
+        this.loginState = 'unlocked';
+        this.cdr.detectChanges();
+        this.completeLogin(r, rememberMe);
+      },
+      error: (err) => {
+        this.loginState = 'idle';
+        if (err?.error?.emailUnverified) {
+          this.emailUnverified = true;
+          this.emailForResend = email;
+          this.cdr.detectChanges();
+          return;
+        }
+        this.errorMessage =
+          typeof err?.error === 'string'
+            ? err.error
+            : (err?.error?.message ?? 'Login failed');
+        this.cdr.detectChanges();
       }
-      this.errorMessage =
-        typeof err?.error === 'string'
-          ? err.error
-          : (err?.error?.message ?? 'Login failed');
-    }
-  });
+    });
 }
 
 /** Login using platform biometric (fingerprint / Face ID / Windows Hello). */
@@ -173,9 +182,11 @@ loginWithBiometric() {
       if (!r?.token) {
         this.loginState = 'idle';
         this.errorMessage = 'Biometric login failed — no token received.';
+        this.cdr.detectChanges();
         return;
       }
       this.loginState = 'unlocked';
+      this.cdr.detectChanges();
       this.completeLogin(r);
     },
     error: (err) => {
@@ -184,6 +195,7 @@ loginWithBiometric() {
         typeof err?.error === 'string'
           ? err.error
           : (err?.error?.message ?? err?.message ?? 'Biometric login failed. Please use your password.');
+      this.cdr.detectChanges();
     }
   });
 }
@@ -233,9 +245,11 @@ loginWithBiometric() {
       if (err?.status === 403 && err?.error?.emailUnverified) {
         this.mfaFormVisible = false;
         this.emailUnverified = true;
+        this.cdr.detectChanges();
         return;
       }
       this.errorMessage = 'MFA verification failed. Please check your code and try again.';
+      this.cdr.detectChanges();
     });
   }
 
@@ -247,10 +261,12 @@ loginWithBiometric() {
       next: (r: any) => {
         this.resendState = 'sent';
         this.resendMessage = r?.message ?? 'Verification email sent. Please check your inbox.';
+        this.cdr.detectChanges();
       },
       error: () => {
         this.resendState = 'idle';
         this.resendMessage = 'Could not send verification email. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }

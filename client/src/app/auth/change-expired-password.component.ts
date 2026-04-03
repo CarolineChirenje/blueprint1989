@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -22,7 +22,8 @@ export class ChangeExpiredPasswordComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.passwordForm = this.fb.group({
       currentPassword: ['', [Validators.required]],
@@ -42,6 +43,7 @@ export class ChangeExpiredPasswordComponent implements OnInit {
       if (!this.userId) {
         this.router.navigate(['/login']);
       }
+      this.cdr.detectChanges();
     });
   }
 
@@ -75,6 +77,7 @@ export class ChangeExpiredPasswordComponent implements OnInit {
       },
       error: (err) => {
         this.errorMessage = err.error || 'Failed to change password';
+        this.cdr.detectChanges();
       }
     });
   }

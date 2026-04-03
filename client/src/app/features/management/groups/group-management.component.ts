@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { GroupService } from '../../../core/services/group.service';
 import { DialogService } from '../../../shared/services/dialog.service';
@@ -14,14 +14,14 @@ import { GroupMembersDialogComponent } from './group-members-dialog/group-member
 })
 export class GroupManagementComponent implements OnInit {
   groups: GroupDto[] = [];
-  isLoading = false;
   errorMessage = '';
   displayedColumns = ['name', 'memberCount', 'status', 'createdAt', 'actions'];
 
   constructor(
     private groupService: GroupService,
     private dialog: MatDialog,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -29,11 +29,10 @@ export class GroupManagementComponent implements OnInit {
   }
 
   loadGroups(): void {
-    this.isLoading = true;
     this.errorMessage = '';
     this.groupService.getGroups().subscribe({
-      next: groups => { this.groups = groups; this.isLoading = false; },
-      error: () => { this.errorMessage = 'Failed to load groups.'; this.isLoading = false; }
+      next: groups => { this.groups = groups; this.cdr.detectChanges(); },
+      error: () => { this.errorMessage = 'Failed to load groups.'; this.cdr.detectChanges(); }
     });
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
@@ -25,7 +25,7 @@ export class SignupComponent implements OnInit {
     { value: Role.Member, label: 'Member', description: 'Group member',     icon: 'person',               color: '#237A49' }
   ];
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     this.signupForm = this.fb.group({
       role:            [null, Validators.required],
       email:           ['', [Validators.required, Validators.email]],
@@ -89,11 +89,13 @@ export class SignupComponent implements OnInit {
         this.skipMfaToken = res?.skipMfaToken ?? null;
         this.errorMsg = '';
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMsg = err.error?.message || 'Signup failed. Please try again.';
         this.signupSuccess = false;
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }

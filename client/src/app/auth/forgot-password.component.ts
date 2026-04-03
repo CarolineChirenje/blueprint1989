@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 
@@ -18,7 +18,8 @@ export class ForgotPasswordComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -45,10 +46,12 @@ export class ForgotPasswordComponent implements OnInit {
         this.submitted = true;
         this.successMessage = response.message || 'Check your email for password reset link';
         this.email = '';
+        this.cdr.detectChanges();
       },
       (error: any) => {
         this.loading = false;
         this.errorMessage = error?.error?.message || 'An error occurred. Please try again.';
+        this.cdr.detectChanges();
       }
     );
   }

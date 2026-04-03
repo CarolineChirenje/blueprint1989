@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
@@ -28,7 +28,8 @@ export class CreateCycleDialogComponent implements OnInit {
     private cycleService: ExpenseCycleService,
     private auth: AuthService,
     private http: HttpClient,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       name:      ['', [Validators.required, Validators.maxLength(150)]],
@@ -41,11 +42,11 @@ export class CreateCycleDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.http.get<UserOption[]>(`${environment.apiUrl}/auth/users`).subscribe({
-      next: users => this.users = users,
+      next: users => { this.users = users; this.cdr.detectChanges(); },
       error: () => {}
     });
     this.groupService.getGroups().subscribe({
-      next: groups => { this.groups = groups; },
+      next: groups => { this.groups = groups; this.cdr.detectChanges(); },
       error: () => {}
     });
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ExpenseCycleService } from '../../../../core/services/expense-cycle.service';
@@ -27,7 +27,8 @@ export class CycleListComponent implements OnInit {
     private auth: AuthService,
     private router: Router,
     private dialog: MatDialog,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -38,7 +39,7 @@ export class CycleListComponent implements OnInit {
 
   loadGroups(): void {
     this.groupService.getGroups().subscribe({
-      next: groups => { this.groups = groups; },
+      next: groups => { this.groups = groups; this.cdr.detectChanges(); },
       error: () => {}
     });
   }
@@ -52,8 +53,8 @@ export class CycleListComponent implements OnInit {
     this.loading = true;
     this.error = '';
     this.cycleService.getAll(this.selectedGroupId).subscribe({
-      next: cycles => { this.cycles = cycles; this.loading = false; },
-      error: () => { this.error = 'Failed to load cycles.'; this.loading = false; }
+      next: cycles => { this.cycles = cycles; this.loading = false; this.cdr.detectChanges(); },
+      error: () => { this.error = 'Failed to load cycles.'; this.loading = false; this.cdr.detectChanges(); }
     });
   }
 

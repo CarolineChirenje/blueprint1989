@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ExpenseService } from '../../../../core/services/expense.service';
@@ -19,7 +19,8 @@ export class AddExpenseDialogComponent {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddExpenseDialogComponent>,
     private expenseService: ExpenseService,
-    @Inject(MAT_DIALOG_DATA) public data: { cycleId: number }
+    @Inject(MAT_DIALOG_DATA) public data: { cycleId: number },
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       title:    ['', [Validators.required, Validators.maxLength(200)]],
@@ -40,7 +41,7 @@ export class AddExpenseDialogComponent {
       notes: notes || undefined
     }).subscribe({
       next: () => this.dialogRef.close(true),
-      error: err => { this.error = err.error?.message || 'Failed to add expense.'; this.saving = false; }
+      error: err => { this.error = err.error?.message || 'Failed to add expense.'; this.saving = false; this.cdr.detectChanges(); }
     });
   }
 

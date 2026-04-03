@@ -38,9 +38,7 @@
   <mat-divider></mat-divider>
 
   <!-- Members table -->
-  <div *ngIf="isLoading" class="loading-wrap"><mat-spinner diameter="28"></mat-spinner></div>
-
-  <div *ngIf="!isLoading">
+  <div>
     <h4>Accepted Members ({{ acceptedMembers.length }})</h4>
     <table mat-table [dataSource]="acceptedMembers" class="members-table" *ngIf="acceptedMembers.length; else noAccepted">
       <ng-container matColumnDef="name">

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { NotificationDto, NotificationService } from '../../core/services/notification.service';
@@ -40,7 +40,8 @@ export class NotificationsComponent implements OnInit {
     private notificationService: NotificationService,
     private router: Router,
     private dialog: MatDialog,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   get hasReadNotifications(): boolean {
@@ -54,7 +55,7 @@ export class NotificationsComponent implements OnInit {
 
   loadPendingInvites(): void {
     this.groupService.getMyInvites().subscribe({
-      next: invites => { this.pendingInvites = invites; },
+      next: invites => { this.pendingInvites = invites; this.cdr.detectChanges(); },
       error: () => {}
     });
   }
@@ -63,8 +64,8 @@ export class NotificationsComponent implements OnInit {
     this.inviteError = '';
     this.inviteResponding = true;
     this.groupService.respondToInvite(invite.groupId, { accept }).subscribe({
-      next: () => { this.inviteResponding = false; this.loadPendingInvites(); },
-      error: err => { this.inviteError = err.error?.message || 'Failed to respond to invite.'; this.inviteResponding = false; }
+      next: () => { this.inviteResponding = false; this.loadPendingInvites(); this.cdr.detectChanges(); },
+      error: err => { this.inviteError = err.error?.message || 'Failed to respond to invite.'; this.inviteResponding = false; this.cdr.detectChanges(); }
     });
   }
 
@@ -104,11 +105,13 @@ export class NotificationsComponent implements OnInit {
         this.hasMore = summary.notifications.length === this.pageSize;
         this.isLoading = false;
         this.isLoadingMore = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Unable to load notifications right now.';
         this.isLoading = false;
         this.isLoadingMore = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -133,9 +136,11 @@ export class NotificationsComponent implements OnInit {
         if (navigateAfter && notification.deepLinkUrl) {
           this.router.navigateByUrl(notification.deepLinkUrl);
         }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Unable to update that notification.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -149,9 +154,11 @@ export class NotificationsComponent implements OnInit {
           : this.notifications.map(notification => ({ ...notification, isRead: true }));
         this.notificationGroups = this.groupNotifications(this.notifications);
         this.hasMore = this.selectedFilter === 'unread' ? false : this.hasMore;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Unable to mark all notifications as read.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -161,9 +168,11 @@ export class NotificationsComponent implements OnInit {
       next: () => {
         this.notifications = this.notifications.filter(notification => !notification.isRead);
         this.notificationGroups = this.groupNotifications(this.notifications);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Unable to archive read notifications right now.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -173,9 +182,11 @@ export class NotificationsComponent implements OnInit {
       next: () => {
         this.notifications = this.notifications.filter(item => item.id !== notification.id);
         this.notificationGroups = this.groupNotifications(this.notifications);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Unable to restore that notification right now.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -189,9 +200,11 @@ export class NotificationsComponent implements OnInit {
           this.unreadCount = Math.max(0, this.unreadCount - 1);
         }
         this.notificationGroups = this.groupNotifications(this.notifications);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Unable to archive that notification right now.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -207,9 +220,11 @@ export class NotificationsComponent implements OnInit {
         );
         this.unreadCount = this.unreadCount + 1;
         this.notificationGroups = this.groupNotifications(this.notifications);
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Unable to mark that notification as unread.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -236,9 +251,11 @@ export class NotificationsComponent implements OnInit {
             this.unreadCount = Math.max(0, this.unreadCount - 1);
           }
           this.notificationGroups = this.groupNotifications(this.notifications);
+          this.cdr.detectChanges();
         },
         error: () => {
           this.error = 'Unable to delete that notification.';
+          this.cdr.detectChanges();
         }
       });
     });
@@ -263,9 +280,11 @@ export class NotificationsComponent implements OnInit {
           this.notifications = [];
           this.notificationGroups = [];
           this.hasMore = false;
+          this.cdr.detectChanges();
         },
         error: () => {
           this.error = 'Unable to purge archived notifications right now.';
+          this.cdr.detectChanges();
         }
       });
     });

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { GroupService } from '../../../../core/services/group.service';
@@ -23,7 +23,8 @@ export class UserGroupRolesDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private dialogRef: MatDialogRef<UserGroupRolesDialogComponent>,
     private groupService: GroupService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -36,8 +37,8 @@ export class UserGroupRolesDialogComponent implements OnInit {
     this.http.get<UserGroupMembershipDto[]>(
       `${environment.apiUrl}/auth/users/${this.data.userId}/group-memberships`
     ).subscribe({
-      next: m => { this.memberships = m; this.isLoading = false; },
-      error: () => { this.error = 'Failed to load group memberships.'; this.isLoading = false; }
+      next: m => { this.memberships = m; this.isLoading = false; this.cdr.detectChanges(); },
+      error: () => { this.error = 'Failed to load group memberships.'; this.isLoading = false; this.cdr.detectChanges(); }
     });
   }
 
@@ -48,10 +49,12 @@ export class UserGroupRolesDialogComponent implements OnInit {
       next: () => {
         m.groupRole = newRole;
         this.savingGroupId = null;
+        this.cdr.detectChanges();
       },
       error: err => {
         this.error = err.error?.message || 'Failed to update role.';
         this.savingGroupId = null;
+        this.cdr.detectChanges();
       }
     });
   }
