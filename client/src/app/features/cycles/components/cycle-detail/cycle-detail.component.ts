@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ExpenseCycleService } from '../../../../core/services/expense-cycle.service';
 import { ExpenseService } from '../../../../core/services/expense.service';
 import { PaymentService } from '../../../../core/services/payment.service';
@@ -72,6 +73,7 @@ export class CycleDetailComponent implements OnInit {
     private disputeService: ExpenseDisputeService,
     private auth: AuthService,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -226,7 +228,7 @@ export class CycleDetailComponent implements OnInit {
         this.loadContributionSummary();
         this.cdr.detectChanges();
       },
-      error: err => alert(err?.error?.message ?? 'Could not start cycle.')
+      error: err => this.snackBar.open(err?.error?.message ?? 'Could not start cycle.', 'Dismiss', { duration: 5000 })
     });
   }
 
@@ -236,12 +238,12 @@ export class CycleDetailComponent implements OnInit {
     this.cycleService.sendReminder(this.cycle.id).subscribe({
       next: () => {
         this.reminderSending = false;
-        alert('Reminders sent to all unsettled members.');
+        this.snackBar.open('Reminders sent to all unsettled members.', 'Dismiss', { duration: 4000 });
         this.cdr.detectChanges();
       },
       error: err => {
         this.reminderSending = false;
-        alert(err?.error?.message ?? 'Failed to send reminders.');
+        this.snackBar.open(err?.error?.message ?? 'Failed to send reminders.', 'Dismiss', { duration: 5000 });
         this.cdr.detectChanges();
       }
     });
@@ -304,7 +306,7 @@ export class CycleDetailComponent implements OnInit {
     if (!confirm('Remove this member from the cycle?')) return;
     this.cycleService.removeMember(this.cycle.id, userId).subscribe({
       next: () => this.loadAll(this.cycle!.id),
-      error: err => alert(err?.error?.message ?? 'Failed to remove member.')
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed to remove member.', 'Dismiss', { duration: 5000 })
     });
   }
 
