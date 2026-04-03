@@ -54,20 +54,22 @@ public class PaymentService
         if (request.Amount <= 0)
             return (null, "Amount must be greater than zero.");
 
-        if (request.PayeeId == payerId)
-            return (null, "Cannot create a payment to yourself.");
+        // Self-payment (payer == payee) is allowed — auto-confirmed with broadcast push
+        bool isSelfPayment = request.PayeeId == payerId;
 
         var cycle = await _context.ExpenseCycles.FindAsync(request.ExpenseCycleId);
         if (cycle == null) return (null, "Expense cycle not found.");
 
-        // Verify both payer and payee are members
         var payerIsMember = await _context.CycleMembers
             .AnyAsync(m => m.ExpenseCycleId == request.ExpenseCycleId && m.UserId == payerId);
         if (!payerIsMember) return (null, "You are not a member of this cycle.");
 
-        var payeeIsMember = await _context.CycleMembers
-            .AnyAsync(m => m.ExpenseCycleId == request.ExpenseCycleId && m.UserId == request.PayeeId);
-        if (!payeeIsMember) return (null, "Payee is not a member of this cycle.");
+        if (!isSelfPayment)
+        {
+            var payeeIsMember = await _context.CycleMembers
+                .AnyAsync(m => m.ExpenseCycleId == request.ExpenseCycleId && m.UserId == request.PayeeId);
+            if (!payeeIsMember) return (null, "Payee is not a member of this cycle.");
+        }
 
         var payment = new Payment
         {
@@ -75,7 +77,8 @@ public class PaymentService
             PayeeId        = request.PayeeId,
             ExpenseCycleId = request.ExpenseCycleId,
             Amount         = Math.Round(request.Amount, 2),
-            Status         = PaymentStatus.Pending,
+            Status         = isSelfPayment ? PaymentStatus.Confirmed : PaymentStatus.Pending,
+            ConfirmedAt    = isSelfPayment ? DateTime.UtcNow : null,
             Notes          = request.Notes?.Trim(),
             CreatedAt      = DateTime.UtcNow
         };
@@ -83,14 +86,45 @@ public class PaymentService
         _context.Payments.Add(payment);
         await _context.SaveChangesAsync();
 
-        // Notify payee that a payment is pending their confirmation
         var payer = await _context.Users.FindAsync(payerId);
-        await _notifications.CreateAsync(
-            request.PayeeId,
-            $"{payer?.FirstName} {payer?.LastName} sent you a payment of ${payment.Amount:F2} — please confirm.",
-            NotificationType.PaymentReceived,
-            $"/cycles/{request.ExpenseCycleId}/payments",
-            payment.Id);
+
+        if (isSelfPayment)
+        {
+            // Auto-confirmed: broadcast push to all cycle members
+            var memberIds = await _context.CycleMembers
+                .Where(m => m.ExpenseCycleId == request.ExpenseCycleId)
+                .Select(m => m.UserId)
+                .ToListAsync();
+
+            if (memberIds.Count > 0)
+                await _push.SendToUsersAsync(
+                    memberIds,
+                    NotificationType.CyclePaymentMade,
+                    $"Payment made in {cycle.Name}",
+                    $"{payer?.FirstName} {payer?.LastName} paid ${payment.Amount:F2} toward \"{cycle.Name}\".",
+                    $"/cycles/{request.ExpenseCycleId}",
+                    payment.Id);
+        }
+        else
+        {
+            // Notify all accepted group admins for approval
+            var adminIds = await _context.GroupMembers
+                .Where(m => m.GroupId == cycle.GroupId
+                         && m.GroupRole == GroupRole.GroupAdmin
+                         && m.Status == GroupInviteStatus.Accepted)
+                .Select(m => m.UserId)
+                .ToListAsync();
+
+            foreach (var adminId in adminIds)
+            {
+                await _notifications.CreateAsync(
+                    adminId,
+                    $"{payer?.FirstName} {payer?.LastName} sent a payment of ${payment.Amount:F2} — please review and confirm.",
+                    NotificationType.PaymentReceived,
+                    $"/cycles/{request.ExpenseCycleId}/payments",
+                    payment.Id);
+            }
+        }
 
         var dto = (await BuildDtosAsync(new List<Payment> { payment })).First();
         return (dto, null);
@@ -101,11 +135,21 @@ public class PaymentService
         var payment = await _context.Payments.FindAsync(paymentId);
         if (payment == null) return (null, "Payment not found.");
 
-        if (payment.PayeeId != respondingUserId)
-            return (null, "Only the payee can confirm or reject a payment.");
-
         if (payment.Status != PaymentStatus.Pending)
             return (null, "Payment has already been responded to.");
+
+        // Only an accepted group admin of the cycle's group may confirm or reject
+        var cycle = await _context.ExpenseCycles.FindAsync(payment.ExpenseCycleId);
+        if (cycle == null) return (null, "Cycle not found.");
+
+        var isGroupAdmin = await _context.GroupMembers
+            .AnyAsync(m => m.GroupId == cycle.GroupId
+                        && m.UserId == respondingUserId
+                        && m.GroupRole == GroupRole.GroupAdmin
+                        && m.Status == GroupInviteStatus.Accepted);
+
+        if (!isGroupAdmin)
+            return (null, "Only a group admin can confirm or reject a payment.");
 
         payment.Status      = confirm ? PaymentStatus.Confirmed : PaymentStatus.Rejected;
         payment.ConfirmedAt = confirm ? DateTime.UtcNow : null;
@@ -114,10 +158,10 @@ public class PaymentService
         await _context.SaveChangesAsync();
 
         // Notify payer of the result
-        var payee = await _context.Users.FindAsync(respondingUserId);
+        var responder = await _context.Users.FindAsync(respondingUserId);
         var message = confirm
-            ? $"{payee?.FirstName} confirmed your payment of ${payment.Amount:F2}."
-            : $"{payee?.FirstName} rejected your payment of ${payment.Amount:F2}.";
+            ? $"{responder?.FirstName} {responder?.LastName} confirmed your payment of ${payment.Amount:F2}."
+            : $"{responder?.FirstName} {responder?.LastName} rejected your payment of ${payment.Amount:F2}.";
 
         await _notifications.CreateAsync(
             payment.PayerId,
@@ -130,7 +174,6 @@ public class PaymentService
         if (confirm)
         {
             var payer = await _context.Users.FindAsync(payment.PayerId);
-            var cycle = await _context.ExpenseCycles.FindAsync(payment.ExpenseCycleId);
             var memberIds = await _context.CycleMembers
                 .Where(m => m.ExpenseCycleId == payment.ExpenseCycleId)
                 .Select(m => m.UserId)
@@ -140,8 +183,8 @@ public class PaymentService
                 await _push.SendToUsersAsync(
                     memberIds,
                     NotificationType.CyclePaymentMade,
-                    $"Payment made in {cycle?.Name ?? "cycle"}",
-                    $"{payer?.FirstName} {payer?.LastName} paid ${payment.Amount:F2} toward \"{cycle?.Name}\".",
+                    $"Payment made in {cycle.Name}",
+                    $"{payer?.FirstName} {payer?.LastName} paid ${payment.Amount:F2} toward \"{cycle.Name}\".",
                     $"/cycles/{payment.ExpenseCycleId}",
                     payment.Id);
         }

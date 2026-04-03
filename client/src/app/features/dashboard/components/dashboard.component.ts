@@ -1,8 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { ExpenseService } from '../../../core/services/expense.service';
-import { ObligationsSummaryDto } from '../../../shared/models/expense-cycle.model';
+import { ExpenseCycleService } from '../../../core/services/expense-cycle.service';
+import { OutstandingSummaryDto } from '../../../shared/models/expense-cycle.model';
 import { Role } from '../../../shared/models/user.model';
 
 @Component({
@@ -17,14 +17,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showRecordPicker: boolean = false;
   private clockInterval: ReturnType<typeof setInterval> | null = null;
 
-  obligationsSummary: ObligationsSummaryDto | null = null;
+  outstandingSummary: OutstandingSummaryDto | null = null;
   summaryLoading = true;
   summaryError = false;
 
   constructor(
     private auth: AuthService,
     private router: Router,
-    private expenseService: ExpenseService,
+    private cycleService: ExpenseCycleService,
     private cdr: ChangeDetectorRef
   ) {}
   
@@ -35,9 +35,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.currentTime = new Date();
     }, 1000);
 
-    this.expenseService.getObligationsSummary().subscribe({
+    this.cycleService.getOutstandingSummary().subscribe({
       next: (summary) => {
-        this.obligationsSummary = summary;
+        this.outstandingSummary = summary;
         this.summaryLoading = false;
         this.cdr.detectChanges();
       },

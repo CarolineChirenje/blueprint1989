@@ -6,7 +6,8 @@ import {
   ExpenseCycleDto,
   ExpenseCycleSummaryDto,
   CycleBalanceDto,
-  CycleContributionSummaryDto
+  CycleContributionSummaryDto,
+  OutstandingSummaryDto
 } from '../../shared/models/expense-cycle.model';
 
 @Injectable({ providedIn: 'root' })
@@ -62,5 +63,9 @@ export class ExpenseCycleService {
 
   removeMember(cycleId: number, userId: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${cycleId}/members/${userId}`);
+  }
+
+  getOutstandingSummary(): Observable<OutstandingSummaryDto> {
+    return this.http.get<OutstandingSummaryDto>(`${this.url}/outstanding-summary`);
   }
 }

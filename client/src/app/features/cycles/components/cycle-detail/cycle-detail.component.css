@@ -56,6 +56,13 @@
 .strip-value.primary { color: var(--primary); }
 /* Summary tab */
 .summary-table-wrap { overflow-x: auto; }
+.summary-outstanding-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--warn-bg, #fff3e0); border: 1px solid var(--warn, #fb8c00);
+  border-radius: var(--radius-md); padding: .6rem 1.25rem; margin-bottom: 1rem;
+}
+.summary-outstanding-label { font-size: .9rem; color: var(--warn, #e65100); font-weight: 500; }
+.summary-outstanding-amount { font-size: 1.15rem; font-weight: 700; color: var(--warn, #e65100); }
 .summary-table { width: 100%; }
 .contrib-positive { color: var(--success) !important; font-weight: 600; }
 .contrib-negative { color: var(--error) !important; font-weight: 600; }

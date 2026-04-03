@@ -262,8 +262,12 @@ export class CycleDetailComponent implements OnInit {
   isActive(): boolean { return this.cycle?.status === 'Active'; }
   isClosed(): boolean { return this.cycle?.status === 'Closed'; }
 
+  get currentUserIsGroupAdmin(): boolean {
+    return this.cycle?.currentUserGroupRole === 'GroupAdmin';
+  }
+
   canManageCycle(): boolean {
-    return this.isAdmin || this.cycle?.createdByUserId === this.currentUserId;
+    return this.isAdmin || this.currentUserIsGroupAdmin;
   }
 
   isPayer(payment: PaymentDto): boolean { return payment.payerId === this.currentUserId; }

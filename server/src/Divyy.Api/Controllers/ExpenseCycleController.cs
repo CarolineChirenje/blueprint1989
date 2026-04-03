@@ -72,7 +72,8 @@ public class ExpenseCycleController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var cycle = await _cycleService.GetByIdAsync(id);
+        var userId = GetCurrentUserId();
+        var cycle = await _cycleService.GetByIdAsync(id, userId ?? 0);
         if (cycle == null) return NotFound(new { message = "Cycle not found." });
         return Ok(cycle);
     }
@@ -87,6 +88,16 @@ public class ExpenseCycleController : ControllerBase
         var balance = await _cycleService.GetBalanceAsync(id, userId.Value);
         if (balance == null) return NotFound(new { message = "Cycle not found." });
         return Ok(balance);
+    }
+
+    /// <summary>Returns the outstanding balance for the current user across all their active cycles.</summary>
+    [HttpGet("outstanding-summary")]
+    public async Task<IActionResult> GetOutstandingSummary()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+        var summary = await _cycleService.GetOutstandingSummaryAsync(userId.Value);
+        return Ok(summary);
     }
 
     /// <summary>Creates a new expense cycle. Admin/SuperAdmin or GroupAdmin of the target group.</summary>

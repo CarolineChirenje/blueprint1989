@@ -42,6 +42,8 @@ export interface ExpenseCycleDto {
   createdByUserId: number;
   createdAt: string;
   members: CycleMemberDto[];
+  /** "GroupAdmin" or "GroupMember" — role of the requesting user in this cycle's group. */
+  currentUserGroupRole: 'GroupAdmin' | 'GroupMember';
 }
 
 export interface MemberObligationDto {
@@ -116,6 +118,24 @@ export interface CycleContributionSummaryDto {
   memberCount: number;
   sharePerMember: number;
   members: CycleMemberContributionDto[];
+  /** Sum of absolute balances for all unsettled members. */
+  totalOutstanding: number;
+}
+
+// ── Outstanding Summary (cross-cycle) ────────────────────────────────────────
+
+export interface OutstandingSummaryDto {
+  totalOutstanding: number;
+  cycleCount: number;
+  cycles: CycleOutstandingItemDto[];
+}
+
+export interface CycleOutstandingItemDto {
+  cycleId: number;
+  cycleName: string;
+  outstanding: number;
+  sharePerMember: number;
+  totalPaid: number;
 }
 
 // ── Disputes ──────────────────────────────────────────────────────────────────

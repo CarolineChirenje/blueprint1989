@@ -85,12 +85,15 @@ public class ExpenseCycleService
         return summaries;
     }
 
-    public async Task<ExpenseCycleDto?> GetByIdAsync(int id)
+    public async Task<ExpenseCycleDto?> GetByIdAsync(int id, int currentUserId = 0)
     {
         var cycle = await _context.ExpenseCycles.FindAsync(id);
         if (cycle == null) return null;
 
         var members = await GetMemberDtosAsync(id);
+        var role = currentUserId > 0
+            ? await GetUserGroupRoleAsync(cycle.GroupId, currentUserId)
+            : "GroupMember";
 
         return new ExpenseCycleDto(
             cycle.Id,
@@ -101,7 +104,8 @@ public class ExpenseCycleService
             cycle.SplitType.ToString(),
             cycle.CreatedByUserId,
             cycle.CreatedAt,
-            members);
+            members,
+            role);
     }
 
     public async Task<CycleBalanceDto?> GetBalanceAsync(int cycleId, int currentUserId)
@@ -225,11 +229,12 @@ public class ExpenseCycleService
         await _context.SaveChangesAsync();
 
         var members = await GetMemberDtosAsync(cycle.Id);
+        var role = await GetUserGroupRoleAsync(cycle.GroupId, createdByUserId);
 
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
             cycle.Status.ToString(), cycle.SplitType.ToString(),
-            cycle.CreatedByUserId, cycle.CreatedAt, members), null);
+            cycle.CreatedByUserId, cycle.CreatedAt, members, role), null);
     }
 
     public async Task<(ExpenseCycleDto? dto, string? error)> StartAsync(int cycleId)
@@ -294,7 +299,7 @@ public class ExpenseCycleService
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
             cycle.Status.ToString(), cycle.SplitType.ToString(),
-            cycle.CreatedByUserId, cycle.CreatedAt, members), null);
+            cycle.CreatedByUserId, cycle.CreatedAt, members, "GroupAdmin"), null);
     }
 
     public async Task<(ExpenseCycleDto? dto, string? error)> UpdateAsync(int id, UpdateExpenseCycleRequest request)
@@ -320,7 +325,7 @@ public class ExpenseCycleService
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
             cycle.Status.ToString(), cycle.SplitType.ToString(),
-            cycle.CreatedByUserId, cycle.CreatedAt, members), null);
+            cycle.CreatedByUserId, cycle.CreatedAt, members, "GroupAdmin"), null);
     }
 
     public async Task<string?> CloseAsync(int id)
@@ -430,7 +435,8 @@ public class ExpenseCycleService
         }).ToList();
 
         return new CycleContributionSummaryDto(
-            cycleId, cycle.Name, totalExpenses, memberCount, sharePerMember, members);
+            cycleId, cycle.Name, totalExpenses, memberCount, sharePerMember, members,
+            Math.Round(members.Where(m => !m.IsSettled).Sum(m => Math.Abs(m.Balance)), 2));
     }
 
     public async Task<string?> SendReminderAsync(int cycleId)
@@ -462,7 +468,57 @@ public class ExpenseCycleService
         return null;
     }
 
+    // ── Outstanding summary (cross-cycle) ────────────────────────────────────
+
+    public async Task<OutstandingSummaryDto> GetOutstandingSummaryAsync(int userId)
+    {
+        var cycleIds = await _context.CycleMembers
+            .Where(m => m.UserId == userId)
+            .Select(m => m.ExpenseCycleId)
+            .ToListAsync();
+
+        var activeCycles = await _context.ExpenseCycles
+            .Where(c => cycleIds.Contains(c.Id) && c.Status == CycleStatus.Active)
+            .ToListAsync();
+
+        var items = new List<CycleOutstandingItemDto>();
+
+        foreach (var cycle in activeCycles)
+        {
+            var memberCount   = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycle.Id);
+            var totalExpenses = await _context.Expenses
+                .Where(e => e.ExpenseCycleId == cycle.Id)
+                .SumAsync(e => e.Amount);
+
+            decimal sharePerMember = memberCount > 0 ? Math.Round(totalExpenses / memberCount, 2) : 0;
+
+            var totalPaid = await _context.Payments
+                .Where(p => p.ExpenseCycleId == cycle.Id
+                         && p.PayerId == userId
+                         && p.Status == PaymentStatus.Confirmed)
+                .SumAsync(p => p.Amount);
+
+            var outstanding = Math.Max(0, Math.Round(sharePerMember - totalPaid, 2));
+
+            items.Add(new CycleOutstandingItemDto(cycle.Id, cycle.Name, outstanding, sharePerMember, totalPaid));
+        }
+
+        return new OutstandingSummaryDto(
+            Math.Round(items.Sum(c => c.Outstanding), 2),
+            items.Count,
+            items);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private async Task<string> GetUserGroupRoleAsync(int groupId, int userId)
+    {
+        var member = await _context.GroupMembers
+            .FirstOrDefaultAsync(m => m.GroupId == groupId
+                                   && m.UserId == userId
+                                   && m.Status == GroupInviteStatus.Accepted);
+        return member?.GroupRole == GroupRole.GroupAdmin ? "GroupAdmin" : "GroupMember";
+    }
 
     private async Task<List<CycleMemberDto>> GetMemberDtosAsync(int cycleId)
     {

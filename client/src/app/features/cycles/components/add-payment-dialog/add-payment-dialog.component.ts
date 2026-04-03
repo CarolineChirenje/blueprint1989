@@ -20,6 +20,7 @@ export class AddPaymentDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: {
       cycleId: number;
       cycleCreatedByUserId: number;
+      currentUserId: number | null;
     },
     private cdr: ChangeDetectorRef
   ) {
@@ -46,4 +47,8 @@ export class AddPaymentDialogComponent {
   }
 
   cancel(): void { this.dialogRef.close(false); }
+
+  get isSelfPayment(): boolean {
+    return this.data.currentUserId != null && this.data.currentUserId === this.data.cycleCreatedByUserId;
+  }
 }

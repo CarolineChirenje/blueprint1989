@@ -18,6 +18,12 @@
     @if (error) {
       <p class="error-msg">{{ error }}</p>
     }
+    @if (isSelfPayment) {
+      <p class="self-payment-hint">
+        <mat-icon class="hint-icon">info</mat-icon>
+        Your payment will be auto-confirmed.
+      </p>
+    }
   </form>
 </mat-dialog-content>
 

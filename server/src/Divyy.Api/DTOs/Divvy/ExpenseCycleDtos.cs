@@ -25,7 +25,9 @@ public record ExpenseCycleDto(
     string SplitType,
     int CreatedByUserId,
     DateTime CreatedAt,
-    List<CycleMemberDto> Members);
+    List<CycleMemberDto> Members,
+    /// <summary>"GroupAdmin" or "GroupMember" — role of the requesting user in this cycle's group.</summary>
+    string CurrentUserGroupRole);
 
 public record ExpenseCycleSummaryDto(
     int Id,
@@ -76,4 +78,20 @@ public record CycleContributionSummaryDto(
     decimal TotalExpenses,
     int MemberCount,
     decimal SharePerMember,
-    List<CycleMemberContributionDto> Members);
+    List<CycleMemberContributionDto> Members,
+    /// <summary>Sum of absolute balances for all unsettled members.</summary>
+    decimal TotalOutstanding);
+
+// ── Outstanding Summary (cross-cycle) ────────────────────────────────────────
+
+public record OutstandingSummaryDto(
+    decimal TotalOutstanding,
+    int CycleCount,
+    List<CycleOutstandingItemDto> Cycles);
+
+public record CycleOutstandingItemDto(
+    int CycleId,
+    string CycleName,
+    decimal Outstanding,
+    decimal SharePerMember,
+    decimal TotalPaid);
