@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Flag Dispute</h2>
+
+<mat-dialog-content>
+  <p class="expense-ref">
+    <strong>{{ data.expense.title }}</strong>
+    &nbsp;–&nbsp;
+    <span class="expense-amount">${{ data.expense.amount | number:'1.2-2' }}</span>
+  </p>
+
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Reason for dispute</mat-label>
+      <textarea matInput formControlName="reason" rows="4"
+        placeholder="Describe why you are disputing this expense…"
+        required></textarea>
+      <mat-hint align="end">{{ form.value.reason?.length || 0 }}/1000</mat-hint>
+      <mat-error>Reason is required (max 1000 characters).</mat-error>
+    </mat-form-field>
+
+    @if (error) {
+      <p class="error-msg">{{ error }}</p>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()" [disabled]="saving">Cancel</button>
+  <button mat-raised-button color="warn" (click)="submit()" [disabled]="form.invalid || saving">
+    {{ saving ? 'Submitting…' : 'Raise Dispute' }}
+  </button>
+</mat-dialog-actions>

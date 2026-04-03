@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { PaymentService } from '../../../../core/services/payment.service';
-import { CycleMemberDto } from '../../../../shared/models/expense-cycle.model';
 
 @Component({
   selector: 'app-add-payment-dialog',
@@ -14,25 +13,19 @@ export class AddPaymentDialogComponent {
   saving = false;
   error = '';
 
-  get payableMembers(): CycleMemberDto[] {
-    return this.data.members.filter(m => m.userId !== this.data.currentUserId);
-  }
-
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AddPaymentDialogComponent>,
     private paymentService: PaymentService,
     @Inject(MAT_DIALOG_DATA) public data: {
       cycleId: number;
-      members: CycleMemberDto[];
-      currentUserId: number | null;
+      cycleCreatedByUserId: number;
     },
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
-      payeeId: [null, Validators.required],
-      amount:  [null, [Validators.required, Validators.min(0.01)]],
-      notes:   ['']
+      amount: [null, [Validators.required, Validators.min(0.01)]],
+      notes:  ['']
     });
   }
 
@@ -40,9 +33,9 @@ export class AddPaymentDialogComponent {
     if (this.form.invalid) return;
     this.saving = true;
     this.error = '';
-    const { payeeId, amount, notes } = this.form.value;
+    const { amount, notes } = this.form.value;
     this.paymentService.create({
-      payeeId,
+      payeeId: this.data.cycleCreatedByUserId,
       expenseCycleId: this.data.cycleId,
       amount: parseFloat(amount),
       notes: notes || undefined

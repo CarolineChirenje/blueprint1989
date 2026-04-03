@@ -19,8 +19,8 @@ public class Expense
     [Required]
     public ExpenseCategory Category { get; set; } = ExpenseCategory.Other;
 
-    /// <summary>The user who paid this expense and is owed by the other members.</summary>
-    public int PaidByUserId { get; set; }
+    /// <summary>The user who logged this expense (audit trail only). All members share the cost equally.</summary>
+    public int LoggedByUserId { get; set; }
 
     [StringLength(500)]
     public string? Notes { get; set; }

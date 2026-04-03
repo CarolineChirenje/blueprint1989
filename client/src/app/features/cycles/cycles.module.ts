@@ -9,6 +9,7 @@ import { AddExpenseDialogComponent } from './components/add-expense-dialog/add-e
 import { AddPaymentDialogComponent } from './components/add-payment-dialog/add-payment-dialog.component';
 import { RespondPaymentDialogComponent } from './components/respond-payment-dialog/respond-payment-dialog.component';
 import { CreateCycleDialogComponent } from './components/create-cycle-dialog/create-cycle-dialog.component';
+import { DisputeExpenseDialogComponent } from './components/dispute-expense-dialog/dispute-expense-dialog.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { CreateCycleDialogComponent } from './components/create-cycle-dialog/cre
     AddExpenseDialogComponent,
     AddPaymentDialogComponent,
     RespondPaymentDialogComponent,
-    CreateCycleDialogComponent
+    CreateCycleDialogComponent,
+    DisputeExpenseDialogComponent
   ],
   imports: [
     CommonModule,

@@ -23,8 +23,8 @@ public record ExpenseDto(
     string Title,
     decimal Amount,
     string Category,
-    int PaidByUserId,
-    string PaidByName,
+    int LoggedByUserId,
+    string LoggedByName,
     string? Notes,
     DateTime CreatedAt,
     List<MemberObligationDto> Obligations);

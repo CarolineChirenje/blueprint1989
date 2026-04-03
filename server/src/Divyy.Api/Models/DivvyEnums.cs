@@ -2,6 +2,7 @@ namespace Divvy.Api.Models;
 
 public enum CycleStatus
 {
+    Draft  = 0,
     Active = 1,
     Closed = 2
 }
@@ -34,4 +35,18 @@ public enum GroupInviteStatus
     Pending  = 1,
     Accepted = 2,
     Declined = 3
+}
+
+public enum SplitType
+{
+    Equal  = 1,
+    Custom = 2
+}
+
+public enum DisputeStatus
+{
+    Pending  = 1,
+    Reviewed = 2,
+    Resolved = 3,
+    Rejected = 4
 }

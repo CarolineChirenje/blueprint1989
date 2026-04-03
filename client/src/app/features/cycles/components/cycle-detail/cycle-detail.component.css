@@ -46,3 +46,41 @@
 .member-item { flex-direction: row; justify-content: space-between; align-items: center; }
 .member-name { font-weight: 600; color: var(--text-primary); }
 .member-email { font-size: .85rem; color: var(--text-secondary); }
+/* Draft badge */
+.badge-draft { background: #fff3cd; color: #856404; }
+/* Summary strip */
+.summary-strip { display: flex; gap: 2rem; padding: 1rem 1.25rem; background: var(--surface); border-radius: var(--radius-md); margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
+.strip-item { display: flex; flex-direction: column; }
+.strip-label { font-size: .8rem; color: var(--text-secondary); }
+.strip-value { font-size: 1.3rem; font-weight: 700; }
+.strip-value.primary { color: var(--primary); }
+/* Summary tab */
+.summary-table-wrap { overflow-x: auto; }
+.summary-table { width: 100%; }
+.contrib-positive { color: var(--success) !important; font-weight: 600; }
+.contrib-negative { color: var(--error) !important; font-weight: 600; }
+.contrib-chip { padding: .15rem .55rem; border-radius: 8px; font-size: .8rem; font-weight: 600; display: inline-flex; align-items: center; gap: .2rem; }
+.contrib-chip.settled  { background: var(--success-bg); color: var(--success); }
+.contrib-chip.overpaid { background: #e8f5e9; color: #2e7d32; }
+.contrib-chip.owing    { background: var(--warning-bg); color: var(--warning-text); }
+/* Dispute tab */
+.dispute-list { display: flex; flex-direction: column; gap: .75rem; }
+.dispute-item { background: var(--surface); border-radius: var(--radius-md); padding: 1rem 1.25rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: .4rem; }
+.dispute-header { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.dispute-expense { font-weight: 600; color: var(--text-primary); }
+.dispute-chip { padding: .2rem .6rem; border-radius: 8px; font-size: .78rem; font-weight: 600; }
+.dispute-pending  { background: var(--warning-bg);    color: var(--warning-text); }
+.dispute-reviewed { background: #e3f2fd; color: #1565c0; }
+.dispute-resolved { background: var(--success-bg);   color: var(--success); }
+.dispute-rejected { background: var(--surface-raised); color: var(--text-secondary); }
+.dispute-body { font-size: .9rem; color: var(--text-secondary); }
+.dispute-raiser { font-weight: 600; color: var(--text-primary); margin-right: .5rem; }
+.dispute-badge { background: var(--error); color: #fff; border-radius: 999px; padding: 0 .4rem; font-size: .7rem; font-weight: 700; margin-left: .3rem; vertical-align: middle; }
+.dispute-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; }
+.dispute-admin-notes { font-size: .82rem; font-style: italic; color: var(--text-secondary); border-left: 3px solid var(--border); padding-left: .5rem; }
+.dispute-date { font-size: .8rem; color: var(--text-disabled); }
+.btn-dispute { font-size: .82rem !important; }
+/* Expense action row */
+.expense-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-top: .25rem; }
+.col-center { text-align: center !important; }
+.col-right { text-align: right !important; }

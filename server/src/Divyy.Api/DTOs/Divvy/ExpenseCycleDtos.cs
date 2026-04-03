@@ -6,7 +6,7 @@ public record CreateExpenseCycleRequest(
     string Name,
     DateTime StartDate,
     DateTime EndDate,
-    List<int> MemberUserIds,
+    List<int>? MemberUserIds,
     int GroupId);
 
 public record UpdateExpenseCycleRequest(
@@ -22,6 +22,7 @@ public record ExpenseCycleDto(
     DateTime StartDate,
     DateTime EndDate,
     string Status,
+    string SplitType,
     int CreatedByUserId,
     DateTime CreatedAt,
     List<CycleMemberDto> Members);
@@ -56,3 +57,23 @@ public record MemberBalanceDto(
     string LastName,
     /// <summary>Positive = this user owes the current user. Negative = current user owes this user.</summary>
     decimal NetBalance);
+
+// ── Contribution Summary ──────────────────────────────────────────────────────
+
+public record CycleMemberContributionDto(
+    int UserId,
+    string FirstName,
+    string LastName,
+    decimal ShareOwed,
+    decimal TotalPaid,
+    /// <summary>Positive = overpaid, Negative = still owes.</summary>
+    decimal Balance,
+    bool IsSettled);
+
+public record CycleContributionSummaryDto(
+    int CycleId,
+    string CycleName,
+    decimal TotalExpenses,
+    int MemberCount,
+    decimal SharePerMember,
+    List<CycleMemberContributionDto> Members);

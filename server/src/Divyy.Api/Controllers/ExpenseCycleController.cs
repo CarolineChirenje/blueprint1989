@@ -118,6 +118,41 @@ public class ExpenseCycleController : ControllerBase
         return Ok(dto);
     }
 
+    /// <summary>Starts a Draft cycle. Validates ≥2 members and no open disputes.</summary>
+    [HttpPost("{id:int}/start")]
+    public async Task<IActionResult> Start(int id)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var (dto, error) = await _cycleService.StartAsync(id);
+        if (error != null)
+            return error == "Cycle not found." ? NotFound(new { message = error }) : BadRequest(new { message = error });
+
+        return Ok(dto);
+    }
+
+    /// <summary>Returns contribution summary: total expenses, share per member, and each member's paid/owed/balance.</summary>
+    [HttpGet("{id:int}/contribution-summary")]
+    public async Task<IActionResult> GetContributionSummary(int id)
+    {
+        var summary = await _cycleService.GetContributionSummaryAsync(id);
+        if (summary == null) return NotFound(new { message = "Cycle not found." });
+        return Ok(summary);
+    }
+
+    /// <summary>Sends a personalised payment reminder push to all unsettled members.</summary>
+    [HttpPost("{id:int}/send-reminder")]
+    public async Task<IActionResult> SendReminder(int id)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var error = await _cycleService.SendReminderAsync(id);
+        if (error != null)
+            return error == "Cycle not found." ? NotFound(new { message = error }) : BadRequest(new { message = error });
+
+        return NoContent();
+    }
+
     /// <summary>Closes a cycle. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
     [HttpPost("{id:int}/close")]
     public async Task<IActionResult> Close(int id)

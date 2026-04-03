@@ -7,5 +7,8 @@ public class CycleMember
 
     public int UserId { get; set; }
 
+    /// <summary>Null = equal share. Populated only when SplitType=Custom (future feature).</summary>
+    public decimal? SharePercentage { get; set; }
+
     public DateTime AddedAt { get; set; } = DateTime.UtcNow;
 }

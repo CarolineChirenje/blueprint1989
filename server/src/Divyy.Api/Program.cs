@@ -204,6 +204,7 @@ builder.Services.AddScoped<TimeZoneService>();
 builder.Services.AddScoped<ExpenseCycleService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<ExpenseDisputeService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 
 // WebAuthn / Biometric authentication
@@ -229,6 +230,7 @@ builder.Services.Configure<VapidSettings>(builder.Configuration.GetSection("Vapi
 builder.Services.AddHttpClient<PushNotificationSender>();
 builder.Services.AddScoped<IPushNotificationSender, PushNotificationSender>();
 builder.Services.AddHostedService<BgTimerHostedService>();
+builder.Services.AddHostedService<CycleReminderService>();
 
 // Add Swagger/OpenAPI (only in development)
 if (builder.Environment.IsDevelopment())

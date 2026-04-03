@@ -29,6 +29,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Expense>          Expenses          { get; set; } = null!;
     public DbSet<MemberObligation> MemberObligations { get; set; } = null!;
     public DbSet<Payment>          Payments          { get; set; } = null!;
+    public DbSet<ExpenseDispute>   ExpenseDisputes   { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +55,7 @@ public class ApplicationDbContext : DbContext
         ConfigureExpenseEntity(modelBuilder);
         ConfigureMemberObligationEntity(modelBuilder);
         ConfigurePaymentEntity(modelBuilder);
+        ConfigureExpenseDisputeEntity(modelBuilder);
     }
 
     private static void ConfigureUserEntity(ModelBuilder modelBuilder)
@@ -238,7 +240,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
             entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(e => e.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);
-            entity.HasOne<User>().WithMany().HasForeignKey(e => e.PaidByUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(e => e.LoggedByUserId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 
@@ -264,6 +266,19 @@ public class ApplicationDbContext : DbContext
             entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(p => p.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne<User>().WithMany().HasForeignKey(p => p.PayerId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<User>().WithMany().HasForeignKey(p => p.PayeeId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    private static void ConfigureExpenseDisputeEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ExpenseDispute>(entity =>
+        {
+            entity.ToTable("ExpenseDisputes");
+            entity.HasKey(d => d.Id);
+            entity.Property(d => d.Reason).IsRequired().HasMaxLength(1000);
+            entity.Property(d => d.AdminNotes).HasMaxLength(1000);
+            entity.HasOne<Expense>().WithMany().HasForeignKey(d => d.ExpenseId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(d => d.RaisedByUserId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

@@ -5,7 +5,8 @@ import { environment } from '../../../environments/environment';
 import {
   ExpenseCycleDto,
   ExpenseCycleSummaryDto,
-  CycleBalanceDto
+  CycleBalanceDto,
+  CycleContributionSummaryDto
 } from '../../shared/models/expense-cycle.model';
 
 @Injectable({ providedIn: 'root' })
@@ -35,8 +36,20 @@ export class ExpenseCycleService {
     return this.http.put<ExpenseCycleDto>(`${this.url}/${id}`, payload);
   }
 
+  start(id: number): Observable<ExpenseCycleDto> {
+    return this.http.post<ExpenseCycleDto>(`${this.url}/${id}/start`, {});
+  }
+
   close(id: number): Observable<void> {
     return this.http.post<void>(`${this.url}/${id}/close`, {});
+  }
+
+  sendReminder(id: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${id}/send-reminder`, {});
+  }
+
+  getContributionSummary(id: number): Observable<CycleContributionSummaryDto> {
+    return this.http.get<CycleContributionSummaryDto>(`${this.url}/${id}/contribution-summary`);
   }
 
   delete(id: number): Observable<void> {

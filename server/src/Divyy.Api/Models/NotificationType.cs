@@ -23,5 +23,29 @@ public enum NotificationType
 
     /// <summary>A user has been invited to join a group.</summary>
     GroupInviteReceived = 6,
+
+    /// <summary>An expense cycle has been started by the admin and is now active.</summary>
+    CycleStarted = 7,
+
+    /// <summary>A member made a payment toward a cycle.</summary>
+    CyclePaymentMade = 8,
+
+    /// <summary>Reminder sent at the midpoint of an active cycle.</summary>
+    CycleMidReminder = 9,
+
+    /// <summary>Reminder sent 7 days before a cycle's end date.</summary>
+    CycleClosingSoon = 10,
+
+    /// <summary>An expense cycle has been closed by the admin.</summary>
+    CycleClosed = 11,
+
+    /// <summary>A member raised a dispute on an expense in a cycle.</summary>
+    DisputeRaised = 12,
+
+    /// <summary>The admin updated the status of an expense dispute.</summary>
+    DisputeUpdated = 13,
+
+    /// <summary>Admin manually nudged unsettled members showing their outstanding balance.</summary>
+    ManualReminder = 14,
 }
 

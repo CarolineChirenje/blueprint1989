@@ -21,6 +21,7 @@ export class CycleListComponent implements OnInit {
   loading = true;
   error = '';
   isAdmin = false;
+  displayedColumns = ['name', 'groupName', 'period', 'memberCount', 'totalAmount', 'status', 'actions'];
 
   constructor(
     private cycleService: ExpenseCycleService,
@@ -68,6 +69,8 @@ export class CycleListComponent implements OnInit {
   }
 
   statusClass(status: string): string {
-    return status === 'Active' ? 'badge-active' : 'badge-closed';
+    if (status === 'Active') return 'badge-active';
+    if (status === 'Draft')  return 'badge-draft';
+    return 'badge-closed';
   }
 }

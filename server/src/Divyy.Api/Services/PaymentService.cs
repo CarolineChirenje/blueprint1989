@@ -7,13 +7,15 @@ namespace Divvy.Api.Services;
 
 public class PaymentService
 {
-    private readonly ApplicationDbContext _context;
-    private readonly NotificationService  _notifications;
+    private readonly ApplicationDbContext    _context;
+    private readonly NotificationService     _notifications;
+    private readonly IPushNotificationSender _push;
 
-    public PaymentService(ApplicationDbContext context, NotificationService notifications)
+    public PaymentService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push)
     {
         _context       = context;
         _notifications = notifications;
+        _push          = push;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -123,6 +125,26 @@ public class PaymentService
             NotificationType.PaymentReceived,
             $"/cycles/{payment.ExpenseCycleId}/payments",
             payment.Id);
+
+        // On confirmation: push to ALL cycle members that a payment was made
+        if (confirm)
+        {
+            var payer = await _context.Users.FindAsync(payment.PayerId);
+            var cycle = await _context.ExpenseCycles.FindAsync(payment.ExpenseCycleId);
+            var memberIds = await _context.CycleMembers
+                .Where(m => m.ExpenseCycleId == payment.ExpenseCycleId)
+                .Select(m => m.UserId)
+                .ToListAsync();
+
+            if (memberIds.Count > 0)
+                await _push.SendToUsersAsync(
+                    memberIds,
+                    NotificationType.CyclePaymentMade,
+                    $"Payment made in {cycle?.Name ?? "cycle"}",
+                    $"{payer?.FirstName} {payer?.LastName} paid ${payment.Amount:F2} toward \"{cycle?.Name}\".",
+                    $"/cycles/{payment.ExpenseCycleId}",
+                    payment.Id);
+        }
 
         var dto = (await BuildDtosAsync(new List<Payment> { payment })).First();
         return (dto, null);

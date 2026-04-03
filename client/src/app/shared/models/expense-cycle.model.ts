@@ -37,7 +37,8 @@ export interface ExpenseCycleDto {
   name: string;
   startDate: string;
   endDate: string;
-  status: string;
+  status: 'Draft' | 'Active' | 'Closed';
+  splitType: 'Equal' | 'Custom';
   createdByUserId: number;
   createdAt: string;
   members: CycleMemberDto[];
@@ -68,8 +69,8 @@ export interface ExpenseDto {
   title: string;
   amount: number;
   category: string;
-  paidByUserId: number;
-  paidByName: string;
+  loggedByUserId: number;
+  loggedByName: string;
   notes: string | null;
   createdAt: string;
   obligations: MemberObligationDto[];
@@ -94,3 +95,41 @@ export interface PaymentDto {
 export const EXPENSE_CATEGORIES = [
   'Rent', 'Utilities', 'Groceries', 'Transport', 'Entertainment', 'Other'
 ] as const;
+
+// ── Contribution Summary ──────────────────────────────────────────────────────
+
+export interface CycleMemberContributionDto {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  shareOwed: number;
+  totalPaid: number;
+  /** Positive = overpaid, Negative = still owes */
+  balance: number;
+  isSettled: boolean;
+}
+
+export interface CycleContributionSummaryDto {
+  cycleId: number;
+  cycleName: string;
+  totalExpenses: number;
+  memberCount: number;
+  sharePerMember: number;
+  members: CycleMemberContributionDto[];
+}
+
+// ── Disputes ──────────────────────────────────────────────────────────────────
+
+export interface ExpenseDisputeDto {
+  id: number;
+  expenseId: number;
+  expenseTitle: string;
+  cycleId: number;
+  raisedByUserId: number;
+  raiserFullName: string;
+  reason: string;
+  status: 'Pending' | 'Reviewed' | 'Resolved' | 'Rejected';
+  adminNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

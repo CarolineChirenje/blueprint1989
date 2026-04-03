@@ -4,63 +4,30 @@
 .loading, .error-msg { text-align: center; padding: 3rem; color: var(--text-secondary); }
 .empty-state { text-align: center; padding: 4rem; color: var(--text-secondary); }
 .empty-icon { font-size: 4rem; display: block; margin-bottom: 1rem; }
-.cycle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
-.cycle-card {
-  background: var(--surface); border-radius: var(--radius-lg); padding: 1.5rem;
-  box-shadow: var(--shadow-sm); cursor: pointer;
-  transition: transform .2s, box-shadow .2s; border: 1px solid var(--border);
-}
-.cycle-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-.cycle-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
-.cycle-name { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
-.cycle-card-meta { font-size: .85rem; color: var(--text-secondary); margin-bottom: 1rem; }
-.cycle-card-stats { display: flex; gap: 1.5rem; }
-.stat { display: flex; flex-direction: column; align-items: center; }
-.stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); }
-.stat-label { font-size: .75rem; color: var(--text-secondary); }
+
 .badge { padding: .2rem .7rem; border-radius: var(--radius-full); font-size: .75rem; font-weight: 600; }
 .badge-active { background: var(--success-bg); color: var(--success); }
+.badge-draft  { background: #fff3cd; color: #856404; }
 .badge-closed { background: var(--surface-raised); color: var(--text-secondary); }
 
 /* Group filter bar */
-.cycles-group-filter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
+.cycles-group-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
 .cycles-group-filter__btn {
-  padding: 0.35rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface-raised);
-  color: var(--text-secondary);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
+  padding: 0.35rem 0.9rem; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface-raised); color: var(--text-secondary);
+  font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-
-.cycles-group-filter__btn.is-active,
-.cycles-group-filter__btn:hover {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
+.cycles-group-filter__btn.is-active, .cycles-group-filter__btn:hover {
+  background: var(--primary); color: #fff; border-color: var(--primary);
 }
 
-/* Group badge on cycle card */
-.cycle-card-group {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.8rem;
-  color: var(--primary);
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-}
-
-.cycle-card-group .material-icons {
-  font-size: 0.9rem;
-}
+/* Table */
+.cycles-table-wrap { overflow-x: auto; }
+.cycles-table { width: 100%; }
+.cycle-row { cursor: pointer; transition: background 0.1s; }
+.cycle-row:hover { background: var(--surface-raised) !important; }
+.cycle-name-link { font-weight: 600; color: var(--primary); cursor: pointer; }
+.cycle-name-link:hover { text-decoration: underline; }
+.col-center { text-align: center !important; }
+.col-right  { text-align: right !important; }

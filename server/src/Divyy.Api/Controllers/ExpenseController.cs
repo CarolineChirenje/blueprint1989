@@ -51,7 +51,7 @@ public class ExpenseController : ControllerBase
         return Ok(obligations);
     }
 
-    /// <summary>Creates a new expense. The current user is recorded as the payer.</summary>
+    /// <summary>Creates a new expense. The current user is recorded as the logger.</summary>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateExpenseRequest request)
     {

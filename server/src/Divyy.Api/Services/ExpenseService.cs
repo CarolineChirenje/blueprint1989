@@ -58,7 +58,7 @@ public class ExpenseService
 
     // ── Mutations ─────────────────────────────────────────────────────────────
 
-    public async Task<(ExpenseDto? dto, string? error)> CreateAsync(int paidByUserId, CreateExpenseRequest request)
+    public async Task<(ExpenseDto? dto, string? error)> CreateAsync(int loggedByUserId, CreateExpenseRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Title))
             return (null, "Title is required.");
@@ -79,7 +79,7 @@ public class ExpenseService
             Title          = request.Title.Trim(),
             Amount         = Math.Round(request.Amount, 2),
             Category       = category,
-            PaidByUserId   = paidByUserId,
+            LoggedByUserId = loggedByUserId,
             Notes          = request.Notes?.Trim(),
             CreatedAt      = DateTime.UtcNow,
             UpdatedAt      = DateTime.UtcNow
@@ -153,11 +153,11 @@ public class ExpenseService
             .Select(m => m.UserId)
             .ToListAsync();
 
-        // Exclude the payer — they don't owe themselves
-        var debtors = memberIds.Where(uid => uid != expense.PaidByUserId).ToList();
+        // All members owe an equal share (logger is audit trail only)
+        var debtors = memberIds;
         if (debtors.Count == 0) return;
 
-        // Total members (including payer) for equal split
+        // Equal split across all members
         int totalMembers = memberIds.Count;
         decimal share = Math.Round(expense.Amount / totalMembers, 2);
 
@@ -178,8 +178,8 @@ public class ExpenseService
 
     private async Task<ExpenseDto> BuildDtoAsync(Expense expense)
     {
-        var payer = await _context.Users.FindAsync(expense.PaidByUserId);
-        var payerName = payer != null ? $"{payer.FirstName} {payer.LastName}".Trim() : "Unknown";
+        var logger = await _context.Users.FindAsync(expense.LoggedByUserId);
+        var loggerName = logger != null ? $"{logger.FirstName} {logger.LastName}".Trim() : "Unknown";
 
         var obligations = await _context.MemberObligations
             .Where(o => o.ExpenseId == expense.Id)
@@ -201,8 +201,8 @@ public class ExpenseService
             expense.Title,
             expense.Amount,
             expense.Category.ToString(),
-            expense.PaidByUserId,
-            payerName,
+            expense.LoggedByUserId,
+            loggerName,
             expense.Notes,
             expense.CreatedAt,
             obDtos);
