@@ -52,6 +52,14 @@ export interface MemberObligationDto {
   settledAt: string | null;
 }
 
+export interface ObligationsSummaryDto {
+  totalOwed: number;
+  unsettledCount: number;
+  activeCycleCount: number;
+  soonestCycleName: string | null;
+  soonestDueDate: string | null;
+}
+
 export interface ExpenseDto {
   id: number;
   expenseCycleId: number;

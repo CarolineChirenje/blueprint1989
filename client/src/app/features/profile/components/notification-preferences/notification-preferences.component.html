@@ -19,76 +19,51 @@
     </div>
   } @else {
 
-    <!-- Health Alerts (admin-controlled) -->
-    <section class="pref-section">
-      <div class="section-header">
-        <span class="material-icons section-icon health-icon">health_and_safety</span>
-        <div>
-          <h3>Health Alerts</h3>
-          <p class="section-note">
-            <span class="material-icons lock-icon">lock</span>
-            These notifications are managed by your administrator and cannot be changed here.
-            Contact your administrator if you need them adjusted.
-          </p>
-        </div>
-      </div>
-
-      <ul class="pref-list">
-        @for (pref of healthPrefs; track pref.typeId) {
-          <li class="pref-item pref-item--locked">
-            <div class="pref-info">
-              <span class="pref-name">{{ formatName(pref.typeName) }}</span>
-              @if (pref.description) {
-                <span class="pref-desc">{{ pref.description }}</span>
-              }
-            </div>
-            <div class="toggle-wrap">
-              <span class="lock-badge" title="Contact your administrator to change this setting">
-                <span class="material-icons">lock</span>
-              </span>
-              <label class="toggle toggle--disabled" title="Contact your administrator to change this setting">
-                <input type="checkbox" [checked]="true" disabled />
-                <span class="slider"></span>
-              </label>
-            </div>
-          </li>
-        }
-      </ul>
-    </section>
-
-    <!-- Timer Alarm Sound (device-local preference) -->
-    <section class="pref-section">
-      <div class="section-header">
-        <span class="material-icons section-icon">volume_up</span>
-        <div>
-          <h3>Timer Alarm Sound</h3>
-          <p class="section-note">Controls the audio beep played when a health timer (BGL or blood pressure) expires.</p>
-        </div>
-      </div>
-
-      <ul class="pref-list">
-        <li class="pref-item" [class.pref-item--disabled]="audioAlarmService.isMuted()">
-          <div class="pref-info">
-            <span class="pref-name">Timer alarm sound</span>
-            <span class="pref-desc">Play a beep when the countdown timer finishes. Stored on this device only.</span>
+    @if (adminPrefs.length > 0) {
+      <!-- Admin-controlled notifications -->
+      <section class="pref-section">
+        <div class="section-header">
+          <span class="material-icons section-icon">admin_panel_settings</span>
+          <div>
+            <h3>Administrator-Controlled</h3>
+            <p class="section-note">
+              <span class="material-icons lock-icon">lock</span>
+              These notifications are managed by your administrator and cannot be changed here.
+            </p>
           </div>
-          <label class="toggle">
-            <input type="checkbox"
-                   [checked]="!audioAlarmService.isMuted()"
-                   (change)="audioAlarmService.setMuted(!audioAlarmService.isMuted())" />
-            <span class="slider"></span>
-          </label>
-        </li>
-      </ul>
-    </section>
+        </div>
 
-    <!-- Other Notifications (user-controlled) -->
+        <ul class="pref-list">
+          @for (pref of adminPrefs; track pref.typeId) {
+            <li class="pref-item pref-item--locked">
+              <div class="pref-info">
+                <span class="pref-name">{{ formatName(pref.typeName) }}</span>
+                @if (pref.description) {
+                  <span class="pref-desc">{{ pref.description }}</span>
+                }
+              </div>
+              <div class="toggle-wrap">
+                <span class="lock-badge" title="Managed by your administrator">
+                  <span class="material-icons">lock</span>
+                </span>
+                <label class="toggle toggle--disabled">
+                  <input type="checkbox" [checked]="pref.isEnabled" disabled />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- User-controlled notifications -->
     <section class="pref-section">
       <div class="section-header">
         <span class="material-icons section-icon">notifications</span>
         <div>
-          <h3>Other Notifications</h3>
-          <p class="section-note">Toggle these on or off to suit your preferences.</p>
+          <h3>Push Notifications</h3>
+          <p class="section-note">Toggle which push notifications you receive.</p>
         </div>
       </div>
 

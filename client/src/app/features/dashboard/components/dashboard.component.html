@@ -12,33 +12,76 @@
     <p class="current-time">{{ currentTime | date: 'fullDate' }} - {{ currentTime | date: 'shortTime' }}</p>
   </div>
 
-  <div class="quick-actions">
-    <h2>Quick Actions</h2>
-    
-    <div class="cards-grid">
+  <div class="obligations-section">
+    <h2>My Obligations</h2>
 
-      <!-- Cycles Card -->
-      <div class="action-card" (click)="navigateTo('/cycles')">
-        <div class="card-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:3rem;height:3rem;">
-            <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
-          </svg>
-        </div>
-        <h3>Cycles</h3>
-        <p>View and manage shared expense cycles</p>
-        <div class="card-arrow">→</div>
+    <!-- Loading skeleton -->
+    <div *ngIf="summaryLoading" class="hero-skeleton">
+      <div class="skeleton skeleton-icon"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton skeleton-line-lg"></div>
+        <div class="skeleton skeleton-line-md"></div>
+        <div class="skeleton skeleton-line-sm"></div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="!summaryLoading && summaryError" class="hero-empty">
+      <span class="hero-empty__icon">⚠</span>
+      <span>Could not load obligations.</span>
+      <a class="hero-empty__link" (click)="navigateTo('/cycles')" tabindex="0">Go to Cycles</a>
+    </div>
+
+    <!-- All settled -->
+    <div *ngIf="!summaryLoading && !summaryError && obligationsSummary?.unsettledCount === 0"
+         class="hero-settled"
+         role="status">
+      <div class="hero-settled__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="hero-settled__title">You're all settled up!</p>
+        <p class="hero-settled__sub">No outstanding obligations across your active cycles.</p>
+      </div>
+    </div>
+
+    <!-- Hero card — has obligations -->
+    <div *ngIf="!summaryLoading && !summaryError && obligationsSummary && obligationsSummary.unsettledCount > 0"
+         class="hero-card"
+         role="button"
+         tabindex="0"
+         (click)="navigateTo('/cycles')"
+         (keyup.enter)="navigateTo('/cycles')">
+
+      <div class="hero-card__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+        </svg>
       </div>
 
-      <!-- My Obligations Card -->
-      <div class="action-card" (click)="navigateTo('/cycles')">
-        <div class="card-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:3rem;height:3rem;">
-            <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+      <div class="hero-card__content">
+        <span class="hero-card__label">You Owe</span>
+        <span class="hero-card__amount">{{ obligationsSummary.totalOwed | currency:'USD':'symbol':'1.2-2' }}</span>
+        <span class="hero-card__meta">
+          {{ obligationsSummary.unsettledCount }} unsettled obligation{{ obligationsSummary.unsettledCount !== 1 ? 's' : '' }}
+          &nbsp;·&nbsp;
+          {{ obligationsSummary.activeCycleCount }} active cycle{{ obligationsSummary.activeCycleCount !== 1 ? 's' : '' }}
+        </span>
+        <span *ngIf="obligationsSummary.soonestDueDate" class="hero-card__due">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="due-icon">
+            <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
           </svg>
-        </div>
-        <h3>My Obligations</h3>
-        <p>Track what you owe across active cycles</p>
-        <div class="card-arrow">→</div>
+          Due {{ obligationsSummary.soonestDueDate | date:'d MMM y' }}&nbsp;·&nbsp;{{ obligationsSummary.soonestCycleName }}
+        </span>
+      </div>
+
+      <div class="hero-card__cta">
+        <span>View Obligations</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
       </div>
 
     </div>

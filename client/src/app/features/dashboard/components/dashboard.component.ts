@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ExpenseService } from '../../../core/services/expense.service';
+import { ObligationsSummaryDto } from '../../../shared/models/expense-cycle.model';
 import { Role } from '../../../shared/models/user.model';
 
 @Component({
@@ -14,19 +16,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
   currentTime: Date = new Date();
   showRecordPicker: boolean = false;
   private clockInterval: ReturnType<typeof setInterval> | null = null;
-  
+
+  obligationsSummary: ObligationsSummaryDto | null = null;
+  summaryLoading = true;
+  summaryError = false;
+
   constructor(
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private expenseService: ExpenseService
   ) {}
   
   ngOnInit() {
     this.userName = this.auth.getUserDisplayName();
     
-    // Update time every second
     this.clockInterval = setInterval(() => {
       this.currentTime = new Date();
     }, 1000);
+
+    this.expenseService.getObligationsSummary().subscribe({
+      next: (summary) => {
+        this.obligationsSummary = summary;
+        this.summaryLoading = false;
+      },
+      error: () => {
+        this.summaryError = true;
+        this.summaryLoading = false;
+      }
+    });
   }
 
   ngOnDestroy(): void {

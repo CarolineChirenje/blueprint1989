@@ -38,3 +38,10 @@ public record MemberObligationDto(
     decimal AmountOwed,
     bool IsSettled,
     DateTime? SettledAt);
+
+public record ObligationsSummaryDto(
+    decimal TotalOwed,
+    int UnsettledCount,
+    int ActiveCycleCount,
+    string? SoonestCycleName,
+    DateTime? SoonestDueDate);

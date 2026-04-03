@@ -2,13 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ExpenseDto, MemberObligationDto } from '../../shared/models/expense-cycle.model';
+import { ExpenseDto, MemberObligationDto, ObligationsSummaryDto } from '../../shared/models/expense-cycle.model';
 
 @Injectable({ providedIn: 'root' })
 export class ExpenseService {
   private url = `${environment.apiUrl}/expenses`;
+  private dashboardUrl = `${environment.apiUrl}/dashboard`;
 
   constructor(private http: HttpClient) {}
+
+  getObligationsSummary(): Observable<ObligationsSummaryDto> {
+    return this.http.get<ObligationsSummaryDto>(`${this.dashboardUrl}/obligations-summary`);
+  }
 
   getByCycle(cycleId: number): Observable<ExpenseDto[]> {
     return this.http.get<ExpenseDto[]>(`${this.url}/by-cycle/${cycleId}`);

@@ -4,8 +4,6 @@ import {
   NotificationPreferenceDto,
   UpdateNotificationPreferenceItem
 } from '../../../../shared/models/notification-preference.model';
-import { AudioAlarmService } from '../../../../core/services/audio-alarm.service';
-
 @Component({
   selector: 'app-notification-preferences',
   templateUrl: './notification-preferences.component.html',
@@ -21,8 +19,7 @@ export class NotificationPreferencesComponent implements OnInit {
   successMessage = '';
 
   constructor(
-    private prefService: NotificationPreferenceService,
-    public audioAlarmService: AudioAlarmService
+    private prefService: NotificationPreferenceService
   ) {}
 
   ngOnInit(): void {
@@ -38,7 +35,7 @@ export class NotificationPreferencesComponent implements OnInit {
     });
   }
 
-  get healthPrefs(): NotificationPreferenceDto[] {
+  get adminPrefs(): NotificationPreferenceDto[] {
     return this.preferences.filter(p => p.isAdminControlled);
   }
 
