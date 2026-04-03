@@ -63,4 +63,8 @@ export class GroupService {
   respondToInvite(groupId: number, req: RespondToInviteRequest): Observable<void> {
     return this.http.post<void>(`${this.url}/${groupId}/invites/respond`, req);
   }
+
+  leaveGroup(groupId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${groupId}/leave`, {});
+  }
 }

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CyclesRoutingModule } from './cycles-routing.module';
 import { SharedModule } from '../../shared/shared.module';
-import { CycleListComponent } from './components/cycle-list/cycle-list.component';
 import { CycleDetailComponent } from './components/cycle-detail/cycle-detail.component';
 import { AddExpenseDialogComponent } from './components/add-expense-dialog/add-expense-dialog.component';
 import { AddPaymentDialogComponent } from './components/add-payment-dialog/add-payment-dialog.component';
@@ -13,7 +12,6 @@ import { DisputeExpenseDialogComponent } from './components/dispute-expense-dial
 
 @NgModule({
   declarations: [
-    CycleListComponent,
     CycleDetailComponent,
     AddExpenseDialogComponent,
     AddPaymentDialogComponent,

@@ -257,8 +257,16 @@
         <div class="member-list">
           @for (m of cycle.members; track m.userId) {
             <div class="member-item">
-              <span class="member-name">{{ m.firstName }} {{ m.lastName }}</span>
-              <span class="member-email">{{ m.email }}</span>
+              <div class="member-info">
+                <span class="member-name">{{ m.firstName }} {{ m.lastName }}</span>
+                <span class="member-email">{{ m.email }}</span>
+              </div>
+              @if (canManageCycle() && isDraft() && m.userId !== cycle.createdByUserId) {
+                <button mat-icon-button color="warn" matTooltip="Remove from cycle"
+                        (click)="removeCycleMember(m.userId)">
+                  <mat-icon>person_remove</mat-icon>
+                </button>
+              }
             </div>
           }
         </div>

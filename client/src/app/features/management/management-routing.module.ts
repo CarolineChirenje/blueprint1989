@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AppConfigManagementComponent } from './app-config/app-config-management.component';
 import { FeatureBugReportsComponent } from './feature-bug-reports/feature-bug-reports.component';
-import { GroupManagementComponent } from './groups/group-management.component';
 import { UserManagementComponent } from './users/user-management.component';
 import { RoleGuard } from '../../core/guards/role.guard';
 
@@ -18,12 +17,6 @@ const routes: Routes = [
     component: FeatureBugReportsComponent,
     canActivate: [RoleGuard],
     data: { roles: ['Admin', 'SuperAdmin'] }
-  },
-  {
-    path: 'groups',
-    component: GroupManagementComponent,
-    canActivate: [RoleGuard],
-    data: { roles: ['Admin', 'SuperAdmin', 'Member'] }
   },
   {
     path: 'users',

@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CycleListComponent } from './components/cycle-list/cycle-list.component';
 import { CycleDetailComponent } from './components/cycle-detail/cycle-detail.component';
 
 const routes: Routes = [
-  { path: '', component: CycleListComponent },
+  { path: '', redirectTo: '/groups', pathMatch: 'full' },
   { path: ':id', component: CycleDetailComponent }
 ];
 

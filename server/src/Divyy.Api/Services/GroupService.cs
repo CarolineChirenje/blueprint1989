@@ -9,11 +9,13 @@ public class GroupService : IGroupService
 {
     private readonly ApplicationDbContext _context;
     private readonly NotificationService  _notifications;
+    private readonly IPushNotificationSender _push;
 
-    public GroupService(ApplicationDbContext context, NotificationService notifications)
+    public GroupService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push)
     {
         _context       = context;
         _notifications = notifications;
+        _push          = push;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -26,12 +28,19 @@ public class GroupService : IGroupService
 
         if (!isAdmin)
         {
+            // GroupAdmins see groups they created; GroupMembers see groups where they were invited and accepted.
+            var createdGroupIds = await _context.Groups
+                .Where(g => g.CreatedByUserId == userId)
+                .Select(g => g.Id)
+                .ToListAsync();
+
             var memberGroupIds = await _context.GroupMembers
                 .Where(gm => gm.UserId == userId && gm.Status == GroupInviteStatus.Accepted)
                 .Select(gm => gm.GroupId)
                 .ToListAsync();
 
-            query = query.Where(g => memberGroupIds.Contains(g.Id));
+            var visibleIds = createdGroupIds.Union(memberGroupIds).ToList();
+            query = query.Where(g => visibleIds.Contains(g.Id));
         }
 
         var groups = await query.OrderBy(g => g.Name).ToListAsync();
@@ -359,6 +368,54 @@ public class GroupService : IGroupService
             .AnyAsync(gm => gm.GroupId == groupId
                          && gm.UserId == userId
                          && gm.Status == GroupInviteStatus.Accepted);
+    }
+
+    public async Task<string?> LeaveGroupAsync(int groupId, int userId)
+    {
+        var group = await _context.Groups.FindAsync(groupId);
+        if (group == null) return "Group not found.";
+
+        var membership = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId
+                                    && gm.UserId == userId
+                                    && gm.Status == GroupInviteStatus.Accepted);
+
+        if (membership == null) return "You are not a member of this group.";
+
+        // Prevent the last GroupAdmin from leaving
+        if (membership.GroupRole == GroupRole.GroupAdmin)
+        {
+            var adminCount = await _context.GroupMembers
+                .CountAsync(gm => gm.GroupId == groupId
+                               && gm.GroupRole == GroupRole.GroupAdmin
+                               && gm.Status == GroupInviteStatus.Accepted);
+            if (adminCount <= 1)
+                return "Cannot leave — you are the only admin. Assign another admin first.";
+        }
+
+        var leavingUser = await _context.Users.FindAsync(userId);
+        var leaverName  = leavingUser != null ? $"{leavingUser.FirstName} {leavingUser.LastName}".Trim() : "A member";
+
+        _context.GroupMembers.Remove(membership);
+        await _context.SaveChangesAsync();
+
+        // Notify all remaining accepted members
+        var remainingMemberIds = await _context.GroupMembers
+            .Where(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.Accepted)
+            .Select(gm => gm.UserId)
+            .ToListAsync();
+
+        var notifyTasks = remainingMemberIds.Select(recipientId => _push.SendToUserAsync(
+            userId: recipientId,
+            type: NotificationType.MemberLeftGroup,
+            title: group.Name,
+            body: $"{leaverName} has left the group.",
+            deepLinkUrl: $"/groups/{groupId}",
+            relatedEntityId: groupId));
+
+        await Task.WhenAll(notifyTasks);
+
+        return null;
     }
 
     private static GroupRole ParseGroupRole(string value)

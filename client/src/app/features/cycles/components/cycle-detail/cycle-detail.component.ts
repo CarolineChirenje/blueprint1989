@@ -224,6 +224,15 @@ export class CycleDetailComponent implements OnInit {
   isPayer(payment: PaymentDto): boolean { return payment.payerId === this.currentUserId; }
   isPayee(payment: PaymentDto): boolean { return payment.payeeId === this.currentUserId; }
 
+  removeCycleMember(userId: number): void {
+    if (!this.cycle) return;
+    if (!confirm('Remove this member from the cycle?')) return;
+    this.cycleService.removeMember(this.cycle.id, userId).subscribe({
+      next: () => this.loadAll(this.cycle!.id),
+      error: err => alert(err?.error?.message ?? 'Failed to remove member.')
+    });
+  }
+
   netBalanceClass(net: number): string {
     if (net > 0) return 'balance-positive';
     if (net < 0) return 'balance-negative';

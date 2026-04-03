@@ -1,14 +1,15 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, Optional } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { ExpenseCycleService } from '../../../../core/services/expense-cycle.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { GroupService } from '../../../../core/services/group.service';
-import { GroupDto } from '../../../../shared/models/group.model';
+import { GroupDto, GroupMemberDto } from '../../../../shared/models/group.model';
 
 interface UserOption { id: number; firstName: string; lastName: string; email: string; }
+interface DialogData { groupId?: number; groupMembers?: GroupMemberDto[]; }
 
 @Component({
   selector: 'app-create-cycle-dialog',
@@ -22,6 +23,9 @@ export class CreateCycleDialogComponent implements OnInit {
   saving = false;
   error = '';
 
+  /** When opened from a group detail page, these are set and the group selector is hidden. */
+  presetGroupId: number | null = null;
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<CreateCycleDialogComponent>,
@@ -29,26 +33,40 @@ export class CreateCycleDialogComponent implements OnInit {
     private auth: AuthService,
     private http: HttpClient,
     private groupService: GroupService,
+    @Optional() @Inject(MAT_DIALOG_DATA) private data: DialogData | null,
     private cdr: ChangeDetectorRef
   ) {
+    this.presetGroupId = data?.groupId ?? null;
     this.form = this.fb.group({
       name:      ['', [Validators.required, Validators.maxLength(150)]],
       startDate: ['', Validators.required],
       endDate:   ['', Validators.required],
       memberIds: [[], Validators.required],
-      groupId:   [null, Validators.required]
+      groupId:   [this.presetGroupId, Validators.required]
     });
   }
 
   ngOnInit(): void {
-    this.http.get<UserOption[]>(`${environment.apiUrl}/auth/users`).subscribe({
-      next: users => { this.users = users; this.cdr.detectChanges(); },
-      error: () => {}
-    });
-    this.groupService.getGroups().subscribe({
-      next: groups => { this.groups = groups; this.cdr.detectChanges(); },
-      error: () => {}
-    });
+    if (this.data?.groupMembers?.length) {
+      // Use group members as the member picker source
+      this.users = this.data.groupMembers
+        .filter(m => m.status === 'Accepted')
+        .map(m => ({ id: m.userId, firstName: m.firstName, lastName: m.lastName, email: m.email }));
+      this.cdr.detectChanges();
+    } else {
+      // Fall back to all users
+      this.http.get<UserOption[]>(`${environment.apiUrl}/auth/users`).subscribe({
+        next: users => { this.users = users; this.cdr.detectChanges(); },
+        error: () => {}
+      });
+    }
+
+    if (!this.presetGroupId) {
+      this.groupService.getGroups().subscribe({
+        next: groups => { this.groups = groups; this.cdr.detectChanges(); },
+        error: () => {}
+      });
+    }
   }
 
   submit(): void {

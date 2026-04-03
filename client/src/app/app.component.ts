@@ -796,8 +796,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
   
   navigateToGroups(): void {
-    this.closeManagementDropdown();
-    this.router.navigate(['/management/groups']);
+    this.mobileNavOpen = false;
+    this.router.navigate(['/groups']);
   }
 
   navigateToCycles(): void {

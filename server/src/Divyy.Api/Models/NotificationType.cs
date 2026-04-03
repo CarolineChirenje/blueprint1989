@@ -47,5 +47,8 @@ public enum NotificationType
 
     /// <summary>Admin manually nudged unsettled members showing their outstanding balance.</summary>
     ManualReminder = 14,
+
+    /// <summary>A member voluntarily left a group; remaining members are notified.</summary>
+    MemberLeftGroup = 15,
 }
 

@@ -169,4 +169,16 @@ public class GroupController : ControllerBase
              : error == "Forbidden."                      ? Forbid()
              : BadRequest(new { message = error });
     }
+
+    /// <summary>Allows the currently authenticated user to voluntarily leave a group. Notifies all remaining members via push.</summary>
+    [HttpPost("{id:int}/leave")]
+    public async Task<IActionResult> LeaveGroup(int id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _groupService.LeaveGroupAsync(id, userId.Value);
+        if (error == null) return NoContent();
+        return BadRequest(new { message = error });
+    }
 }

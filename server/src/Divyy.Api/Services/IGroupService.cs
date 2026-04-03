@@ -17,4 +17,5 @@ public interface IGroupService
     Task<string?> UpdateMemberRoleAsync(int groupId, int targetUserId, UpdateGroupMemberRoleRequest request, int userId, Role userRole);
     Task<List<GroupInviteDto>> GetPendingInvitesForUserAsync(int userId);
     Task<bool> IsGroupAdminOfGroupAsync(int groupId, int userId);
+    Task<string?> LeaveGroupAsync(int groupId, int userId);
 }
