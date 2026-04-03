@@ -167,6 +167,43 @@
 
 .toggle input:checked + .toggle__slider::before { transform: translateX(18px); }
 
+.btn {
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: var(--primary-subtle);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-icon {
   background: none;
   border: none;

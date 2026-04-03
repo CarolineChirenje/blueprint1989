@@ -94,6 +94,46 @@
 }
 .link-btn:hover { text-decoration: underline; }
 
+.btn {
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.btn--sm {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: var(--primary-subtle);
+}
+
+.btn--danger-ghost {
+  background: transparent;
+  color: #c62828;
+  border-color: #c62828;
+}
+.btn--danger-ghost:hover:not(:disabled) {
+  background: #fdecea;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .action-btns {
   display: flex;
   gap: 0.4rem;
