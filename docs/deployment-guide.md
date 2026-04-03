@@ -11,7 +11,7 @@
 | What | Domain | Served by |
 |------|--------|-----------|
 | Angular PWA (frontend) | `divvy.elroitec.com` | Nginx (static files) |
-| .NET API (backend) | `divvyapi.elroitec.com` | Nginx â†’ Kestrel on port 5000 |
+| .NET API (backend) | `divvyapi.elroitec.com` | Nginx → Kestrel on port 1954 |
 | PostgreSQL | localhost only | PostgreSQL 15+ |
 
 ---
@@ -302,7 +302,7 @@ KillSignal=SIGINT
 SyslogIdentifier=divvy-api
 User=ubuntu
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=ASPNETCORE_URLS=http://localhost:5000
+Environment=ASPNETCORE_URLS=http://localhost:1954
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 
 [Install]
@@ -319,7 +319,7 @@ sudo systemctl status divvy-api
 
 Confirm the API is responding:
 ```bash
-curl -s http://localhost:5000/api/health
+curl -s http://localhost:1954/api/health
 ```
 
 ---
@@ -383,7 +383,7 @@ server {
     server_name divvyapi.elroitec.com;
 
     location / {
-        proxy_pass         http://127.0.0.1:5000;
+        proxy_pass         http://127.0.0.1:1954;
         proxy_http_version 1.1;
         proxy_set_header   Upgrade $http_upgrade;
         proxy_set_header   Connection keep-alive;
@@ -438,7 +438,7 @@ sudo systemctl status divvy-api
 sudo systemctl status nginx
 
 # API on localhost
-curl -s http://localhost:5000/api/health
+curl -s http://localhost:1954/api/health
 
 # Frontend HTTPS (should return 200)
 curl -s -o /dev/null -w "%{http_code}" https://divvy.elroitec.com/
@@ -702,7 +702,7 @@ Replace the contents with:
       "Microsoft.Hosting.Lifetime": "Information"
     }
   },
-  "Urls": "http://localhost:5000"
+  "Urls": "http://localhost:1954"
 }
 ```
 
@@ -790,7 +790,7 @@ sudo systemctl status divvy-api
 You should see `Active: active (running)`. Also confirm it is listening:
 
 ```bash
-curl http://localhost:5000/api/health   # or any valid endpoint
+curl http://localhost:1954/api/health   # or any valid endpoint
 ```
 
 ---
@@ -835,9 +835,9 @@ server {
       try_files $uri =404;
     }
 
-    # API â€” proxied to Kestrel on port 5000
+    # API – proxied to Kestrel on port 1954
     location /api/ {
-      proxy_pass         http://localhost:5000/api/;
+      proxy_pass         http://localhost:1954/api/;
       proxy_http_version 1.1;
       proxy_set_header   Upgrade $http_upgrade;
       proxy_set_header   Connection keep-alive;
@@ -918,7 +918,7 @@ sudo systemctl status divvy-api
 sudo systemctl status nginx
 
 # API responding on localhost
-curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health
+curl -s -o /dev/null -w "%{http_code}" http://localhost:1954/api/health
 
 # Tail the API logs
 sudo journalctl -u divvy-api -f
