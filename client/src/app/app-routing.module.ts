@@ -56,6 +56,11 @@ const routes: Routes = [
     loadChildren: () => import('./features/cycles/cycles.module').then(m => m.CyclesModule),
     canActivate: [AuthGuard]
   },
+  {
+    path: 'management',
+    loadChildren: () => import('./features/management/management.module').then(m => m.ManagementModule),
+    canActivate: [AuthGuard]
+  },
   { 
     path: 'admin', 
     redirectTo: '/dashboard',
