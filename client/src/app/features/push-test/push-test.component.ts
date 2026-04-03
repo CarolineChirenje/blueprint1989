@@ -24,7 +24,7 @@ export class PushTestComponent implements OnInit {
 
   // Test form
   selectedType: NotificationType = NotificationType.General;
-  testTitle = 'Vitara Test';
+  testTitle = 'Divvy Test';
   testBody = 'This is a test push notification.';
   testDeepLink = '/dashboard';
 

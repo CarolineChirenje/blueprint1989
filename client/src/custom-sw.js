@@ -165,7 +165,7 @@ self.addEventListener('push', (event) => {
   console.log('Service Worker: Push received', event);
 
   let payload = {
-    title: 'Vitara Notification',
+    title: 'Divvy Notification',
     body: 'You have a new notification.',
     icon: ICON,
     badge: ICON,
@@ -368,7 +368,7 @@ function idbReq(request) {
 // Open IndexedDB (v2 adds offlineQueue store alongside notifications)
 function openNotificationDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('VitaraNotifications', 2);
+    const request = indexedDB.open('DivvyNotifications', 2);
     
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);

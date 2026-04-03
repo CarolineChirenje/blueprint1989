@@ -5,6 +5,7 @@
     "module": "esnext",
     "esModuleInterop": true,
     "outDir": "./dist/out-tsc",
+    "rootDir": "./src",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "bundler",
@@ -15,7 +16,6 @@
     "noImplicitAny": true
   },
   "angularCompilerOptions": {
-    "enableIvy": true,
     "strictTemplates": false
   },
   "include": [

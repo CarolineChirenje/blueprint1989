@@ -48,7 +48,7 @@ type NotificationGroup = {
 })
 
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'Vitara';
+  title = 'Divvy';
   version = '';
   dropdownOpen = false;
   bglDropdownOpen = false;

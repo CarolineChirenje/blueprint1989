@@ -56,7 +56,7 @@ This folder contains detailed technical documentation for every feature in the D
 If this repository is hosted on GitHub, the built-in Wiki can host these files directly:
 
 1. Enable the Wiki tab on the repository settings page.
-2. Clone the wiki repo: `git clone https://github.com/CarolineChirenje/vitara.wiki.git`
+2. Clone the wiki repo: `git clone https://github.com/CarolineChirenje/divvy.wiki.git`
 3. Copy all `.md` files from this folder into the wiki repo root.
 4. Rename `README.md` → `Home.md` (GitHub Wiki uses `Home.md` as the landing page).
 5. Push and the wiki is live at `https://github.com/<org>/<repo>/wiki`.
@@ -69,7 +69,7 @@ Produces a fully searchable static site from these markdown files.
 
 ```yaml
 # mkdocs.yml (place in project root)
-site_name: Vitara Technical Docs
+site_name: Divvy Technical Docs
 docs_dir: docs/technical documents
 nav:
   - Home: README.md

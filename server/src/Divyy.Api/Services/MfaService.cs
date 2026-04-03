@@ -107,7 +107,7 @@ public class MfaService
     /// </summary>
     public string GenerateQrCodeUrl(string email, string secret, string? issuer = null)
     {
-        issuer = issuer ?? _configuration["AppSettings:AppName"] ?? "Vitara - Elroitec";
+        issuer = issuer ?? _configuration["AppSettings:AppName"] ?? "Divvy - Elroitec";
         var label = $"{issuer} ({email})";
         var otpauthUrl = $"otpauth://totp/{Uri.EscapeDataString(label)}?secret={secret}&issuer={Uri.EscapeDataString(issuer)}";
         

@@ -5,7 +5,7 @@
 @import '@fontsource/inter/latin-600.css';
 @import '@fontsource/inter/latin-700.css';
 
-/* ── Shepherd.js Tour Theme (Vitara Blue) ──────────────────────────────── */
+/* ── Shepherd.js Tour Theme (divvyBlue) ───────────────────────────────── */
 .shepherd-has-cancel-icon .shepherd-cancel-icon {
   color: #666;
 }
@@ -754,9 +754,62 @@ tbody tr:last-child td {
   margin-bottom: 16px;
 }
 
+.dialog-title-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+}
+
 /* Ensure dialog content doesn't scroll */
 .mat-mdc-dialog-content:not(.mat-mdc-dialog-content-scroll) {
   overflow-y: visible !important;
+}
+
+/* ── Mobile dialog scroll fix ──────────────────────────────────────── */
+/* On small screens dialogs must be height-bounded and scrollable so
+   the title stays visible and content doesn't overflow the viewport. */
+@media (max-width: 767px) {
+  .cdk-overlay-pane {
+    max-height: 92dvh !important;
+    display: flex !important;
+    align-items: flex-start !important;
+  }
+
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    max-height: 92dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  /* Title: never scrolls away */
+  .mat-mdc-dialog-title {
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    background: #fff !important;
+    z-index: 2 !important;
+    padding-bottom: 8px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Content fills remaining space and scrolls */
+  .mat-mdc-dialog-content {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    max-height: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Actions: never scrolls away */
+  .mat-mdc-dialog-actions {
+    flex-shrink: 0 !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════

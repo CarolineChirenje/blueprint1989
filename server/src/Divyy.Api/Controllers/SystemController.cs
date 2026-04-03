@@ -61,7 +61,7 @@ public class SystemController : ControllerBase
                         userIds,
                         NotificationType.SystemRestart,
                         "System Restart",
-                        $"Vitara is restarting in {delaySeconds} second{(delaySeconds == 1 ? "" : "s")}. It will be back shortly.",
+                        $"Divvy is restarting in {delaySeconds} second{(delaySeconds == 1 ? "" : "s")}. It will be back shortly.",
                         deepLinkUrl: "/dashboard");
                 }
 

@@ -55,7 +55,7 @@ yarn-error.log*
 .env    
 
 # Local dev secrets — never commit, use appsettings.Development.template.json as reference
-server/src/Vitara.Api/appsettings.Development.json
+server/src/Divyy.Api/appsettings.Development.json
 
 # Ignore coverage reports
 coverage/

@@ -97,7 +97,7 @@ Operations:
 
 ### Service: `NotificationPreferenceService`
 
-**File:** `server/src/Vitara.Api/Services/NotificationPreferenceService.cs`
+**File:** `server/src/Divvy.Api/Services/NotificationPreferenceService.cs`
 
 **`GetPreferencesAsync(userId)`**
 - Loads all 5 `NotificationTypeEntity` rows.
@@ -203,7 +203,7 @@ When a new user registers (`AuthService.SignupAsync`), all 5 `UserNotificationPr
 
 - `unlock(ctx: AudioContext)` — call on user gesture to unblock iOS Safari. Plays a silent 1-sample buffer.
 - `playAlarm()` — resumes the stored context, schedules 3 beeps, then returns. No-ops if muted or context is unavailable.
-- `isMuted() / setMuted(val)` — reads/writes `localStorage` key `vitara-alarm-muted`.
+- `isMuted() / setMuted(val)` — reads/writes `localStorage` key `divvy-alarm-muted`.
 
 **`WakeLockService`** — `client/src/app/core/services/wake-lock.service.ts`
 
@@ -237,7 +237,7 @@ The BP rest timer has the same alarm/vibration/wake lock experience but has no s
 When the browser receives a push event, the service worker (`client/src/custom-sw.js`) processes it:
 1. Parses the push data payload (JSON: `{ title, body, deepLinkUrl?, type }`).
 2. Calls `self.registration.showNotification(title, { body, data: { deepLinkUrl } })`.
-3. On `notificationclick` event: focuses an existing Vitara window if open, or opens a new one, navigating to `deepLinkUrl` if provided.
+3. On `notificationclick` event: focuses an existing Divvy window if open, or opens a new one, navigating to `deepLinkUrl` if provided.
 
 ---
 

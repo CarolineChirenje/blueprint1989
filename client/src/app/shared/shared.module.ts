@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from './material.module';
@@ -7,7 +7,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { PasswordFieldComponent } from './components/password-field/password-field.component';
 import { CloseReportDialogComponent } from './components/close-report-dialog/close-report-dialog.component';
 import { ViewReportDialogComponent } from './components/view-report-dialog/view-report-dialog.component';
-import { VitaraChartComponent } from './components/vitara-chart/vitara-chart.component';
+import { DivvyChartComponent } from './components/vitara-chart/vitara-chart.component';
 
 @NgModule({
   declarations: [
@@ -15,23 +15,25 @@ import { VitaraChartComponent } from './components/vitara-chart/vitara-chart.com
     PasswordFieldComponent,
     CloseReportDialogComponent,
     ViewReportDialogComponent,
-    VitaraChartComponent
+    DivvyChartComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    MaterialModule
+    MaterialModule,
+    DatePipe
   ],
   exports: [
     ConfirmDialogComponent,
     PasswordFieldComponent,
     CloseReportDialogComponent,
     ViewReportDialogComponent,
-    VitaraChartComponent,
+    DivvyChartComponent,
     RouterModule,
     ReactiveFormsModule,
-    MaterialModule
+    MaterialModule,
+    DatePipe
   ]
 })
 export class SharedModule { }

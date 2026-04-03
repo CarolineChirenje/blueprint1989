@@ -13,14 +13,14 @@ Chart.register(
   CategoryScale, Title, Tooltip, Legend, Filler
 );
 
-export interface VitaraChartDataset {
+export interface DivvyChartDataset {
   label: string;
   data: (number | null)[];
   color: string;
   fill?: boolean;
 }
 
-export interface VitaraReferenceBand {
+export interface DivvyReferenceBand {
   /** Y value where the dashed line is drawn */
   y: number;
   label: string;
@@ -28,19 +28,19 @@ export interface VitaraReferenceBand {
 }
 
 @Component({
-  selector: 'app-vitara-chart',
+  selector: 'app-divvy-chart',
   templateUrl: './vitara-chart.component.html',
   styleUrls: ['./vitara-chart.component.css'],
   standalone: false
 })
-export class VitaraChartComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class DivvyChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('chartCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   @Input() title = '';
   @Input() labels: string[] = [];
-  @Input() datasets: VitaraChartDataset[] = [];
+  @Input() datasets: DivvyChartDataset[] = [];
   @Input() yAxisLabel = '';
-  @Input() referenceBands: VitaraReferenceBand[] = [];
+  @Input() referenceBands: DivvyReferenceBand[] = [];
 
   private chart: Chart | null = null;
   private viewReady = false;
@@ -74,7 +74,7 @@ export class VitaraChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (!this.labels?.length || !this.datasets?.length) return;
 
     const refLinePlugin: Plugin<'line'> = {
-      id: 'vitaraRefLines',
+      id: 'divvyRefLines',
       afterDraw: (chartInstance) => {
         if (!this.referenceBands?.length) return;
         const { ctx, chartArea, scales } = chartInstance as any;

@@ -1,28 +1,31 @@
-# Vitara Client Application
+# Divvy Client Application
 
-This is the client-side application for the Vitara project, built using Angular and TypeScript. The application is designed for school administrators and parents to manage BGL entries and comments effectively.
+This is the client-side application for the Divvy project, built using Angular and TypeScript. Divvy is a shared expense management PWA that helps groups track, split, and settle expenses across billing cycles.
 
 ## Features
 
-- **Admin Login**: School administrators can log in to the application.
-- **BGL Entry Management**: Administrators can enter BGL values along with comments, which are automatically timestamped.
-- **Parent Comments**: A dedicated section for parents to add their comments.
-- **Excel Export**: The application can generate an Excel sheet containing all history, which can be updated to a shared Google Drive.
+- **Authentication**: Login, signup, MFA, biometric (WebAuthn), and password reset flows.
+- **Dashboard**: Overview of outstanding obligations across active cycles.
+- **Cycles**: Create and manage expense cycles; track member contributions and settlements.
+- **Management**: Admin tools for managing users, groups, and terms.
+- **Notifications**: In-app and push notification support via VAPID.
+- **Offline Queue**: Captures actions while offline and syncs when connectivity is restored.
+- **PWA**: Installable progressive web app with service worker support.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (version 14 or later)
+- Node.js (version 18 or later)
 - Angular CLI (install via npm: `npm install -g @angular/cli`)
-- A compatible web browser
+- The Divvy API running at `http://localhost:5000` (see `server/` for setup)
 
 ### Installation
 
 1. Clone the repository:
    ```
    git clone <repository-url>
-   cd Vitara/client
+   cd 6299/client
    ```
 
 2. Install dependencies:
@@ -30,21 +33,23 @@ This is the client-side application for the Vitara project, built using Angular 
    npm install
    ```
 
+3. Configure the API URL in `src/environments/environment.ts` if needed.
+
 ### Running the Application
 
 To start the development server, run:
 ```
 ng serve
 ```
-Navigate to `http://localhost:4200/` in your web browser to view the application.
+Navigate to `http://localhost:4300/` in your web browser to view the application.
 
 ### Building for Production
 
 To build the application for production, use:
 ```
-ng build --prod
+ng build --configuration production
 ```
-The output will be stored in the `dist/` directory.
+The output will be stored in the configured `outputPath` (default: `C:/Publish/app`).
 
 ## Contributing
 

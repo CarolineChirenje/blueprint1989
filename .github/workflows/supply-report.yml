@@ -15,5 +15,5 @@ jobs:
       - name: Trigger supply report endpoint
         run: |
           curl --fail --silent --show-error \
-            -X POST "${{ vars.VITARA_API_URL }}/api/supply-report/send" \
+            -X POST "${{ vars.DIVVY_API_URL }}/api/supply-report/send" \
             -H "Authorization: Bearer ${{ secrets.SUPPLY_REPORT_TOKEN }}"

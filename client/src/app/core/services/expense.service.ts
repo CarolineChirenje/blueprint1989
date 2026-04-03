@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ExpenseDto, MemberObligationDto, ObligationsSummaryDto } from '../../shared/models/expense-cycle.model';
 
@@ -12,7 +13,7 @@ export class ExpenseService {
   constructor(private http: HttpClient) {}
 
   getObligationsSummary(): Observable<ObligationsSummaryDto> {
-    return this.http.get<ObligationsSummaryDto>(`${this.dashboardUrl}/obligations-summary`);
+    return this.http.get<ObligationsSummaryDto>(`${this.dashboardUrl}/obligations-summary`).pipe(timeout(8000));
   }
 
   getByCycle(cycleId: number): Observable<ExpenseDto[]> {

@@ -1,7 +1,7 @@
 <h2 mat-dialog-title>{{ isEdit ? 'Edit Group' : 'Create Group' }}</h2>
 
 <mat-dialog-content>
-  <form [formGroup]="form">
+  <form [formGroup]="form" class="dialog-form">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Group Name</mat-label>
       <input matInput formControlName="name" maxlength="150" placeholder="e.g. House A" />
@@ -10,13 +10,13 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description (optional)</mat-label>
-      <textarea matInput formControlName="description" rows="3" maxlength="500"></textarea>
+      <textarea matInput formControlName="description" rows="4" maxlength="500"></textarea>
     </mat-form-field>
 
     <mat-slide-toggle *ngIf="isEdit" formControlName="isActive">Active</mat-slide-toggle>
   </form>
 
-  <div *ngIf="error" class="error-msg">{{ error }}</div>
+  <div *ngIf="error" class="error-msg" style="color:#d32f2f;margin-top:8px;">{{ error }}</div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

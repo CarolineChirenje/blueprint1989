@@ -46,6 +46,14 @@
     #app-splash.splash-hide { opacity: 0; pointer-events: none; }
     #app-splash img { width: 120px; height: 120px; }
   </style>
+  <script>
+    // In development (localhost), unregister any stale service workers to prevent blank pages.
+    if ('serviceWorker' in navigator && location.hostname === 'localhost') {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        registrations.forEach(function(reg) { reg.unregister(); });
+      });
+    }
+  </script>
     <app-root></app-root>
 </body>
 </html>
