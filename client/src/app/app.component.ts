@@ -470,9 +470,24 @@ export class AppComponent implements OnInit, OnDestroy {
       case NotificationType.PaymentReceived:
         return 'payment received';
       case NotificationType.CycleCreated:
+      case NotificationType.CycleStarted:
+      case NotificationType.CycleMidReminder:
+      case NotificationType.CycleClosingSoon:
+      case NotificationType.CycleClosed:
         return 'cycle update';
+      case NotificationType.CyclePaymentMade:
+        return 'payment received';
       case NotificationType.SystemRestart:
         return 'system update';
+      case NotificationType.GroupInviteReceived:
+      case NotificationType.MemberLeftGroup:
+      case NotificationType.MemberJoinedGroup:
+        return 'group update';
+      case NotificationType.DisputeRaised:
+      case NotificationType.DisputeUpdated:
+        return 'dispute update';
+      case NotificationType.ManualReminder:
+        return 'payment reminder';
       default:
         return 'notification';
     }
@@ -486,8 +501,30 @@ export class AppComponent implements OnInit, OnDestroy {
         return '✅';
       case NotificationType.CycleCreated:
         return '🔄';
+      case NotificationType.CycleStarted:
+        return '🚀';
+      case NotificationType.CyclePaymentMade:
+        return '💸';
+      case NotificationType.CycleMidReminder:
+        return '⏳';
+      case NotificationType.CycleClosingSoon:
+        return '⚠️';
+      case NotificationType.CycleClosed:
+        return '🔒';
       case NotificationType.SystemRestart:
-        return '🔄';
+        return '🔧';
+      case NotificationType.GroupInviteReceived:
+        return '👥';
+      case NotificationType.DisputeRaised:
+        return '🚨';
+      case NotificationType.DisputeUpdated:
+        return '📋';
+      case NotificationType.ManualReminder:
+        return '📣';
+      case NotificationType.MemberLeftGroup:
+        return '👋';
+      case NotificationType.MemberJoinedGroup:
+        return '🎉';
       default:
         return '🔔';
     }
@@ -498,11 +535,23 @@ export class AppComponent implements OnInit, OnDestroy {
       case NotificationType.PaymentDue:
         return 'warning';
       case NotificationType.PaymentReceived:
+      case NotificationType.CyclePaymentMade:
         return 'success';
       case NotificationType.CycleCreated:
-        return 'info';
+      case NotificationType.CycleStarted:
+      case NotificationType.CycleMidReminder:
+      case NotificationType.CycleClosed:
       case NotificationType.SystemRestart:
+      case NotificationType.GroupInviteReceived:
+      case NotificationType.DisputeUpdated:
+      case NotificationType.MemberLeftGroup:
+      case NotificationType.MemberJoinedGroup:
         return 'info';
+      case NotificationType.CycleClosingSoon:
+      case NotificationType.ManualReminder:
+        return 'warning';
+      case NotificationType.DisputeRaised:
+        return 'alert';
       default:
         return 'neutral';
     }

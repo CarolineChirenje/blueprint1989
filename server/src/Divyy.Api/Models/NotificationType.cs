@@ -50,5 +50,8 @@ public enum NotificationType
 
     /// <summary>A member voluntarily left a group; remaining members are notified.</summary>
     MemberLeftGroup = 15,
+
+    /// <summary>A member accepted a group invite; existing members are notified.</summary>
+    MemberJoinedGroup = 16,
 }
 

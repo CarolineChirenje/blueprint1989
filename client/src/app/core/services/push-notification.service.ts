@@ -27,6 +27,16 @@ export enum NotificationType {
   CycleCreated         = 4,
   SystemRestart        = 5,
   GroupInviteReceived  = 6,
+  CycleStarted         = 7,
+  CyclePaymentMade     = 8,
+  CycleMidReminder     = 9,
+  CycleClosingSoon     = 10,
+  CycleClosed          = 11,
+  DisputeRaised        = 12,
+  DisputeUpdated       = 13,
+  ManualReminder       = 14,
+  MemberLeftGroup      = 15,
+  MemberJoinedGroup    = 16,
 }
 
 @Injectable({ providedIn: 'root' })

@@ -280,6 +280,35 @@ public class GroupService : IGroupService
         invite.RespondedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+
+        if (request.Accept)
+        {
+            var group       = await _context.Groups.FindAsync(groupId);
+            var joiningUser = await _context.Users.FindAsync(userId);
+            var joinerName  = joiningUser != null ? $"{joiningUser.FirstName} {joiningUser.LastName}".Trim() : "A member";
+
+            // Notify all other accepted members that this user has joined
+            var otherMemberIds = await _context.GroupMembers
+                .Where(gm => gm.GroupId == groupId
+                          && gm.Status == GroupInviteStatus.Accepted
+                          && gm.UserId != userId)
+                .Select(gm => gm.UserId)
+                .ToListAsync();
+
+            if (group != null && otherMemberIds.Count > 0)
+            {
+                var notifyTasks = otherMemberIds.Select(recipientId => _push.SendToUserAsync(
+                    userId: recipientId,
+                    type: NotificationType.MemberJoinedGroup,
+                    title: group.Name,
+                    body: $"{joinerName} has joined the group.",
+                    deepLinkUrl: $"/groups/{groupId}",
+                    relatedEntityId: groupId));
+
+                await Task.WhenAll(notifyTasks);
+            }
+        }
+
         return null;
     }
 
@@ -304,8 +333,37 @@ public class GroupService : IGroupService
                 return "Cannot remove the last group admin.";
         }
 
+        // Load group and removed user details before removal for notification
+        var group       = await _context.Groups.FindAsync(groupId);
+        var removedUser = await _context.Users.FindAsync(targetUserId);
+        var removedName = removedUser != null ? $"{removedUser.FirstName} {removedUser.LastName}".Trim() : "A member";
+        var wasAccepted = member.Status == GroupInviteStatus.Accepted;
+
         _context.GroupMembers.Remove(member);
         await _context.SaveChangesAsync();
+
+        // Only notify if the removed user was an active member (not a pending invite)
+        if (wasAccepted && group != null)
+        {
+            var remainingMemberIds = await _context.GroupMembers
+                .Where(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.Accepted)
+                .Select(gm => gm.UserId)
+                .ToListAsync();
+
+            if (remainingMemberIds.Count > 0)
+            {
+                var notifyTasks = remainingMemberIds.Select(recipientId => _push.SendToUserAsync(
+                    userId: recipientId,
+                    type: NotificationType.MemberLeftGroup,
+                    title: group.Name,
+                    body: $"{removedName} was removed from the group.",
+                    deepLinkUrl: $"/groups/{groupId}",
+                    relatedEntityId: groupId));
+
+                await Task.WhenAll(notifyTasks);
+            }
+        }
+
         return null;
     }
 

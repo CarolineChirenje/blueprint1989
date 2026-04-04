@@ -12,6 +12,7 @@ public static class DatabaseSeeder
         await SeedNotificationTypesAsync(context);
         await SeedAppConfigAsync(context);
         await SeedUsersAsync(context, passwordHashingService);
+        await SeedUserNotificationPreferencesAsync(context);
     }
 
     private static async Task SeedRolesAsync(ApplicationDbContext context)
@@ -29,18 +30,75 @@ public static class DatabaseSeeder
 
     private static async Task SeedNotificationTypesAsync(ApplicationDbContext context)
     {
-        if (!await context.NotificationTypes.AnyAsync())
+        // Mandatory = IsAdminControlled: users cannot toggle these off.
+        // Optional  = IsAdminControlled false: users can disable push for these.
+        var expected = new[]
         {
-            context.NotificationTypes.AddRange(
-                new NotificationTypeEntity { Id = 1, Name = "General",             Description = "General or test notification" },
-                new NotificationTypeEntity { Id = 2, Name = "PaymentDue",            Description = "A payment obligation is due" },
-                new NotificationTypeEntity { Id = 3, Name = "PaymentReceived",       Description = "A payment has been recorded" },
-                new NotificationTypeEntity { Id = 4, Name = "CycleCreated",          Description = "A new expense cycle has been created" },
-                new NotificationTypeEntity { Id = 5, Name = "SystemRestart",         Description = "System is restarting" },
-                new NotificationTypeEntity { Id = 6, Name = "GroupInviteReceived",   Description = "A user has been invited to join a group" }
-            );
-            await context.SaveChangesAsync();
+            new NotificationTypeEntity { Id =  1, Name = "General",             Description = "General or test notification",                                  IsAdminControlled = false },
+            new NotificationTypeEntity { Id =  2, Name = "PaymentDue",           Description = "A payment obligation is due",                                   IsAdminControlled = true  },
+            new NotificationTypeEntity { Id =  3, Name = "PaymentReceived",      Description = "A payment has been recorded",                                   IsAdminControlled = false },
+            new NotificationTypeEntity { Id =  4, Name = "CycleCreated",         Description = "A new expense cycle has been created",                          IsAdminControlled = false },
+            new NotificationTypeEntity { Id =  5, Name = "SystemRestart",        Description = "System is restarting",                                          IsAdminControlled = true  },
+            new NotificationTypeEntity { Id =  6, Name = "GroupInviteReceived",  Description = "A user has been invited to join a group",                       IsAdminControlled = false },
+            new NotificationTypeEntity { Id =  7, Name = "CycleStarted",         Description = "An expense cycle has been started and is now active",           IsAdminControlled = false },
+            new NotificationTypeEntity { Id =  8, Name = "CyclePaymentMade",     Description = "A member made a payment toward a cycle",                        IsAdminControlled = false },
+            new NotificationTypeEntity { Id =  9, Name = "CycleMidReminder",     Description = "Reminder sent at the midpoint of an active cycle",              IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 10, Name = "CycleClosingSoon",     Description = "Reminder sent 7 days before a cycle end date",                  IsAdminControlled = true  },
+            new NotificationTypeEntity { Id = 11, Name = "CycleClosed",          Description = "An expense cycle has been closed by the admin",                 IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 12, Name = "DisputeRaised",        Description = "A member raised a dispute on an expense in a cycle",            IsAdminControlled = true  },
+            new NotificationTypeEntity { Id = 13, Name = "DisputeUpdated",       Description = "The admin updated the status of an expense dispute",            IsAdminControlled = true  },
+            new NotificationTypeEntity { Id = 14, Name = "ManualReminder",       Description = "Admin manually nudged unsettled members about their balance",   IsAdminControlled = true  },
+            new NotificationTypeEntity { Id = 15, Name = "MemberLeftGroup",      Description = "A member left a group; remaining members are notified",         IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 16, Name = "MemberJoinedGroup",    Description = "A member accepted a group invite; existing members are notified", IsAdminControlled = false },
+        };
+
+        foreach (var e in expected)
+        {
+            var existing = await context.NotificationTypes.FindAsync(e.Id);
+            if (existing == null)
+            {
+                context.NotificationTypes.Add(e);
+            }
+            else if (existing.IsAdminControlled != e.IsAdminControlled)
+            {
+                existing.IsAdminControlled = e.IsAdminControlled;
+            }
         }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedUserNotificationPreferencesAsync(ApplicationDbContext context)
+    {
+        // Seed emails must match the users created in SeedUsersAsync.
+        var seededEmails = new[] { "carochire@gmail.com", "elroitec@gmail.com" };
+        var typeIds      = await context.NotificationTypes.Select(t => t.Id).ToListAsync();
+
+        var userIds = await context.Users
+            .Where(u => seededEmails.Contains(u.Email))
+            .Select(u => u.Id)
+            .ToListAsync();
+
+        foreach (var userId in userIds)
+        {
+            foreach (var typeId in typeIds)
+            {
+                var exists = await context.UserNotificationPreferences
+                    .AnyAsync(p => p.UserId == userId && p.NotificationTypeId == typeId);
+
+                if (!exists)
+                {
+                    context.UserNotificationPreferences.Add(new UserNotificationPreference
+                    {
+                        UserId             = userId,
+                        NotificationTypeId = typeId,
+                        IsEnabled          = true
+                    });
+                }
+            }
+        }
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedUsersAsync(ApplicationDbContext context, IPasswordHashingService passwordHashingService)
@@ -80,21 +138,6 @@ public static class DatabaseSeeder
             };
 
             context.Users.AddRange(users);
-            await context.SaveChangesAsync();
-
-            var typeIds = await context.NotificationTypes.Select(t => t.Id).ToListAsync();
-            foreach (var user in users)
-            {
-                foreach (var typeId in typeIds)
-                {
-                    context.UserNotificationPreferences.Add(new UserNotificationPreference
-                    {
-                        UserId             = user.Id,
-                        NotificationTypeId = typeId,
-                        IsEnabled          = true
-                    });
-                }
-            }
             await context.SaveChangesAsync();
         }
     }
