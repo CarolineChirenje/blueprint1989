@@ -37,6 +37,7 @@
   } @else if (filteredReports.length === 0) {
     <div class="state-message">No reports found for the selected filters.</div>
   } @else {
+    <div class="table-wrap">
     <table class="table">
       <thead>
         <tr>
@@ -52,15 +53,15 @@
       <tbody>
         @for (report of filteredReports; track report.id) {
           <tr>
-            <td>
+            <td data-label="Title">
               <button class="link-btn" (click)="openViewDialog(report)">{{ report.title }}</button>
             </td>
-            <td>{{ report.typeName }}</td>
-            <td>{{ report.priorityName }}</td>
-            <td><span class="badge" [ngClass]="getStatusBadgeClass(report.status)">{{ report.statusName }}</span></td>
-            <td>{{ report.submittedByName }}</td>
-            <td>{{ report.submittedAt | date:'d MMM y' }}</td>
-            <td>
+            <td data-label="Type">{{ report.typeName }}</td>
+            <td data-label="Priority">{{ report.priorityName }}</td>
+            <td data-label="Status"><span class="badge" [ngClass]="getStatusBadgeClass(report.status)">{{ report.statusName }}</span></td>
+            <td data-label="Submitted by">{{ report.submittedByName }}</td>
+            <td data-label="Date">{{ report.submittedAt | date:'d MMM y' }}</td>
+            <td data-label="">
               <div class="action-btns">
                 <button class="btn btn--sm btn--ghost" (click)="openViewDialog(report)">View</button>
                 @if (canMarkInReview(report.status, report.id)) {
@@ -76,5 +77,6 @@
         }
       </tbody>
     </table>
+    </div>
   }
 </section>

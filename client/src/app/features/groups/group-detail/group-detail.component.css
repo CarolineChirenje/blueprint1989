@@ -17,3 +17,11 @@ mat-card-header { display: flex; justify-content: space-between; align-items: ce
 .status-chip { padding: .2rem .65rem; border-radius: 10px; font-size: .78rem; font-weight: 600; }
 .status-chip.active   { background: var(--success-bg); color: var(--success); }
 .status-chip.inactive { background: var(--surface-raised); color: var(--text-secondary); }
+
+@media (max-width: 600px) {
+  .detail-page { padding: 1rem; }
+  .page-header { flex-direction: column; }
+  .header-left h1 { font-size: 1.3rem; }
+  .header-right { justify-content: flex-start; }
+  mat-card-header { flex-wrap: wrap; gap: .5rem; }
+}

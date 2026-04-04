@@ -8,8 +8,8 @@
 .badge { padding: .25rem .75rem; border-radius: 12px; font-size: .8rem; font-weight: 600; }
 .badge-active { background: var(--success-bg); color: var(--success); }
 .badge-closed { background: var(--surface-raised); color: var(--text-secondary); }
-.tabs { display: flex; gap: .25rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
-.tabs button { background: none; border: none; padding: .75rem 1.25rem; cursor: pointer; font-size: .95rem; color: var(--text-secondary); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; }
+.tabs { display: flex; gap: .25rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
+.tabs button { background: none; border: none; padding: .75rem 1.25rem; cursor: pointer; font-size: .95rem; color: var(--text-secondary); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; white-space: nowrap; }
 .tabs button.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
 .tab-content { padding: 1rem 0; }
 .tab-actions { margin-bottom: 1.25rem; }
@@ -145,3 +145,18 @@
 .table-filter-field .mdc-floating-label,
 .table-filter-field .mat-mdc-floating-label { color: var(--text-secondary) !important; }
 .table-filter-field input.mat-mdc-input-element { color: var(--text-primary) !important; }
+
+/* ── Mobile responsive ── */
+@media (max-width: 600px) {
+  .detail-page { padding: 1rem; }
+  .page-header { flex-direction: column; align-items: stretch; }
+  .header-left h1 { font-size: 1.3rem; }
+  .header-right { justify-content: flex-start; }
+  .tabs button { padding: .6rem .75rem; font-size: .85rem; }
+  .summary-strip { gap: 1rem; }
+  .strip-value { font-size: 1.1rem; }
+  .table-summary-strip { flex-direction: column; align-items: flex-start; }
+  .strip-action { margin-left: 0; }
+  .table-filter-field { max-width: 100%; }
+  .add-member-row { flex-direction: column; }
+}

@@ -49,7 +49,7 @@
           <tbody>
             @for (entry of entriesForCategory(category); track entry.key) {
               <tr [class.row--dirty]="dirtyKeys.has(entry.key)">
-                <td>
+                <td data-label="Setting">
                   <div class="entry-name">{{ entry.displayName }}</div>
                   <div class="entry-key">{{ entry.key }}</div>
                   @if (entry.description) {
@@ -62,7 +62,7 @@
                     <span class="badge badge--muted">Read-only</span>
                   }
                 </td>
-                <td>
+                <td data-label="Value">
                   @if (entry.isReadOnly) {
                     <span class="value-readonly">
                       {{ entry.isSecret && !revealedKeys.has(entry.key) ? '••••••••' : entry.value }}
@@ -85,10 +85,10 @@
                     </div>
                   }
                 </td>
-                <td>
+                <td data-label="Type">
                   <span class="badge badge--type">{{ entry.dataType }}</span>
                 </td>
-                <td>
+                <td data-label="">
                   @if (entry.isSecret) {
                     <button class="btn-icon" type="button" (click)="toggleReveal(entry.key)" [title]="revealedKeys.has(entry.key) ? 'Hide' : 'Reveal'">
                       <span class="material-icons">{{ revealedKeys.has(entry.key) ? 'visibility_off' : 'visibility' }}</span>

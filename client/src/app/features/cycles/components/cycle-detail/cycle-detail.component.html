@@ -103,32 +103,32 @@
 
               <ng-container matColumnDef="title">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Title</th>
-                <td mat-cell *matCellDef="let e">{{ e.title }}</td>
+                <td mat-cell *matCellDef="let e" data-label="Title">{{ e.title }}</td>
               </ng-container>
 
               <ng-container matColumnDef="amount">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="col-right">Amount</th>
-                <td mat-cell *matCellDef="let e" class="col-right">${{ e.amount | number:'1.2-2' }}</td>
+                <td mat-cell *matCellDef="let e" class="col-right" data-label="Amount">${{ e.amount | number:'1.2-2' }}</td>
               </ng-container>
 
               <ng-container matColumnDef="category">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
-                <td mat-cell *matCellDef="let e"><span class="category-badge">{{ e.category }}</span></td>
+                <td mat-cell *matCellDef="let e" data-label="Category"><span class="category-badge">{{ e.category }}</span></td>
               </ng-container>
 
               <ng-container matColumnDef="loggedByName">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Added By</th>
-                <td mat-cell *matCellDef="let e">{{ e.loggedByName }}</td>
+                <td mat-cell *matCellDef="let e" data-label="Added By">{{ e.loggedByName }}</td>
               </ng-container>
 
               <ng-container matColumnDef="date">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-                <td mat-cell *matCellDef="let e">{{ e.createdAt | date:'mediumDate' }}</td>
+                <td mat-cell *matCellDef="let e" data-label="Date">{{ e.createdAt | date:'mediumDate' }}</td>
               </ng-container>
 
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef></th>
-                <td mat-cell *matCellDef="let e" class="col-right">
+                <td mat-cell *matCellDef="let e" class="col-right" data-label="">
                   @if (isDraft() && isCurrentUserCycleMember) {
                     <button mat-icon-button matTooltip="Flag dispute"
                             (click)="openDisputeExpense(e); $event.stopPropagation()">
@@ -214,7 +214,7 @@
 
               <ng-container matColumnDef="parties">
                 <th mat-header-cell *matHeaderCellDef>From → To</th>
-                <td mat-cell *matCellDef="let p">
+                <td mat-cell *matCellDef="let p" data-label="From → To">
                   {{ p.payerFirstName }} {{ p.payerLastName }}
                   <mat-icon class="arrow-icon">arrow_forward</mat-icon>
                   {{ p.payeeFirstName }} {{ p.payeeLastName }}
@@ -226,24 +226,24 @@
 
               <ng-container matColumnDef="amount">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="col-right">Amount</th>
-                <td mat-cell *matCellDef="let p" class="col-right">${{ p.amount | number:'1.2-2' }}</td>
+                <td mat-cell *matCellDef="let p" class="col-right" data-label="Amount">${{ p.amount | number:'1.2-2' }}</td>
               </ng-container>
 
               <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header class="col-center">Status</th>
-                <td mat-cell *matCellDef="let p" class="col-center">
+                <td mat-cell *matCellDef="let p" class="col-center" data-label="Status">
                   <span class="status-badge" [ngClass]="'status-' + p.status.toLowerCase()">{{ p.status }}</span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="date">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-                <td mat-cell *matCellDef="let p">{{ p.createdAt | date:'mediumDate' }}</td>
+                <td mat-cell *matCellDef="let p" data-label="Date">{{ p.createdAt | date:'mediumDate' }}</td>
               </ng-container>
 
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef></th>
-                <td mat-cell *matCellDef="let p" class="col-right">
+                <td mat-cell *matCellDef="let p" class="col-right" data-label="">
                   @if (p.status === 'Pending' && currentUserIsGroupAdmin) {
                     <button mat-stroked-button color="primary" (click)="openRespondPayment(p)">Respond</button>
                   }
@@ -283,25 +283,25 @@
             <table mat-table [dataSource]="contributionSummary.members" class="summary-table mat-elevation-z1">
               <ng-container matColumnDef="member">
                 <th mat-header-cell *matHeaderCellDef>Member</th>
-                <td mat-cell *matCellDef="let m">{{ m.firstName }} {{ m.lastName }}</td>
+                <td mat-cell *matCellDef="let m" data-label="Member">{{ m.firstName }} {{ m.lastName }}</td>
               </ng-container>
               <ng-container matColumnDef="owes">
                 <th mat-header-cell *matHeaderCellDef class="col-right">Owes</th>
-                <td mat-cell *matCellDef="let m" class="col-right">${{ m.shareOwed | number:'1.2-2' }}</td>
+                <td mat-cell *matCellDef="let m" class="col-right" data-label="Owes">${{ m.shareOwed | number:'1.2-2' }}</td>
               </ng-container>
               <ng-container matColumnDef="paid">
                 <th mat-header-cell *matHeaderCellDef class="col-right">Paid</th>
-                <td mat-cell *matCellDef="let m" class="col-right">${{ m.totalPaid | number:'1.2-2' }}</td>
+                <td mat-cell *matCellDef="let m" class="col-right" data-label="Paid">${{ m.totalPaid | number:'1.2-2' }}</td>
               </ng-container>
               <ng-container matColumnDef="balance">
                 <th mat-header-cell *matHeaderCellDef class="col-right">Balance</th>
-                <td mat-cell *matCellDef="let m" class="col-right" [ngClass]="contributionClass(m.balance)">
+                <td mat-cell *matCellDef="let m" class="col-right" data-label="Balance" [ngClass]="contributionClass(m.balance)">
                   {{ m.balance >= 0 ? '+' : '' }}${{ m.balance | number:'1.2-2' }}
                 </td>
               </ng-container>
               <ng-container matColumnDef="status">
                 <th mat-header-cell *matHeaderCellDef class="col-center">Status</th>
-                <td mat-cell *matCellDef="let m" class="col-center">
+                <td mat-cell *matCellDef="let m" class="col-center" data-label="Status">
                   @if (m.isSettled) {
                     <span class="contrib-chip settled"><mat-icon>check_circle</mat-icon> Settled</span>
                   } @else if (m.balance > 0) {

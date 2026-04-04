@@ -238,6 +238,21 @@ public class ExpenseCycleService
 
         await _context.SaveChangesAsync();
 
+        // Notify added members (excluding the creator) that they've been added to the cycle
+        var notifyIds = memberIds.Where(id => id != createdByUserId).ToList();
+        if (notifyIds.Count > 0)
+        {
+            var group = await _context.Groups.FindAsync(cycle.GroupId);
+            var groupName = group?.Name ?? "your group";
+            await _push.SendToUsersAsync(
+                notifyIds,
+                NotificationType.CycleMemberAdded,
+                $"Added to {cycle.Name}",
+                $"You've been added to the {cycle.Name} cycle in {groupName}.",
+                $"/cycles/{cycle.Id}",
+                cycle.Id);
+        }
+
         // Copy expenses from another cycle if requested
         if (request.CopyExpensesFromCycleId.HasValue)
         {
