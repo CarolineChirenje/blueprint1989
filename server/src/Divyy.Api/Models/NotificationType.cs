@@ -53,5 +53,11 @@ public enum NotificationType
 
     /// <summary>A member accepted a group invite; existing members are notified.</summary>
     MemberJoinedGroup = 16,
+
+    /// <summary>A user has been added to a Draft expense cycle.</summary>
+    CycleMemberAdded = 17,
+
+    /// <summary>A user has been removed from a Draft expense cycle.</summary>
+    CycleMemberRemoved = 18,
 }
 

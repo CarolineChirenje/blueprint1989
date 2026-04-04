@@ -50,6 +50,8 @@ public static class DatabaseSeeder
             new NotificationTypeEntity { Id = 14, Name = "ManualReminder",       Description = "Admin manually nudged unsettled members about their balance",   IsAdminControlled = true  },
             new NotificationTypeEntity { Id = 15, Name = "MemberLeftGroup",      Description = "A member left a group; remaining members are notified",         IsAdminControlled = false },
             new NotificationTypeEntity { Id = 16, Name = "MemberJoinedGroup",    Description = "A member accepted a group invite; existing members are notified", IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 17, Name = "CycleMemberAdded",     Description = "A user has been added to a Draft expense cycle",                  IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 18, Name = "CycleMemberRemoved",   Description = "A user has been removed from a Draft expense cycle",              IsAdminControlled = false },
         };
 
         foreach (var e in expected)

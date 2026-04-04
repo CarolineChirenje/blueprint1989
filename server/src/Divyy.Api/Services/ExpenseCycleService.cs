@@ -335,6 +335,9 @@ public class ExpenseCycleService
             deepLink,
             cycleId);
 
+        cycle.StartNotificationSent = true;
+        await _context.SaveChangesAsync();
+
         var members = await GetMemberDtosAsync(cycleId, cycle.GroupId);
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
@@ -423,6 +426,17 @@ public class ExpenseCycleService
         });
 
         await _context.SaveChangesAsync();
+
+        var group = await _context.Groups.FindAsync(cycle.GroupId);
+        var groupName = group?.Name ?? "your group";
+        await _push.SendToUserAsync(
+            userId,
+            NotificationType.CycleMemberAdded,
+            $"Added to {cycle.Name}",
+            $"You've been added to the {cycle.Name} cycle in {groupName}.",
+            $"/cycles/{cycleId}",
+            cycleId);
+
         return null;
     }
 
@@ -434,6 +448,21 @@ public class ExpenseCycleService
 
         _context.CycleMembers.Remove(member);
         await _context.SaveChangesAsync();
+
+        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
+        if (cycle != null)
+        {
+            var group = await _context.Groups.FindAsync(cycle.GroupId);
+            var groupName = group?.Name ?? "your group";
+            await _push.SendToUserAsync(
+                userId,
+                NotificationType.CycleMemberRemoved,
+                $"Removed from {cycle.Name}",
+                $"You've been removed from the {cycle.Name} cycle in {groupName}.",
+                $"/cycles/{cycleId}",
+                cycleId);
+        }
+
         return null;
     }
 
