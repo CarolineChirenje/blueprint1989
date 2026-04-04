@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Divvy.Api.Data;
 using Divvy.Api.DTOs.Group;
 using Divvy.Api.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Divvy.Api.Services;
 
@@ -10,12 +11,14 @@ public class GroupService : IGroupService
     private readonly ApplicationDbContext _context;
     private readonly NotificationService  _notifications;
     private readonly IPushNotificationSender _push;
+    private readonly ILogger<GroupService> _logger;
 
-    public GroupService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push)
+    public GroupService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push, ILogger<GroupService> logger)
     {
         _context       = context;
         _notifications = notifications;
         _push          = push;
+        _logger        = logger;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -340,34 +343,46 @@ public class GroupService : IGroupService
         _context.GroupMembers.Remove(member);
         await _context.SaveChangesAsync();
 
-        // Only notify if the removed user was an active member (not a pending invite)
-        if (wasAccepted && group != null)
+        // Send notifications — wrapped so a delivery failure never blocks the removal response
+        try
         {
-            var remainingMemberIds = await _context.GroupMembers
-                .Where(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.Accepted)
-                .Select(gm => gm.UserId)
-                .ToListAsync();
-
-            // Notify the removed member personally
-            await _push.SendToUserAsync(
-                userId: targetUserId,
-                type: NotificationType.MemberLeftGroup,
-                title: group.Name,
-                body: "You have been removed from the group.",
-                deepLinkUrl: "/groups",
-                relatedEntityId: groupId);
-
-            // Notify all remaining members sequentially (shared DbContext — no Task.WhenAll)
-            if (remainingMemberIds.Count > 0)
+            if (group != null)
             {
-                await _push.SendToUsersAsync(
-                    userIds: remainingMemberIds,
+                // Always notify the removed/uninvited person
+                await _push.SendToUserAsync(
+                    userId: targetUserId,
                     type: NotificationType.MemberLeftGroup,
                     title: group.Name,
-                    body: $"{removedName} was removed from the group.",
-                    deepLinkUrl: $"/groups/{groupId}",
+                    body: wasAccepted
+                        ? "You have been removed from the group."
+                        : "Your group invite has been cancelled.",
+                    deepLinkUrl: "/groups",
                     relatedEntityId: groupId);
+
+                // Only notify remaining accepted members if an active member was removed
+                if (wasAccepted)
+                {
+                    var remainingMemberIds = await _context.GroupMembers
+                        .Where(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.Accepted)
+                        .Select(gm => gm.UserId)
+                        .ToListAsync();
+
+                    if (remainingMemberIds.Count > 0)
+                    {
+                        await _push.SendToUsersAsync(
+                            userIds: remainingMemberIds,
+                            type: NotificationType.MemberLeftGroup,
+                            title: group.Name,
+                            body: $"{removedName} was removed from the group.",
+                            deepLinkUrl: $"/groups/{groupId}",
+                            relatedEntityId: groupId);
+                    }
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send removal notifications for user {TargetUserId} from group {GroupId}", targetUserId, groupId);
         }
 
         return null;
@@ -463,21 +478,28 @@ public class GroupService : IGroupService
         _context.GroupMembers.Remove(membership);
         await _context.SaveChangesAsync();
 
-        // Notify all remaining accepted members
-        var remainingMemberIds = await _context.GroupMembers
-            .Where(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.Accepted)
-            .Select(gm => gm.UserId)
-            .ToListAsync();
-
-        if (remainingMemberIds.Count > 0)
+        // Notify all remaining accepted members — wrapped so a delivery failure never blocks the response
+        try
         {
-            await _push.SendToUsersAsync(
-                userIds: remainingMemberIds,
-                type: NotificationType.MemberLeftGroup,
-                title: group.Name,
-                body: $"{leaverName} has left the group.",
-                deepLinkUrl: $"/groups/{groupId}",
-                relatedEntityId: groupId);
+            var remainingMemberIds = await _context.GroupMembers
+                .Where(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.Accepted)
+                .Select(gm => gm.UserId)
+                .ToListAsync();
+
+            if (remainingMemberIds.Count > 0)
+            {
+                await _push.SendToUsersAsync(
+                    userIds: remainingMemberIds,
+                    type: NotificationType.MemberLeftGroup,
+                    title: group.Name,
+                    body: $"{leaverName} has left the group.",
+                    deepLinkUrl: $"/groups/{groupId}",
+                    relatedEntityId: groupId);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send leave notifications for user {UserId} from group {GroupId}", userId, groupId);
         }
 
         return null;

@@ -80,7 +80,11 @@ public class PushNotificationSender : IPushNotificationSender
             .Where(s => s.UserId == userId)
             .ToListAsync();
 
-        if (subscriptions.Count == 0) return;
+        if (subscriptions.Count == 0)
+        {
+            _logger.LogDebug("No push subscriptions found for user {UserId}; in-app notification created but no push sent.", userId);
+            return;
+        }
 
         // 4. Build message payload
         var payload = BuildPayload(type, title, body, deepLinkUrl);
