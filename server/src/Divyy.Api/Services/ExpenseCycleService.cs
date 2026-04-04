@@ -237,6 +237,36 @@ public class ExpenseCycleService
 
         await _context.SaveChangesAsync();
 
+        // Copy expenses from another cycle if requested
+        if (request.CopyExpensesFromCycleId.HasValue)
+        {
+            var sourceCycleExists = await _context.ExpenseCycles
+                .AnyAsync(c => c.Id == request.CopyExpensesFromCycleId.Value && c.GroupId == request.GroupId);
+            if (!sourceCycleExists)
+                return (null, "Source cycle not found in this group.");
+
+            var sourceExpenses = await _context.Expenses
+                .Where(e => e.ExpenseCycleId == request.CopyExpensesFromCycleId.Value)
+                .ToListAsync();
+
+            foreach (var src in sourceExpenses)
+            {
+                _context.Expenses.Add(new Expense
+                {
+                    ExpenseCycleId  = cycle.Id,
+                    Title           = src.Title,
+                    Amount          = src.Amount,
+                    Category        = src.Category,
+                    Notes           = src.Notes,
+                    LoggedByUserId  = createdByUserId,
+                    CreatedAt       = DateTime.UtcNow,
+                    UpdatedAt       = DateTime.UtcNow
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         var members = await GetMemberDtosAsync(cycle.Id, cycle.GroupId);
         var role = await GetUserGroupRoleAsync(cycle.GroupId, createdByUserId);
 

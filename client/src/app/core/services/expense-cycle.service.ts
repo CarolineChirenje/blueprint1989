@@ -29,7 +29,7 @@ export class ExpenseCycleService {
     return this.http.get<CycleBalanceDto>(`${this.url}/${id}/balance`);
   }
 
-  create(payload: { name: string; startDate: string; endDate: string; memberUserIds: number[]; groupId?: number | null }): Observable<ExpenseCycleDto> {
+  create(payload: { name: string; startDate: string; endDate: string; memberUserIds: number[]; groupId?: number | null; copyExpensesFromCycleId?: number | null }): Observable<ExpenseCycleDto> {
     return this.http.post<ExpenseCycleDto>(this.url, payload);
   }
 

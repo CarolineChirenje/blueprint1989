@@ -7,7 +7,8 @@ public record CreateExpenseCycleRequest(
     DateTime StartDate,
     DateTime EndDate,
     List<int>? MemberUserIds,
-    int GroupId);
+    int GroupId,
+    int? CopyExpensesFromCycleId = null);
 
 public record UpdateExpenseCycleRequest(
     string Name,
