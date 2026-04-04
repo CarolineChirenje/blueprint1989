@@ -303,18 +303,18 @@
    Chrome Android "Force Dark" auto-inverts colours on native form controls
    and Angular Material elements. color-scheme: light opts them out entirely.
 ────────────────────────────────────────────────────────────────────────── */
-input,
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="search"],
-input[type="number"],
-input[type="tel"],
-input[type="url"],
-input[type="date"],
-input[type="time"],
-textarea,
-select {
+input:not(.mat-mdc-input-element),
+input[type="text"]:not(.mat-mdc-input-element),
+input[type="email"]:not(.mat-mdc-input-element),
+input[type="password"]:not(.mat-mdc-input-element),
+input[type="search"]:not(.mat-mdc-input-element),
+input[type="number"]:not(.mat-mdc-input-element),
+input[type="tel"]:not(.mat-mdc-input-element),
+input[type="url"]:not(.mat-mdc-input-element),
+input[type="date"]:not(.mat-mdc-input-element),
+input[type="time"]:not(.mat-mdc-input-element),
+textarea:not(.mat-mdc-input-element),
+select:not([class*="mat-"]) {
   color-scheme: light;
   background-color: var(--surface);
   color: var(--text-primary);
@@ -499,7 +499,7 @@ textarea:not(.mat-mdc-input-element):focus {
   background-color: var(--surface);
 }
 
-textarea {
+textarea:not(.mat-mdc-input-element) {
   resize: vertical;
   min-height: 120px;
 }
@@ -1158,6 +1158,10 @@ tbody tr:last-child td {
   font-family: inherit !important;
   font-size: 0.9375rem !important;
   caret-color: var(--border-focus) !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* mat-select value text */
