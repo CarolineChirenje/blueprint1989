@@ -1127,18 +1127,14 @@ tbody tr:last-child td {
 .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch,
 .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
   border-color: var(--border-focus) !important;
-  border-width: 2px !important;
+  border-width: 1.5px !important;
 }
 
-/* Background fill inside mat-form-field — clean white at rest, subtle tint on focus */
+/* Background fill inside mat-form-field — consistent white at rest and on focus */
 .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-text-field--outlined {
   background-color: var(--surface) !important;
   border-radius: var(--radius-md) !important;
   transition: background-color 0.2s ease !important;
-}
-
-.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-text-field--outlined {
-  background-color: var(--primary-subtle) !important;
 }
 
 /* Label color */
@@ -1170,6 +1166,16 @@ tbody tr:last-child td {
 /* mat-select arrow */
 .mat-mdc-select-arrow {
   color: var(--text-secondary) !important;
+}
+
+/* Hide number input spinner arrows so number inputs match select/text field heights */
+.mat-mdc-form-field input[type=number]::-webkit-inner-spin-button,
+.mat-mdc-form-field input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.mat-mdc-form-field input[type=number] {
+  -moz-appearance: textfield;
 }
 
 /* Error state outline */
