@@ -371,7 +371,7 @@ namespace Divvy.Api.Controllers
         }
 
         [HttpPut("users/{userId}/status")]
-        [Authorize(Policy = "SuperAdminOnly")]
+        [Authorize(Policy = "AdminOrAbove")]
         public async Task<IActionResult> UpdateUserStatus(int userId, [FromBody] UpdateUserStatusRequest request)
         {
             var (success, error) = await _authService.UpdateUserStatusAsync(userId, request.IsActive);
@@ -409,7 +409,7 @@ namespace Divvy.Api.Controllers
         }
 
         [HttpDelete("users/{userId}")]
-        [Authorize(Policy = "SuperAdminOnly")]
+        [Authorize(Policy = "AdminOrAbove")]
         public async Task<IActionResult> DeleteUser(int userId)
         {
             var (success, error) = await _authService.DeleteUserAsync(userId);

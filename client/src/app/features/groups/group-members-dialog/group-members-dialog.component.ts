@@ -25,6 +25,7 @@ export class GroupMembersDialogComponent implements OnInit {
 
   selectedUserId: number | null = null;
   selectedRole: 'GroupAdmin' | 'GroupMember' = 'GroupMember';
+  userSearchTerm = '';
   displayedColumns = ['name', 'email', 'role', 'status', 'actions'];
   readOnlyColumns  = ['name', 'email', 'role', 'status'];
 
@@ -68,6 +69,16 @@ export class GroupMembersDialogComponent implements OnInit {
     const memberIds = new Set(this.members.map(m => m.userId));
     return this.users.filter(u => !memberIds.has(u.id));
   }
+
+  get filteredUsers(): UserOption[] {
+    const term = this.userSearchTerm.toLowerCase().trim();
+    if (!term) return this.availableUsers;
+    return this.availableUsers.filter(u =>
+      `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(term)
+    );
+  }
+
+  clearUserSearch(): void { this.userSearchTerm = ''; }
 
   sendInvite(): void {
     if (!this.selectedUserId) return;

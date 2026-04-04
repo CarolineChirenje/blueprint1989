@@ -10,9 +10,18 @@
       <div class="invite-row">
         <mat-form-field appearance="outline" class="user-select">
           <mat-label>Select user</mat-label>
-          <mat-select [(ngModel)]="selectedUserId">
-            <mat-option *ngFor="let u of availableUsers" [value]="u.id">
-              {{ u.firstName }} {{ u.lastName }} ({{ u.email }})
+          <mat-select [(ngModel)]="selectedUserId" (closed)="clearUserSearch()">
+            <div class="select-search-wrap" (click)="$event.stopPropagation()">
+              <input
+                class="select-search-input"
+                placeholder="Search by name or email…"
+                [(ngModel)]="userSearchTerm"
+                (keydown)="$event.stopPropagation()"
+                autocomplete="off" />
+            </div>
+            <mat-option *ngIf="filteredUsers.length === 0" disabled>No users found</mat-option>
+            <mat-option *ngFor="let u of filteredUsers" [value]="u.id">
+              {{ u.firstName }} {{ u.lastName }} — {{ u.email }}
             </mat-option>
           </mat-select>
         </mat-form-field>

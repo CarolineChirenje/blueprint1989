@@ -43,6 +43,25 @@
           <button mat-icon-button matTooltip="Manage group roles" (click)="openGroupRolesDialog(u)">
             <mat-icon>manage_accounts</mat-icon>
           </button>
+          <button *ngIf="isAdminOrAbove"
+                  mat-icon-button
+                  matTooltip="Edit user"
+                  (click)="openEditDialog(u)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button *ngIf="isAdminOrAbove"
+                  mat-icon-button
+                  [matTooltip]="u.isActive ? 'Deactivate user' : 'Activate user'"
+                  (click)="toggleStatus(u)">
+            <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
+          </button>
+          <button *ngIf="isAdminOrAbove"
+                  mat-icon-button
+                  matTooltip="Delete user"
+                  class="delete-btn"
+                  (click)="deleteUser(u)">
+            <mat-icon>delete</mat-icon>
+          </button>
         </td>
       </ng-container>
 

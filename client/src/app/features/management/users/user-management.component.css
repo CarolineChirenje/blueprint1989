@@ -47,3 +47,11 @@
   text-align: right;
   white-space: nowrap;
 }
+
+.delete-btn {
+  color: #d32f2f;
+}
+
+.delete-btn:hover {
+  color: #b71c1c;
+}
