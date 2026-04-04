@@ -28,7 +28,8 @@ public record ExpenseCycleDto(
     DateTime CreatedAt,
     List<CycleMemberDto> Members,
     /// <summary>"GroupAdmin" or "GroupMember" — role of the requesting user in this cycle's group.</summary>
-    string CurrentUserGroupRole);
+    string CurrentUserGroupRole,
+    int GroupId);
 
 public record ExpenseCycleSummaryDto(
     int Id,

@@ -114,7 +114,8 @@ public class ExpenseCycleService
             cycle.CreatedByUserId,
             cycle.CreatedAt,
             members,
-            role);
+            role,
+            cycle.GroupId);
     }
 
     public async Task<CycleBalanceDto?> GetBalanceAsync(int cycleId, int currentUserId)
@@ -273,7 +274,7 @@ public class ExpenseCycleService
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
             cycle.Status.ToString(), cycle.SplitType.ToString(),
-            cycle.CreatedByUserId, cycle.CreatedAt, members, role), null);
+            cycle.CreatedByUserId, cycle.CreatedAt, members, role, cycle.GroupId), null);
     }
 
     public async Task<(ExpenseCycleDto? dto, string? error)> StartAsync(int cycleId)
@@ -338,7 +339,7 @@ public class ExpenseCycleService
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
             cycle.Status.ToString(), cycle.SplitType.ToString(),
-            cycle.CreatedByUserId, cycle.CreatedAt, members, "GroupAdmin"), null);
+            cycle.CreatedByUserId, cycle.CreatedAt, members, "GroupAdmin", cycle.GroupId), null);
     }
 
     public async Task<(ExpenseCycleDto? dto, string? error)> UpdateAsync(int id, UpdateExpenseCycleRequest request)
@@ -364,7 +365,7 @@ public class ExpenseCycleService
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
             cycle.Status.ToString(), cycle.SplitType.ToString(),
-            cycle.CreatedByUserId, cycle.CreatedAt, members, "GroupAdmin"), null);
+            cycle.CreatedByUserId, cycle.CreatedAt, members, "GroupAdmin", cycle.GroupId), null);
     }
 
     public async Task<string?> CloseAsync(int id)

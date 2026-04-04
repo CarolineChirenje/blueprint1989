@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CyclesRoutingModule } from './cycles-routing.module';
 import { SharedModule } from '../../shared/shared.module';
 import { CycleDetailComponent } from './components/cycle-detail/cycle-detail.component';
@@ -22,6 +22,7 @@ import { DisputeExpenseDialogComponent } from './components/dispute-expense-dial
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     CyclesRoutingModule,
     SharedModule
   ]

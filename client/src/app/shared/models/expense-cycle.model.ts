@@ -46,6 +46,7 @@ export interface ExpenseCycleDto {
   members: CycleMemberDto[];
   /** "GroupAdmin" or "GroupMember" — role of the requesting user in this cycle's group. */
   currentUserGroupRole: 'GroupAdmin' | 'GroupMember';
+  groupId: number;
 }
 
 export interface MemberObligationDto {

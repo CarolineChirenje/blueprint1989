@@ -10,6 +10,8 @@ import { ExpenseService } from '../../../../core/services/expense.service';
 import { PaymentService } from '../../../../core/services/payment.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ExpenseDisputeService } from '../../../../core/services/expense-dispute.service';
+import { GroupService } from '../../../../core/services/group.service';
+import { GroupMemberDto } from '../../../../shared/models/group.model';
 import {
   ExpenseCycleDto,
   ExpenseDto,
@@ -43,6 +45,9 @@ export class CycleDetailComponent implements OnInit {
   activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' = 'expenses';
   isAdmin = false;
   currentUserId: number | null = null;
+  addableMembers: GroupMemberDto[] = [];
+  selectedAddUserId: number | null = null;
+  addingMember = false;
 
   expenseDataSource = new MatTableDataSource<ExpenseDto>([]);
   paymentDataSource = new MatTableDataSource<PaymentDto>([]);
@@ -76,7 +81,8 @@ export class CycleDetailComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private cdr: ChangeDetectorRef,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private groupService: GroupService
   ) {}
 
   ngOnInit(): void {
@@ -95,6 +101,9 @@ export class CycleDetailComponent implements OnInit {
         this.loadPayments();
         this.loadContributionSummary();
         this.loadDisputes();
+        if (this.canManageCycle() && cycle.status === 'Draft') {
+          this.loadAddableMembers(cycle);
+        }
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -326,6 +335,10 @@ export class CycleDetailComponent implements OnInit {
     return this.isAdmin || this.currentUserIsGroupAdmin;
   }
 
+  get isCurrentUserCycleMember(): boolean {
+    return this.cycle?.members.some(m => m.userId === this.currentUserId) ?? false;
+  }
+
   isPayer(payment: PaymentDto): boolean { return payment.payerId === this.currentUserId; }
   isPayee(payment: PaymentDto): boolean { return payment.payeeId === this.currentUserId; }
 
@@ -368,6 +381,34 @@ export class CycleDetailComponent implements OnInit {
         next: () => this.loadAll(this.cycle!.id),
         error: err => this.snackBar.open(err?.error?.message ?? 'Failed to remove member.', 'Dismiss', { duration: 5000 })
       });
+    });
+  }
+
+  loadAddableMembers(cycle: ExpenseCycleDto): void {
+    this.groupService.getGroupMembers(cycle.groupId).subscribe({
+      next: members => {
+        const cycleUserIds = new Set(cycle.members.map(m => m.userId));
+        this.addableMembers = members.filter(m => m.status === 'Accepted' && !cycleUserIds.has(m.userId));
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  addCycleMember(): void {
+    if (!this.cycle || !this.selectedAddUserId) return;
+    this.addingMember = true;
+    this.cycleService.addMember(this.cycle.id, this.selectedAddUserId).subscribe({
+      next: () => {
+        this.selectedAddUserId = null;
+        this.addingMember = false;
+        this.loadAll(this.cycle!.id);
+      },
+      error: err => {
+        this.snackBar.open(err?.error?.message ?? 'Failed to add member.', 'Dismiss', { duration: 5000 });
+        this.addingMember = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

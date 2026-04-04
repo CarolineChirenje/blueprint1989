@@ -129,7 +129,7 @@
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let e" class="col-right">
-                  @if (isDraft()) {
+                  @if (isDraft() && isCurrentUserCycleMember) {
                     <button mat-icon-button matTooltip="Flag dispute"
                             (click)="openDisputeExpense(e); $event.stopPropagation()">
                       <mat-icon>flag</mat-icon>
@@ -359,6 +359,23 @@
     <!-- Members Tab -->
     @if (activeTab === 'members') {
       <div class="tab-content">
+        @if (canManageCycle() && isDraft() && addableMembers.length > 0) {
+          <div class="add-member-row">
+            <mat-form-field appearance="outline" class="add-member-select">
+              <mat-label>Add a group member</mat-label>
+              <mat-select [(ngModel)]="selectedAddUserId">
+                @for (m of addableMembers; track m.userId) {
+                  <mat-option [value]="m.userId">{{ m.firstName }} {{ m.lastName }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <button mat-raised-button color="primary"
+                    [disabled]="!selectedAddUserId || addingMember"
+                    (click)="addCycleMember()">
+              <mat-icon>person_add</mat-icon> Add
+            </button>
+          </div>
+        }
         <div class="member-list">
           @for (m of cycle.members; track m.userId) {
             <div class="member-item">
