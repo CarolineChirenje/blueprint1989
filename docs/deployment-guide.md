@@ -2,7 +2,7 @@
 
 **Frontend:** `https://divvy.elroitec.com` (port 4300)  
 **Backend API:** `https://divvyapi.elroitec.com` (port 1954)  
-**Stack:** .NET 10 · PostgreSQL · Angular 21 PWA · Nginx · Let's Encrypt · Ubuntu 22.04
+**Stack:** .NET 10 ï¿½ PostgreSQL ï¿½ Angular 21 PWA ï¿½ Nginx ï¿½ Let's Encrypt ï¿½ Ubuntu 22.04
 
 ---
 
@@ -16,9 +16,9 @@
 
 ---
 
-## Step 1 — DNS (Namesilo)
+## Step 1 ï¿½ DNS (Namesilo)
 
-Do this **first** — propagation can take up to 30 minutes.
+Do this **first** ï¿½ propagation can take up to 30 minutes.
 
 In your **Namesilo DNS Manager** for `elroitec.com`, add two A records:
 
@@ -35,7 +35,7 @@ nslookup divvyapi.elroitec.com
 
 ---
 
-## Step 2 — Server Setup (Ubuntu)
+## Step 2 ï¿½ Server Setup (Ubuntu)
 
 ```bash
 ssh ubuntu@<server-ip>
@@ -101,9 +101,9 @@ sudo apt install -y certbot python3-certbot-nginx
 
 ### 2.8 Create deployment directories
 ```bash
-sudo mkdir -p /home/elroitecProjects/app
-sudo mkdir -p /home/elroitecProjects/api
-sudo chown -R ubuntu:ubuntu /home/elroitecProjects
+sudo mkdir -p /home/elroitecProjects/divvy/app
+sudo mkdir -p /home/elroitecProjects/divvy/api
+sudo chown -R ubuntu:ubuntu /home/elroitecProjects/divvy
 ```
 
 ### 2.9 Configure firewall (open ports 4300 and 1954)
@@ -130,20 +130,20 @@ Expected output includes:
 
 ---
 
-## Step 3 — Connect to PostgreSQL via DBeaver
+## Step 3 ï¿½ Connect to PostgreSQL via DBeaver
 
-DBeaver connects through an **SSH tunnel** — PostgreSQL is never exposed publicly.
+DBeaver connects through an **SSH tunnel** ï¿½ PostgreSQL is never exposed publicly.
 
 1. Open DBeaver ? **New Database Connection** ? **PostgreSQL**
 2. **Main** tab:
-   - Host: `localhost` · Port: `5432` · Database: `Divvy` · Username: `Divvy` · Password: `3lr01tec2024##`
+   - Host: `localhost` ï¿½ Port: `5432` ï¿½ Database: `Divvy` ï¿½ Username: `Divvy` ï¿½ Password: `3lr01tec2024##`
 3. **SSH** tab ? enable **Use SSH tunnel**:
-   - Host: `<server-ip>` · Port: `22` · Username: `ubuntu` · Auth: Public Key (`.pem` file)
+   - Host: `<server-ip>` ï¿½ Port: `22` ï¿½ Username: `ubuntu` ï¿½ Auth: Public Key (`.pem` file)
 4. **Test Connection** ? **Finish**
 
 ---
 
-## Step 4 — Build Frontend (on Windows)
+## Step 4 ï¿½ Build Frontend (on Windows)
 
 ### 4.1 Update `client/src/environments/environment.prod.ts`
 
@@ -173,7 +173,7 @@ scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 
 ---
 
-## Step 5 — Build & Deploy Backend (on Windows)
+## Step 5 ï¿½ Build & Deploy Backend (on Windows)
 
 ### 5.1 Update `server/src/Divvy.Api/appsettings.Production.json`
 
@@ -251,16 +251,16 @@ scp -r C:\dev\divvy\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
 
 ---
 
-## Step 6 — Run Database Migrations
+## Step 6 ï¿½ Run Database Migrations
 
-**Option A — From Windows (recommended for first deploy):**
+**Option A ï¿½ From Windows (recommended for first deploy):**
 ```powershell
 cd C:\dev\divvy\server\src\Divvy.Api
 $env:ConnectionStrings__DefaultConnection = "Host=<server-ip>;Port=5432;Database=Divvy;Username=Divvy;Password=3lr01tec2024##"
 dotnet ef database update
 ```
 
-**Option B — From the server:**
+**Option B ï¿½ From the server:**
 ```bash
 cd /home/elroitecProjects/api
 export ASPNETCORE_ENVIRONMENT=Production
@@ -275,7 +275,7 @@ dotnet ef migrations script --idempotent -o migration.sql
 
 ---
 
-## Step 7 — Create systemd Service
+## Step 7 ï¿½ Create systemd Service
 
 On the server:
 ```bash
@@ -319,7 +319,7 @@ curl -s http://localhost:1954/api/health
 
 ---
 
-## Step 8 — Configure Nginx
+## Step 8 ï¿½ Configure Nginx
 
 ### 8.1 Frontend (`divvy.elroitec.com` on port 4300)
 ```bash
@@ -333,7 +333,7 @@ server {
     root /home/elroitecProjects/app;
     index index.html;
 
-    # Service worker — no cache
+    # Service worker ï¿½ no cache
     location = /ngsw-worker.js {
         add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
         add_header Service-Worker-Allowed "/";
@@ -352,14 +352,14 @@ server {
         try_files $uri =404;
     }
 
-    # Static assets — long cache
+    # Static assets ï¿½ long cache
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
         try_files $uri =404;
     }
 
-    # Angular router — fallback to index.html
+    # Angular router ï¿½ fallback to index.html
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -402,7 +402,7 @@ sudo systemctl reload nginx
 
 ---
 
-## Step 9 — SSL Certificates (Let's Encrypt)
+## Step 9 ï¿½ SSL Certificates (Let's Encrypt)
 
 ```bash
 sudo certbot --nginx -d divvy.elroitec.com -d divvyapi.elroitec.com
@@ -418,7 +418,7 @@ sudo certbot renew --dry-run
 
 ---
 
-## Step 10 — Verify Everything
+## Step 10 ï¿½ Verify Everything
 
 ```bash
 # Services
@@ -455,7 +455,7 @@ cd C:\dev\divvy\client
 npx ng build --configuration production
 scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 ```
-No restart needed — Nginx serves static files directly.
+No restart needed ï¿½ Nginx serves static files directly.
 
 ### Backend only
 ```powershell
