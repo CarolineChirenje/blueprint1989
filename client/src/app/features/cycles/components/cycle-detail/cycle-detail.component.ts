@@ -23,7 +23,7 @@ import {
 import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dialog.component';
 import { AddPaymentDialogComponent } from '../add-payment-dialog/add-payment-dialog.component';
 import { RespondPaymentDialogComponent } from '../respond-payment-dialog/respond-payment-dialog.component';
-import { DisputeExpenseDialogComponent } from '../dispute-expense-dialog/dispute-expense-dialog.component';
+import { DisputeExpenseDialogComponent, ResolveDisputeDialogComponent } from '../dispute-expense-dialog/dispute-expense-dialog.component';
 import { DialogService } from '../../../../shared/services/dialog.service';
 
 @Component({
@@ -224,9 +224,12 @@ export class CycleDetailComponent implements OnInit {
   }
 
   resolveDispute(dispute: ExpenseDisputeDto, status: string): void {
-    this.disputeService.updateStatus(dispute.id, { status }).subscribe({
-      next: () => this.loadDisputes(),
-      error: () => {}
+    const ref = this.dialog.open(ResolveDisputeDialogComponent, {
+      width: '480px',
+      data: { dispute, status }
+    });
+    ref.afterClosed().subscribe(result => {
+      if (result) this.loadDisputes();
     });
   }
 
