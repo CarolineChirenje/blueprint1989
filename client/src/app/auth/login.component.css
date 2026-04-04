@@ -1,4 +1,4 @@
-body { background: transparent; overflow-x: hidden; }
+/* overflow-x guard — scoped to login page wrapper instead of body */
 
 /* ── Full-page layout ──────────────────────────────────────────────────── */
 .login-page {
