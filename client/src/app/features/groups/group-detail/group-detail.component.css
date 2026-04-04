@@ -1,4 +1,4 @@
-.detail-page { max-width: 960px; margin: 0 auto; padding: 2rem; }
+.detail-page { max-width: 960px; margin: 0 auto; padding: 2rem; box-sizing: border-box; overflow-x: hidden; }
 .loading, .error-msg { text-align: center; padding: 3rem; color: var(--text-secondary); }
 .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap; }
 .header-left { display: flex; align-items: center; gap: .75rem; flex: 1; flex-wrap: wrap; }

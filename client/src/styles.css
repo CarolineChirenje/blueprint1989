@@ -345,6 +345,10 @@ select:not([class*="mat-"]) {
   color: var(--text-primary) !important;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 html, body {
   color-scheme: light;
   height: 100%;

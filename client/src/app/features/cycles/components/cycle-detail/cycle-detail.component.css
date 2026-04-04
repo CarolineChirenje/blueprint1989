@@ -146,9 +146,14 @@
 .table-filter-field .mat-mdc-floating-label { color: var(--text-secondary) !important; }
 .table-filter-field input.mat-mdc-input-element { color: var(--text-primary) !important; }
 
-/* ── Mobile responsive ── */
+/* ── Mobile / tablet responsive ── */
+@media (max-width: 1023px) {
+  .detail-page { padding: 1rem; overflow-x: hidden; max-width: 100vw; }
+  .tab-content { overflow-x: hidden; }
+  .table-wrap, .summary-table-wrap { overflow-x: hidden; max-width: 100%; }
+}
+
 @media (max-width: 600px) {
-  .detail-page { padding: 1rem; }
   .page-header { flex-direction: column; align-items: stretch; }
   .header-left h1 { font-size: 1.3rem; }
   .header-right { justify-content: flex-start; }

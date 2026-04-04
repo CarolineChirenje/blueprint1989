@@ -617,6 +617,8 @@ main {
   padding: 2rem;
   flex: 1;
   background-color: var(--bg);
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 @media (max-width: 599px) {
@@ -633,10 +635,6 @@ footer {
   margin-top: auto;
   font-size: 0.95rem;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
-  /* Break out of max-width container on wide screens — use negative margins
-     instead of 100vw to avoid horizontal scroll on mobile */
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
 }
 
 footer p {

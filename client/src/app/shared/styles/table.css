@@ -460,6 +460,24 @@ td.actions-cell {
     width: 44px !important;
     height: 44px !important;
   }
+
+  /* Hide expandable detail rows on mobile — content shows inline */
+  .detail-row {
+    display: none !important;
+  }
+
+  /* No-data row: simple block, no card styling */
+  .mat-row[class*="noDataRow"],
+  tr.mat-row:has(.no-data-row),
+  tr.mat-row:has(.no-data) {
+    border-left: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Strip mat-card padding so table cards go edge-to-edge */
+  mat-card, .mat-mdc-card { padding: 0 !important; box-shadow: none !important; border: none !important; }
+  mat-card-content, .mat-mdc-card-content { padding: 0 !important; }
+  mat-card-header, .mat-mdc-card-header { padding: 0.5rem 0 !important; }
 }
 
 /* --- Diabetes Type Badges -------------------------------------------- */
