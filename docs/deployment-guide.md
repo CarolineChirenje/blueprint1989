@@ -1,8 +1,8 @@
-ï»¿# Divvy Deployment Guide
+# Divvy Deployment Guide
 
 **Frontend:** `https://divvy.elroitec.com` (port 4300)  
 **Backend API:** `https://divvyapi.elroitec.com` (port 1954)  
-**Stack:** .NET 10 Â· PostgreSQL Â· Angular 21 PWA Â· Nginx Â· Let's Encrypt Â· Ubuntu 22.04
+**Stack:** .NET 10 · PostgreSQL · Angular 21 PWA · Nginx · Let's Encrypt · Ubuntu 22.04
 
 ---
 
@@ -10,15 +10,15 @@
 
 | What | Port | Domain | Served by |
 |------|------|--------|-----------|
-| Angular PWA (frontend) | 4300 | `divvy.elroitec.com` | Nginx â†’ static files |
-| .NET API (backend) | 1954 | `divvyapi.elroitec.com` | Nginx â†’ Kestrel |
+| Angular PWA (frontend) | 4300 | `divvy.elroitec.com` | Nginx ? static files |
+| .NET API (backend) | 1954 | `divvyapi.elroitec.com` | Nginx ? Kestrel |
 | PostgreSQL | 5432 | localhost only | PostgreSQL 15+ |
 
 ---
 
-## Step 1 â€” DNS (Namesilo)
+## Step 1 — DNS (Namesilo)
 
-Do this **first** â€” propagation can take up to 30 minutes.
+Do this **first** — propagation can take up to 30 minutes.
 
 In your **Namesilo DNS Manager** for `elroitec.com`, add two A records:
 
@@ -35,7 +35,7 @@ nslookup divvyapi.elroitec.com
 
 ---
 
-## Step 2 â€” Server Setup (Ubuntu)
+## Step 2 — Server Setup (Ubuntu)
 
 ```bash
 ssh ubuntu@<server-ip>
@@ -130,20 +130,20 @@ Expected output includes:
 
 ---
 
-## Step 3 â€” Connect to PostgreSQL via DBeaver
+## Step 3 — Connect to PostgreSQL via DBeaver
 
-DBeaver connects through an **SSH tunnel** â€” PostgreSQL is never exposed publicly.
+DBeaver connects through an **SSH tunnel** — PostgreSQL is never exposed publicly.
 
-1. Open DBeaver â†’ **New Database Connection** â†’ **PostgreSQL**
+1. Open DBeaver ? **New Database Connection** ? **PostgreSQL**
 2. **Main** tab:
-   - Host: `localhost` Â· Port: `5432` Â· Database: `Divvy` Â· Username: `Divvy` Â· Password: `3lr01tec2024##`
-3. **SSH** tab â†’ enable **Use SSH tunnel**:
-   - Host: `<server-ip>` Â· Port: `22` Â· Username: `ubuntu` Â· Auth: Public Key (`.pem` file)
-4. **Test Connection** â†’ **Finish**
+   - Host: `localhost` · Port: `5432` · Database: `Divvy` · Username: `Divvy` · Password: `3lr01tec2024##`
+3. **SSH** tab ? enable **Use SSH tunnel**:
+   - Host: `<server-ip>` · Port: `22` · Username: `ubuntu` · Auth: Public Key (`.pem` file)
+4. **Test Connection** ? **Finish**
 
 ---
 
-## Step 4 â€” Build Frontend (on Windows)
+## Step 4 — Build Frontend (on Windows)
 
 ### 4.1 Update `client/src/environments/environment.prod.ts`
 
@@ -161,10 +161,10 @@ export const environment = {
 
 ### 4.2 Build
 ```powershell
-cd C:\dev\6299\client
+cd C:\dev\divvy\client
 npx ng build --configuration production
 ```
-Output: `C:\Publish\divvy\app\` (configured in `angular.json` â†’ `outputPath`)
+Output: `C:\Publish\divvy\app\` (configured in `angular.json` ? `outputPath`)
 
 ### 4.3 Copy to server
 ```powershell
@@ -173,7 +173,7 @@ scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 
 ---
 
-## Step 5 â€” Build & Deploy Backend (on Windows)
+## Step 5 — Build & Deploy Backend (on Windows)
 
 ### 5.1 Update `server/src/Divvy.Api/appsettings.Production.json`
 
@@ -240,27 +240,27 @@ scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 
 ### 5.2 Publish
 ```powershell
-cd C:\dev\6299\server\src\Divvy.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\6299\publish\api
+cd C:\dev\divvy\server\src\Divvy.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\divvy\publish\api
 ```
 
 ### 5.3 Copy to server
 ```powershell
-scp -r C:\dev\6299\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
+scp -r C:\dev\divvy\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
 ```
 
 ---
 
-## Step 6 â€” Run Database Migrations
+## Step 6 — Run Database Migrations
 
-**Option A â€” From Windows (recommended for first deploy):**
+**Option A — From Windows (recommended for first deploy):**
 ```powershell
-cd C:\dev\6299\server\src\Divvy.Api
+cd C:\dev\divvy\server\src\Divvy.Api
 $env:ConnectionStrings__DefaultConnection = "Host=<server-ip>;Port=5432;Database=Divvy;Username=Divvy;Password=3lr01tec2024##"
 dotnet ef database update
 ```
 
-**Option B â€” From the server:**
+**Option B — From the server:**
 ```bash
 cd /home/elroitecProjects/api
 export ASPNETCORE_ENVIRONMENT=Production
@@ -269,13 +269,13 @@ dotnet Divvy.Api.dll --migrate
 
 **Generate idempotent SQL script (apply only unapplied migrations):**
 ```powershell
-cd C:\dev\6299\server\src\Divvy.Api
+cd C:\dev\divvy\server\src\Divvy.Api
 dotnet ef migrations script --idempotent -o migration.sql
 ```
 
 ---
 
-## Step 7 â€” Create systemd Service
+## Step 7 — Create systemd Service
 
 On the server:
 ```bash
@@ -319,7 +319,7 @@ curl -s http://localhost:1954/api/health
 
 ---
 
-## Step 8 â€” Configure Nginx
+## Step 8 — Configure Nginx
 
 ### 8.1 Frontend (`divvy.elroitec.com` on port 4300)
 ```bash
@@ -333,7 +333,7 @@ server {
     root /home/elroitecProjects/app;
     index index.html;
 
-    # Service worker â€” no cache
+    # Service worker — no cache
     location = /ngsw-worker.js {
         add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
         add_header Service-Worker-Allowed "/";
@@ -352,14 +352,14 @@ server {
         try_files $uri =404;
     }
 
-    # Static assets â€” long cache
+    # Static assets — long cache
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
         try_files $uri =404;
     }
 
-    # Angular router â€” fallback to index.html
+    # Angular router — fallback to index.html
     location / {
         try_files $uri $uri/ /index.html;
     }
@@ -402,7 +402,7 @@ sudo systemctl reload nginx
 
 ---
 
-## Step 9 â€” SSL Certificates (Let's Encrypt)
+## Step 9 — SSL Certificates (Let's Encrypt)
 
 ```bash
 sudo certbot --nginx -d divvy.elroitec.com -d divvyapi.elroitec.com
@@ -418,7 +418,7 @@ sudo certbot renew --dry-run
 
 ---
 
-## Step 10 â€” Verify Everything
+## Step 10 — Verify Everything
 
 ```bash
 # Services
@@ -442,8 +442,8 @@ sudo journalctl -u divvy-api -f
 ```
 
 Open in browser:
-- `https://divvy.elroitec.com:4300` â†’ Angular login screen
-- `https://divvyapi.elroitec.com/api/swagger` â†’ Swagger UI
+- `https://divvy.elroitec.com:4300` ? Angular login screen
+- `https://divvyapi.elroitec.com/api/swagger` ? Swagger UI
 
 ---
 
@@ -451,17 +451,17 @@ Open in browser:
 
 ### Frontend only
 ```powershell
-cd C:\dev\6299\client
+cd C:\dev\divvy\client
 npx ng build --configuration production
 scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 ```
-No restart needed â€” Nginx serves static files directly.
+No restart needed — Nginx serves static files directly.
 
 ### Backend only
 ```powershell
-cd C:\dev\6299\server\src\Divvy.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\6299\publish\api
-scp -r C:\dev\6299\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
+cd C:\dev\divvy\server\src\Divvy.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\divvy\publish\api
+scp -r C:\dev\divvy\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
 ```
 Then on server:
 ```bash
@@ -477,7 +477,7 @@ sudo systemctl restart divvy-api
 
 ### Generate new VAPID keys
 ```powershell
-cd C:\dev\6299\server\vapid-keygen
+cd C:\dev\divvy\server\vapid-keygen
 dotnet run
 ```
 Copy output into `appsettings.Production.json` (`Vapid` section) **and** `environment.prod.ts` (`vapidPublicKey`), then rebuild and redeploy both.
@@ -492,7 +492,7 @@ Copy output into `appsettings.Production.json` (`Vapid` section) **and** `enviro
 | `400 Bad Request - Invalid Hostname` | Domain missing from `AllowedHosts` | Add domain to `AllowedHosts` in `appsettings.Production.json`, restart API |
 | `401 Unauthorized` on all calls | `Jwt:Issuer`/`Jwt:Audience` mismatch | Ensure both are `divvyapi.elroitec.com` in `appsettings.Production.json` |
 | `CORS error` in browser | Frontend origin not allowed | Add `https://divvy.elroitec.com` to `Cors:AllowedOrigins`, restart API |
-| `styles.css 404` | Stale service worker | DevTools â†’ Application â†’ Service Workers â†’ Unregister â†’ hard refresh |
+| `styles.css 404` | Stale service worker | DevTools ? Application ? Service Workers ? Unregister ? hard refresh |
 | `404` on page refresh | Missing Angular fallback | Ensure `try_files $uri $uri/ /index.html;` in Nginx config |
 | DB connection error | Wrong credentials | Check `ConnectionStrings` in `appsettings.Production.json` |
 | SSL certificate error | Cert expired | `sudo certbot certificates` then `sudo certbot renew` |

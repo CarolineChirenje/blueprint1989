@@ -25,7 +25,7 @@ This is the client-side application for the Divvy project, built using Angular a
 1. Clone the repository:
    ```
    git clone <repository-url>
-   cd 6299/client
+   cd divvy/client
    ```
 
 2. Install dependencies:
