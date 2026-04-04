@@ -164,6 +164,20 @@ export class CycleDetailComponent implements OnInit {
     });
   }
 
+  openEditExpense(expense: ExpenseDto): void {
+    if (!this.cycle) return;
+    const ref = this.dialog.open(AddExpenseDialogComponent, {
+      width: '480px',
+      data: {
+        cycleId: this.cycle.id,
+        expense: { id: expense.id, title: expense.title, amount: expense.amount, category: expense.category, notes: expense.notes }
+      }
+    });
+    ref.afterClosed().subscribe(result => {
+      if (result) { this.loadExpenses(); this.loadContributionSummary(); }
+    });
+  }
+
   openAddPayment(): void {
     if (!this.cycle) return;
     const ref = this.dialog.open(AddPaymentDialogComponent, {

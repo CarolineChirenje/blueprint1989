@@ -135,6 +135,12 @@
                       <mat-icon>flag</mat-icon>
                     </button>
                   }
+                  @if (isDraft() && canManageCycle()) {
+                    <button mat-icon-button matTooltip="Edit"
+                            (click)="openEditExpense(e); $event.stopPropagation()">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                  }
                   @if ((isDraft() || isActive()) && canManageCycle()) {
                     <button mat-icon-button color="warn" matTooltip="Delete"
                             (click)="deleteExpense(e.id); $event.stopPropagation()">

@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Add Expense</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Expense' : 'Add Expense' }}</h2>
 <mat-dialog-content>
   <form [formGroup]="form" class="dialog-form">
     @if (error) { <div class="form-error">{{ error }}</div> }
@@ -32,6 +32,6 @@
 <mat-dialog-actions align="end">
   <button mat-button (click)="cancel()">Cancel</button>
   <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || saving">
-    {{ saving ? 'Adding…' : 'Add Expense' }}
+    {{ saving ? (isEditMode ? 'Saving…' : 'Adding…') : (isEditMode ? 'Save Changes' : 'Add Expense') }}
   </button>
 </mat-dialog-actions>
