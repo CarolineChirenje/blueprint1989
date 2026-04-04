@@ -187,7 +187,7 @@ public class FeatureBugReportService
         r.VersionNumber,
         r.SubmittedByUserId,
         $"{r.SubmittedByUser.FirstName} {r.SubmittedByUser.LastName}",
-        r.CreatedAt,
+        r.CreatedAt,  // maps to SubmittedAt in DTO
         r.UpdatedAt
     );
 }

@@ -38,6 +38,6 @@ public record FeatureBugReportResponseDto(
     string? VersionNumber,
     int SubmittedByUserId,
     string SubmittedByName,
-    DateTime CreatedAt,
+    DateTime SubmittedAt,
     DateTime UpdatedAt
 );
