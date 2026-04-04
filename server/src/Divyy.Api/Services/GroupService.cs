@@ -350,18 +350,27 @@ public class GroupService : IGroupService
                 .Select(gm => gm.UserId)
                 .ToListAsync();
 
-            if (remainingMemberIds.Count > 0)
-            {
-                var notifyTasks = remainingMemberIds.Select(recipientId => _push.SendToUserAsync(
-                    userId: recipientId,
-                    type: NotificationType.MemberLeftGroup,
-                    title: group.Name,
-                    body: $"{removedName} was removed from the group.",
-                    deepLinkUrl: $"/groups/{groupId}",
-                    relatedEntityId: groupId));
+            var allTasks = new List<Task>();
 
-                await Task.WhenAll(notifyTasks);
-            }
+            // Notify the removed member personally
+            allTasks.Add(_push.SendToUserAsync(
+                userId: targetUserId,
+                type: NotificationType.MemberLeftGroup,
+                title: group.Name,
+                body: "You have been removed from the group.",
+                deepLinkUrl: "/groups",
+                relatedEntityId: groupId));
+
+            // Notify all remaining members
+            allTasks.AddRange(remainingMemberIds.Select(recipientId => _push.SendToUserAsync(
+                userId: recipientId,
+                type: NotificationType.MemberLeftGroup,
+                title: group.Name,
+                body: $"{removedName} was removed from the group.",
+                deepLinkUrl: $"/groups/{groupId}",
+                relatedEntityId: groupId)));
+
+            await Task.WhenAll(allTasks);
         }
 
         return null;
