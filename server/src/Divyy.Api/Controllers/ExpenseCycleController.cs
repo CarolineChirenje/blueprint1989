@@ -62,7 +62,7 @@ public class ExpenseCycleController : ControllerBase
         if (userId == null) return Unauthorized();
 
         var cycles = IsAdminOrAbove()
-            ? await _cycleService.GetAllAsync(groupId)
+            ? await _cycleService.GetAllAsync(userId.Value, groupId)
             : await _cycleService.GetForUserAsync(userId.Value, groupId);
 
         return Ok(cycles);

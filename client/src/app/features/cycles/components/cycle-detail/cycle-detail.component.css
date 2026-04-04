@@ -44,7 +44,9 @@
 .balance-negative .balance-amount { color: var(--error);   font-weight: 600; }
 .balance-zero .balance-amount { color: var(--text-secondary); }
 .member-item { flex-direction: row; justify-content: space-between; align-items: center; }
+.member-name-row { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .member-name { font-weight: 600; color: var(--text-primary); }
+.group-admin-badge { font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--primary-subtle); color: var(--primary); line-height: 1.6; }
 .member-email { font-size: .85rem; color: var(--text-secondary); }
 /* Draft badge */
 .badge-draft { background: #fff3cd; color: #856404; }

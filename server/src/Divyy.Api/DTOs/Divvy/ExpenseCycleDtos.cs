@@ -40,13 +40,16 @@ public record ExpenseCycleSummaryDto(
     decimal TotalAmount,
     DateTime CreatedAt,
     int GroupId,
-    string GroupName);
+    string GroupName,
+    /// <summary>"GroupAdmin" or "GroupMember" — role of the requesting user in this cycle's group.</summary>
+    string CurrentUserGroupRole);
 
 public record CycleMemberDto(
     int UserId,
     string FirstName,
     string LastName,
-    string Email);
+    string Email,
+    string GroupRole);
 
 public record CycleBalanceDto(
     int CycleId,

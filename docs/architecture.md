@@ -42,7 +42,7 @@ Divvy is a Progressive Web Application (PWA) designed to facilitate shared expen
     - `NotificationController`: In-app notifications.
     - `PushController`: VAPID web push subscriptions and dispatch.
     - `AppConfigController`: Runtime application configuration.
-    - `SystemController`: System health and restart triggers.
+    - `SystemController`: System restart triggers.
   - **Models**:
     - `User`: Authentication and role data.
     - `ExpenseCycle`: A cycle with start date, end date, and status (Active/Closed).

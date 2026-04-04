@@ -22,6 +22,7 @@ import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dia
 import { AddPaymentDialogComponent } from '../add-payment-dialog/add-payment-dialog.component';
 import { RespondPaymentDialogComponent } from '../respond-payment-dialog/respond-payment-dialog.component';
 import { DisputeExpenseDialogComponent } from '../dispute-expense-dialog/dispute-expense-dialog.component';
+import { DialogService } from '../../../../shared/services/dialog.service';
 
 @Component({
   selector: 'app-cycle-detail',
@@ -74,7 +75,8 @@ export class CycleDetailComponent implements OnInit {
     private auth: AuthService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private dialogService: DialogService
   ) {}
 
   ngOnInit(): void {
@@ -206,16 +208,30 @@ export class CycleDetailComponent implements OnInit {
   }
 
   deleteExpense(id: number): void {
-    if (!confirm('Delete this expense?')) return;
-    this.expenseService.delete(id).subscribe(() => {
-      this.loadExpenses(); this.loadContributionSummary();
+    this.dialogService.confirm({
+      title: 'Delete Expense',
+      message: 'Delete this expense?',
+      confirmText: 'Delete',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.expenseService.delete(id).subscribe(() => {
+        this.loadExpenses(); this.loadContributionSummary();
+      });
     });
   }
 
   deletePayment(id: number): void {
-    if (!confirm('Cancel this payment?')) return;
-    this.paymentService.delete(id).subscribe(() => {
-      this.loadPayments(); this.loadContributionSummary();
+    this.dialogService.confirm({
+      title: 'Cancel Payment',
+      message: 'Cancel this payment?',
+      confirmText: 'Cancel Payment',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.paymentService.delete(id).subscribe(() => {
+        this.loadPayments(); this.loadContributionSummary();
+      });
     });
   }
 
@@ -250,15 +266,39 @@ export class CycleDetailComponent implements OnInit {
   }
 
   closeCycle(): void {
-    if (!this.cycle || !confirm('Close this cycle? No more changes can be made.')) return;
-    this.cycleService.close(this.cycle.id).subscribe(() => {
-      if (this.cycle) this.cycle = { ...this.cycle, status: 'Closed' };
-      this.loadContributionSummary();
-      this.cdr.detectChanges();
+    if (!this.cycle) return;
+    this.dialogService.confirm({
+      title: 'Close Cycle',
+      message: 'Close this cycle? No more changes can be made.',
+      confirmText: 'Close Cycle',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.cycleService.close(this.cycle!.id).subscribe(() => {
+        if (this.cycle) this.cycle = { ...this.cycle, status: 'Closed' };
+        this.loadContributionSummary();
+        this.cdr.detectChanges();
+      });
     });
   }
 
   back(): void { this.router.navigate(['/cycles']); }
+
+  deleteCycle(): void {
+    if (!this.cycle) return;
+    this.dialogService.confirm({
+      title: 'Delete Cycle',
+      message: `Delete "${this.cycle.name}" and all its data? This cannot be undone.`,
+      confirmText: 'Delete',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.cycleService.delete(this.cycle!.id).subscribe({
+        next: () => this.router.navigate(['/cycles']),
+        error: err => this.snackBar.open(err?.error?.message ?? 'Could not delete cycle.', 'Dismiss', { duration: 5000 })
+      });
+    });
+  }
 
   isDraft(): boolean  { return this.cycle?.status === 'Draft'; }
   isActive(): boolean { return this.cycle?.status === 'Active'; }
@@ -303,10 +343,17 @@ export class CycleDetailComponent implements OnInit {
 
   removeCycleMember(userId: number): void {
     if (!this.cycle) return;
-    if (!confirm('Remove this member from the cycle?')) return;
-    this.cycleService.removeMember(this.cycle.id, userId).subscribe({
-      next: () => this.loadAll(this.cycle!.id),
-      error: err => this.snackBar.open(err?.error?.message ?? 'Failed to remove member.', 'Dismiss', { duration: 5000 })
+    this.dialogService.confirm({
+      title: 'Remove Member',
+      message: 'Remove this member from the cycle?',
+      confirmText: 'Remove',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.cycleService.removeMember(this.cycle!.id, userId).subscribe({
+        next: () => this.loadAll(this.cycle!.id),
+        error: err => this.snackBar.open(err?.error?.message ?? 'Failed to remove member.', 'Dismiss', { duration: 5000 })
+      });
     });
   }
 

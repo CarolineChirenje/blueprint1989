@@ -3,6 +3,7 @@ export interface CycleMemberDto {
   firstName: string;
   lastName: string;
   email: string;
+  groupRole: 'GroupAdmin' | 'GroupMember';
 }
 
 export interface MemberBalanceDto {
@@ -30,6 +31,7 @@ export interface ExpenseCycleSummaryDto {
   createdAt: string;
   groupId: number;
   groupName: string;
+  currentUserGroupRole: 'GroupAdmin' | 'GroupMember';
 }
 
 export interface ExpenseCycleDto {

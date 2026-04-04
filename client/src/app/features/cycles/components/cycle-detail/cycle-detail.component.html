@@ -29,6 +29,11 @@
           </button>
           <button mat-stroked-button color="warn" (click)="closeCycle()">Close Cycle</button>
         }
+        @if (canManageCycle()) {
+          <button mat-icon-button color="warn" matTooltip="Delete cycle" (click)="deleteCycle()">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        }
       </div>
     </div>
 
@@ -352,7 +357,12 @@
           @for (m of cycle.members; track m.userId) {
             <div class="member-item">
               <div class="member-info">
-                <span class="member-name">{{ m.firstName }} {{ m.lastName }}</span>
+                <div class="member-name-row">
+                  <span class="member-name">{{ m.firstName }} {{ m.lastName }}</span>
+                  @if (m.groupRole === 'GroupAdmin') {
+                    <span class="group-admin-badge">Group Admin</span>
+                  }
+                </div>
                 <span class="member-email">{{ m.email }}</span>
               </div>
               @if (canManageCycle() && isDraft() && m.userId !== cycle.createdByUserId) {

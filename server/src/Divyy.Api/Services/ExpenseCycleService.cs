@@ -18,7 +18,7 @@ public class ExpenseCycleService
 
     // ── Queries ───────────────────────────────────────────────────────────────
 
-    public async Task<List<ExpenseCycleSummaryDto>> GetAllAsync(int? groupId = null)
+    public async Task<List<ExpenseCycleSummaryDto>> GetAllAsync(int currentUserId, int? groupId = null)
     {
         var query = _context.ExpenseCycles.AsQueryable();
 
@@ -29,7 +29,7 @@ public class ExpenseCycleService
             .OrderByDescending(c => c.StartDate)
             .ToListAsync();
 
-        return await BuildSummariesAsync(cycles);
+        return await BuildSummariesAsync(cycles, currentUserId);
     }
 
     public async Task<List<ExpenseCycleSummaryDto>> GetForUserAsync(int userId, int? groupId = null)
@@ -48,16 +48,23 @@ public class ExpenseCycleService
             .OrderByDescending(c => c.StartDate)
             .ToListAsync();
 
-        return await BuildSummariesAsync(cycles);
+        return await BuildSummariesAsync(cycles, userId);
     }
 
-    private async Task<List<ExpenseCycleSummaryDto>> BuildSummariesAsync(List<ExpenseCycle> cycles)
+    private async Task<List<ExpenseCycleSummaryDto>> BuildSummariesAsync(List<ExpenseCycle> cycles, int currentUserId)
     {
         var groupIds   = cycles.Select(c => c.GroupId).Distinct().ToList();
         var groupNames = groupIds.Any()
             ? await _context.Groups
                 .Where(g => groupIds.Contains(g.Id))
                 .ToDictionaryAsync(g => g.Id, g => g.Name)
+            : new Dictionary<int, string>();
+
+        // Look up the current user's group role for all relevant groups in one query
+        var groupRoles = groupIds.Any()
+            ? await _context.GroupMembers
+                .Where(gm => gm.UserId == currentUserId && groupIds.Contains(gm.GroupId))
+                .ToDictionaryAsync(gm => gm.GroupId, gm => gm.GroupRole.ToString())
             : new Dictionary<int, string>();
 
         var summaries = new List<ExpenseCycleSummaryDto>();
@@ -67,6 +74,7 @@ public class ExpenseCycleService
             var memberCount = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycle.Id);
             var expenses    = await _context.Expenses.Where(e => e.ExpenseCycleId == cycle.Id).ToListAsync();
             groupNames.TryGetValue(cycle.GroupId, out var groupName);
+            groupRoles.TryGetValue(cycle.GroupId, out var groupRole);
 
             summaries.Add(new ExpenseCycleSummaryDto(
                 cycle.Id,
@@ -79,7 +87,8 @@ public class ExpenseCycleService
                 expenses.Sum(e => e.Amount),
                 cycle.CreatedAt,
                 cycle.GroupId,
-                groupName ?? "(Unknown group)"));
+                groupName ?? "(Unknown group)",
+                groupRole ?? "GroupMember"));
         }
 
         return summaries;
@@ -90,7 +99,7 @@ public class ExpenseCycleService
         var cycle = await _context.ExpenseCycles.FindAsync(id);
         if (cycle == null) return null;
 
-        var members = await GetMemberDtosAsync(id);
+        var members = await GetMemberDtosAsync(id, cycle.GroupId);
         var role = currentUserId > 0
             ? await GetUserGroupRoleAsync(cycle.GroupId, currentUserId)
             : "GroupMember";
@@ -228,7 +237,7 @@ public class ExpenseCycleService
 
         await _context.SaveChangesAsync();
 
-        var members = await GetMemberDtosAsync(cycle.Id);
+        var members = await GetMemberDtosAsync(cycle.Id, cycle.GroupId);
         var role = await GetUserGroupRoleAsync(cycle.GroupId, createdByUserId);
 
         return (new ExpenseCycleDto(
@@ -295,7 +304,7 @@ public class ExpenseCycleService
             deepLink,
             cycleId);
 
-        var members = await GetMemberDtosAsync(cycleId);
+        var members = await GetMemberDtosAsync(cycleId, cycle.GroupId);
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
             cycle.Status.ToString(), cycle.SplitType.ToString(),
@@ -320,7 +329,7 @@ public class ExpenseCycleService
 
         await _context.SaveChangesAsync();
 
-        var members = await GetMemberDtosAsync(cycle.Id);
+        var members = await GetMemberDtosAsync(cycle.Id, cycle.GroupId);
 
         return (new ExpenseCycleDto(
             cycle.Id, cycle.Name, cycle.StartDate, cycle.EndDate,
@@ -520,7 +529,7 @@ public class ExpenseCycleService
         return member?.GroupRole == GroupRole.GroupAdmin ? "GroupAdmin" : "GroupMember";
     }
 
-    private async Task<List<CycleMemberDto>> GetMemberDtosAsync(int cycleId)
+    private async Task<List<CycleMemberDto>> GetMemberDtosAsync(int cycleId, int groupId)
     {
         var memberIds = await _context.CycleMembers
             .Where(m => m.ExpenseCycleId == cycleId)
@@ -531,6 +540,12 @@ public class ExpenseCycleService
             .Where(u => memberIds.Contains(u.Id))
             .ToListAsync();
 
-        return users.Select(u => new CycleMemberDto(u.Id, u.FirstName, u.LastName, u.Email)).ToList();
+        var groupRoles = await _context.GroupMembers
+            .Where(gm => gm.GroupId == groupId && memberIds.Contains(gm.UserId))
+            .ToDictionaryAsync(gm => gm.UserId, gm => gm.GroupRole.ToString());
+
+        return users.Select(u => new CycleMemberDto(
+            u.Id, u.FirstName, u.LastName, u.Email,
+            groupRoles.TryGetValue(u.Id, out var gr) ? gr : "GroupMember")).ToList();
     }
 }
