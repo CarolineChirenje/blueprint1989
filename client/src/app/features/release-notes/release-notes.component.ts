@@ -62,71 +62,9 @@ export class ReleaseNotesComponent implements OnInit {
 
   readonly releases: ReleaseNote[] = [
     {
-      version: '1.0.2',
-      date: '2026-03-27',
-      status: 'latest',
-      summary: 'PWA update-banner polish, push notification VAPID resilience, and minor UX fixes.',
-      sections: [
-        {
-          type: 'fixed',
-          label: 'Fixed',
-          icon: 'bug_report',
-          items: [
-            {
-              title: 'PWA Update Banner — Mobile Layout',
-              description: 'The update-available banner now stacks vertically on small screens with full-width buttons, preventing text overflow and overlapping controls on mobile devices.',
-              technical: 'Added @media (max-width: 480px) rule to app.component.css targeting .pwa-update-banner: flex-direction column, full-width buttons.'
-            },
-            {
-              title: 'PWA Update Banner — Immediate Dismiss on Apply',
-              description: 'Tapping "Apply Update" now immediately hides the update banner before the page reloads, eliminating the brief flash where both the banner and the reload were visible simultaneously.',
-              technical: 'applyUpdate() in AppComponent now sets this.showUpdatePrompt = false as its first statement before calling SwUpdate.activateUpdate().'
-            },
-            {
-              title: 'Push Notification VAPID Resilience',
-              description: 'A misconfigured VAPID Subject no longer causes the DI container to fail at startup, which previously resulted in 504 Gateway Timeout errors on all endpoints that inject IPushNotificationSender.',
-              technical: 'PushNotificationSender constructor now validates vapid.Subject: if null, empty, or missing a mailto:/https: scheme prefix it logs a warning, sets _pushClient = null, and returns early without throwing. SendToUserAsync() guards with if (_pushClient is null) return early so in-app notifications are still created.'
-            }
-          ]
-        }
-      ],
-      techStack: {
-        backend: ['PushNotificationSender: null-safe VAPID Subject validation']
-      }
-    },
-    {
-      version: '1.0.1',
-      date: '2026-03-27',
-      status: 'stable',
-      summary: 'Guided system tour, role-aware What\'s New announcements, and notification preference improvements.',
-      sections: [
-        {
-          type: 'added',
-          label: 'Added',
-          icon: 'add_circle',
-          items: [
-            {
-              title: 'Guided System Tour',
-              description: 'A role-aware interactive walkthrough powered by Shepherd.js automatically launches the first time a user lands on the dashboard after login. The tour highlights key areas relevant to the user\'s role. Users can replay the tour at any time from Help → Take a Tour.',
-              technical: 'TourService builds role-specific step arrays. Steps use Shepherd.js default export (ESM-only). On mobile, steps detach from DOM anchors and use a centred overlay. Tour completion persisted via POST /api/auth/tour/complete → sets HasCompletedTour = true on User entity. AppComponent.ngOnInit() wires a NavigationEnd subscriber: if user.hasCompletedTour === false on /dashboard, launchTour() is called.'
-            },
-            {
-              title: 'What\'s New Announcements',
-              description: 'When a returning user logs in after a platform version update, a short "What\'s New" mini-tour automatically appears on their first dashboard visit, summarising new features in the current release. The prompt only appears once per version per user and is skippable.',
-              technical: 'Version tracking stored on User entity as LastSeenVersion. Exposed via AuthResponse DTO and persisted on login. AppComponent checks user.lastSeenVersion !== environment.version on /dashboard NavigationEnd. Acknowledgement persisted via POST /api/auth/seen-version. EF migration: AddLastSeenVersion.'
-            }
-          ]
-        }
-      ],
-      techStack: {
-        frontend: ['Shepherd.js (ESM, guided tour)'],
-        backend: ['EF Core migration: AddHasCompletedTour, AddLastSeenVersion']
-      }
-    },
-    {
       version: '1.0.0',
-      date: '2026-03-10',
-      status: 'stable',
+      date: '2026-04-04',
+      status: 'latest',
       summary: 'Full platform launch — expense cycle management, expense and payment tracking, member obligations, push notifications, offline queue, biometric auth, TOTP MFA, and comprehensive admin management.',
       sections: [
         {

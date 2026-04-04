@@ -11,9 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": {
-              "base": "C:/Publish/app"
-            },
+            "outputPath": "C:/Publish/divvy/app",
             "index": "src/index.html",
             "polyfills": [
               "src/polyfills.ts"
