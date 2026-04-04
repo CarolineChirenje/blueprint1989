@@ -44,6 +44,7 @@
           <th>Title</th>
           <th>Type</th>
           <th>Priority</th>
+          <th>Categories</th>
           <th>Status</th>
           <th>Submitted by</th>
           <th>Date</th>
@@ -58,6 +59,11 @@
             </td>
             <td data-label="Type">{{ report.typeName }}</td>
             <td data-label="Priority">{{ report.priorityName }}</td>
+            <td data-label="Categories">
+              @for (cat of report.categoryNames; track cat) {
+                <span class="category-chip">{{ cat }}</span>
+              }
+            </td>
             <td data-label="Status"><span class="badge" [ngClass]="getStatusBadgeClass(report.status)">{{ report.statusName }}</span></td>
             <td data-label="Submitted by">{{ report.submittedByName }}</td>
             <td data-label="Date">{{ report.submittedAt | date:'d MMM y' }}</td>

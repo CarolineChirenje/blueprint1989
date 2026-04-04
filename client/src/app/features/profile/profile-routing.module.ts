@@ -5,6 +5,7 @@ import { MfaSetupComponent } from './components/mfa-setup.component';
 import { LinkedDevicesComponent } from './components/linked-devices.component';
 import { BiometricSetupComponent } from './components/biometric-setup.component';
 import { NotificationPreferencesComponent } from './components/notification-preferences/notification-preferences.component';
+import { MyReportsComponent } from './components/my-reports/my-reports.component';
 import { RoleGuard } from '../../core/guards/role.guard';
 
 const routes: Routes = [
@@ -35,6 +36,12 @@ const routes: Routes = [
   {
     path: 'notifications',
     component: NotificationPreferencesComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
+  },
+  {
+    path: 'my-reports',
+    component: MyReportsComponent,
     canActivate: [RoleGuard],
     data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
   }

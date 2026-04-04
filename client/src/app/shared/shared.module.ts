@@ -7,6 +7,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { PasswordFieldComponent } from './components/password-field/password-field.component';
 import { CloseReportDialogComponent } from './components/close-report-dialog/close-report-dialog.component';
 import { ViewReportDialogComponent } from './components/view-report-dialog/view-report-dialog.component';
+import { ReportFeatureBugDialogComponent } from './components/report-feature-bug-dialog/report-feature-bug-dialog.component';
 import { DivvyChartComponent } from './components/vitara-chart/vitara-chart.component';
 
 @NgModule({
@@ -15,6 +16,7 @@ import { DivvyChartComponent } from './components/vitara-chart/vitara-chart.comp
     PasswordFieldComponent,
     CloseReportDialogComponent,
     ViewReportDialogComponent,
+    ReportFeatureBugDialogComponent,
     DivvyChartComponent
   ],
   imports: [
@@ -29,6 +31,7 @@ import { DivvyChartComponent } from './components/vitara-chart/vitara-chart.comp
     PasswordFieldComponent,
     CloseReportDialogComponent,
     ViewReportDialogComponent,
+    ReportFeatureBugDialogComponent,
     DivvyChartComponent,
     RouterModule,
     ReactiveFormsModule,

@@ -5,10 +5,13 @@ import { environment } from '../../../environments/environment';
 import {
   FeatureBugReportResponseDto,
   UpdateReportStatusRequest,
+  CreateFeatureBugReportRequest,
+  UpdateFeatureBugReportRequest,
   DropdownOption,
   ReportStatus,
   ReportType,
-  ReportPriority
+  ReportPriority,
+  ReportCategory
 } from '../../shared/models/feature-bug-report.model';
 
 @Injectable({ providedIn: 'root' })
@@ -37,6 +40,22 @@ export class FeatureBugReportService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  create(body: CreateFeatureBugReportRequest): Observable<FeatureBugReportResponseDto> {
+    return this.http.post<FeatureBugReportResponseDto>(this.apiUrl, body);
+  }
+
+  update(id: number, body: UpdateFeatureBugReportRequest): Observable<FeatureBugReportResponseDto> {
+    return this.http.put<FeatureBugReportResponseDto>(`${this.apiUrl}/${id}`, body);
+  }
+
+  getMyReports(): Observable<FeatureBugReportResponseDto[]> {
+    return this.http.get<FeatureBugReportResponseDto[]>(`${this.apiUrl}/my-reports`);
+  }
+
+  getMyReportById(id: number): Observable<FeatureBugReportResponseDto> {
+    return this.http.get<FeatureBugReportResponseDto>(`${this.apiUrl}/my-reports/${id}`);
+  }
+
   getStatusOptions(): DropdownOption[] {
     return [
       { value: 0, label: 'All Statuses' },
@@ -57,9 +76,23 @@ export class FeatureBugReportService {
   getPriorityOptions(): DropdownOption[] {
     return [
       { value: 0, label: 'All Priorities' },
-      { value: ReportPriority.Low, label: 'Low' },
+      { value: ReportPriority.Critical, label: 'Critical' },
+      { value: ReportPriority.High, label: 'High' },
       { value: ReportPriority.Medium, label: 'Medium' },
-      { value: ReportPriority.High, label: 'High' }
+      { value: ReportPriority.Low, label: 'Low' }
+    ];
+  }
+
+  getCategoryOptions(): DropdownOption[] {
+    return [
+      { value: ReportCategory.UI, label: 'User Interface' },
+      { value: ReportCategory.Backend, label: 'Backend/Server' },
+      { value: ReportCategory.Performance, label: 'Performance' },
+      { value: ReportCategory.Security, label: 'Security' },
+      { value: ReportCategory.API, label: 'API' },
+      { value: ReportCategory.Mobile, label: 'Mobile' },
+      { value: ReportCategory.Desktop, label: 'Desktop' },
+      { value: ReportCategory.Other, label: 'Other' }
     ];
   }
 }

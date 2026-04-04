@@ -687,6 +687,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.closeDropdown();
   }
 
+  navigateToMyReports(): void {
+    this.closeDropdown();
+    this.router.navigate(['/profile/my-reports']);
+  }
+
   toggleDiabetesDropdown(): void {
     this.diabetesDropdownOpen = !this.diabetesDropdownOpen;
     this.dropdownOpen = false;
@@ -857,6 +862,11 @@ export class AppComponent implements OnInit, OnDestroy {
   navigateToAppConfig(): void {
     this.closeManagementDropdown();
     this.router.navigate(['/management/app-config']);
+  }
+
+  navigateToFeatureBugReports(): void {
+    this.closeManagementDropdown();
+    this.router.navigate(['/management/feature-bug-reports']);
   }
 
   navigateToProfile(): void {

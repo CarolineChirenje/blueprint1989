@@ -206,6 +206,7 @@ builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<ExpenseDisputeService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<FeatureBugReportService>();
 
 // WebAuthn / Biometric authentication
 builder.Services.AddMemoryCache();

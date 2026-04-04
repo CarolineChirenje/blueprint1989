@@ -10,9 +10,21 @@ export enum ReportType {
 }
 
 export enum ReportPriority {
-  Low = 1,
-  Medium = 2,
-  High = 3
+  Critical = 1,
+  High = 2,
+  Medium = 3,
+  Low = 4
+}
+
+export enum ReportCategory {
+  UI = 1,
+  Backend = 2,
+  Performance = 3,
+  Security = 4,
+  API = 5,
+  Mobile = 6,
+  Desktop = 7,
+  Other = 8
 }
 
 export interface FeatureBugReportResponseDto {
@@ -25,10 +37,29 @@ export interface FeatureBugReportResponseDto {
   statusName: string;
   priority: number;
   priorityName: string;
+  categories: number[];
+  categoryNames: string[];
   versionNumber: string | null;
+  submittedByUserId: number;
   submittedByName: string;
   submittedAt: string;
   updatedAt: string;
+}
+
+export interface CreateFeatureBugReportRequest {
+  title: string;
+  description: string;
+  type: ReportType;
+  priority: ReportPriority;
+  categories: ReportCategory[];
+}
+
+export interface UpdateFeatureBugReportRequest {
+  title: string;
+  description: string;
+  type: ReportType;
+  priority: ReportPriority;
+  categories: ReportCategory[];
 }
 
 export interface UpdateReportStatusRequest {

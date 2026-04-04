@@ -31,6 +31,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment>          Payments          { get; set; } = null!;
     public DbSet<ExpenseDispute>   ExpenseDisputes   { get; set; } = null!;
 
+    // ── Feedback ───────────────────────────────────────────────────────────
+    public DbSet<FeatureBugReport>         FeatureBugReports         { get; set; } = null!;
+    public DbSet<FeatureBugReportCategory> FeatureBugReportCategories { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -56,6 +60,10 @@ public class ApplicationDbContext : DbContext
         ConfigureMemberObligationEntity(modelBuilder);
         ConfigurePaymentEntity(modelBuilder);
         ConfigureExpenseDisputeEntity(modelBuilder);
+
+        // Feedback
+        ConfigureFeatureBugReportEntity(modelBuilder);
+        ConfigureFeatureBugReportCategoryEntity(modelBuilder);
     }
 
     private static void ConfigureUserEntity(ModelBuilder modelBuilder)
@@ -279,6 +287,31 @@ public class ApplicationDbContext : DbContext
             entity.Property(d => d.AdminNotes).HasMaxLength(1000);
             entity.HasOne<Expense>().WithMany().HasForeignKey(d => d.ExpenseId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne<User>().WithMany().HasForeignKey(d => d.RaisedByUserId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    // ── Feedback ───────────────────────────────────────────────────────────
+
+    private static void ConfigureFeatureBugReportEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<FeatureBugReport>(entity =>
+        {
+            entity.ToTable("FeatureBugReports");
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Title).IsRequired().HasMaxLength(200);
+            entity.Property(r => r.Description).IsRequired().HasMaxLength(2000);
+            entity.Property(r => r.VersionNumber).HasMaxLength(20);
+            entity.HasOne(r => r.SubmittedByUser).WithMany().HasForeignKey(r => r.SubmittedByUserId).OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    private static void ConfigureFeatureBugReportCategoryEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<FeatureBugReportCategory>(entity =>
+        {
+            entity.ToTable("FeatureBugReportCategories");
+            entity.HasKey(rc => new { rc.FeatureBugReportId, rc.Category });
+            entity.HasOne(rc => rc.Report).WithMany(r => r.Categories).HasForeignKey(rc => rc.FeatureBugReportId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

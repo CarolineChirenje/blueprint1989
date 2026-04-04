@@ -14,6 +14,16 @@
         <span class="meta-label">Priority</span>
         <span class="meta-value">{{ report.priorityName }}</span>
       </div>
+      @if (report.categoryNames && report.categoryNames.length > 0) {
+        <div class="meta-row">
+          <span class="meta-label">Categories</span>
+          <span class="meta-value">
+            @for (cat of report.categoryNames; track cat) {
+              <span class="category-chip">{{ cat }}</span>
+            }
+          </span>
+        </div>
+      }
       <div class="meta-row">
         <span class="meta-label">Date</span>
         <span class="meta-value">{{ report.submittedAt | date:'d MMM y, h:mm a' }}</span>

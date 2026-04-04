@@ -9,6 +9,7 @@ import { MfaSetupComponent } from './components/mfa-setup.component';
 import { LinkedDevicesComponent } from './components/linked-devices.component';
 import { BiometricSetupComponent } from './components/biometric-setup.component';
 import { NotificationPreferencesComponent } from './components/notification-preferences/notification-preferences.component';
+import { MyReportsComponent } from './components/my-reports/my-reports.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { NotificationPreferencesComponent } from './components/notification-pref
     MfaSetupComponent,
     LinkedDevicesComponent,
     BiometricSetupComponent,
-    NotificationPreferencesComponent
+    NotificationPreferencesComponent,
+    MyReportsComponent
   ],
   imports: [
     CommonModule,

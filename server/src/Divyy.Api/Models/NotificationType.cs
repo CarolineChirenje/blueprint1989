@@ -59,5 +59,8 @@ public enum NotificationType
 
     /// <summary>A user has been removed from a Draft expense cycle.</summary>
     CycleMemberRemoved = 18,
+
+    /// <summary>A feature/bug report status has been updated by an admin.</summary>
+    FeatureBugReportResolved = 19,
 }
 
