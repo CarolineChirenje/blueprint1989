@@ -10,7 +10,6 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { TimezoneInterceptor } from './core/interceptors/timezone.interceptor';
 import { SharedModule } from './shared/shared.module';
 import { AuthModule } from './auth/auth.module';
-import { environment } from '../environments/environment';
 
 @NgModule({ declarations: [
         AppComponent
@@ -22,7 +21,7 @@ import { environment } from '../environments/environment';
         AuthModule,
         SharedModule,
         ServiceWorkerModule.register('/custom-sw.js', {
-          enabled: environment.production,
+          enabled: true,
           // Register immediately so the SW is active when Chrome evaluates
           // PWA installability (beforeinstallprompt fires early in page load).
           registrationStrategy: 'registerImmediately'

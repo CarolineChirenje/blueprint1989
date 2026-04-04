@@ -61,7 +61,7 @@ public class PushNotificationSender : IPushNotificationSender
         int? relatedEntityId = null)
     {
         // 1. Create in-app notification row
-        await _notificationService.CreateAsync(userId, $"{title}: {body}", type, deepLinkUrl, relatedEntityId);
+        await _notificationService.CreateAsync(userId, $"{title}: {body}", type, deepLinkUrl, relatedEntityId, sentViaPush: true);
 
         if (_pushClient is null) return; // VAPID not configured — in-app notification still created above
 

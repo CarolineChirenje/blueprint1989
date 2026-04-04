@@ -47,9 +47,9 @@ public class BgTimerHostedService : BackgroundService
 
     private async Task ProcessAsync(CancellationToken ct)
     {
-        using var scope   = _scopeFactory.CreateScope();
-        var context       = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var notifications = scope.ServiceProvider.GetRequiredService<NotificationService>();
+        using var scope = _scopeFactory.CreateScope();
+        var context     = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var push        = scope.ServiceProvider.GetRequiredService<IPushNotificationSender>();
 
         // Find members with unsettled obligations in active cycles,
         // who have not received a PaymentDue notification in the last 24 hours.
@@ -89,10 +89,11 @@ public class BgTimerHostedService : BackgroundService
                 .Where(o => expenseIds.Contains(o.ExpenseId) && o.UserId == userId && !o.IsSettled)
                 .SumAsync(o => o.AmountOwed, ct);
 
-            await notifications.CreateAsync(
+            await push.SendToUserAsync(
                 userId,
-                $"You have ${total:F2} in outstanding payments. Head to your cycles to settle up.",
                 NotificationType.PaymentDue,
+                "Payment Reminder",
+                $"You have ${total:F2} in outstanding payments. Head to your cycles to settle up.",
                 "/cycles");
         }
     }

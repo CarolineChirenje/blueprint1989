@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-
 
 export interface ScheduledNotification {
   id: string;
@@ -26,11 +24,7 @@ export class ServiceWorkerNotificationService {
     this._registrationPromise = new Promise(resolve => {
       this._resolveRegistration = resolve;
     });
-    if (environment.production) {
-      this.registerServiceWorker();
-    } else {
-      this._resolveRegistration(null);
-    }
+    this.registerServiceWorker();
   }
 
   /** Returns the SW registration (resolves after the SW registers, or null if unsupported). */
