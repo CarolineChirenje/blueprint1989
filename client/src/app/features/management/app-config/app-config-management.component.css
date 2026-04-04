@@ -72,6 +72,11 @@
   border-bottom: 2px solid var(--border);
 }
 
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .entry-name {
   font-weight: 600;
   color: var(--text-primary);

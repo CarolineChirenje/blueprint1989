@@ -11,6 +11,7 @@
       <mat-spinner diameter="36"></mat-spinner>
     </div>
 
+    <div class="table-scroll">
     <table mat-table [dataSource]="users" class="shared-table" *ngIf="!isLoading">
 
       <ng-container matColumnDef="fullName">
@@ -72,6 +73,7 @@
         <td class="mat-cell no-data" colspan="5">No users found.</td>
       </tr>
     </table>
+    </div>
 
   </mat-card-content>
 </mat-card>

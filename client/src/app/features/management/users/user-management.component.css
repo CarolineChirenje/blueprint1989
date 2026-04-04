@@ -20,6 +20,11 @@
   padding: 8px 0;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .status-chip {
   padding: 2px 10px;
   border-radius: 12px;

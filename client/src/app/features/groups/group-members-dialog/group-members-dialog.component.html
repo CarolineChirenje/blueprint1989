@@ -50,6 +50,7 @@
   <!-- Accepted Members -->
   <div>
     <h4>Accepted Members ({{ acceptedMembers.length }})</h4>
+    <div class="table-scroll">
     <table mat-table [dataSource]="acceptedMembers" class="members-table" *ngIf="acceptedMembers.length; else noAccepted">
 
       <ng-container matColumnDef="name">
@@ -88,11 +89,13 @@
       <tr mat-header-row *matHeaderRowDef="isReadOnly ? readOnlyColumns : displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: isReadOnly ? readOnlyColumns : displayedColumns;"></tr>
     </table>
+    </div>
     <ng-template #noAccepted><p class="empty-msg">No accepted members yet.</p></ng-template>
 
     <!-- Pending invites — hidden in read-only mode -->
     <ng-container *ngIf="!isReadOnly">
       <h4 style="margin-top:16px">Pending Invites ({{ pendingMembers.length }})</h4>
+      <div class="table-scroll">
       <table mat-table [dataSource]="pendingMembers" class="members-table" *ngIf="pendingMembers.length; else noPending">
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -121,6 +124,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+      </div>
       <ng-template #noPending><p class="empty-msg">No pending invites.</p></ng-template>
     </ng-container>
   </div>

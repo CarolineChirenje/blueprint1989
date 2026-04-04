@@ -12,6 +12,7 @@
       This user is not a member of any group.
     </p>
 
+    <div class="table-scroll">
     <table mat-table [dataSource]="memberships" class="roles-table" *ngIf="memberships.length > 0">
 
       <ng-container matColumnDef="groupName">
@@ -46,6 +47,7 @@
       <tr mat-header-row *matHeaderRowDef="['groupName','groupRole','action']"></tr>
       <tr mat-row *matRowDef="let row; columns: ['groupName','groupRole','action'];"></tr>
     </table>
+    </div>
   </ng-container>
 </mat-dialog-content>
 

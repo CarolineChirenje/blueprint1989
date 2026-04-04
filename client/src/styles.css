@@ -1223,29 +1223,33 @@ tbody tr:last-child td {
   width: 100%;
 }
 
-/* Side-by-side field row used in dialogs (e.g. amount + category) */
+/* Side-by-side field row used in dialogs (e.g. amount + category, start + end date) */
 .amount-row,
-.field-row {
+.field-row,
+.date-row {
   display: flex;
   gap: 0.75rem;
   width: 100%;
 }
 
 .amount-row .mat-mdc-form-field,
-.field-row .mat-mdc-form-field {
+.field-row .mat-mdc-form-field,
+.date-row .mat-mdc-form-field {
   flex: 1;
   min-width: 0;
 }
 
 @media (max-width: 480px) {
   .amount-row,
-  .field-row {
+  .field-row,
+  .date-row {
     flex-direction: column;
     gap: 0;
   }
 
   .amount-row .mat-mdc-form-field,
-  .field-row .mat-mdc-form-field {
+  .field-row .mat-mdc-form-field,
+  .date-row .mat-mdc-form-field {
     width: 100%;
   }
 }

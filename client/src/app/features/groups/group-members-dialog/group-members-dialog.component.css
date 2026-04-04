@@ -65,6 +65,11 @@
   margin-bottom: 8px;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .loading-wrap {
   display: flex;
   justify-content: center;
