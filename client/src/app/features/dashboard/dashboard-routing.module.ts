@@ -8,7 +8,7 @@ const routes: Routes = [
     path: '',
     component: DashboardComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['Administrator', 'Carer', 'SuperAdmin', 'SupportWorker', 'CareRecipient', 'HealthCareProvider'] }
+    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
   }
 ];
 

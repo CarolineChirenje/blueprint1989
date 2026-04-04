@@ -97,7 +97,7 @@ namespace Divvy.Api.Controllers
 
             if (emailUnverified)
             {
-                return Unauthorized(new { message = "Please verify your email address before logging in.", emailUnverified = true });
+                return Ok(new { emailUnverified = true, message = "Please verify your email address before logging in." });
             }
 
             var response = new AuthResponse

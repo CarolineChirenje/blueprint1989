@@ -20,7 +20,7 @@ public class EmailTemplateService
     private async Task<(string appName, string appDisplayName, string loginUrl)> GetBrandingAsync()
     {
         var appName        = await _appConfig.GetStringAsync(AppConfigKeys.AppName, "App");
-        var appDisplayName = appName + " Health";
+        var appDisplayName = appName + " Team";
         var domain         = await _appConfig.GetStringAsync(AppConfigKeys.AppDomain, "");
         var loginUrl       = string.IsNullOrWhiteSpace(domain) ? "" : domain.TrimEnd('/') + "/login";
         return (appName, appDisplayName, loginUrl);

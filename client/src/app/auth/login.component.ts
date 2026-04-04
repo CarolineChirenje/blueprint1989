@@ -156,12 +156,6 @@ submit() {
       },
       error: (err) => {
         this.loginState = 'idle';
-        if (err?.error?.emailUnverified) {
-          this.emailUnverified = true;
-          this.emailForResend = email;
-          this.cdr.detectChanges();
-          return;
-        }
         this.errorMessage =
           typeof err?.error === 'string'
             ? err.error

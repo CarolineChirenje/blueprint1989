@@ -505,6 +505,8 @@ namespace Divvy.Api.Services
             // Rate-limiting: max N resends per hour per user
             var resendLimit = await _appConfig.GetIntAsync(AppConfigKeys.EmailVerificationResendLimitPerHour, 3);
             var oneHourAgo  = DateTime.UtcNow.AddHours(-1);
+            // Only count tokens from successful sends (IsUsed=false AND CreatedAt recent)
+            // We persist the token only after a successful send, so the count is accurate.
             var recentCount = await _context.EmailVerificationTokens
                 .Where(t => t.UserId == user.Id && t.CreatedAt > oneHourAgo && !t.IsUsed)
                 .CountAsync();
@@ -514,6 +516,10 @@ namespace Divvy.Api.Services
                 _logger.LogWarning("Email verification resend rate limit exceeded for user: {UserId}", user.Id);
                 return (false, "rate_limited");
             }
+
+            // Build the verification URL before touching the DB
+            var domain = await _appConfig.GetStringAsync(AppConfigKeys.AppDomain, "");
+            var path   = await _appConfig.GetStringAsync(AppConfigKeys.EmailVerificationUrlPath, "");
 
             // Generate URL-safe token
             var tokenBytes = new byte[32];
@@ -527,22 +533,12 @@ namespace Divvy.Api.Services
             var validityHours = await _appConfig.GetIntAsync(AppConfigKeys.EmailVerificationTokenValidityHours, 24);
             var expiresAt     = DateTime.UtcNow.AddHours(validityHours);
 
-            _context.EmailVerificationTokens.Add(new EmailVerificationToken
-            {
-                UserId    = user.Id,
-                Token     = hashedToken,
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = expiresAt,
-                IsUsed    = false
-            });
-            await _context.SaveChangesAsync();
-
-            var domain = await _appConfig.GetStringAsync(AppConfigKeys.AppDomain, "");
-            var path   = await _appConfig.GetStringAsync(AppConfigKeys.EmailVerificationUrlPath, "");
-
             if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(path))
             {
-                _logger.LogWarning("AppDomain and/or EmailVerificationUrlPath not configured — verification email not sent for user {UserId}", user.Id);
+                _logger.LogWarning(
+                    "AppDomain and/or EmailVerificationUrlPath not configured — verification email not sent for user {UserId}. " +
+                    "To manually verify in development, use token: {PlainToken}",
+                    user.Id, plainToken);
                 return (false, "not_configured");
             }
 
@@ -558,8 +554,24 @@ namespace Divvy.Api.Services
 
             if (!sent)
             {
-                _logger.LogWarning("Failed to send verification email to {Email}", user.Email);
+                _logger.LogWarning(
+                    "SMTP send failed for user {UserId} ({Email}). " +
+                    "Check SMTP settings in AppConfig. Verification URL (dev use only): {VerificationUrl}",
+                    user.Id, user.Email, verificationUrl);
+                return (false, "smtp_failed");
             }
+
+            // Only persist the token after a successful send so the rate limit
+            // counter accurately reflects emails the user actually received.
+            _context.EmailVerificationTokens.Add(new EmailVerificationToken
+            {
+                UserId    = user.Id,
+                Token     = hashedToken,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = expiresAt,
+                IsUsed    = false
+            });
+            await _context.SaveChangesAsync();
 
             _logger.LogInformation("Verification email sent for user {UserId}", user.Id);
             return (sent, null);

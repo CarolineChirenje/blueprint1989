@@ -103,4 +103,8 @@ export class SignupComponent implements OnInit {
   setupMfaNow(): void {
     this.router.navigate(['/login'], { queryParams: { promptMfa: 'true' } });
   }
+
+  skipMfa(): void {
+    this.router.navigate(['/login']);
+  }
 }

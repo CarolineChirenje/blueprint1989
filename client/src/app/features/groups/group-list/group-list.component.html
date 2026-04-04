@@ -50,7 +50,9 @@
               <mat-icon>delete</mat-icon>
             </button>
           </ng-container>
-          <mat-icon class="row-chevron">chevron_right</mat-icon>
+          <button mat-icon-button matTooltip="View group details" (click)="openGroup(g)" class="view-btn">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
         </td>
       </ng-container>
 

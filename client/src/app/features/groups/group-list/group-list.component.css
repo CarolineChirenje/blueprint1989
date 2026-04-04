@@ -1,4 +1,6 @@
-.row-chevron {
-  color: var(--text-disabled);
-  vertical-align: middle;
+.view-btn {
+  color: var(--primary);
+}
+.view-btn:hover {
+  color: var(--primary-hover);
 }

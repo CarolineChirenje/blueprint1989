@@ -153,7 +153,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.ToTable("EmailVerificationTokens");
             entity.HasKey(t => t.Id);
-            entity.HasOne<User>().WithMany().HasForeignKey(t => t.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(t => t.User).WithMany().HasForeignKey(t => t.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.Property(t => t.Token).IsRequired();
             entity.HasIndex(t => t.Token).IsUnique();
         });
