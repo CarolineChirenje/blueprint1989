@@ -1,4 +1,4 @@
-﻿using Divvy.Api.Configuration;
+using Divvy.Api.Configuration;
 using Divvy.Api.Data;
 using Divvy.Api.Services;
 using Fido2NetLib;
@@ -268,7 +268,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Divvy API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Divvy API");
     });
 }
 else

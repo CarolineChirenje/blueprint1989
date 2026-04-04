@@ -20,8 +20,8 @@ public static class DatabaseSeeder
         {
             context.RoleEntities.AddRange(
                 new RoleEntity { Id = 1, Name = "SuperAdmin", Description = "Super Administrator with full system access", IsActive = true, CreatedAt = DateTime.UtcNow },
-                new RoleEntity { Id = 2, Name = "Admin",      Description = "Administrator with system management access", IsActive = true, CreatedAt = DateTime.UtcNow },
-                new RoleEntity { Id = 3, Name = "Member",     Description = "Household member", IsActive = true, CreatedAt = DateTime.UtcNow }
+                new RoleEntity { Id = 2, Name = "Administrator",      Description = "Administrator with system management access", IsActive = true, CreatedAt = DateTime.UtcNow },
+                new RoleEntity { Id = 3, Name = "Member",     Description = "Group member", IsActive = true, CreatedAt = DateTime.UtcNow }
             );
             await context.SaveChangesAsync();
         }
@@ -65,7 +65,7 @@ public static class DatabaseSeeder
                 },
                 new User
                 {
-                    Email               = "admin@elroitec.com",
+                    Email               = "elroitec@gmail.com",
                     FirstName           = "Divvy",
                     LastName            = "Admin",
                     PasswordHash        = passwordHashingService.HashPassword("SuperAdmin123!"),
