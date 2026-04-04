@@ -13,7 +13,10 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px;
+}
+
+@media (min-width: 1024px) {
+  table { min-width: 800px; }
 }
 
 /* Material Table Headers */
@@ -336,8 +339,12 @@ td.actions-cell {
   .mat-mdc-header-row { display: none !important; }
 
   /* Outer wrapper: hard-clip overflow so nothing bleeds past screen edge */
-  .entries-table { overflow-x: hidden !important; max-width: 100% !important; }
-  .table-wrapper { overflow-x: hidden !important; max-width: 100% !important; }
+  .entries-table,
+  .table-wrapper,
+  .table-scroll,
+  .table-wrap,
+  .cycles-table-wrap,
+  .summary-table-wrap { overflow-x: hidden !important; max-width: 100% !important; }
 
   /* Each data row becomes a card */
   tbody tr,
@@ -389,7 +396,7 @@ td.actions-cell {
     border-bottom: none !important;
   }
 
-  /* Auto-label from data-label — fixed 38% width, never wraps */
+  /* Auto-label from data-label */
   td::before,
   .mat-mdc-cell::before {
     content: attr(data-label);
@@ -399,11 +406,10 @@ td.actions-cell {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     flex-shrink: 0;
-    width: 38%;
+    width: 40%;
     min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
     padding-top: 0.1rem;
   }
 

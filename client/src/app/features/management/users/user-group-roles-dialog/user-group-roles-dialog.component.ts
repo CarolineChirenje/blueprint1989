@@ -10,7 +10,7 @@ interface DialogData { userId: number; userName: string; }
 @Component({
   selector: 'app-user-group-roles-dialog',
   templateUrl: './user-group-roles-dialog.component.html',
-  styleUrls: ['./user-group-roles-dialog.component.css'],
+  styleUrls: ['./user-group-roles-dialog.component.css', '../../../../shared/styles/table.css'],
   standalone: false
 })
 export class UserGroupRolesDialogComponent implements OnInit {

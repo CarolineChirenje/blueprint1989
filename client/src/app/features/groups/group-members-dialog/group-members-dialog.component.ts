@@ -12,7 +12,7 @@ interface UserOption { id: number; firstName: string; lastName: string; email: s
 @Component({
   selector: 'app-group-members-dialog',
   templateUrl: './group-members-dialog.component.html',
-  styleUrls: ['./group-members-dialog.component.css'],
+  styleUrls: ['./group-members-dialog.component.css', '../../../shared/styles/table.css'],
   standalone: false
 })
 export class GroupMembersDialogComponent implements OnInit {

@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-feature-bug-reports',
   templateUrl: './feature-bug-reports.component.html',
-  styleUrls: ['./feature-bug-reports.component.css'],
+  styleUrls: ['./feature-bug-reports.component.css', '../../../shared/styles/table.css'],
   standalone: false
 })
 export class FeatureBugReportsComponent implements OnInit {

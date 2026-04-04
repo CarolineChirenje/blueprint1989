@@ -12,7 +12,7 @@ import { DialogService } from '../../../../shared/services/dialog.service';
 @Component({
   selector: 'app-cycle-list',
   templateUrl: './cycle-list.component.html',
-  styleUrls: ['./cycle-list.component.css'],
+  styleUrls: ['./cycle-list.component.css', '../../../../shared/styles/table.css'],
   standalone: false
 })
 export class CycleListComponent implements OnInit {
