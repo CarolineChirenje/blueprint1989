@@ -1107,15 +1107,24 @@ tbody tr:last-child td {
 .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch,
 .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
   border-color: var(--border) !important;
-  border-width: 1.5px !important;
 }
 
 .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading {
+  border-width: 1.5px !important;
+  border-right-width: 0 !important;
   border-radius: var(--radius-md) 0 0 var(--radius-md) !important;
   min-width: var(--radius-md) !important;
 }
 
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+}
+
 .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
   border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
 }
 
@@ -1131,7 +1140,22 @@ tbody tr:last-child td {
 .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch,
 .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
   border-color: var(--border-focus) !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__leading {
   border-width: 1.5px !important;
+  border-right-width: 0 !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
 }
 
 /* Background fill inside mat-form-field — consistent white at rest and on focus */
