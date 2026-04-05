@@ -10,6 +10,7 @@ public static class DatabaseSeeder
     {
         await SeedRolesAsync(context);
         await SeedNotificationTypesAsync(context);
+        await SeedCurrenciesAsync(context);
         await SeedAppConfigAsync(context);
         await SeedUsersAsync(context, passwordHashingService);
         await SeedUserNotificationPreferencesAsync(context);
@@ -52,6 +53,21 @@ public static class DatabaseSeeder
             new NotificationTypeEntity { Id = 16, Name = "MemberJoinedGroup",    Description = "A member accepted a group invite; existing members are notified", IsAdminControlled = false },
             new NotificationTypeEntity { Id = 17, Name = "CycleMemberAdded",     Description = "A user has been added to a Draft expense cycle",                  IsAdminControlled = false },
             new NotificationTypeEntity { Id = 18, Name = "CycleMemberRemoved",   Description = "A user has been removed from a Draft expense cycle",              IsAdminControlled = false },
+
+            // Mukando
+            new NotificationTypeEntity { Id = 20, Name = "MukandoRoundStarted",              Description = "A Mukando round has started",                                   IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 21, Name = "MukandoContributionReceived",       Description = "A member submitted their contribution",                         IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 22, Name = "MukandoContributionConfirmed",      Description = "Admin confirmed a member's contribution",                       IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 23, Name = "MukandoAllContributionsCollected",  Description = "All contributions for a round have been collected",              IsAdminControlled = true  },
+            new NotificationTypeEntity { Id = 24, Name = "MukandoPayoutConfirmed",            Description = "Payout for a Mukando round has been confirmed",                 IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 25, Name = "MukandoRoundCompleted",             Description = "A Mukando round has been completed",                            IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 26, Name = "MukandoCycleCompleted",             Description = "All rounds in a Mukando cycle are done",                        IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 27, Name = "MukandoSwapRequested",              Description = "A member requested to swap turns",                              IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 28, Name = "MukandoSwapAccepted",               Description = "A swap request was accepted",                                   IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 29, Name = "MukandoSwapDeclined",               Description = "A swap request was declined",                                   IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 30, Name = "MukandoContributionDue",            Description = "Reminder: contribution is due soon or overdue",                 IsAdminControlled = true  },
+            new NotificationTypeEntity { Id = 31, Name = "MukandoOptOutRequested",            Description = "A member requested to opt out of a Mukando cycle",              IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 32, Name = "MukandoOptOutResponded",            Description = "Admin responded to an opt-out request",                         IsAdminControlled = false },
         };
 
         foreach (var e in expected)
@@ -67,6 +83,34 @@ public static class DatabaseSeeder
             }
         }
 
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedCurrenciesAsync(ApplicationDbContext context)
+    {
+        if (await context.Currencies.AnyAsync()) return;
+
+        var currencies = new[]
+        {
+            new Currency { Id =  1, Code = "USD", Name = "US Dollar",             Symbol = "$"   },
+            new Currency { Id =  2, Code = "ZAR", Name = "South African Rand",    Symbol = "R"   },
+            new Currency { Id =  3, Code = "GBP", Name = "British Pound",         Symbol = "£"   },
+            new Currency { Id =  4, Code = "EUR", Name = "Euro",                  Symbol = "€"   },
+            new Currency { Id =  5, Code = "ZWG", Name = "Zimbabwe Gold",         Symbol = "ZiG" },
+            new Currency { Id =  6, Code = "BWP", Name = "Botswana Pula",         Symbol = "P"   },
+            new Currency { Id =  7, Code = "KES", Name = "Kenyan Shilling",       Symbol = "KSh" },
+            new Currency { Id =  8, Code = "NGN", Name = "Nigerian Naira",        Symbol = "₦"   },
+            new Currency { Id =  9, Code = "GHS", Name = "Ghanaian Cedi",         Symbol = "GH₵" },
+            new Currency { Id = 10, Code = "TZS", Name = "Tanzanian Shilling",    Symbol = "TSh" },
+            new Currency { Id = 11, Code = "UGX", Name = "Ugandan Shilling",      Symbol = "USh" },
+            new Currency { Id = 12, Code = "MZN", Name = "Mozambican Metical",    Symbol = "MT"  },
+            new Currency { Id = 13, Code = "ZMW", Name = "Zambian Kwacha",        Symbol = "ZK"  },
+            new Currency { Id = 14, Code = "MWK", Name = "Malawian Kwacha",       Symbol = "MK"  },
+            new Currency { Id = 15, Code = "NAD", Name = "Namibian Dollar",       Symbol = "N$"  },
+            new Currency { Id = 16, Code = "AUD", Name = "Australian Dollar",     Symbol = "A$"  },
+        };
+
+        context.Currencies.AddRange(currencies);
         await context.SaveChangesAsync();
     }
 

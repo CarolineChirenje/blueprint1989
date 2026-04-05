@@ -202,11 +202,13 @@ builder.Services.AddScoped<UserDeviceService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<TimeZoneService>();
 builder.Services.AddScoped<ExpenseCycleService>();
+builder.Services.AddScoped<MukandoService>();
 builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<ExpenseDisputeService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<FeatureBugReportService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
 // WebAuthn / Biometric authentication
 builder.Services.AddMemoryCache();
@@ -278,6 +280,7 @@ else
     app.UseHsts();
 }
 
+app.UseStaticFiles(); // serve wwwroot/uploads for proof images
 app.UseRouting();
 
 // HTTPS redirection (important for production)

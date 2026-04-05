@@ -1,0 +1,35 @@
+.cycle-type-row {
+  display: flex; gap: 12px; margin-bottom: 16px;
+}
+.type-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px 8px; border: 2px solid #e0e0e0; border-radius: 8px;
+  background: #fafafa; cursor: pointer; transition: all 0.15s;
+}
+.type-btn:hover { border-color: #90caf9; background: #e3f2fd; }
+.type-btn.active { border-color: #1976d2; background: #e3f2fd; }
+.type-btn span { font-weight: 600; font-size: 14px; }
+.type-btn small { font-size: 11px; color: #666; }
+.type-btn mat-icon { font-size: 28px; height: 28px; width: 28px; color: #1976d2; }
+
+.payout-order-section {
+  margin: 8px 0 16px;
+}
+.payout-label {
+  font-weight: 500; font-size: 13px; margin-bottom: 8px; display: block; color: #555;
+}
+.payout-label small { font-weight: 400; color: #999; }
+.payout-row {
+  display: flex; align-items: center; gap: 8px; padding: 4px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.payout-num {
+  font-weight: 700; font-size: 14px; color: #1976d2; min-width: 24px; text-align: center;
+}
+.payout-name { flex: 1; font-size: 14px; }
+
+.mukando-preview {
+  background: #e8f5e9; border-radius: 6px; padding: 8px 12px;
+  font-size: 13px; color: #2e7d32; margin-bottom: 12px;
+}
+.mukando-preview .sep { margin: 0 6px; }

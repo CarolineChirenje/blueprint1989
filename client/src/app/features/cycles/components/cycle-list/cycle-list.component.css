@@ -9,6 +9,8 @@
 .badge-active { background: var(--success-bg); color: var(--success); }
 .badge-draft  { background: #fff3cd; color: #856404; }
 .badge-closed { background: var(--surface-raised); color: var(--text-secondary); }
+.badge-majana  { background: #e3f2fd; color: #1565c0; }
+.badge-mukando { background: #f3e5f5; color: #7b1fa2; }
 
 /* Group filter bar */
 .cycles-group-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }

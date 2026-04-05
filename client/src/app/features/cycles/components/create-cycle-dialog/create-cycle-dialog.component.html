@@ -1,11 +1,35 @@
-<h2 mat-dialog-title>New Expense Cycle</h2>
+<h2 mat-dialog-title>New Cycle</h2>
 <mat-dialog-content>
   <form [formGroup]="form" class="dialog-form">
     @if (error) { <div class="form-error">{{ error }}</div> }
 
+    <!-- Cycle Type Selector -->
+    <div class="cycle-type-row">
+      <button type="button" class="type-btn" [class.active]="cycleType === 'Majana'" (click)="setCycleType('Majana')">
+        <mat-icon>receipt_long</mat-icon>
+        <span>Majana</span>
+        <small>Shared expenses</small>
+      </button>
+      <button type="button" class="type-btn" [class.active]="cycleType === 'Mukando'" (click)="setCycleType('Mukando')">
+        <mat-icon>groups</mat-icon>
+        <span>Mukando</span>
+        <small>Round-robin payout</small>
+      </button>
+    </div>
+
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Cycle Name</mat-label>
       <input matInput formControlName="name" placeholder="e.g. April 2026 House Expenses">
+    </mat-form-field>
+
+    <!-- Currency -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Currency</mat-label>
+      <mat-select formControlName="currencyId" required>
+        @for (cur of currencies; track cur.id) {
+          <mat-option [value]="cur.id">{{ cur.symbol }} — {{ cur.name }} ({{ cur.code }})</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
 
     <div class="date-row">
@@ -13,13 +37,33 @@
         <mat-label>Start Date</mat-label>
         <input matInput type="date" formControlName="startDate">
       </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>End Date</mat-label>
-        <input matInput type="date" formControlName="endDate">
-      </mat-form-field>
+      @if (cycleType === 'Majana') {
+        <mat-form-field appearance="outline">
+          <mat-label>End Date</mat-label>
+          <input matInput type="date" formControlName="endDate">
+        </mat-form-field>
+      }
     </div>
 
-    @if (sourceCycles.length > 0) {
+    <!-- Mukando-specific fields -->
+    @if (cycleType === 'Mukando') {
+      <div class="date-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Contribution Amount</mat-label>
+          <input matInput type="number" formControlName="contributionAmount" min="0.01" step="0.01">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Frequency</mat-label>
+          <mat-select formControlName="frequency">
+            <mat-option value="Weekly">Weekly</mat-option>
+            <mat-option value="Biweekly">Biweekly</mat-option>
+            <mat-option value="Monthly">Monthly</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+
+    @if (cycleType === 'Majana' && sourceCycles.length > 0) {
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Copy expenses from (optional)</mat-label>
         <mat-select formControlName="copyFromCycleId">
@@ -39,8 +83,31 @@
           <mat-option [value]="user.id">{{ user.firstName }} {{ user.lastName }} ({{ user.email }})</mat-option>
         }
       </mat-select>
-      <mat-hint>Select all members who share expenses in this cycle</mat-hint>
+      <mat-hint>{{ cycleType === 'Mukando' ? 'Each member receives the pool once' : 'Select all members who share expenses' }}</mat-hint>
     </mat-form-field>
+
+    <!-- Mukando payout order -->
+    @if (cycleType === 'Mukando' && payoutOrder.length > 0) {
+      <div class="payout-order-section">
+        <label class="payout-label">Payout Order <small>(drag to reorder)</small></label>
+        @for (userId of payoutOrder; track userId; let i = $index) {
+          <div class="payout-row">
+            <span class="payout-num">{{ i + 1 }}</span>
+            <span class="payout-name">{{ getUserName(userId) }}</span>
+            <button mat-icon-button type="button" (click)="movePayoutUp(i)" [disabled]="i === 0" matTooltip="Move up"><mat-icon>arrow_upward</mat-icon></button>
+            <button mat-icon-button type="button" (click)="movePayoutDown(i)" [disabled]="i === payoutOrder.length - 1" matTooltip="Move down"><mat-icon>arrow_downward</mat-icon></button>
+          </div>
+        }
+      </div>
+
+      @if (mukandoPreview) {
+        <div class="mukando-preview">
+          <span>{{ mukandoPreview.rounds }} rounds</span>
+          <span class="sep">·</span>
+          <span>Pool per round: {{ mukandoPreview.poolPerRound | number:'1.2-2' }}</span>
+        </div>
+      }
+    }
 
     @if (!presetGroupId) {
       <mat-form-field appearance="outline" class="full-width">

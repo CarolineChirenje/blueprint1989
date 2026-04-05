@@ -22,7 +22,7 @@ export class CycleListComponent implements OnInit {
   loading = true;
   error = '';
   isAdmin = false;
-  displayedColumns = ['name', 'groupName', 'period', 'memberCount', 'totalAmount', 'status', 'actions'];
+  displayedColumns = ['name', 'cycleType', 'groupName', 'period', 'memberCount', 'totalAmount', 'status', 'actions'];
 
   constructor(
     private cycleService: ExpenseCycleService,

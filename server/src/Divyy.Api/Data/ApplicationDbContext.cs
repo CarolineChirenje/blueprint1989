@@ -31,6 +31,15 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment>          Payments          { get; set; } = null!;
     public DbSet<ExpenseDispute>   ExpenseDisputes   { get; set; } = null!;
 
+    // ── Mukando domain ────────────────────────────────────────────────────────
+    public DbSet<Currency>               Currencies               { get; set; } = null!;
+    public DbSet<MukandoRound>           MukandoRounds            { get; set; } = null!;
+    public DbSet<MukandoContribution>    MukandoContributions     { get; set; } = null!;
+    public DbSet<MukandoPayout>          MukandoPayouts           { get; set; } = null!;
+    public DbSet<MukandoSwapRequest>     MukandoSwapRequests      { get; set; } = null!;
+    public DbSet<MukandoOptOutRequest>   MukandoOptOutRequests    { get; set; } = null!;
+    public DbSet<MukandoRoundActivity>   MukandoRoundActivities   { get; set; } = null!;
+
     // ── Feedback ───────────────────────────────────────────────────────────
     public DbSet<FeatureBugReport>         FeatureBugReports         { get; set; } = null!;
     public DbSet<FeatureBugReportCategory> FeatureBugReportCategories { get; set; } = null!;
@@ -60,6 +69,15 @@ public class ApplicationDbContext : DbContext
         ConfigureMemberObligationEntity(modelBuilder);
         ConfigurePaymentEntity(modelBuilder);
         ConfigureExpenseDisputeEntity(modelBuilder);
+
+        // Mukando domain
+        ConfigureCurrencyEntity(modelBuilder);
+        ConfigureMukandoRoundEntity(modelBuilder);
+        ConfigureMukandoContributionEntity(modelBuilder);
+        ConfigureMukandoPayoutEntity(modelBuilder);
+        ConfigureMukandoSwapRequestEntity(modelBuilder);
+        ConfigureMukandoOptOutRequestEntity(modelBuilder);
+        ConfigureMukandoRoundActivityEntity(modelBuilder);
 
         // Feedback
         ConfigureFeatureBugReportEntity(modelBuilder);
@@ -225,6 +243,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(c => c.Name).IsRequired().HasMaxLength(150);
             entity.HasOne<User>().WithMany().HasForeignKey(c => c.CreatedByUserId).OnDelete(DeleteBehavior.Restrict);
             entity.HasOne<Group>().WithMany().HasForeignKey(c => c.GroupId).IsRequired(true).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<Currency>().WithMany().HasForeignKey(c => c.CurrencyId).IsRequired(true).OnDelete(DeleteBehavior.Restrict);
+            entity.Property(c => c.ContributionAmount).HasColumnType("decimal(18,2)");
         });
     }
 
@@ -287,6 +307,106 @@ public class ApplicationDbContext : DbContext
             entity.Property(d => d.AdminNotes).HasMaxLength(1000);
             entity.HasOne<Expense>().WithMany().HasForeignKey(d => d.ExpenseId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne<User>().WithMany().HasForeignKey(d => d.RaisedByUserId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    // ── Mukando domain configure methods ──────────────────────────────────────
+
+    private static void ConfigureCurrencyEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Currency>(entity =>
+        {
+            entity.ToTable("Currencies");
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Code).IsRequired().HasMaxLength(3);
+            entity.HasIndex(c => c.Code).IsUnique();
+            entity.Property(c => c.Name).IsRequired().HasMaxLength(50);
+            entity.Property(c => c.Symbol).IsRequired().HasMaxLength(5);
+        });
+    }
+
+    private static void ConfigureMukandoRoundEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MukandoRound>(entity =>
+        {
+            entity.ToTable("MukandoRounds");
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.ExpectedPool).HasColumnType("decimal(18,2)");
+            entity.Property(r => r.ActualCollected).HasColumnType("decimal(18,2)");
+            entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(r => r.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(r => r.RecipientUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(r => new { r.ExpenseCycleId, r.RoundNumber }).IsUnique();
+        });
+    }
+
+    private static void ConfigureMukandoContributionEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MukandoContribution>(entity =>
+        {
+            entity.ToTable("MukandoContributions");
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(c => c.ProofUrl).HasMaxLength(500);
+            entity.Property(c => c.Reference).HasMaxLength(200);
+            entity.Property(c => c.Notes).HasMaxLength(500);
+            entity.HasOne<MukandoRound>().WithMany().HasForeignKey(c => c.MukandoRoundId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(c => new { c.MukandoRoundId, c.UserId }).IsUnique();
+        });
+    }
+
+    private static void ConfigureMukandoPayoutEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MukandoPayout>(entity =>
+        {
+            entity.ToTable("MukandoPayouts");
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.AmountDisbursed).HasColumnType("decimal(18,2)");
+            entity.Property(p => p.ProofUrl).IsRequired().HasMaxLength(500);
+            entity.Property(p => p.Reference).HasMaxLength(200);
+            entity.HasOne<MukandoRound>().WithMany().HasForeignKey(p => p.MukandoRoundId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(p => p.RecipientUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(p => p.ConfirmedByUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(p => p.MukandoRoundId).IsUnique();
+        });
+    }
+
+    private static void ConfigureMukandoSwapRequestEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MukandoSwapRequest>(entity =>
+        {
+            entity.ToTable("MukandoSwapRequests");
+            entity.HasKey(s => s.Id);
+            entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(s => s.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(s => s.RequesterUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(s => s.TargetUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<MukandoRound>().WithMany().HasForeignKey(s => s.RequesterRoundId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<MukandoRound>().WithMany().HasForeignKey(s => s.TargetRoundId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    private static void ConfigureMukandoOptOutRequestEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MukandoOptOutRequest>(entity =>
+        {
+            entity.ToTable("MukandoOptOutRequests");
+            entity.HasKey(o => o.Id);
+            entity.Property(o => o.Reason).IsRequired().HasMaxLength(500);
+            entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(o => o.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(o => o.UserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(o => o.RespondedByUserId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    private static void ConfigureMukandoRoundActivityEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MukandoRoundActivity>(entity =>
+        {
+            entity.ToTable("MukandoRoundActivities");
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.Details).IsRequired().HasMaxLength(500);
+            entity.HasOne<MukandoRound>().WithMany().HasForeignKey(a => a.MukandoRoundId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 

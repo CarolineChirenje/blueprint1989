@@ -13,6 +13,9 @@
         <div>
           <h1>{{ cycle.name }}</h1>
           <span class="date-range">{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
+          @if (isMukando) {
+            <span class="cycle-type-badge mukando">Mukando</span>
+          }
         </div>
       </div>
       <div class="header-right">
@@ -29,6 +32,11 @@
           </button>
           <button mat-stroked-button color="warn" (click)="closeCycle()">Close Cycle</button>
         }
+        @if (canManageCycle() && isMukando) {
+          <button mat-stroked-button (click)="exportCsv()" matTooltip="Export cycle data as CSV">
+            <mat-icon>download</mat-icon> Export
+          </button>
+        }
         @if (canManageCycle()) {
           <button mat-icon-button color="warn" matTooltip="Delete cycle" (click)="deleteCycle()">
             <mat-icon>delete_outline</mat-icon>
@@ -37,12 +45,12 @@
       </div>
     </div>
 
-    <!-- Contribution totals strip (shown when expenses exist) -->
-    @if (contributionSummary && contributionSummary.totalExpenses > 0) {
+    <!-- Contribution totals strip (Majana) -->
+    @if (!isMukando && contributionSummary && contributionSummary.totalExpenses > 0) {
       <div class="summary-strip">
         <div class="strip-item">
           <span class="strip-label">Total expenses</span>
-          <span class="strip-value">${{ contributionSummary.totalExpenses | number:'1.2-2' }}</span>
+          <span class="strip-value">{{ currencySymbol }}{{ contributionSummary.totalExpenses | number:'1.2-2' }}</span>
         </div>
         <div class="strip-item">
           <span class="strip-label">Members</span>
@@ -50,22 +58,69 @@
         </div>
         <div class="strip-item">
           <span class="strip-label">Each owes</span>
-          <span class="strip-value primary">${{ contributionSummary.sharePerMember | number:'1.2-2' }}</span>
+          <span class="strip-value primary">{{ currencySymbol }}{{ contributionSummary.sharePerMember | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Mukando summary strip -->
+    @if (isMukando && mukandoSummary) {
+      <div class="summary-strip">
+        <div class="strip-item">
+          <span class="strip-label">Contribution</span>
+          <span class="strip-value">{{ currencySymbol }}{{ cycle.contributionAmount | number:'1.2-2' }}</span>
+        </div>
+        <div class="strip-item">
+          <span class="strip-label">Progress</span>
+          <span class="strip-value primary">{{ mukandoSummary.roundsCompleted }} / {{ mukandoSummary.totalRounds }}</span>
+        </div>
+        <div class="strip-item">
+          <span class="strip-label">Collected</span>
+          <span class="strip-value">{{ currencySymbol }}{{ mukandoSummary.totalCollected | number:'1.2-2' }}</span>
+        </div>
+        <div class="strip-item">
+          <span class="strip-label">Disbursed</span>
+          <span class="strip-value">{{ currencySymbol }}{{ mukandoSummary.totalDisbursed | number:'1.2-2' }}</span>
+        </div>
+        <div class="strip-item">
+          <span class="strip-label">On-time rate</span>
+          <span class="strip-value">{{ mukandoSummary.onTimeContributionRate | number:'1.0-0' }}%</span>
         </div>
       </div>
     }
 
     <!-- Tabs -->
     <div class="tabs">
-      <button [class.active]="activeTab==='expenses'" (click)="activeTab='expenses'">
-        Expenses ({{ expenses.length }})
-      </button>
-      <button [class.active]="activeTab==='payments'" (click)="activeTab='payments'">
-        Payments ({{ payments.length }})
-      </button>
-      <button [class.active]="activeTab==='summary'" (click)="activeTab='summary'">
-        Summary
-      </button>
+      @if (!isMukando) {
+        <button [class.active]="activeTab==='expenses'" (click)="activeTab='expenses'">
+          Expenses ({{ expenses.length }})
+        </button>
+        <button [class.active]="activeTab==='payments'" (click)="activeTab='payments'">
+          Payments ({{ payments.length }})
+        </button>
+        <button [class.active]="activeTab==='summary'" (click)="activeTab='summary'">
+          Summary
+        </button>
+      }
+      @if (isMukando) {
+        <button [class.active]="activeTab==='rounds'" (click)="activeTab='rounds'">
+          Rounds ({{ rounds.length }})
+        </button>
+        <button [class.active]="activeTab==='stats'" (click)="activeTab='stats'">
+          Stats
+        </button>
+        <button [class.active]="activeTab==='activity'" (click)="activeTab='activity'">
+          Activity
+        </button>
+        @if (isDraft()) {
+          <button [class.active]="activeTab==='swaps'" (click)="activeTab='swaps'">
+            Swaps @if (pendingSwapCount() > 0) { <span class="dispute-badge">{{ pendingSwapCount() }}</span> }
+          </button>
+          <button [class.active]="activeTab==='optouts'" (click)="activeTab='optouts'">
+            Opt-outs @if (pendingOptOutCount() > 0) { <span class="dispute-badge">{{ pendingOptOutCount() }}</span> }
+          </button>
+        }
+      }
       <button [class.active]="activeTab==='disputes'" (click)="activeTab='disputes'">
         Disputes @if (pendingDisputeCount() > 0) { <span class="dispute-badge">{{ pendingDisputeCount() }}</span> }
       </button>
@@ -314,6 +369,263 @@
               <tr mat-header-row *matHeaderRowDef="['member','owes','paid','balance','status']"></tr>
               <tr mat-row *matRowDef="let row; columns: ['member','owes','paid','balance','status'];"></tr>
             </table>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ═══════ Mukando: Rounds Tab ═══════ -->
+    @if (activeTab === 'rounds') {
+      <div class="tab-content">
+        @if (rounds.length === 0) {
+          <div class="empty-state">No rounds yet. Start the cycle to activate the first round.</div>
+        } @else {
+          <div class="round-list">
+            @for (r of rounds; track r.id) {
+              <div class="round-card" [class.round-expanded]="selectedRound?.id === r.id"
+                   [ngClass]="roundStatusClass(r.status)" (click)="selectRound(r)">
+                <div class="round-header">
+                  <div class="round-number">Round {{ r.roundNumber }}</div>
+                  <div class="round-recipient">
+                    <mat-icon>person</mat-icon> {{ r.recipientName }}
+                  </div>
+                  <span class="round-status-chip" [ngClass]="roundStatusClass(r.status)">{{ r.status }}</span>
+                  <div class="round-due">Due: {{ r.dueDate | date:'mediumDate' }}</div>
+                  <div class="round-pool">{{ currencySymbol }}{{ r.actualCollected | number:'1.2-2' }} / {{ currencySymbol }}{{ r.expectedPool | number:'1.2-2' }}</div>
+                  <mat-icon class="expand-icon">{{ selectedRound?.id === r.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </div>
+
+                <!-- Expanded round detail -->
+                @if (selectedRound?.id === r.id && selectedRound.contributions) {
+                  <div class="round-detail" (click)="$event.stopPropagation()">
+                    <h4>Contributions</h4>
+                    <div class="contribution-list">
+                      @for (c of selectedRound.contributions; track c.id) {
+                        <div class="contribution-row">
+                          <span class="contrib-member">{{ c.firstName }} {{ c.lastName }}</span>
+                          <span class="contrib-amount">{{ currencySymbol }}{{ c.amount | number:'1.2-2' }}</span>
+                          <span class="contrib-status-chip" [ngClass]="contributionStatusClass(c.status)">{{ c.status }}</span>
+                          @if (c.proofUrl) {
+                            <a [href]="c.proofUrl" target="_blank" class="proof-link" matTooltip="View proof">
+                              <mat-icon>receipt_long</mat-icon>
+                            </a>
+                          }
+                          @if (c.reference) {
+                            <span class="contrib-ref">Ref: {{ c.reference }}</span>
+                          }
+                          <!-- Admin: confirm a Paid contribution -->
+                          @if (canManageCycle() && c.status === 'Paid') {
+                            <button mat-stroked-button color="primary" class="btn-sm"
+                                    (click)="confirmContribution(selectedRound.id, c.userId)">
+                              <mat-icon>check</mat-icon> Confirm
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Member: record own contribution -->
+                    @if (isActive() && isCurrentUserCycleMember && !selectedRound.payoutConfirmed) {
+                      <div class="record-contribution-form">
+                        <h4>Record Your Contribution</h4>
+                        <mat-form-field appearance="outline">
+                          <mat-label>Proof URL</mat-label>
+                          <input matInput [(ngModel)]="contributionProofUrl" placeholder="Upload proof link">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                          <mat-label>Reference (optional)</mat-label>
+                          <input matInput [(ngModel)]="contributionReference">
+                        </mat-form-field>
+                        <button mat-raised-button color="primary"
+                                [disabled]="!contributionProofUrl"
+                                (click)="recordContribution(selectedRound.id)">
+                          Submit Contribution
+                        </button>
+                      </div>
+                    }
+
+                    <!-- Admin: payout & force-close -->
+                    @if (canManageCycle() && selectedRound.status === 'Active' && !selectedRound.payoutConfirmed) {
+                      <div class="admin-actions-section">
+                        <h4>Admin Actions</h4>
+                        <div class="payout-form">
+                          <h5>Record Payout to {{ selectedRound.recipientName }}</h5>
+                          <div class="payout-fields">
+                            <mat-form-field appearance="outline">
+                              <mat-label>Amount</mat-label>
+                              <input matInput type="number" [(ngModel)]="payoutAmount">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline">
+                              <mat-label>Method</mat-label>
+                              <mat-select [(ngModel)]="payoutMethod">
+                                <mat-option value="Cash">Cash</mat-option>
+                                <mat-option value="BankTransfer">Bank Transfer</mat-option>
+                                <mat-option value="MobileMoney">Mobile Money</mat-option>
+                                <mat-option value="Other">Other</mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                            <mat-form-field appearance="outline">
+                              <mat-label>Proof URL</mat-label>
+                              <input matInput [(ngModel)]="payoutProofUrl">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline">
+                              <mat-label>Reference</mat-label>
+                              <input matInput [(ngModel)]="payoutReference">
+                            </mat-form-field>
+                          </div>
+                          <button mat-raised-button color="primary"
+                                  [disabled]="!payoutAmount || !payoutMethod || !payoutProofUrl"
+                                  (click)="recordPayout(selectedRound.id)">
+                            <mat-icon>payment</mat-icon> Record Payout
+                          </button>
+                        </div>
+                        <button mat-stroked-button color="warn" class="force-close-btn"
+                                (click)="forceCloseRound(selectedRound.id)">
+                          <mat-icon>block</mat-icon> Force Close Round
+                        </button>
+                      </div>
+                    }
+
+                    @if (selectedRound.payoutConfirmed) {
+                      <div class="payout-confirmed-banner">
+                        <mat-icon>check_circle</mat-icon> Payout confirmed
+                      </div>
+                    }
+
+                    <!-- Round activity timeline -->
+                    @if (roundActivities.length > 0) {
+                      <div class="round-activity">
+                        <h4>Activity</h4>
+                        @for (a of roundActivities; track a.id) {
+                          <div class="activity-item">
+                            <span class="activity-action">{{ a.action }}</span>
+                            <span class="activity-user">{{ a.userName }}</span>
+                            <span class="activity-detail">{{ a.details }}</span>
+                            <span class="activity-time">{{ a.createdAt | date:'short' }}</span>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ═══════ Mukando: Stats Tab ═══════ -->
+    @if (activeTab === 'stats') {
+      <div class="tab-content">
+        @if (!mukandoSummary) {
+          <div class="empty-state">No stats available yet.</div>
+        } @else {
+          <h3>Member Reliability</h3>
+          <div class="reliability-list">
+            @for (m of mukandoSummary.memberReliability; track m.userId) {
+              <div class="reliability-card">
+                <div class="reliability-name">{{ m.firstName }} {{ m.lastName }}</div>
+                <div class="reliability-bar-track">
+                  <div class="reliability-bar-fill" [style.width.%]="m.reliabilityPercent"></div>
+                </div>
+                <div class="reliability-stats">
+                  <span>{{ m.reliabilityPercent | number:'1.0-0' }}%</span>
+                  <span class="reliability-detail">{{ m.onTimeCount }} on-time · {{ m.missedCount }} missed</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ═══════ Mukando: Activity Tab ═══════ -->
+    @if (activeTab === 'activity') {
+      <div class="tab-content">
+        @if (activeRound) {
+          <h3>Activity for Round {{ activeRound.roundNumber }}</h3>
+        }
+        @if (roundActivities.length === 0) {
+          <div class="empty-state">No activity recorded yet.</div>
+        } @else {
+          <div class="activity-timeline">
+            @for (a of roundActivities; track a.id) {
+              <div class="activity-timeline-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                  <div class="activity-header-row">
+                    <strong>{{ a.action }}</strong>
+                    <span class="activity-time">{{ a.createdAt | date:'medium' }}</span>
+                  </div>
+                  <div class="activity-body">{{ a.userName }}: {{ a.details }}</div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ═══════ Mukando: Swaps Tab ═══════ -->
+    @if (activeTab === 'swaps') {
+      <div class="tab-content">
+        @if (swapRequests.length === 0) {
+          <div class="empty-state">No swap requests.</div>
+        } @else {
+          <div class="swap-list">
+            @for (s of swapRequests; track s.id) {
+              <div class="swap-card">
+                <div class="swap-header">
+                  <span class="swap-parties">
+                    {{ s.requesterName }} (Round {{ s.requesterRoundNumber }})
+                    <mat-icon>swap_horiz</mat-icon>
+                    {{ s.targetName }} (Round {{ s.targetRoundNumber }})
+                  </span>
+                  <span class="swap-status-chip" [ngClass]="'swap-' + s.status.toLowerCase()">{{ s.status }}</span>
+                </div>
+                <div class="swap-date">{{ s.createdAt | date:'mediumDate' }}</div>
+                @if (s.status === 'Pending') {
+                  <div class="swap-actions">
+                    @if (s.targetUserId === currentUserId) {
+                      <button mat-raised-button color="primary" (click)="respondSwap(s.id, true)">Accept</button>
+                      <button mat-stroked-button color="warn" (click)="respondSwap(s.id, false)">Decline</button>
+                    }
+                    @if (s.requesterUserId === currentUserId) {
+                      <button mat-stroked-button (click)="cancelSwap(s.id)">Cancel</button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ═══════ Mukando: Opt-outs Tab ═══════ -->
+    @if (activeTab === 'optouts') {
+      <div class="tab-content">
+        @if (optOutRequests.length === 0) {
+          <div class="empty-state">No opt-out requests.</div>
+        } @else {
+          <div class="optout-list">
+            @for (o of optOutRequests; track o.id) {
+              <div class="optout-card">
+                <div class="optout-header">
+                  <span class="optout-name">{{ o.userName }}</span>
+                  <span class="optout-status-chip" [ngClass]="'optout-' + o.status.toLowerCase()">{{ o.status }}</span>
+                </div>
+                <div class="optout-reason">{{ o.reason }}</div>
+                <div class="optout-date">{{ o.createdAt | date:'mediumDate' }}</div>
+                @if (canManageCycle() && o.status === 'Pending') {
+                  <div class="optout-actions">
+                    <button mat-raised-button color="primary" (click)="respondOptOut(o.id, true)">Approve</button>
+                    <button mat-stroked-button color="warn" (click)="respondOptOut(o.id, false)">Reject</button>
+                  </div>
+                }
+              </div>
+            }
           </div>
         }
       </div>

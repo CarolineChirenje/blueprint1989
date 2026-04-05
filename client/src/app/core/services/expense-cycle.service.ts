@@ -7,7 +7,15 @@ import {
   ExpenseCycleSummaryDto,
   CycleBalanceDto,
   CycleContributionSummaryDto,
-  OutstandingSummaryDto
+  OutstandingSummaryDto,
+  CurrencyDto,
+  MukandoRoundDto,
+  MukandoPayoutDto,
+  MukandoSwapRequestDto,
+  MukandoOptOutRequestDto,
+  MukandoRoundActivityDto,
+  MukandoCycleSummaryDto,
+  MukandoDashboardDto
 } from '../../shared/models/expense-cycle.model';
 
 @Injectable({ providedIn: 'root' })
@@ -15,6 +23,8 @@ export class ExpenseCycleService {
   private url = `${environment.apiUrl}/cycles`;
 
   constructor(private http: HttpClient) {}
+
+  // ── Existing endpoints ──────────────────────────────────────────────────────
 
   getAll(groupId?: number | null): Observable<ExpenseCycleSummaryDto[]> {
     const params = groupId ? new HttpParams().set('groupId', groupId) : undefined;
@@ -29,7 +39,19 @@ export class ExpenseCycleService {
     return this.http.get<CycleBalanceDto>(`${this.url}/${id}/balance`);
   }
 
-  create(payload: { name: string; startDate: string; endDate: string; memberUserIds: number[]; groupId?: number | null; copyExpensesFromCycleId?: number | null }): Observable<ExpenseCycleDto> {
+  create(payload: {
+    name: string;
+    startDate: string;
+    endDate: string;
+    memberUserIds: number[];
+    groupId?: number | null;
+    currencyId: number;
+    cycleType?: string;
+    contributionAmount?: number | null;
+    frequency?: string | null;
+    payoutOrder?: number[] | null;
+    copyExpensesFromCycleId?: number | null;
+  }): Observable<ExpenseCycleDto> {
     return this.http.post<ExpenseCycleDto>(this.url, payload);
   }
 
@@ -67,5 +89,111 @@ export class ExpenseCycleService {
 
   getOutstandingSummary(): Observable<OutstandingSummaryDto> {
     return this.http.get<OutstandingSummaryDto>(`${this.url}/outstanding-summary`);
+  }
+
+  // ── Currencies ──────────────────────────────────────────────────────────────
+
+  getCurrencies(): Observable<CurrencyDto[]> {
+    return this.http.get<CurrencyDto[]>(`${environment.apiUrl}/currencies`);
+  }
+
+  // ── Mukando Rounds ──────────────────────────────────────────────────────────
+
+  getRounds(cycleId: number): Observable<MukandoRoundDto[]> {
+    return this.http.get<MukandoRoundDto[]>(`${this.url}/${cycleId}/rounds`);
+  }
+
+  getRoundDetail(cycleId: number, roundId: number): Observable<MukandoRoundDto> {
+    return this.http.get<MukandoRoundDto>(`${this.url}/${cycleId}/rounds/${roundId}`);
+  }
+
+  getPayout(cycleId: number, roundId: number): Observable<MukandoPayoutDto> {
+    return this.http.get<MukandoPayoutDto>(`${this.url}/${cycleId}/rounds/${roundId}/payout`);
+  }
+
+  recordContribution(cycleId: number, roundId: number, payload: { proofUrl: string; reference?: string; notes?: string }): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/contribute`, payload);
+  }
+
+  confirmContribution(cycleId: number, roundId: number, memberId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/confirm-contribution/${memberId}`, {});
+  }
+
+  recordPayout(cycleId: number, roundId: number, payload: { amountDisbursed: number; paymentMethod: string; proofUrl: string; reference?: string }): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/payout`, payload);
+  }
+
+  forceCloseRound(cycleId: number, roundId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/force-close`, {});
+  }
+
+  // ── Mukando Settings ────────────────────────────────────────────────────────
+
+  updateMukandoSettings(cycleId: number, payload: { contributionAmount: number; frequency: string; payoutOrder: number[] }): Observable<void> {
+    return this.http.put<void>(`${this.url}/${cycleId}/mukando-settings`, payload);
+  }
+
+  // ── Summary & Export ────────────────────────────────────────────────────────
+
+  getMukandoSummary(cycleId: number): Observable<MukandoCycleSummaryDto> {
+    return this.http.get<MukandoCycleSummaryDto>(`${this.url}/${cycleId}/mukando-summary`);
+  }
+
+  getRoundActivity(cycleId: number, roundId: number): Observable<MukandoRoundActivityDto[]> {
+    return this.http.get<MukandoRoundActivityDto[]>(`${this.url}/${cycleId}/rounds/${roundId}/activity`);
+  }
+
+  exportCycleCsv(cycleId: number): Observable<Blob> {
+    return this.http.get(`${this.url}/${cycleId}/export`, { responseType: 'blob' });
+  }
+
+  duplicateCycle(cycleId: number, newStartDate: string): Observable<ExpenseCycleDto> {
+    return this.http.post<ExpenseCycleDto>(`${this.url}/${cycleId}/duplicate`, { newStartDate });
+  }
+
+  // ── Dashboard ───────────────────────────────────────────────────────────────
+
+  getMukandoDashboard(): Observable<MukandoDashboardDto> {
+    return this.http.get<MukandoDashboardDto>(`${this.url}/mukando-dashboard`);
+  }
+
+  // ── Swap Requests ───────────────────────────────────────────────────────────
+
+  getSwapRequests(cycleId: number): Observable<MukandoSwapRequestDto[]> {
+    return this.http.get<MukandoSwapRequestDto[]>(`${this.url}/${cycleId}/swap-requests`);
+  }
+
+  createSwapRequest(cycleId: number, targetUserId: number): Observable<MukandoSwapRequestDto> {
+    return this.http.post<MukandoSwapRequestDto>(`${this.url}/${cycleId}/swap-requests`, { targetUserId });
+  }
+
+  respondSwapRequest(cycleId: number, swapId: number, accept: boolean): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/swap-requests/${swapId}/respond`, { accept });
+  }
+
+  cancelSwapRequest(cycleId: number, swapId: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${cycleId}/swap-requests/${swapId}`);
+  }
+
+  // ── Opt-out Requests ────────────────────────────────────────────────────────
+
+  getOptOutRequests(cycleId: number): Observable<MukandoOptOutRequestDto[]> {
+    return this.http.get<MukandoOptOutRequestDto[]>(`${this.url}/${cycleId}/opt-out-requests`);
+  }
+
+  createOptOutRequest(cycleId: number, reason: string): Observable<MukandoOptOutRequestDto> {
+    return this.http.post<MukandoOptOutRequestDto>(`${this.url}/${cycleId}/opt-out`, { reason });
+  }
+
+  respondOptOutRequest(cycleId: number, requestId: number, approve: boolean): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/opt-out/${requestId}/respond`, { approve });
+  }
+
+  // ── File Upload ─────────────────────────────────────────────────────────────
+
+  uploadFile(file: File, folder: string = 'proofs'): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ url: string }>(`${environment.apiUrl}/files/upload?folder=${encodeURIComponent(folder)}`, formData);
   }
 }

@@ -50,3 +50,69 @@ public enum DisputeStatus
     Resolved = 3,
     Rejected = 4
 }
+
+public enum CycleType
+{
+    Majana  = 0,
+    Mukando = 1
+}
+
+public enum CycleFrequency
+{
+    Weekly   = 1,
+    Biweekly = 2,
+    Monthly  = 3
+}
+
+public enum RoundStatus
+{
+    Pending   = 0,
+    Active    = 1,
+    Completed = 2
+}
+
+public enum ContributionStatus
+{
+    Pending   = 0,
+    Paid      = 1,
+    Confirmed = 2,
+    Missed    = 3
+}
+
+public enum SwapRequestStatus
+{
+    Pending   = 0,
+    Accepted  = 1,
+    Declined  = 2,
+    Cancelled = 3
+}
+
+public enum OptOutRequestStatus
+{
+    Pending  = 0,
+    Approved = 1,
+    Rejected = 2
+}
+
+public enum PaymentMethod
+{
+    Cash          = 1,
+    BankTransfer  = 2,
+    MobileMoney   = 3,
+    Other         = 4
+}
+
+public enum RoundActivityAction
+{
+    RoundActivated         = 1,
+    ContributionSubmitted  = 2,
+    ContributionConfirmed  = 3,
+    PayoutRecorded         = 4,
+    RoundForceClose        = 5,
+    SwapRequested          = 6,
+    SwapAccepted           = 7,
+    SwapDeclined           = 8,
+    OptOutRequested        = 9,
+    OptOutApproved         = 10,
+    OptOutRejected         = 11
+}

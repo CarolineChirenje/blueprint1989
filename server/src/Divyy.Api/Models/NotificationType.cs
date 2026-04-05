@@ -62,5 +62,46 @@ public enum NotificationType
 
     /// <summary>A feature/bug report status has been updated by an admin.</summary>
     FeatureBugReportResolved = 19,
+
+    // ── Mukando ──────────────────────────────────────────────────────────────
+
+    /// <summary>A Mukando round has started; all members are notified of the recipient and due date.</summary>
+    MukandoRoundStarted = 20,
+
+    /// <summary>A member submitted their contribution for a Mukando round.</summary>
+    MukandoContributionReceived = 21,
+
+    /// <summary>Admin confirmed a member's contribution for a Mukando round.</summary>
+    MukandoContributionConfirmed = 22,
+
+    /// <summary>All contributions for a Mukando round have been collected; admin is notified.</summary>
+    MukandoAllContributionsCollected = 23,
+
+    /// <summary>The payout for a Mukando round has been confirmed by the admin.</summary>
+    MukandoPayoutConfirmed = 24,
+
+    /// <summary>A Mukando round has been completed.</summary>
+    MukandoRoundCompleted = 25,
+
+    /// <summary>All rounds in a Mukando cycle are done.</summary>
+    MukandoCycleCompleted = 26,
+
+    /// <summary>A member requested to swap turns with another member.</summary>
+    MukandoSwapRequested = 27,
+
+    /// <summary>A swap request was accepted.</summary>
+    MukandoSwapAccepted = 28,
+
+    /// <summary>A swap request was declined.</summary>
+    MukandoSwapDeclined = 29,
+
+    /// <summary>Reminder: a Mukando contribution is due soon or overdue.</summary>
+    MukandoContributionDue = 30,
+
+    /// <summary>A member requested to opt out of a Mukando cycle.</summary>
+    MukandoOptOutRequested = 31,
+
+    /// <summary>Admin responded to an opt-out request.</summary>
+    MukandoOptOutResponded = 32,
 }
 

@@ -18,7 +18,13 @@ import {
   PaymentDto,
   CycleBalanceDto,
   CycleContributionSummaryDto,
-  ExpenseDisputeDto
+  ExpenseDisputeDto,
+  MukandoRoundDto,
+  MukandoContributionDto,
+  MukandoCycleSummaryDto,
+  MukandoRoundActivityDto,
+  MukandoSwapRequestDto,
+  MukandoOptOutRequestDto,
 } from '../../../../shared/models/expense-cycle.model';
 import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dialog.component';
 import { AddPaymentDialogComponent } from '../add-payment-dialog/add-payment-dialog.component';
@@ -42,12 +48,26 @@ export class CycleDetailComponent implements OnInit {
   loading = true;
   error = '';
   reminderSending = false;
-  activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' = 'expenses';
+  activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' | 'rounds' | 'stats' | 'activity' | 'swaps' | 'optouts' = 'expenses';
   isAdmin = false;
   currentUserId: number | null = null;
   addableMembers: GroupMemberDto[] = [];
   selectedAddUserId: number | null = null;
   addingMember = false;
+
+  // Mukando state
+  rounds: MukandoRoundDto[] = [];
+  selectedRound: MukandoRoundDto | null = null;
+  mukandoSummary: MukandoCycleSummaryDto | null = null;
+  roundActivities: MukandoRoundActivityDto[] = [];
+  swapRequests: MukandoSwapRequestDto[] = [];
+  optOutRequests: MukandoOptOutRequestDto[] = [];
+  contributionProofUrl = '';
+  contributionReference = '';
+  payoutAmount: number | null = null;
+  payoutMethod = '';
+  payoutProofUrl = '';
+  payoutReference = '';
 
   expenseDataSource = new MatTableDataSource<ExpenseDto>([]);
   paymentDataSource = new MatTableDataSource<PaymentDto>([]);
@@ -97,9 +117,17 @@ export class CycleDetailComponent implements OnInit {
     this.cycleService.getById(id).subscribe({
       next: cycle => {
         this.cycle = cycle;
-        this.loadExpenses();
-        this.loadPayments();
-        this.loadContributionSummary();
+        if (cycle.cycleType === 'Mukando') {
+          this.activeTab = this.activeTab === 'expenses' || this.activeTab === 'payments' || this.activeTab === 'summary' ? 'rounds' : this.activeTab;
+          this.loadRounds();
+          this.loadMukandoSummary();
+          this.loadSwapRequests();
+          this.loadOptOutRequests();
+        } else {
+          this.loadExpenses();
+          this.loadPayments();
+          this.loadContributionSummary();
+        }
         this.loadDisputes();
         if (this.canManageCycle() && cycle.status === 'Draft') {
           this.loadAddableMembers(cycle);
@@ -309,6 +337,224 @@ export class CycleDetailComponent implements OnInit {
   }
 
   back(): void { this.router.navigate(['/cycles']); }
+
+  // ── Mukando helpers ─────────────────────────────────────────────────────
+
+  get isMukando(): boolean { return this.cycle?.cycleType === 'Mukando'; }
+
+  get currencySymbol(): string { return this.cycle?.currencySymbol ?? '$'; }
+
+  loadRounds(): void {
+    if (!this.cycle) return;
+    this.cycleService.getRounds(this.cycle.id).subscribe({
+      next: r => { this.rounds = r; this.cdr.detectChanges(); }
+    });
+  }
+
+  selectRound(round: MukandoRoundDto): void {
+    if (this.selectedRound?.id === round.id) {
+      this.selectedRound = null;
+      this.roundActivities = [];
+      return;
+    }
+    if (!this.cycle) return;
+    this.cycleService.getRoundDetail(this.cycle.id, round.id).subscribe({
+      next: r => {
+        this.selectedRound = r;
+        this.loadRoundActivities(r.id);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadRoundActivities(roundId: number): void {
+    if (!this.cycle) return;
+    this.cycleService.getRoundActivity(this.cycle.id, roundId).subscribe({
+      next: a => { this.roundActivities = a; this.cdr.detectChanges(); }
+    });
+  }
+
+  loadMukandoSummary(): void {
+    if (!this.cycle) return;
+    this.cycleService.getMukandoSummary(this.cycle.id).subscribe({
+      next: s => { this.mukandoSummary = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  loadSwapRequests(): void {
+    if (!this.cycle) return;
+    this.cycleService.getSwapRequests(this.cycle.id).subscribe({
+      next: s => { this.swapRequests = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  loadOptOutRequests(): void {
+    if (!this.cycle) return;
+    this.cycleService.getOptOutRequests(this.cycle.id).subscribe({
+      next: r => { this.optOutRequests = r; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  recordContribution(roundId: number): void {
+    if (!this.cycle || !this.contributionProofUrl) return;
+    this.cycleService.recordContribution(this.cycle.id, roundId, {
+      proofUrl: this.contributionProofUrl,
+      reference: this.contributionReference || undefined
+    }).subscribe({
+      next: () => {
+        this.contributionProofUrl = '';
+        this.contributionReference = '';
+        this.snackBar.open('Contribution recorded.', 'OK', { duration: 3000 });
+        this.selectRound(this.selectedRound!);
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  confirmContribution(roundId: number, memberId: number): void {
+    if (!this.cycle) return;
+    this.cycleService.confirmContribution(this.cycle.id, roundId, memberId).subscribe({
+      next: () => {
+        this.snackBar.open('Contribution confirmed.', 'OK', { duration: 3000 });
+        this.selectRound(this.selectedRound!);
+        this.loadRounds();
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  recordPayout(roundId: number): void {
+    if (!this.cycle || !this.payoutProofUrl || !this.payoutAmount || !this.payoutMethod) return;
+    this.cycleService.recordPayout(this.cycle.id, roundId, {
+      amountDisbursed: this.payoutAmount,
+      paymentMethod: this.payoutMethod,
+      proofUrl: this.payoutProofUrl,
+      reference: this.payoutReference || undefined
+    }).subscribe({
+      next: () => {
+        this.payoutAmount = null;
+        this.payoutMethod = '';
+        this.payoutProofUrl = '';
+        this.payoutReference = '';
+        this.snackBar.open('Payout recorded.', 'OK', { duration: 3000 });
+        this.loadRounds();
+        this.loadMukandoSummary();
+        this.selectedRound = null;
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  forceCloseRound(roundId: number): void {
+    if (!this.cycle) return;
+    this.dialogService.confirm({
+      title: 'Force Close Round',
+      message: 'Force-close this round? This will mark all pending contributions as missed.',
+      confirmText: 'Force Close',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.cycleService.forceCloseRound(this.cycle!.id, roundId).subscribe({
+        next: () => {
+          this.snackBar.open('Round force-closed.', 'OK', { duration: 3000 });
+          this.loadRounds();
+          this.loadMukandoSummary();
+          this.selectedRound = null;
+        },
+        error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+      });
+    });
+  }
+
+  exportCsv(): void {
+    if (!this.cycle) return;
+    this.cycleService.exportCycleCsv(this.cycle.id).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.cycle!.name}-export.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.snackBar.open('Export failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  respondSwap(swapId: number, accept: boolean): void {
+    if (!this.cycle) return;
+    this.cycleService.respondSwapRequest(this.cycle.id, swapId, accept).subscribe({
+      next: () => {
+        this.snackBar.open(accept ? 'Swap accepted.' : 'Swap declined.', 'OK', { duration: 3000 });
+        this.loadSwapRequests();
+        this.loadRounds();
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  cancelSwap(swapId: number): void {
+    if (!this.cycle) return;
+    this.cycleService.cancelSwapRequest(this.cycle.id, swapId).subscribe({
+      next: () => {
+        this.snackBar.open('Swap cancelled.', 'OK', { duration: 3000 });
+        this.loadSwapRequests();
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  respondOptOut(requestId: number, approve: boolean): void {
+    if (!this.cycle) return;
+    this.cycleService.respondOptOutRequest(this.cycle.id, requestId, approve).subscribe({
+      next: () => {
+        this.snackBar.open(approve ? 'Opt-out approved.' : 'Opt-out rejected.', 'OK', { duration: 3000 });
+        this.loadOptOutRequests();
+        if (approve) { this.loadRounds(); this.loadAll(this.cycle!.id); }
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  contributionStatusClass(status: string): string {
+    switch (status) {
+      case 'Confirmed': return 'contrib-status-confirmed';
+      case 'Paid': return 'contrib-status-paid';
+      case 'Missed': return 'contrib-status-missed';
+      default: return 'contrib-status-pending';
+    }
+  }
+
+  roundStatusClass(status: string): string {
+    switch (status) {
+      case 'Completed': return 'round-completed';
+      case 'Active': return 'round-active';
+      default: return 'round-pending';
+    }
+  }
+
+  get activeRound(): MukandoRoundDto | undefined {
+    return this.rounds.find(r => r.status === 'Active');
+  }
+
+  get completedRoundsCount(): number {
+    return this.rounds.filter(r => r.status === 'Completed').length;
+  }
+
+  pendingSwapCount(): number {
+    return this.swapRequests.filter(s => s.status === 'Pending').length;
+  }
+
+  pendingOptOutCount(): number {
+    return this.optOutRequests.filter(o => o.status === 'Pending').length;
+  }
+
+  isMyContribution(c: MukandoContributionDto): boolean {
+    return c.userId === this.currentUserId;
+  }
 
   deleteCycle(): void {
     if (!this.cycle) return;

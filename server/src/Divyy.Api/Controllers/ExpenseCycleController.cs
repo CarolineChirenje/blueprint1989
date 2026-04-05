@@ -12,12 +12,14 @@ namespace Divvy.Api.Controllers;
 public class ExpenseCycleController : ControllerBase
 {
     private readonly ExpenseCycleService _cycleService;
+    private readonly MukandoService      _mukandoService;
     private readonly IGroupService _groupService;
 
-    public ExpenseCycleController(ExpenseCycleService cycleService, IGroupService groupService)
+    public ExpenseCycleController(ExpenseCycleService cycleService, MukandoService mukandoService, IGroupService groupService)
     {
-        _cycleService  = cycleService;
-        _groupService  = groupService;
+        _cycleService   = cycleService;
+        _mukandoService = mukandoService;
+        _groupService   = groupService;
     }
 
     private int? GetCurrentUserId()
@@ -212,6 +214,238 @@ public class ExpenseCycleController : ControllerBase
         if (error != null)
             return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
 
+        return NoContent();
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    //  Mukando Endpoints
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>Returns all rounds for a Mukando cycle.</summary>
+    [HttpGet("{id:int}/rounds")]
+    public async Task<IActionResult> GetRounds(int id)
+    {
+        var rounds = await _mukandoService.GetRoundsAsync(id);
+        return Ok(rounds);
+    }
+
+    /// <summary>Returns round detail with contributions.</summary>
+    [HttpGet("{id:int}/rounds/{roundId:int}")]
+    public async Task<IActionResult> GetRoundDetail(int id, int roundId)
+    {
+        var round = await _mukandoService.GetRoundDetailAsync(roundId);
+        if (round == null) return NotFound(new { message = "Round not found." });
+        return Ok(round);
+    }
+
+    /// <summary>Returns the payout record for a round (if exists).</summary>
+    [HttpGet("{id:int}/rounds/{roundId:int}/payout")]
+    public async Task<IActionResult> GetPayout(int id, int roundId)
+    {
+        var payout = await _mukandoService.GetPayoutAsync(roundId);
+        if (payout == null) return NotFound(new { message = "Payout not found." });
+        return Ok(payout);
+    }
+
+    /// <summary>Member records their contribution for a round (with proof URL).</summary>
+    [HttpPost("{id:int}/rounds/{roundId:int}/contribute")]
+    public async Task<IActionResult> RecordContribution(int id, int roundId, [FromBody] RecordContributionRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _mukandoService.RecordContributionAsync(roundId, userId.Value, request);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Admin confirms a member's contribution.</summary>
+    [HttpPost("{id:int}/rounds/{roundId:int}/confirm-contribution/{memberId:int}")]
+    public async Task<IActionResult> ConfirmContribution(int id, int roundId, int memberId)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var adminId = GetCurrentUserId();
+        if (adminId == null) return Unauthorized();
+
+        var error = await _mukandoService.ConfirmContributionAsync(roundId, memberId, adminId.Value);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Admin records payout to round recipient (with proof).</summary>
+    [HttpPost("{id:int}/rounds/{roundId:int}/payout")]
+    public async Task<IActionResult> RecordPayout(int id, int roundId, [FromBody] RecordPayoutRequest request)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var adminId = GetCurrentUserId();
+        if (adminId == null) return Unauthorized();
+
+        var error = await _mukandoService.RecordPayoutAsync(roundId, adminId.Value, request);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Admin force-closes a round, marking unpaid members as Missed.</summary>
+    [HttpPost("{id:int}/rounds/{roundId:int}/force-close")]
+    public async Task<IActionResult> ForceCloseRound(int id, int roundId)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var adminId = GetCurrentUserId();
+        if (adminId == null) return Unauthorized();
+
+        var error = await _mukandoService.ForceCloseRoundAsync(roundId, adminId.Value);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Update Mukando settings (contribution amount, frequency, payout order) in Draft mode.</summary>
+    [HttpPut("{id:int}/mukando-settings")]
+    public async Task<IActionResult> UpdateMukandoSettings(int id, [FromBody] UpdateMukandoSettingsRequest request)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var error = await _mukandoService.UpdateSettingsAsync(id, request);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Get Mukando cycle-level statistics and member reliability.</summary>
+    [HttpGet("{id:int}/mukando-summary")]
+    public async Task<IActionResult> GetMukandoSummary(int id)
+    {
+        var summary = await _mukandoService.GetCycleSummaryAsync(id);
+        if (summary == null) return NotFound(new { message = "Mukando cycle not found." });
+        return Ok(summary);
+    }
+
+    /// <summary>Get round activity log (timeline).</summary>
+    [HttpGet("{id:int}/rounds/{roundId:int}/activity")]
+    public async Task<IActionResult> GetRoundActivity(int id, int roundId)
+    {
+        var activities = await _mukandoService.GetRoundActivitiesAsync(roundId);
+        return Ok(activities);
+    }
+
+    /// <summary>Export Mukando cycle as CSV.</summary>
+    [HttpGet("{id:int}/export")]
+    public async Task<IActionResult> ExportCycle(int id)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var csv = await _mukandoService.ExportCycleCsvAsync(id);
+        if (csv == null) return NotFound(new { message = "Mukando cycle not found." });
+
+        return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", $"mukando-cycle-{id}.csv");
+    }
+
+    /// <summary>Duplicate a cycle to create a new one in Draft status.</summary>
+    [HttpPost("{id:int}/duplicate")]
+    public async Task<IActionResult> DuplicateCycle(int id, [FromBody] DuplicateCycleRequest request)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var (dto, error) = await _cycleService.DuplicateAsync(id, userId.Value, request.NewStartDate);
+        if (error != null) return BadRequest(new { message = error });
+
+        return CreatedAtAction(nameof(GetById), new { id = dto!.Id }, dto);
+    }
+
+    /// <summary>Get Mukando dashboard data for the current user.</summary>
+    [HttpGet("mukando-dashboard")]
+    public async Task<IActionResult> GetMukandoDashboard()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var dashboard = await _mukandoService.GetDashboardAsync(userId.Value);
+        return Ok(dashboard);
+    }
+
+    // ── Swap Requests ──────────────────────────────────────────────
+
+    /// <summary>List all swap requests for a Mukando cycle.</summary>
+    [HttpGet("{id:int}/swap-requests")]
+    public async Task<IActionResult> GetSwapRequests(int id)
+    {
+        var swaps = await _mukandoService.GetSwapRequestsAsync(id);
+        return Ok(swaps);
+    }
+
+    /// <summary>Member creates a swap request (must be in Draft mode).</summary>
+    [HttpPost("{id:int}/swap-requests")]
+    public async Task<IActionResult> CreateSwapRequest(int id, [FromBody] CreateSwapRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var (dto, error) = await _mukandoService.CreateSwapRequestAsync(id, userId.Value, request.TargetUserId);
+        if (error != null) return BadRequest(new { message = error });
+        return Ok(dto);
+    }
+
+    /// <summary>Target member responds to a swap request (accept/decline).</summary>
+    [HttpPost("{id:int}/swap-requests/{swapId:int}/respond")]
+    public async Task<IActionResult> RespondSwapRequest(int id, int swapId, [FromBody] RespondSwapRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _mukandoService.RespondSwapRequestAsync(swapId, userId.Value, request.Accept);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Requester cancels their own pending swap request.</summary>
+    [HttpDelete("{id:int}/swap-requests/{swapId:int}")]
+    public async Task<IActionResult> CancelSwapRequest(int id, int swapId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _mukandoService.CancelSwapRequestAsync(swapId, userId.Value);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    // ── Opt-out Requests ───────────────────────────────────────────
+
+    /// <summary>List all opt-out requests for a cycle.</summary>
+    [HttpGet("{id:int}/opt-out-requests")]
+    public async Task<IActionResult> GetOptOutRequests(int id)
+    {
+        var requests = await _mukandoService.GetOptOutRequestsAsync(id);
+        return Ok(requests);
+    }
+
+    /// <summary>Member requests to opt out of a cycle (Draft only).</summary>
+    [HttpPost("{id:int}/opt-out")]
+    public async Task<IActionResult> CreateOptOutRequest(int id, [FromBody] CreateOptOutRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var (dto, error) = await _mukandoService.CreateOptOutRequestAsync(id, userId.Value, request.Reason);
+        if (error != null) return BadRequest(new { message = error });
+        return Ok(dto);
+    }
+
+    /// <summary>Admin responds to an opt-out request (approve/reject).</summary>
+    [HttpPost("{id:int}/opt-out/{requestId:int}/respond")]
+    public async Task<IActionResult> RespondOptOutRequest(int id, int requestId, [FromBody] RespondOptOutRequest request)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var adminId = GetCurrentUserId();
+        if (adminId == null) return Unauthorized();
+
+        var error = await _mukandoService.RespondOptOutRequestAsync(requestId, adminId.Value, request.Approve);
+        if (error != null) return BadRequest(new { message = error });
         return NoContent();
     }
 }

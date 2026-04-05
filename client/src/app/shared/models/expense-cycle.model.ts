@@ -19,6 +19,15 @@ export interface CycleBalanceDto {
   balances: MemberBalanceDto[];
 }
 
+export type CycleType = 'Majana' | 'Mukando';
+
+export interface CurrencyDto {
+  id: number;
+  code: string;
+  name: string;
+  symbol: string;
+}
+
 export interface ExpenseCycleSummaryDto {
   id: number;
   name: string;
@@ -32,6 +41,9 @@ export interface ExpenseCycleSummaryDto {
   groupId: number;
   groupName: string;
   currentUserGroupRole: 'GroupAdmin' | 'GroupMember';
+  cycleType: CycleType;
+  currencyCode: string;
+  currencySymbol: string;
 }
 
 export interface ExpenseCycleDto {
@@ -44,9 +56,14 @@ export interface ExpenseCycleDto {
   createdByUserId: number;
   createdAt: string;
   members: CycleMemberDto[];
-  /** "GroupAdmin" or "GroupMember" — role of the requesting user in this cycle's group. */
   currentUserGroupRole: 'GroupAdmin' | 'GroupMember';
   groupId: number;
+  cycleType: CycleType;
+  currencyId: number;
+  currencyCode: string;
+  currencySymbol: string;
+  contributionAmount: number | null;
+  frequency: string | null;
 }
 
 export interface MemberObligationDto {
@@ -155,4 +172,129 @@ export interface ExpenseDisputeDto {
   adminNotes: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+// ── Mukando Types ─────────────────────────────────────────────────────────────
+
+export interface MukandoRoundDto {
+  id: number;
+  roundNumber: number;
+  recipientUserId: number;
+  recipientName: string;
+  status: 'Pending' | 'Active' | 'Completed';
+  expectedPool: number;
+  actualCollected: number;
+  dueDate: string;
+  payoutConfirmed: boolean;
+  contributions: MukandoContributionDto[] | null;
+}
+
+export interface MukandoContributionDto {
+  id: number;
+  userId: number;
+  firstName: string;
+  lastName: string;
+  amount: number;
+  status: 'Pending' | 'Paid' | 'Confirmed' | 'Missed';
+  proofUrl: string | null;
+  reference: string | null;
+  paidAt: string | null;
+  confirmedByAdminAt: string | null;
+}
+
+export interface MukandoPayoutDto {
+  id: number;
+  recipientUserId: number;
+  recipientName: string;
+  amountDisbursed: number;
+  paymentMethod: string;
+  proofUrl: string;
+  reference: string | null;
+  confirmedByUserId: number;
+  createdAt: string;
+}
+
+export interface MukandoSwapRequestDto {
+  id: number;
+  requesterUserId: number;
+  requesterName: string;
+  requesterRoundNumber: number;
+  targetUserId: number;
+  targetName: string;
+  targetRoundNumber: number;
+  status: 'Pending' | 'Accepted' | 'Declined' | 'Cancelled';
+  createdAt: string;
+  respondedAt: string | null;
+}
+
+export interface MukandoOptOutRequestDto {
+  id: number;
+  userId: number;
+  userName: string;
+  reason: string;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  createdAt: string;
+  respondedAt: string | null;
+}
+
+export interface MukandoRoundActivityDto {
+  id: number;
+  action: string;
+  details: string;
+  userId: number;
+  userName: string;
+  createdAt: string;
+}
+
+export interface MukandoCycleSummaryDto {
+  cycleId: number;
+  cycleName: string;
+  totalDisbursed: number;
+  totalCollected: number;
+  totalExpectedPool: number;
+  roundsCompleted: number;
+  totalRounds: number;
+  onTimeContributionRate: number;
+  memberReliability: MemberReliabilityDto[];
+}
+
+export interface MemberReliabilityDto {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  onTimeCount: number;
+  missedCount: number;
+  totalContributions: number;
+  reliabilityPercent: number;
+}
+
+export interface MukandoDashboardDto {
+  nextContribution: MukandoNextContributionDto | null;
+  payoutRound: MukandoPayoutRoundDto | null;
+  activeRoundStatus: MukandoActiveRoundStatusDto | null;
+}
+
+export interface MukandoNextContributionDto {
+  cycleId: number;
+  cycleName: string;
+  amount: number;
+  currencySymbol: string;
+  dueDate: string;
+  roundNumber: number;
+  recipientName: string;
+}
+
+export interface MukandoPayoutRoundDto {
+  cycleId: number;
+  cycleName: string;
+  roundNumber: number;
+  estimatedDate: string;
+}
+
+export interface MukandoActiveRoundStatusDto {
+  cycleId: number;
+  cycleName: string;
+  roundNumber: number;
+  contributionsConfirmed: number;
+  contributionsTotal: number;
 }
