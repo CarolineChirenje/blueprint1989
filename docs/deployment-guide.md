@@ -297,8 +297,9 @@ KillSignal=SIGINT
 SyslogIdentifier=Batanai-api
 User=ubuntu
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=ASPNETCORE_URLS=http://localhost:1954
+Environment=ASPNETCORE_URLS=http://0.0.0.0:1954
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=Infisical__ClientSecret=YOUR_SECRET_HERE
 
 [Install]
 WantedBy=multi-user.target
