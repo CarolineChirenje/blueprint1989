@@ -62,7 +62,7 @@ export class CycleListComponent implements OnInit {
   }
 
   openCreate(): void {
-    const ref = this.dialog.open(CreateCycleDialogComponent, { width: '520px' });
+    const ref = this.dialog.open(CreateCycleDialogComponent, { width: '520px', maxHeight: '90vh' });
     ref.afterClosed().subscribe(result => { if (result) this.load(); });
   }
 

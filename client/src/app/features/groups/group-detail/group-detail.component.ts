@@ -108,6 +108,7 @@ export class GroupDetailComponent implements OnInit {
     if (!this.group) return;
     const ref = this.dialog.open(CreateCycleDialogComponent, {
       width: '520px',
+      maxHeight: '90vh',
       disableClose: true,
       data: { groupId: this.group.id, groupMembers: this.acceptedMembers }
     });

@@ -1,3 +1,20 @@
+/* Ensure dialog content scrolls and action buttons stay visible */
+:host ::ng-deep mat-dialog-content,
+:host ::ng-deep .mat-mdc-dialog-content {
+  max-height: 65vh;
+  overflow-y: auto;
+}
+:host ::ng-deep mat-dialog-actions,
+:host ::ng-deep .mat-mdc-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  margin: 0;
+  z-index: 1;
+}
+
 .cycle-type-row {
   display: flex; gap: 12px; margin-bottom: 16px;
 }
