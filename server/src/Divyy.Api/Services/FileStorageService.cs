@@ -1,10 +1,12 @@
-using System.Security;
+using Divvy.Api.Data;
+using Divvy.Api.Models;
 
 namespace Divvy.Api.Services;
 
 public interface IFileStorageService
 {
-    Task<string> UploadAsync(IFormFile file, string folder);
+    Task<(int fileId, string contentType)> UploadAsync(IFormFile file, string folder, int userId);
+    Task<UploadedFile?> GetByIdAsync(int id);
 }
 
 public class FileStorageService : IFileStorageService
@@ -14,11 +16,11 @@ public class FileStorageService : IFileStorageService
 
     private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    private readonly IWebHostEnvironment _env;
+    private readonly ApplicationDbContext _db;
 
-    public FileStorageService(IWebHostEnvironment env) => _env = env;
+    public FileStorageService(ApplicationDbContext db) => _db = db;
 
-    public async Task<string> UploadAsync(IFormFile file, string folder)
+    public async Task<(int fileId, string contentType)> UploadAsync(IFormFile file, string folder, int userId)
     {
         if (file == null || file.Length == 0)
             throw new ArgumentException("No file provided.");
@@ -30,32 +32,28 @@ public class FileStorageService : IFileStorageService
         if (string.IsNullOrEmpty(ext) || !AllowedExtensions.Contains(ext))
             throw new ArgumentException("Only jpg, png, webp images and pdf documents are allowed.");
 
-        // Sanitise folder to prevent path traversal
-        var safeName = SanitisePath(folder);
-        var dirPath = Path.Combine(_env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot"), "uploads", safeName);
-        Directory.CreateDirectory(dirPath);
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
 
-        var fileName = $"{Guid.NewGuid()}{ext}";
-        var filePath = Path.Combine(dirPath, fileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        var entity = new UploadedFile
         {
-            await file.CopyToAsync(stream);
-        }
+            FileName = $"{Guid.NewGuid()}{ext}",
+            ContentType = file.ContentType,
+            Data = ms.ToArray(),
+            SizeBytes = file.Length,
+            Folder = folder,
+            UploadedAt = DateTime.UtcNow,
+            UploadedByUserId = userId
+        };
 
-        return $"/uploads/{safeName}/{fileName}";
+        _db.UploadedFiles.Add(entity);
+        await _db.SaveChangesAsync();
+
+        return (entity.Id, entity.ContentType);
     }
 
-    private static string SanitisePath(string input)
+    public async Task<UploadedFile?> GetByIdAsync(int id)
     {
-        if (string.IsNullOrWhiteSpace(input))
-            return "general";
-
-        // Strip anything that isn't alphanumeric, dash, or underscore
-        var safe = new string(input.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_').ToArray());
-        if (string.IsNullOrEmpty(safe))
-            throw new SecurityException("Invalid folder name.");
-
-        return safe;
+        return await _db.UploadedFiles.FindAsync(id);
     }
 }

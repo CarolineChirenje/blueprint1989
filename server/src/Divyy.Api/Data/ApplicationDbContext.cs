@@ -44,6 +44,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<FeatureBugReport>         FeatureBugReports         { get; set; } = null!;
     public DbSet<FeatureBugReportCategory> FeatureBugReportCategories { get; set; } = null!;
 
+    // ── File storage ──────────────────────────────────────────────────────
+    public DbSet<UploadedFile>             UploadedFiles             { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

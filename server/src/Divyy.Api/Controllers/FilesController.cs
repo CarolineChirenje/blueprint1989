@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Divvy.Api.Services;
@@ -13,18 +14,33 @@ public class FilesController : ControllerBase
 
     public FilesController(IFileStorageService storage) => _storage = storage;
 
-    /// <summary>Uploads an image file (jpg/png/webp, max 5 MB) and returns its URL.</summary>
+    /// <summary>Uploads a file (jpg/png/webp/pdf, max 5 MB), stores bytes in DB, returns its URL.</summary>
     [HttpPost("upload")]
     public async Task<IActionResult> Upload(IFormFile file, [FromQuery] string folder = "proofs")
     {
         try
         {
-            var url = await _storage.UploadAsync(file, folder);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var (fileId, _) = await _storage.UploadAsync(file, folder, userId);
+
+            var url = $"/api/files/{fileId}";
             return Ok(new { url });
         }
         catch (ArgumentException ex)
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    /// <summary>Serves an uploaded file by ID.</summary>
+    [HttpGet("{id:int}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Download(int id)
+    {
+        var file = await _storage.GetByIdAsync(id);
+        if (file == null)
+            return NotFound();
+
+        return File(file.Data, file.ContentType, file.FileName);
     }
 }

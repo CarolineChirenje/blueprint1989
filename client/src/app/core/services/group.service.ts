@@ -79,7 +79,7 @@ export class GroupService {
   }
 
   regenerateJoinCode(groupId: number): Observable<{ joinCode: string; joinUrl: string | null }> {
-    return this.http.post<{ joinCode: string }>(`${this.url}/${groupId}/regenerate-code`, {});
+    return this.http.post<{ joinCode: string; joinUrl: string | null }>(`${this.url}/${groupId}/regenerate-code`, {});
   }
 
   getJoinRequests(groupId: number): Observable<JoinRequestDto[]> {

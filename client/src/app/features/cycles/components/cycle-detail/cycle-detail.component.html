@@ -412,7 +412,7 @@
                           <span class="contrib-status-chip" [ngClass]="contributionStatusClass(c.status)">{{ c.status }}</span>
                           @if (c.proofUrl) {
                             <a [href]="c.proofUrl" target="_blank" class="proof-link" matTooltip="View proof">
-                              <mat-icon>{{ c.proofUrl.endsWith('.pdf') ? 'picture_as_pdf' : 'receipt_long' }}</mat-icon>
+                              <mat-icon>attachment</mat-icon>
                             </a>
                           }
                           @if (c.reference) {
