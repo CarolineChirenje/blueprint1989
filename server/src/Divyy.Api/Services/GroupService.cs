@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Divvy.Api.Data;
 using Divvy.Api.DTOs.Group;
@@ -55,7 +56,8 @@ public class GroupService : IGroupService
                 .CountAsync(gm => gm.GroupId == g.Id && gm.Status == GroupInviteStatus.Accepted);
 
             var canManage = isAdmin || await IsGroupAdminAsync(g.Id, userId);
-            result.Add(new GroupDto(g.Id, g.Name, g.Description, g.IsActive, memberCount, g.CreatedAt, canManage));
+            result.Add(new GroupDto(g.Id, g.Name, g.Description, g.IsActive, memberCount, g.CreatedAt, canManage,
+                canManage ? g.JoinCode : null));
         }
 
         return result;
@@ -75,7 +77,8 @@ public class GroupService : IGroupService
 
         return new GroupDetailDto(
             group.Id, group.Name, group.Description, group.IsActive,
-            memberCount, group.CreatedAt, canManage, members);
+            memberCount, group.CreatedAt, canManage, members,
+            canManage ? group.JoinCode : null);
     }
 
     public async Task<List<GroupMemberDto>> GetMembersAsync(int groupId, int userId, Role userRole)
@@ -84,7 +87,7 @@ public class GroupService : IGroupService
             return new List<GroupMemberDto>();
 
         var rows = await _context.GroupMembers
-            .Where(gm => gm.GroupId == groupId)
+            .Where(gm => gm.GroupId == groupId && gm.Status != GroupInviteStatus.JoinRequested)
             .Join(_context.Users,
                   gm => gm.UserId,
                   u  => u.Id,
@@ -113,17 +116,19 @@ public class GroupService : IGroupService
                   gm => gm.GroupId,
                   g  => g.Id,
                   (gm, g) => new { gm, g })
-            .Join(_context.Users,
+            .GroupJoin(_context.Users,
                   x  => x.gm.InvitedByUserId,
                   u  => u.Id,
+                  (x, users) => new { x.gm, x.g, users })
+            .SelectMany(x => x.users.DefaultIfEmpty(),
                   (x, u) => new { x.gm, x.g, inviter = u })
             .ToListAsync();
 
         return rows.Select(r => new GroupInviteDto(
             r.g.Id,
             r.g.Name,
-            r.inviter.Id,
-            $"{r.inviter.FirstName} {r.inviter.LastName}".Trim(),
+            r.inviter?.Id ?? 0,
+            r.inviter != null ? $"{r.inviter.FirstName} {r.inviter.LastName}".Trim() : "Unknown",
             r.gm.GroupRole.ToString(),
             r.gm.InvitedAt,
             r.gm.Status.ToString()))
@@ -139,12 +144,14 @@ public class GroupService : IGroupService
 
         var group = new Group
         {
-            Name             = request.Name.Trim(),
-            Description      = request.Description?.Trim(),
-            IsActive         = true,
-            CreatedByUserId  = creatorId,
-            CreatedAt        = DateTime.UtcNow,
-            UpdatedAt        = DateTime.UtcNow
+            Name                = request.Name.Trim(),
+            Description         = request.Description?.Trim(),
+            IsActive            = true,
+            CreatedByUserId     = creatorId,
+            CreatedAt           = DateTime.UtcNow,
+            UpdatedAt           = DateTime.UtcNow,
+            JoinCode            = await GenerateUniqueJoinCodeAsync(),
+            JoinCodeGeneratedAt = DateTime.UtcNow
         };
 
         _context.Groups.Add(group);
@@ -164,7 +171,7 @@ public class GroupService : IGroupService
 
         await _context.SaveChangesAsync();
 
-        return (new GroupDto(group.Id, group.Name, group.Description, group.IsActive, 1, group.CreatedAt, true), null);
+        return (new GroupDto(group.Id, group.Name, group.Description, group.IsActive, 1, group.CreatedAt, true, group.JoinCode), null);
     }
 
     public async Task<(GroupDto? dto, string? error)> UpdateAsync(int groupId, UpdateGroupRequest request, int userId, Role userRole)
@@ -188,7 +195,7 @@ public class GroupService : IGroupService
         var memberCount = await _context.GroupMembers
             .CountAsync(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.Accepted);
 
-        return (new GroupDto(group.Id, group.Name, group.Description, group.IsActive, memberCount, group.CreatedAt, true), null);
+        return (new GroupDto(group.Id, group.Name, group.Description, group.IsActive, memberCount, group.CreatedAt, true, group.JoinCode), null);
     }
 
     public async Task<string?> DeleteAsync(int groupId, int userId, Role userRole)
@@ -507,4 +514,215 @@ public class GroupService : IGroupService
 
     private static GroupRole ParseGroupRole(string value)
         => value?.Trim().ToLower() == "groupadmin" ? GroupRole.GroupAdmin : GroupRole.GroupMember;
+
+    // ── Join-code helpers ─────────────────────────────────────────────────────
+
+    private static readonly char[] JoinCodeChars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789".ToCharArray(); // Excludes 0/O, 1/I/L
+
+    private static string GenerateJoinCode()
+    {
+        Span<byte> bytes = stackalloc byte[8];
+        RandomNumberGenerator.Fill(bytes);
+        return string.Create(8, bytes.ToArray(), (span, b) =>
+        {
+            for (int i = 0; i < span.Length; i++)
+                span[i] = JoinCodeChars[b[i] % JoinCodeChars.Length];
+        });
+    }
+
+    private async Task<string> GenerateUniqueJoinCodeAsync()
+    {
+        for (int attempt = 0; attempt < 10; attempt++)
+        {
+            var code = GenerateJoinCode();
+            if (!await _context.Groups.AnyAsync(g => g.JoinCode == code))
+                return code;
+        }
+        throw new InvalidOperationException("Failed to generate a unique join code after 10 attempts.");
+    }
+
+    // ── Join-by-code operations ───────────────────────────────────────────────
+
+    public async Task<(JoinByCodeResponse? dto, string? error)> RequestJoinByCodeAsync(string joinCode, int userId)
+    {
+        if (string.IsNullOrWhiteSpace(joinCode))
+            return (null, "Join code is required.");
+
+        var code = joinCode.Trim().ToUpperInvariant();
+        var group = await _context.Groups.FirstOrDefaultAsync(g => g.JoinCode == code && g.IsActive);
+        if (group == null)
+            return (null, "Invalid join code.");
+
+        var existing = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == group.Id && gm.UserId == userId);
+
+        if (existing != null)
+        {
+            if (existing.Status == GroupInviteStatus.Accepted)
+                return (null, "You are already a member of this group.");
+            if (existing.Status == GroupInviteStatus.Pending)
+                return (null, "You already have a pending invite to this group.");
+            if (existing.Status == GroupInviteStatus.JoinRequested)
+                return (null, "You already have a pending join request for this group.");
+            // Declined — allow re-request
+            existing.Status          = GroupInviteStatus.JoinRequested;
+            existing.GroupRole       = GroupRole.GroupMember;
+            existing.InvitedByUserId = null;
+            existing.JoinRequestedAt = DateTime.UtcNow;
+            existing.RespondedAt     = null;
+            existing.ApprovedByUserId = null;
+            existing.ApprovedAt      = null;
+        }
+        else
+        {
+            _context.GroupMembers.Add(new GroupMember
+            {
+                GroupId          = group.Id,
+                UserId           = userId,
+                GroupRole        = GroupRole.GroupMember,
+                Status           = GroupInviteStatus.JoinRequested,
+                InvitedByUserId  = null,
+                InvitedAt        = DateTime.UtcNow,
+                JoinRequestedAt  = DateTime.UtcNow
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        // Notify all GroupAdmins of this group
+        var requestingUser = await _context.Users.FindAsync(userId);
+        var requesterName = requestingUser != null ? $"{requestingUser.FirstName} {requestingUser.LastName}".Trim() : "A user";
+
+        var adminIds = await _context.GroupMembers
+            .Where(gm => gm.GroupId == group.Id
+                       && gm.GroupRole == GroupRole.GroupAdmin
+                       && gm.Status == GroupInviteStatus.Accepted)
+            .Select(gm => gm.UserId)
+            .ToListAsync();
+
+        if (adminIds.Count > 0)
+        {
+            await _push.SendToUsersAsync(
+                userIds: adminIds,
+                type: NotificationType.JoinRequestReceived,
+                title: group.Name,
+                body: $"{requesterName} has requested to join the group.",
+                deepLinkUrl: $"/groups/{group.Id}",
+                relatedEntityId: group.Id);
+        }
+
+        return (new JoinByCodeResponse(group.Id, group.Name, "Your join request has been sent for approval."), null);
+    }
+
+    public async Task<string?> RespondToJoinRequestAsync(int groupId, int requestingUserId, bool approve, int respondingUserId, Role respondingUserRole)
+    {
+        if (!await CanManageGroupAsync(groupId, respondingUserId, respondingUserRole))
+            return "Forbidden.";
+
+        var member = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId
+                                    && gm.UserId == requestingUserId
+                                    && gm.Status == GroupInviteStatus.JoinRequested);
+
+        if (member == null) return "Join request not found.";
+
+        if (approve)
+        {
+            member.Status          = GroupInviteStatus.Accepted;
+            member.ApprovedByUserId = respondingUserId;
+            member.ApprovedAt      = DateTime.UtcNow;
+            member.RespondedAt     = DateTime.UtcNow;
+        }
+        else
+        {
+            member.Status      = GroupInviteStatus.Declined;
+            member.RespondedAt = DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
+
+        // Notify the requester
+        var group = await _context.Groups.FindAsync(groupId);
+        if (group != null)
+        {
+            var notifType = approve ? NotificationType.JoinRequestApproved : NotificationType.JoinRequestDeclined;
+            var body = approve
+                ? $"Your request to join \"{group.Name}\" has been approved."
+                : $"Your request to join \"{group.Name}\" has been declined.";
+
+            await _push.SendToUserAsync(
+                userId: requestingUserId,
+                type: notifType,
+                title: group.Name,
+                body: body,
+                deepLinkUrl: approve ? $"/groups/{groupId}" : "/groups",
+                relatedEntityId: groupId);
+
+            // If approved, notify existing members that a new member joined
+            if (approve)
+            {
+                var joiningUser = await _context.Users.FindAsync(requestingUserId);
+                var joinerName = joiningUser != null ? $"{joiningUser.FirstName} {joiningUser.LastName}".Trim() : "A member";
+
+                var otherMemberIds = await _context.GroupMembers
+                    .Where(gm => gm.GroupId == groupId
+                              && gm.Status == GroupInviteStatus.Accepted
+                              && gm.UserId != requestingUserId)
+                    .Select(gm => gm.UserId)
+                    .ToListAsync();
+
+                if (otherMemberIds.Count > 0)
+                {
+                    await _push.SendToUsersAsync(
+                        userIds: otherMemberIds,
+                        type: NotificationType.MemberJoinedGroup,
+                        title: group.Name,
+                        body: $"{joinerName} has joined the group.",
+                        deepLinkUrl: $"/groups/{groupId}",
+                        relatedEntityId: groupId);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public async Task<List<JoinRequestDto>> GetPendingJoinRequestsAsync(int groupId, int userId, Role userRole)
+    {
+        if (!await CanManageGroupAsync(groupId, userId, userRole))
+            return new List<JoinRequestDto>();
+
+        var rows = await _context.GroupMembers
+            .Where(gm => gm.GroupId == groupId && gm.Status == GroupInviteStatus.JoinRequested)
+            .Join(_context.Users,
+                  gm => gm.UserId,
+                  u  => u.Id,
+                  (gm, u) => new { gm, u })
+            .ToListAsync();
+
+        return rows.Select(r => new JoinRequestDto(
+            r.u.Id,
+            r.u.FirstName,
+            r.u.LastName,
+            r.u.Email,
+            r.gm.JoinRequestedAt ?? r.gm.InvitedAt))
+        .OrderBy(r => r.RequestedAt)
+        .ToList();
+    }
+
+    public async Task<(string? newCode, string? error)> RegenerateJoinCodeAsync(int groupId, int userId, Role userRole)
+    {
+        if (!await CanManageGroupAsync(groupId, userId, userRole))
+            return (null, "Forbidden.");
+
+        var group = await _context.Groups.FindAsync(groupId);
+        if (group == null) return (null, "Group not found.");
+
+        group.JoinCode            = await GenerateUniqueJoinCodeAsync();
+        group.JoinCodeGeneratedAt = DateTime.UtcNow;
+        group.UpdatedAt           = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        return (group.JoinCode, null);
+    }
 }

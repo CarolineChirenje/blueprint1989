@@ -32,9 +32,10 @@ public enum GroupRole
 
 public enum GroupInviteStatus
 {
-    Pending  = 1,
-    Accepted = 2,
-    Declined = 3
+    Pending       = 1,
+    Accepted      = 2,
+    Declined      = 3,
+    JoinRequested = 4
 }
 
 public enum SplitType

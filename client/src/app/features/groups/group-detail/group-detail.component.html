@@ -45,6 +45,35 @@
       </div>
     </div>
 
+    <!-- Join Code section — visible to admins only -->
+    @if (group.canManage && group.joinCode) {
+      <mat-card class="content-card join-code-card">
+        <mat-card-header>
+          <mat-card-title>Join Code</mat-card-title>
+          <div class="card-header-actions">
+            <button mat-stroked-button (click)="regenerateCode()" [disabled]="regeneratingCode">
+              <mat-icon>refresh</mat-icon> {{ regeneratingCode ? 'Regenerating…' : 'Regenerate' }}
+            </button>
+          </div>
+        </mat-card-header>
+        <mat-card-content class="join-code-content">
+          <div class="join-code-display">
+            <span class="join-code-text">{{ group.joinCode }}</span>
+            <button mat-icon-button matTooltip="Copy code" (click)="copyJoinCode()">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button matTooltip="Share" (click)="shareJoinCode()" *ngIf="canShare">
+              <mat-icon>share</mat-icon>
+            </button>
+          </div>
+          <div class="join-code-qr">
+            <qrcode [qrdata]="group.joinCode" [width]="160" errorCorrectionLevel="M"></qrcode>
+          </div>
+          <p class="join-code-hint">Share this code or QR with people. They'll need admin approval to join.</p>
+        </mat-card-content>
+      </mat-card>
+    }
+
     <!-- Cycles section -->
     <mat-card class="content-card">
       <mat-card-header>

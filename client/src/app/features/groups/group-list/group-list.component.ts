@@ -6,6 +6,7 @@ import { DialogService } from '../../../shared/services/dialog.service';
 import { GroupDto } from '../../../shared/models/group.model';
 import { CreateGroupDialogComponent } from '../create-group-dialog/create-group-dialog.component';
 import { GroupMembersDialogComponent } from '../group-members-dialog/group-members-dialog.component';
+import { JoinGroupDialogComponent } from '../join-group-dialog/join-group-dialog.component';
 
 @Component({
   selector: 'app-group-list',
@@ -45,6 +46,11 @@ export class GroupListComponent implements OnInit {
   openCreateDialog(): void {
     const ref = this.dialog.open(CreateGroupDialogComponent, { width: '480px', disableClose: true });
     ref.afterClosed().subscribe(created => { if (created) this.loadGroups(); });
+  }
+
+  openJoinDialog(): void {
+    const ref = this.dialog.open(JoinGroupDialogComponent, { width: '420px', disableClose: true });
+    ref.afterClosed().subscribe(joined => { if (joined) this.loadGroups(); });
   }
 
   openMembersDialog(event: Event, group: GroupDto): void {

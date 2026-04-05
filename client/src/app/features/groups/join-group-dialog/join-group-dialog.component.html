@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Join a Group</h2>
+
+<mat-dialog-content>
+  @if (successMessage) {
+    <div class="success-msg">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+  } @else {
+    <p class="hint">Enter the group join code shared with you.</p>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Join Code</mat-label>
+      <input matInput
+             [(ngModel)]="joinCode"
+             placeholder="e.g. ABC12345"
+             maxlength="8"
+             style="text-transform: uppercase; font-family: 'Roboto Mono', monospace; letter-spacing: .15rem;"
+             (keydown.enter)="submit()"
+             autocomplete="off" />
+    </mat-form-field>
+
+    <div *ngIf="error" class="error-msg">{{ error }}</div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (successMessage) {
+    <button mat-raised-button color="primary" (click)="close()">Done</button>
+  } @else {
+    <button mat-button (click)="close()">Cancel</button>
+    <button mat-raised-button color="primary"
+            [disabled]="!joinCode.trim() || sending"
+            (click)="submit()">
+      <mat-spinner *ngIf="sending" diameter="16" style="display:inline-block;margin-right:4px;"></mat-spinner>
+      {{ sending ? 'Submitting…' : 'Request to Join' }}
+    </button>
+  }
+</mat-dialog-actions>

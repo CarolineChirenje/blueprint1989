@@ -127,6 +127,40 @@
       </div>
       <ng-template #noPending><p class="empty-msg">No pending invites.</p></ng-template>
     </ng-container>
+
+    <!-- Join Requests — hidden in read-only mode -->
+    <ng-container *ngIf="!isReadOnly && joinRequests.length > 0">
+      <h4 style="margin-top:16px">Join Requests ({{ joinRequests.length }})</h4>
+      <div class="table-scroll">
+      <table mat-table [dataSource]="joinRequests" class="members-table">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let r" data-label="Name">{{ r.firstName }} {{ r.lastName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Email</th>
+          <td mat-cell *matCellDef="let r" data-label="Email">{{ r.email }}</td>
+        </ng-container>
+        <ng-container matColumnDef="requestedAt">
+          <th mat-header-cell *matHeaderCellDef>Requested</th>
+          <td mat-cell *matCellDef="let r" data-label="Requested">{{ r.requestedAt | date:'mediumDate' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let r" data-label="">
+            <button mat-icon-button color="primary" matTooltip="Approve" (click)="respondToJoinRequest(r, true)">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Decline" (click)="respondToJoinRequest(r, false)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="joinRequestColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: joinRequestColumns;"></tr>
+      </table>
+      </div>
+    </ng-container>
   </div>
 
 </mat-dialog-content>

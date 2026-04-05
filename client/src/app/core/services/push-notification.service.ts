@@ -37,6 +37,9 @@ export enum NotificationType {
   ManualReminder       = 14,
   MemberLeftGroup      = 15,
   MemberJoinedGroup    = 16,
+  JoinRequestReceived  = 33,
+  JoinRequestApproved  = 34,
+  JoinRequestDeclined  = 35,
 }
 
 @Injectable({ providedIn: 'root' })

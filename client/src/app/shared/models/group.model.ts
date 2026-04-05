@@ -6,6 +6,7 @@ export interface GroupDto {
   memberCount: number;
   createdAt: string;
   canManage: boolean;
+  joinCode: string | null;
 }
 
 export interface GroupMemberDto {
@@ -55,4 +56,26 @@ export interface RespondToInviteRequest {
 
 export interface UpdateGroupMemberRoleRequest {
   groupRole: 'GroupAdmin' | 'GroupMember';
+}
+
+export interface JoinByCodeRequest {
+  joinCode: string;
+}
+
+export interface JoinByCodeResponse {
+  groupId: number;
+  groupName: string;
+  message: string;
+}
+
+export interface RespondToJoinRequestRequest {
+  approve: boolean;
+}
+
+export interface JoinRequestDto {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  requestedAt: string;
 }

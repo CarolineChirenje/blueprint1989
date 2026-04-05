@@ -201,10 +201,6 @@ public class ExpenseCycleController : ControllerBase
         if (error != null)
             return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
 
-        // Regenerate Mukando rounds to include the new member
-        if (await _cycleService.GetCycleTypeAsync(id) == CycleType.Mukando)
-            await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(id);
-
         return NoContent();
     }
 
@@ -217,10 +213,6 @@ public class ExpenseCycleController : ControllerBase
         var error = await _cycleService.RemoveMemberAsync(id, userId);
         if (error != null)
             return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
-
-        // Regenerate Mukando rounds to reflect the removed member
-        if (await _cycleService.GetCycleTypeAsync(id) == CycleType.Mukando)
-            await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(id);
 
         return NoContent();
     }

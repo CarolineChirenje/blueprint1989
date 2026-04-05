@@ -11,7 +11,11 @@ import {
   UpdateGroupRequest,
   InviteGroupMemberRequest,
   RespondToInviteRequest,
-  UpdateGroupMemberRoleRequest
+  UpdateGroupMemberRoleRequest,
+  JoinByCodeRequest,
+  JoinByCodeResponse,
+  JoinRequestDto,
+  RespondToJoinRequestRequest
 } from '../../shared/models/group.model';
 
 @Injectable({ providedIn: 'root' })
@@ -66,5 +70,23 @@ export class GroupService {
 
   leaveGroup(groupId: number): Observable<void> {
     return this.http.post<void>(`${this.url}/${groupId}/leave`, {});
+  }
+
+  // ── Join-by-code ────────────────────────────────────────────────────────
+
+  joinByCode(req: JoinByCodeRequest): Observable<JoinByCodeResponse> {
+    return this.http.post<JoinByCodeResponse>(`${this.url}/join`, req);
+  }
+
+  regenerateJoinCode(groupId: number): Observable<{ joinCode: string }> {
+    return this.http.post<{ joinCode: string }>(`${this.url}/${groupId}/regenerate-code`, {});
+  }
+
+  getJoinRequests(groupId: number): Observable<JoinRequestDto[]> {
+    return this.http.get<JoinRequestDto[]>(`${this.url}/${groupId}/join-requests`);
+  }
+
+  respondToJoinRequest(groupId: number, userId: number, req: RespondToJoinRequestRequest): Observable<void> {
+    return this.http.post<void>(`${this.url}/${groupId}/join-requests/${userId}/respond`, req);
   }
 }

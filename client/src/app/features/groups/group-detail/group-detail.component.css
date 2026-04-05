@@ -18,6 +18,13 @@ mat-card-header { display: flex; justify-content: space-between; align-items: ce
 .status-chip.active   { background: var(--success-bg); color: var(--success); }
 .status-chip.inactive { background: var(--surface-raised); color: var(--text-secondary); }
 
+.join-code-card { margin-top: 1rem; }
+.join-code-content { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 1rem 0; }
+.join-code-display { display: flex; align-items: center; gap: .5rem; }
+.join-code-text { font-family: 'Roboto Mono', monospace; font-size: 1.8rem; font-weight: 700; letter-spacing: .3rem; color: var(--text-primary); user-select: all; }
+.join-code-qr { padding: .5rem; background: #fff; border-radius: 8px; }
+.join-code-hint { font-size: .85rem; color: var(--text-secondary); text-align: center; margin: 0; }
+
 @media (max-width: 600px) {
   .detail-page { padding: 1rem; }
   .page-header { flex-direction: column; }

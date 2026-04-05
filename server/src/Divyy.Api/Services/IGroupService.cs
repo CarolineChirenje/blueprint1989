@@ -18,4 +18,10 @@ public interface IGroupService
     Task<List<GroupInviteDto>> GetPendingInvitesForUserAsync(int userId);
     Task<bool> IsGroupAdminOfGroupAsync(int groupId, int userId);
     Task<string?> LeaveGroupAsync(int groupId, int userId);
+
+    // ── Join-by-code ──────────────────────────────────────────────────────────
+    Task<(JoinByCodeResponse? dto, string? error)> RequestJoinByCodeAsync(string joinCode, int userId);
+    Task<string?> RespondToJoinRequestAsync(int groupId, int requestingUserId, bool approve, int respondingUserId, Role respondingUserRole);
+    Task<List<JoinRequestDto>> GetPendingJoinRequestsAsync(int groupId, int userId, Role userRole);
+    Task<(string? newCode, string? error)> RegenerateJoinCodeAsync(int groupId, int userId, Role userRole);
 }

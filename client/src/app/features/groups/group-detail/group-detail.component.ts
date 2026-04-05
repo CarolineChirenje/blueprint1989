@@ -25,9 +25,14 @@ export class GroupDetailComponent implements OnInit {
   loading = true;
   error = '';
   leavingGroup = false;
+  regeneratingCode = false;
   cycleColumns = ['name', 'period', 'memberCount', 'totalAmount', 'status', 'actions'];
 
   currentUserId: number | null = null;
+
+  get canShare(): boolean {
+    return typeof navigator.share === 'function';
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -140,6 +145,48 @@ export class GroupDetailComponent implements OnInit {
         error: err => {
           this.leavingGroup = false;
           this.snackBar.open(err.error?.message || 'Failed to leave group.', 'OK', { duration: 5000 });
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
+
+  copyJoinCode(): void {
+    if (!this.group?.joinCode) return;
+    navigator.clipboard.writeText(this.group.joinCode).then(() => {
+      this.snackBar.open('Join code copied to clipboard.', 'OK', { duration: 3000 });
+    });
+  }
+
+  shareJoinCode(): void {
+    if (!this.group?.joinCode) return;
+    navigator.share({
+      title: `Join ${this.group.name}`,
+      text: `Use this code to join the group "${this.group.name}": ${this.group.joinCode}`
+    }).catch(() => {});
+  }
+
+  regenerateCode(): void {
+    if (!this.group) return;
+    this.dialogService.confirm({
+      title: 'Regenerate Join Code',
+      message: 'This will invalidate the current code. Anyone with the old code will no longer be able to use it. Continue?',
+      confirmText: 'Regenerate',
+      cancelText: 'Cancel',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.regeneratingCode = true;
+      this.groupService.regenerateJoinCode(this.group!.id).subscribe({
+        next: res => {
+          this.group = { ...this.group!, joinCode: res.joinCode };
+          this.regeneratingCode = false;
+          this.snackBar.open('Join code regenerated.', 'OK', { duration: 3000 });
+          this.cdr.detectChanges();
+        },
+        error: err => {
+          this.regeneratingCode = false;
+          this.snackBar.open(err.error?.message || 'Failed to regenerate code.', 'OK', { duration: 5000 });
           this.cdr.detectChanges();
         }
       });

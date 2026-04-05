@@ -181,4 +181,58 @@ public class GroupController : ControllerBase
         if (error == null) return NoContent();
         return BadRequest(new { message = error });
     }
+
+    // ── Join-by-code endpoints ────────────────────────────────────────────────
+
+    /// <summary>Requests to join a group using its join code. Any authenticated user.</summary>
+    [HttpPost("join")]
+    public async Task<IActionResult> JoinByCode([FromBody] JoinByCodeRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var (dto, error) = await _groupService.RequestJoinByCodeAsync(request.JoinCode, userId.Value);
+        if (error == null) return Ok(dto);
+        return error == "Invalid join code." ? NotFound(new { message = error })
+             : BadRequest(new { message = error });
+    }
+
+    /// <summary>Regenerates the join code for a group, invalidating the previous one. Admin+ or GroupAdmin.</summary>
+    [HttpPost("{id:int}/regenerate-code")]
+    public async Task<IActionResult> RegenerateJoinCode(int id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var (newCode, error) = await _groupService.RegenerateJoinCodeAsync(id, userId.Value, GetCurrentUserRole());
+        if (error == null) return Ok(new { joinCode = newCode });
+        return error == "Forbidden." ? Forbid()
+             : error == "Group not found." ? NotFound(new { message = error })
+             : BadRequest(new { message = error });
+    }
+
+    /// <summary>Returns all pending join requests for a group. Admin+ or GroupAdmin.</summary>
+    [HttpGet("{id:int}/join-requests")]
+    public async Task<IActionResult> GetJoinRequests(int id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var requests = await _groupService.GetPendingJoinRequestsAsync(id, userId.Value, GetCurrentUserRole());
+        return Ok(requests);
+    }
+
+    /// <summary>Approves or declines a join request. Admin+ or GroupAdmin.</summary>
+    [HttpPost("{id:int}/join-requests/{targetUserId:int}/respond")]
+    public async Task<IActionResult> RespondToJoinRequest(int id, int targetUserId, [FromBody] RespondToJoinRequestRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _groupService.RespondToJoinRequestAsync(id, targetUserId, request.Approve, userId.Value, GetCurrentUserRole());
+        if (error == null) return NoContent();
+        return error == "Forbidden." ? Forbid()
+             : error == "Join request not found." ? NotFound(new { message = error })
+             : BadRequest(new { message = error });
+    }
 }

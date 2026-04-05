@@ -792,18 +792,6 @@ public class MukandoService
                 .FirstOrDefaultAsync(m => m.ExpenseCycleId == req.ExpenseCycleId && m.UserId == req.UserId);
             if (member != null) _context.CycleMembers.Remove(member);
 
-            // Cancel any pending swap requests involving this user
-            var swaps = await _context.MukandoSwapRequests
-                .Where(s => s.ExpenseCycleId == req.ExpenseCycleId
-                         && s.Status == SwapRequestStatus.Pending
-                         && (s.RequesterUserId == req.UserId || s.TargetUserId == req.UserId))
-                .ToListAsync();
-            foreach (var swap in swaps)
-            {
-                swap.Status      = SwapRequestStatus.Cancelled;
-                swap.RespondedAt = DateTime.UtcNow;
-            }
-
             await _context.SaveChangesAsync();
 
             // Regenerate rounds for remaining members (adjusts round count, payout order, and EndDate)

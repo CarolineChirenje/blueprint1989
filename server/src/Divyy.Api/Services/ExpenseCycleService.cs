@@ -9,11 +9,13 @@ public class ExpenseCycleService
 {
     private readonly ApplicationDbContext    _context;
     private readonly IPushNotificationSender _push;
+    private readonly MukandoService          _mukandoService;
 
-    public ExpenseCycleService(ApplicationDbContext context, IPushNotificationSender push)
+    public ExpenseCycleService(ApplicationDbContext context, IPushNotificationSender push, MukandoService mukandoService)
     {
-        _context = context;
-        _push    = push;
+        _context        = context;
+        _push           = push;
+        _mukandoService = mukandoService;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -208,12 +210,6 @@ public class ExpenseCycleService
         => await _context.ExpenseCycles
             .Where(c => c.Id == cycleId)
             .Select(c => (int?)c.GroupId)
-            .FirstOrDefaultAsync();
-
-    public async Task<CycleType?> GetCycleTypeAsync(int cycleId)
-        => await _context.ExpenseCycles
-            .Where(c => c.Id == cycleId)
-            .Select(c => (CycleType?)c.CycleType)
             .FirstOrDefaultAsync();
 
     /// <summary>Duplicate a completed cycle as a new Draft (for "Create Another").</summary>
@@ -635,6 +631,10 @@ public class ExpenseCycleService
             $"/cycles/{cycleId}",
             cycleId);
 
+        // Mukando: regenerate rounds to include the new member
+        if (cycle.CycleType == CycleType.Mukando)
+            await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
+
         return null;
     }
 
@@ -660,6 +660,10 @@ public class ExpenseCycleService
             $"You have been removed from the {cycle.Name} cycle in {groupName}.",
             $"/cycles/{cycleId}",
             cycleId);
+
+        // Mukando: regenerate rounds to reflect the removed member
+        if (cycle.CycleType == CycleType.Mukando)
+            await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
 
         return null;
     }

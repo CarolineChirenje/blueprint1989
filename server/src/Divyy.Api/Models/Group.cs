@@ -22,4 +22,10 @@ public class Group
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    [Required]
+    [StringLength(8)]
+    public string JoinCode { get; set; } = string.Empty;
+
+    public DateTime JoinCodeGeneratedAt { get; set; } = DateTime.UtcNow;
 }

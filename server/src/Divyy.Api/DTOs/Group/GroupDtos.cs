@@ -21,6 +21,12 @@ public record RespondToInviteRequest(
 public record UpdateGroupMemberRoleRequest(
     string GroupRole);  // "GroupAdmin" | "GroupMember"
 
+public record JoinByCodeRequest(
+    string JoinCode);
+
+public record RespondToJoinRequestRequest(
+    bool Approve);
+
 // ── Responses ─────────────────────────────────────────────────────────────────
 
 public record GroupDto(
@@ -30,7 +36,8 @@ public record GroupDto(
     bool IsActive,
     int MemberCount,
     DateTime CreatedAt,
-    bool CanManage);
+    bool CanManage,
+    string? JoinCode = null);
 
 public record GroupDetailDto(
     int Id,
@@ -40,7 +47,8 @@ public record GroupDetailDto(
     int MemberCount,
     DateTime CreatedAt,
     bool CanManage,
-    IReadOnlyList<GroupMemberDto> Members);
+    IReadOnlyList<GroupMemberDto> Members,
+    string? JoinCode = null);
 
 public record GroupMemberDto(
     int UserId,
@@ -60,3 +68,15 @@ public record GroupInviteDto(
     string GroupRole,
     DateTime InvitedAt,
     string Status);
+
+public record JoinByCodeResponse(
+    int GroupId,
+    string GroupName,
+    string Message);
+
+public record JoinRequestDto(
+    int UserId,
+    string FirstName,
+    string LastName,
+    string Email,
+    DateTime RequestedAt);

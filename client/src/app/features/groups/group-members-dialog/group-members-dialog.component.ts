@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { GroupService } from '../../../core/services/group.service';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { GroupMemberDto, InviteGroupMemberRequest } from '../../../shared/models/group.model';
+import { GroupMemberDto, InviteGroupMemberRequest, JoinRequestDto } from '../../../shared/models/group.model';
 import { environment } from '../../../../environments/environment';
 
 interface DialogData { groupId: number; groupName: string; isReadOnly?: boolean; }
@@ -17,6 +17,7 @@ interface UserOption { id: number; firstName: string; lastName: string; email: s
 })
 export class GroupMembersDialogComponent implements OnInit {
   members: GroupMemberDto[] = [];
+  joinRequests: JoinRequestDto[] = [];
   users: UserOption[] = [];
   isSendingInvite = false;
   error = '';
@@ -28,6 +29,7 @@ export class GroupMembersDialogComponent implements OnInit {
   userSearchTerm = '';
   displayedColumns = ['name', 'email', 'role', 'status', 'actions'];
   readOnlyColumns  = ['name', 'email', 'role', 'status'];
+  joinRequestColumns = ['name', 'email', 'requestedAt', 'actions'];
 
   get isReadOnly(): boolean { return !!this.data.isReadOnly; }
 
@@ -43,6 +45,7 @@ export class GroupMembersDialogComponent implements OnInit {
   ngOnInit(): void {
     this.loadMembers();
     if (!this.isReadOnly) {
+      this.loadJoinRequests();
       this.http.get<UserOption[]>(`${environment.apiUrl}/auth/users`).subscribe({
         next: users => this.users = users,
         error: () => {}
@@ -128,6 +131,23 @@ export class GroupMembersDialogComponent implements OnInit {
     this.groupService.updateMemberRole(this.data.groupId, member.userId, { groupRole: newRole }).subscribe({
       next: () => this.loadMembers(),
       error: err => { this.error = err.error?.message || 'Failed to update role.'; }
+    });
+  }
+
+  loadJoinRequests(): void {
+    this.groupService.getJoinRequests(this.data.groupId).subscribe({
+      next: requests => { this.joinRequests = requests; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  respondToJoinRequest(request: JoinRequestDto, approve: boolean): void {
+    this.groupService.respondToJoinRequest(this.data.groupId, request.userId, { approve }).subscribe({
+      next: () => {
+        this.loadJoinRequests();
+        if (approve) this.loadMembers();
+      },
+      error: err => { this.error = err.error?.message || 'Failed to respond to join request.'; this.cdr.detectChanges(); }
     });
   }
 

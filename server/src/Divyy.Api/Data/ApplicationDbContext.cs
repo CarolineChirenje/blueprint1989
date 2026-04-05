@@ -219,6 +219,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(g => g.Name).IsRequired().HasMaxLength(150);
             entity.Property(g => g.Description).HasMaxLength(500);
             entity.HasOne<User>().WithMany().HasForeignKey(g => g.CreatedByUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.Property(g => g.JoinCode).IsRequired().HasMaxLength(8);
+            entity.HasIndex(g => g.JoinCode).IsUnique();
         });
     }
 
@@ -231,6 +233,7 @@ public class ApplicationDbContext : DbContext
             entity.HasOne<Group>().WithMany().HasForeignKey(gm => gm.GroupId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne<User>().WithMany().HasForeignKey(gm => gm.UserId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne<User>().WithMany().HasForeignKey(gm => gm.InvitedByUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(gm => gm.ApprovedByUserId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 

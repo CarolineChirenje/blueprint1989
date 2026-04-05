@@ -103,5 +103,16 @@ public enum NotificationType
 
     /// <summary>Admin responded to an opt-out request.</summary>
     MukandoOptOutResponded = 32,
+
+    // ── Join codes ───────────────────────────────────────────────────────────
+
+    /// <summary>A user requested to join a group via join code; group admins are notified.</summary>
+    JoinRequestReceived = 33,
+
+    /// <summary>A join request was approved by a group admin.</summary>
+    JoinRequestApproved = 34,
+
+    /// <summary>A join request was declined by a group admin.</summary>
+    JoinRequestDeclined = 35,
 }
 
