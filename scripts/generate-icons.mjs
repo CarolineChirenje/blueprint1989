@@ -30,7 +30,7 @@ async function rasterize(svgBuf, outPath, size) {
 }
 
 async function run() {
-  console.log('\nGenerating Divvy icons...\n');
+  console.log('\nGenerating Batanai icons...\n');
 
   // Regular icons (with rounded corner background)
   await rasterize(regularSvgBuf,  join(iconsDir, 'icon-512x512.png'),  512);

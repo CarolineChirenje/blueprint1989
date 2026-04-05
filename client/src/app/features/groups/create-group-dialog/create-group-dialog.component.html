@@ -4,7 +4,7 @@
   <form [formGroup]="form" class="dialog-form">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Group Name</mat-label>
-      <input matInput formControlName="name" maxlength="150" placeholder="e.g. House A" />
+      <input matInput formControlName="name" maxlength="150" placeholder="e.g. Group A" />
       <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required.</mat-error>
     </mat-form-field>
 

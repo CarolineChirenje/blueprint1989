@@ -1,15 +1,15 @@
-// Hybrid Service Worker — Divvy
+// Hybrid Service Worker — Batanai
 // Delegates caching/fetch to the Angular ngsw-worker.js runtime.
 // This file owns: push notifications, scheduled local notifications,
 //                 IndexedDB storage and notification-click routing.
 importScripts('/ngsw-worker.js');
 
-// Custom Service Worker for Divvy
+// Custom Service Worker for Batanai
 // Handles:
 //   1. Scheduled local notifications (ketone recheck timer)
 //   2. Server-sent push notifications (VAPID-signed)
 
-const CACHE_NAME = 'divvy-v1';
+const CACHE_NAME = 'batanai-v1';
 const NOTIFICATION_CHECK_INTERVAL = 60000; // Check every minute
 
 // Default app icon
@@ -165,7 +165,7 @@ self.addEventListener('push', (event) => {
   console.log('Service Worker: Push received', event);
 
   let payload = {
-    title: 'Divvy Notification',
+    title: 'Batanai Notification',
     body: 'You have a new notification.',
     icon: ICON,
     badge: ICON,
@@ -368,7 +368,7 @@ function idbReq(request) {
 // Open IndexedDB (v2 adds offlineQueue store alongside notifications)
 function openNotificationDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('DivvyNotifications', 2);
+    const request = indexedDB.open('BatanaiNotifications', 2);
     
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);

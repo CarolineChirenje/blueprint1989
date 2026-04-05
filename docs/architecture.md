@@ -1,7 +1,7 @@
-# Architecture of Divvy PWA
+# Architecture of Batanai PWA
 
 ## Overview
-Divvy is a Progressive Web Application (PWA) designed to facilitate shared expense management for households and groups. The application is built using Angular for the front end and .NET for the backend API, ensuring a robust and scalable solution.
+Batanai is a Progressive Web Application (PWA) designed to facilitate shared expense management for groups. The application is built using Angular for the front end and .NET for the backend API, ensuring a robust and scalable solution.
 
 ## Architecture Components
 
@@ -66,4 +66,4 @@ Divvy is a Progressive Web Application (PWA) designed to facilitate shared expen
 The application is deployed as a PWA on Ubuntu 22.04, served through Nginx as a reverse proxy. The backend API runs on Kestrel behind Nginx. TLS is handled by Let's Encrypt via Cloudflare.
 
 ## Conclusion
-Divvy provides a streamlined solution for shared expense tracking, leveraging modern web technologies to deliver a fast, offline-capable Progressive Web App for both administrators and members.
+Batanai provides a streamlined solution for shared expense tracking, leveraging modern web technologies to deliver a fast, offline-capable Progressive Web App for both administrators and members.

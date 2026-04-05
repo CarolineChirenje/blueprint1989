@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Divvy",
-  "short_name": "Divvy",
-  "description": "Divvy — Group expense tracker",
+  "name": "Batanai",
+  "short_name": "Batanai",
+  "description": "Batanai — Group expense tracker",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#237A49",

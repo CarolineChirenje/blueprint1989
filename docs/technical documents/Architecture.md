@@ -1,8 +1,8 @@
-# Divvy — System Architecture
+# Batanai — System Architecture
 
 ## Overview
 
-Divvy is a Progressive Web Application (PWA) for shared expense management, built with an Angular 21 frontend and a .NET 10 REST API backend, backed by PostgreSQL and hosted on Ubuntu 22.04.
+Batanai is a Progressive Web Application (PWA) for shared expense management, built with an Angular 21 frontend and a .NET 10 REST API backend, backed by PostgreSQL and hosted on Ubuntu 22.04.
 
 ---
 
@@ -20,21 +20,21 @@ graph TB
 
     subgraph CF["☁️ Cloudflare"]
         CFCDN[Cloudflare CDN\nDDoS + WAF]
-        CFPAGES[Cloudflare Pages\ndivvy-docs.pages.dev]
+        CFPAGES[Cloudflare Pages\nbatanai-docs.pages.dev]
         CFZT[Cloudflare Zero Trust\nOptional SSO gate on docs]
     end
 
     subgraph Server["🖥️ Ubuntu 22.04 VPS"]
         NGINX[Nginx Reverse Proxy\nTLS — Let's Encrypt]
 
-        subgraph Frontend["Angular 21 PWA — divvy.elroitec.com"]
+        subgraph Frontend["Angular 21 PWA — batanai.elroitec.com"]
             FE_PWA[PWA Shell\nService Worker + Offline Queue]
             FE_AUTH[Auth Module\nLogin · Signup · MFA · Biometric]
             FE_FEAT[Feature Modules\nDashboard · Cycles · Expenses\nPayments · Profile · Management]
             FE_CORE[Core Services\nHTTP Interceptor · Push · Sync\nNotifications]
         end
 
-        subgraph API[".NET 10 API — divvyapi.elroitec.com"]
+        subgraph API[".NET 10 API — batanaiapi.elroitec.com"]
             KESTREL[Kestrel :5000]
             CTRL[REST Controllers\nAuth · ExpenseCycle · Expense\nPayment · Notifications · Push]
             SVC[Domain Services\nExpenseCycle · Expense · Payment\nPush · MFA · WebAuthn\nEmail · AppConfig]
@@ -105,7 +105,7 @@ graph TB
 | **PWA** | Custom service worker (`custom-sw.js`), `ngsw-config.json`, `manifest.webmanifest` |
 | **Offline** | Offline queue service — defers mutations when offline |
 | **Auth** | JWT interceptor (`AuthInterceptor`), TOTP MFA, WebAuthn biometric |
-| **Hosting** | Nginx serving static build at `divvy.elroitec.com` |
+| **Hosting** | Nginx serving static build at `batanai.elroitec.com` |
 
 **Feature Modules**
 
@@ -135,7 +135,7 @@ graph TB
 | **MFA** | TOTP via `MfaService` + `QRCoder` v1.7.0 |
 | **Biometric** | FIDO2/WebAuthn via `Fido2NetLib` v3.0.1 |
 | **Documentation** | Swagger / OpenAPI via `Swashbuckle.AspNetCore` v10.1.4 |
-| **Hosting** | Nginx reverse proxy → Kestrel at `divvyapi.elroitec.com` |
+| **Hosting** | Nginx reverse proxy → Kestrel at `batanaiapi.elroitec.com` |
 
 **Controller Groups**
 
@@ -174,7 +174,7 @@ graph TB
 
 #### Google Drive API v3
 
-Not used in Divvy.
+Not used in Batanai.
 
 #### Web Push (VAPID)
 
@@ -192,7 +192,7 @@ Not used in Divvy.
 |---|---|
 | **CDN / WAF** | Cloudflare proxies all traffic to the VPS — DDoS protection, caching |
 | **DNS** | Domain registered at Namesilo; Cloudflare nameservers manage `elroitec.com` |
-| **Pages** | Hosts MkDocs documentation site at `divvy-docs.pages.dev` |
+| **Pages** | Hosts MkDocs documentation site at `batanai-docs.pages.dev` |
 | **Zero Trust** | Optional Google Workspace / GitHub IdP SSO gate on the docs site |
 
 ---
@@ -234,7 +234,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[Divvy event\ne.g. Payment due / Cycle created] --> B[Domain Service\nExpenseCycleService etc.]
+    A[Batanai event\ne.g. Payment due / Cycle created] --> B[Domain Service\nExpenseCycleService etc.]
     B --> C{Check UserNotificationPreference}
     C -->|IsEnabled = true| D[PushNotificationSender]
     C -->|IsEnabled = false| E[In-app bell only]
@@ -277,9 +277,9 @@ flowchart TD
                                 │       │
                     ┌───────────┘       └──────────────┐
                     │                                  │
-          divvy.elroitec.com              divvyapi.elroitec.com
+          batanai.elroitec.com              batanaiapi.elroitec.com
           Angular 21 static build         Kestrel :5000 (.NET 10)
-          /var/www/divvy                 systemd service
+          /var/www/Batanai                 systemd service
                                                │
                                          PostgreSQL 15
                                          (localhost:5432)

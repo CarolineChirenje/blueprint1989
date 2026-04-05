@@ -1,6 +1,6 @@
 # Local PWA Testing Setup
 
-Step-by-step guide to run the Divvy PWA locally and test it on an Android phone — exactly as configured.
+Step-by-step guide to run the Batanai PWA locally and test it on an Android phone — exactly as configured.
 
 ---
 
@@ -30,7 +30,7 @@ You need **four things running simultaneously**, each in its own terminal.
 ### Terminal 1 — .NET API
 
 ```powershell
-Set-Location C:\dev\divvy\server\src\Divvy.Api
+Set-Location C:\dev\Batanai\server\src\Batanai.Api
 dotnet run
 ```
 
@@ -42,11 +42,11 @@ Wait until you see `Now listening on: http://localhost:5000` before continuing.
 
 ```powershell
 # Build first (required — ng serve does NOT work with service workers)
-Set-Location C:\dev\divvy\client
+Set-Location C:\dev\Batanai\client
 npx ng build
 
 # Then serve the output on port 80 (matches ngrok config)
-http-server C:\dev\divvy\client\dist\Divvy\browser -p 80 -c-1
+http-server C:\dev\Batanai\client\dist\Batanai\browser -p 80 -c-1
 ```
 
 > **Important:** Always rebuild (`npx ng build`) after any code change before re-serving. The `-c-1` flag disables caching so the browser always gets fresh files.
@@ -67,7 +67,7 @@ Forwarding   https://uncommanderlike-simonne-demographical.ngrok-free.dev -> htt
 
 Copy the `https://` URL — this is what you open on your Android phone.
 
-> **Note:** Free ngrok URLs change every time you restart ngrok. When you get a new URL, update [Program.cs](../server/src/Divvy.Api/Program.cs) CORS policy (see step below) and restart the API.
+> **Note:** Free ngrok URLs change every time you restart ngrok. When you get a new URL, update [Program.cs](../server/src/Batanai.Api/Program.cs) CORS policy (see step below) and restart the API.
 
 ---
 
@@ -84,7 +84,7 @@ Copy the `https://` URL — this is what you open on your Android phone.
 
 ## When the ngrok URL changes
 
-Update the CORS allowed origins in [server/src/Divvy.Api/Program.cs](../server/src/Divvy.Api/Program.cs):
+Update the CORS allowed origins in [server/src/Batanai.Api/Program.cs](../server/src/Batanai.Api/Program.cs):
 
 ```csharp
 policy.WithOrigins(
@@ -123,7 +123,7 @@ The VS Code devtunnel URL changes if VS Code restarts. When it does:
    ```
 3. If ngrok shows a warning page ("You are about to visit...") → tap **Visit Site**
 4. Log in to the app
-5. After ~30 seconds, Chrome shows an **"Add Divvy to Home Screen"** banner
+5. After ~30 seconds, Chrome shows an **"Add Batanai to Home Screen"** banner
    - Or tap **⋮ menu → Add to Home screen**
 6. Tap **Add** — the app icon appears on your home screen
 7. Launch from the home screen → app opens in standalone mode (no browser chrome)
@@ -168,7 +168,7 @@ Invoke-RestMethod http://127.0.0.1:4040/api/tunnels | Select-Object -ExpandPrope
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| "Target machine actively refused" on phone | http-server not running, or ngrok pointing at wrong port | Run `http-server dist/Divvy/browser -p 80 -c-1`; confirm ngrok forwards port 80 |
+| "Target machine actively refused" on phone | http-server not running, or ngrok pointing at wrong port | Run `http-server dist/Batanai/browser -p 80 -c-1`; confirm ngrok forwards port 80 |
 | "No web page was found" for devtunnel | VS Code tunnel is Private | Ports panel → right-click port 5000 → Port Visibility → **Public** |
 | CORS error on login | New ngrok/devtunnel URL not added to `Program.cs` | Update CORS origins, restart API |
 | SW not updating after rebuild | Old SW is cached | Unregister SW in DevTools Console (see above), then reload |

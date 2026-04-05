@@ -1,14 +1,14 @@
-﻿# Business Overview
+# Business Overview
 
-## What is Divvy?
+## What is Batanai?
 
-**Divvy** is a cloud-hosted, mobile-first expense-sharing application for groups and groups. It replaces informal spreadsheets and manual IOUs with a structured, offline-capable Progressive Web App that tracks shared expenses, calculates member obligations, and guides payments.
+**Batanai** is a cloud-hosted, mobile-first expense-sharing application for groups and groups. It replaces informal spreadsheets and manual IOUs with a structured, offline-capable Progressive Web App that tracks shared expenses, calculates member obligations, and guides payments.
 
 ---
 
 ## The Problem We Solve
 
-Groups that share living costs — flatmates, families, travel groups face a recurring challenge:
+Groups that share living costs � flatmates, families, travel groups face a recurring challenge:
 
 | Pain Point | Impact |
 |---|---|
@@ -22,9 +22,9 @@ These gaps lead to financial ambiguity and social tension within groups.
 
 ---
 
-## The Divvy Solution
+## The Batanai Solution
 
-Divvy connects **Admins** and **Members** in one role-gated platform. Every expense is recorded, attributed, and surfaced as a concrete obligation.
+Batanai connects **Admins** and **Members** in one role-gated platform. Every expense is recorded, attributed, and surfaced as a concrete obligation.
 
 ### Core Capabilities
 
@@ -36,7 +36,7 @@ Divvy connects **Admins** and **Members** in one role-gated platform. Every expe
 | **Payment Workflow** | Members submit payments against their obligations; Admins confirm or reject |
 | **Real-Time Push Notifications** | VAPID web push notifies members on payment due, payment received, and cycle creation events |
 | **Offline-First Architecture** | IndexedDB queue captures expense and payment entries when offline; auto-syncs on reconnect |
-| **Biometric / Passwordless Login** | WebAuthn/FIDO2 fingerprint and Face ID login — fast access for everyday use |
+| **Biometric / Passwordless Login** | WebAuthn/FIDO2 fingerprint and Face ID login � fast access for everyday use |
 | **MFA (TOTP)** | Optional TOTP second factor for Admin accounts |
 
 ---
@@ -58,7 +58,7 @@ Divvy connects **Admins** and **Members** in one role-gated platform. Every expe
 
 ## Competitive Advantage
 
-| Dimension | Divvy | Spreadsheets | Generic expense apps |
+| Dimension | Batanai | Spreadsheets | Generic expense apps |
 |---|---|---|---|
 | Structured cycle-based periods | Yes | No | Rarely |
 | Role-based access (Admin / Member) | Yes | No | No |
@@ -66,13 +66,13 @@ Divvy connects **Admins** and **Members** in one role-gated platform. Every expe
 | Real-time push alerts | Yes | No | Sometimes |
 | Automated obligation calculation | Yes | Manual | Sometimes |
 | Biometric login | Yes | No | Rarely |
-| PWA — no app store required | Yes | No | No |
+| PWA � no app store required | Yes | No | No |
 
 ---
 
 ## Technology Foundation
 
-Divvy is built on proven, enterprise-grade open standards:
+Batanai is built on proven, enterprise-grade open standards:
 
 | Layer | Technology | Why |
 |---|---|---|
@@ -83,13 +83,13 @@ Divvy is built on proven, enterprise-grade open standards:
 | Push Notifications | VAPID Web Push | No proprietary notification vendor lock-in |
 | Hosting | Cloud-hosted API (elroitec.com) | Managed infrastructure, always up-to-date |
 
-Zero dependency on proprietary mobile SDKs — Divvy runs in any modern browser, on any device, without an app store.
+Zero dependency on proprietary mobile SDKs � Batanai runs in any modern browser, on any device, without an app store.
 
 ---
 
 ## Revenue Model
 
-Divvy is positioned as a **SaaS subscription platform**:
+Batanai is positioned as a **SaaS subscription platform**:
 
 | Tier | Target | Pricing Model |
 |---|---|---|
@@ -101,12 +101,12 @@ Divvy is positioned as a **SaaS subscription platform**:
 
 ## Traction & Validation
 
-- Fully functional platform deployed to `divvy.elroitec.com`
+- Fully functional platform deployed to `batanai.elroitec.com`
 - Angular 21 PWA installable to phone home screen; service worker confirmed working
-- Complete expense cycle workflow: create → add members → add expenses → close → obligations → payments
+- Complete expense cycle workflow: create ? add members ? add expenses ? close ? obligations ? payments
 
 ---
 
 ## Summary
 
-> Divvy is the shared expense platform that  groups need — structured billing cycles, automated obligation calculation, real-time alerts, and offline resilience — delivered as a modern PWA that works on any device with no app store required.
+> Batanai is the shared expense platform that  groups need � structured billing cycles, automated obligation calculation, real-time alerts, and offline resilience � delivered as a modern PWA that works on any device with no app store required.

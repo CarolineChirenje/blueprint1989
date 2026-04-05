@@ -37,7 +37,7 @@ Connectivity restored
 
 ### IndexedDB Store
 
-- **Database name:** `divvyDb`.
+- **Database name:** `BatanaiDb`.
 - **Store name:** `offlineQueue`.
 - **Key:** auto-increment integer.
 

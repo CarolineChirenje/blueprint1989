@@ -1,8 +1,8 @@
-﻿# Service Worker Notifications
+# Service Worker Notifications
 
 ## Overview
 
-Divvy uses a **custom Service Worker** (`custom-sw.js`) layered on top of Angular's generated `ngsw-worker.js` to handle push notification display and deep-link navigation. The service worker runs in the background and processes push events sent from the Divvy API via the Web Push Protocol.
+Batanai uses a **custom Service Worker** (`custom-sw.js`) layered on top of Angular's generated `ngsw-worker.js` to handle push notification display and deep-link navigation. The service worker runs in the background and processes push events sent from the Batanai API via the Web Push Protocol.
 
 ---
 
@@ -21,22 +21,22 @@ Divvy uses a **custom Service Worker** (`custom-sw.js`) layered on top of Angula
 ## 1. Architecture
 
 ```
-Divvy API (divvyapi.elroitec.com)
-    │
-    │  Web Push Protocol (RFC 8030)
-    │  VAPID-authenticated POST to push endpoint
-    ▼
+Batanai API (batanaiapi.elroitec.com)
+    �
+    �  Web Push Protocol (RFC 8030)
+    �  VAPID-authenticated POST to push endpoint
+    ?
 Browser Push Service (e.g. FCM, Mozilla)
-    │
-    │  push message delivered to browser
-    ▼
+    �
+    �  push message delivered to browser
+    ?
 custom-sw.js  (Service Worker)
-    │
-    ├── push event  ──► showNotification()
-    │
-    ├── notificationclick  ──► clients.openWindow(deepLinkUrl)
-    │
-    └── pushsubscriptionchange  ──► re-subscribe + POST /api/push/subscribe
+    �
+    +-- push event  --? showNotification()
+    �
+    +-- notificationclick  --? clients.openWindow(deepLinkUrl)
+    �
+    +-- pushsubscriptionchange  --? re-subscribe + POST /api/push/subscribe
 ```
 
 The custom service worker imports the Angular NGSW worker to preserve offline caching and app-update behaviour:
@@ -53,7 +53,7 @@ When the API sends a push message, the service worker fires the `push` event. Th
 
 | Field         | Type   | Description                                    |
 |---------------|--------|------------------------------------------------|
-| `type`        | number | Notification type enum (1–5)                   |
+| `type`        | number | Notification type enum (1�5)                   |
 | `title`       | string | Notification title                             |
 | `body`        | string | Notification body text                         |
 | `deepLinkUrl` | string | In-app route to open on click (optional)       |
@@ -164,7 +164,7 @@ self.addEventListener('pushsubscriptionchange', event => {
 
 ## 5. IndexedDB Usage
 
-The Divvy service worker does **not** use IndexedDB for notification scheduling. Push notifications are server-initiated — the API triggers them when business events occur (payment recorded, cycle created, etc.). There is no client-side timer or local notification queue.
+The Batanai service worker does **not** use IndexedDB for notification scheduling. Push notifications are server-initiated � the API triggers them when business events occur (payment recorded, cycle created, etc.). There is no client-side timer or local notification queue.
 
 Angular NGSW uses its own internal IndexedDB (`ngsw`) for caching; this is managed automatically and does not require manual intervention.
 
@@ -174,29 +174,29 @@ Angular NGSW uses its own internal IndexedDB (`ngsw`) for caching; this is manag
 
 ### Using the Dev Push Test Page
 
-Navigate to `/dev/push-test` in the Divvy app (available in development builds). Enter a notification type and message, then click **Send Test Push** to trigger a push via `POST /api/push/test`.
+Navigate to `/dev/push-test` in the Batanai app (available in development builds). Enter a notification type and message, then click **Send Test Push** to trigger a push via `POST /api/push/test`.
 
 ### Using curl / Postman
 
 ```http
-POST https://divvyapi.elroitec.com/api/push/test
+POST https://batanaiapi.elroitec.com/api/push/test
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
   "type": 2,
   "title": "Payment Due",
-  "body": "You owe Jane £25.00 in cycle January 2026.",
+  "body": "You owe Jane �25.00 in cycle January 2026.",
   "deepLinkUrl": "/cycles/1/obligations"
 }
 ```
 
 ### Verifying in DevTools
 
-1. Open **Application → Service Workers** in Chrome DevTools.
+1. Open **Application ? Service Workers** in Chrome DevTools.
 2. Confirm `custom-sw.js` status is **Activated and running**.
 3. Click **Push** (with a JSON payload) to simulate a push event without going through the API.
-4. The notification should appear within 1–2 seconds.
+4. The notification should appear within 1�2 seconds.
 
 ### Inspecting Registered Subscriptions
 

@@ -1,7 +1,7 @@
-# Divvy Deployment Guide
+# Batanai Deployment Guide
 
-**Frontend:** `https://divvy.elroitec.com` (port 4300)  
-**Backend API:** `https://divvyapi.elroitec.com` (port 1954)  
+**Frontend:** `https://batanai.elroitec.com` (port 4300)  
+**Backend API:** `https://batanaiapi.elroitec.com` (port 1954)  
 **Stack:** .NET 10 � PostgreSQL � Angular 21 PWA � Nginx � Let's Encrypt � Ubuntu 22.04
 
 ---
@@ -10,8 +10,8 @@
 
 | What | Port | Domain | Served by |
 |------|------|--------|-----------|
-| Angular PWA (frontend) | 4300 | `divvy.elroitec.com` | Nginx ? static files |
-| .NET API (backend) | 1954 | `divvyapi.elroitec.com` | Nginx ? Kestrel |
+| Angular PWA (frontend) | 4300 | `batanai.elroitec.com` | Nginx ? static files |
+| .NET API (backend) | 1954 | `batanaiapi.elroitec.com` | Nginx ? Kestrel |
 | PostgreSQL | 5432 | localhost only | PostgreSQL 15+ |
 
 ---
@@ -24,13 +24,13 @@ In your **Namesilo DNS Manager** for `elroitec.com`, add two A records:
 
 | Type | Host | Value | TTL |
 |------|------|-------|-----|
-| A | `divvy` | `<server-ip>` | 3600 |
-| A | `divvyapi` | `<server-ip>` | 3600 |
+| A | `Batanai` | `<server-ip>` | 3600 |
+| A | `Batanaiapi` | `<server-ip>` | 3600 |
 
 Verify:
 ```bash
-nslookup divvy.elroitec.com
-nslookup divvyapi.elroitec.com
+nslookup batanai.elroitec.com
+nslookup batanaiapi.elroitec.com
 ```
 
 ---
@@ -68,9 +68,9 @@ sudo systemctl start postgresql
 sudo -u postgres psql
 ```
 ```sql
-CREATE USER "Divvy" WITH PASSWORD '3lr01tec2024##';
-CREATE DATABASE "Divvy" OWNER "Divvy";
-GRANT ALL PRIVILEGES ON DATABASE "Divvy" TO "Divvy";
+CREATE USER "Batanai" WITH PASSWORD '3lr01tec2024##';
+CREATE DATABASE "Batanai" OWNER "Batanai";
+GRANT ALL PRIVILEGES ON DATABASE "Batanai" TO "Batanai";
 \q
 ```
 
@@ -101,9 +101,9 @@ sudo apt install -y certbot python3-certbot-nginx
 
 ### 2.8 Create deployment directories
 ```bash
-sudo mkdir -p /home/elroitecProjects/divvy/app
-sudo mkdir -p /home/elroitecProjects/divvy/api
-sudo chown -R ubuntu:ubuntu /home/elroitecProjects/divvy
+sudo mkdir -p /home/elroitecProjects/Batanai/app
+sudo mkdir -p /home/elroitecProjects/Batanai/api
+sudo chown -R ubuntu:ubuntu /home/elroitecProjects/Batanai
 ```
 
 ### 2.9 Configure firewall (open ports 4300 and 1954)
@@ -136,7 +136,7 @@ DBeaver connects through an **SSH tunnel** � PostgreSQL is never exposed publi
 
 1. Open DBeaver ? **New Database Connection** ? **PostgreSQL**
 2. **Main** tab:
-   - Host: `localhost` � Port: `5432` � Database: `Divvy` � Username: `Divvy` � Password: `3lr01tec2024##`
+   - Host: `localhost` � Port: `5432` � Database: `Batanai` � Username: `Batanai` � Password: `3lr01tec2024##`
 3. **SSH** tab ? enable **Use SSH tunnel**:
    - Host: `<server-ip>` � Port: `22` � Username: `ubuntu` � Auth: Public Key (`.pem` file)
 4. **Test Connection** ? **Finish**
@@ -150,10 +150,10 @@ DBeaver connects through an **SSH tunnel** � PostgreSQL is never exposed publi
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://divvyapi.elroitec.com/api',
+  apiUrl: 'https://batanaiapi.elroitec.com/api',
   vapidPublicKey: 'BFEfRC079NVJZjR3LC5-a7Jajc3tFvJtjaVdq9ClWX-uLuP58nTRhnYXYuivaGiFIeq9Z2lcrKZ9hx1uOhoIyVU',
   version: '1.0.0',
-  docsUrl: 'https://divvy-docs.pages.dev',
+  docsUrl: 'https://batanai-docs.pages.dev',
 };
 ```
 
@@ -161,38 +161,38 @@ export const environment = {
 
 ### 4.2 Build
 ```powershell
-cd C:\dev\divvy\client
+cd C:\dev\Batanai\client
 npx ng build --configuration production
 ```
-Output: `C:\Publish\divvy\app\` (configured in `angular.json` ? `outputPath`)
+Output: `C:\Publish\Batanai\app\` (configured in `angular.json` ? `outputPath`)
 
 ### 4.3 Copy to server
 ```powershell
-scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
+scp -r C:\Publish\Batanai\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 ```
 
 ---
 
 ## Step 5 � Build & Deploy Backend (on Windows)
 
-### 5.1 Update `server/src/Divvy.Api/appsettings.Production.json`
+### 5.1 Update `server/src/Batanai.Api/appsettings.Production.json`
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=Divvy;Username=Divvy;Password=3lr01tec2024##"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=Batanai;Username=Batanai;Password=3lr01tec2024##"
   },
   "AppSettings": {
-    "AppName": "Divvy",
+    "AppName": "Batanai",
     "PasswordExpirationDays": 30,
     "TimeZone": "AUS Eastern Standard Time",
     "AdminSignupPin": "42115"
   },
   "Jwt": {
-    "Key": "Production2026SecureJwtKeyForDivvyAuthenticationChangeInProductionMin32Chars3K9P",
+    "Key": "Production2026SecureJwtKeyForBatanaiAuthenticationChangeInProductionMin32Chars3K9P",
     "MfaTempKey": "ProductionMfaTempKey2026SecureForTwoFactorAuthChangeInProductionMinimum32CharsLongRequired6W",
-    "Issuer": "divvyapi.elroitec.com",
-    "Audience": "divvyapi.elroitec.com",
+    "Issuer": "batanaiapi.elroitec.com",
+    "Audience": "batanaiapi.elroitec.com",
     "ExpirationMinutes": 30
   },
   "Vapid": {
@@ -201,21 +201,21 @@ scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
     "PrivateKey": "YOUR_VAPID_PRIVATE_KEY"
   },
   "WebAuthn": {
-    "RelyingPartyId": "divvy.elroitec.com",
-    "RelyingPartyName": "Divvy",
-    "Origin": "https://divvy.elroitec.com"
+    "RelyingPartyId": "batanai.elroitec.com",
+    "RelyingPartyName": "Batanai",
+    "Origin": "https://batanai.elroitec.com"
   },
-  "AllowedHosts": "divvyapi.elroitec.com;divvy.elroitec.com;localhost;127.0.0.1",
+  "AllowedHosts": "batanaiapi.elroitec.com;batanai.elroitec.com;localhost;127.0.0.1",
   "Cors": {
     "AllowedOrigins": [
-      "https://divvy.elroitec.com",
-      "https://divvyapi.elroitec.com"
+      "https://batanai.elroitec.com",
+      "https://batanaiapi.elroitec.com"
     ]
   },
   "GoogleDrive": {
     "ClientId": "PRODUCTION_CLIENT_ID",
     "ClientSecret": "PRODUCTION_CLIENT_SECRET",
-    "RedirectUri": "https://divvy.elroitec.com/api/auth/google-callback"
+    "RedirectUri": "https://batanai.elroitec.com/api/auth/google-callback"
   },
   "Logging": {
     "LogLevel": {
@@ -231,22 +231,22 @@ scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 
 | Setting | Must be |
 |---------|---------|
-| `Jwt:Issuer` + `Jwt:Audience` | `divvyapi.elroitec.com` |
+| `Jwt:Issuer` + `Jwt:Audience` | `batanaiapi.elroitec.com` |
 | `Jwt:Key` | At least 32 chars, keep secret |
 | `Vapid:PublicKey` | Must match `environment.prod.ts` |
-| `Cors:AllowedOrigins` | Must include `https://divvy.elroitec.com` |
+| `Cors:AllowedOrigins` | Must include `https://batanai.elroitec.com` |
 | `AllowedHosts` | Both subdomains, semicolon-separated |
-| `WebAuthn:RelyingPartyId` | Frontend domain (`divvy.elroitec.com`) |
+| `WebAuthn:RelyingPartyId` | Frontend domain (`batanai.elroitec.com`) |
 
 ### 5.2 Publish
 ```powershell
-cd C:\dev\divvy\server\src\Divvy.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\divvy\publish\api
+cd C:\dev\Batanai\server\src\Batanai.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\Batanai\publish\api
 ```
 
 ### 5.3 Copy to server
 ```powershell
-scp -r C:\dev\divvy\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
+scp -r C:\dev\Batanai\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
 ```
 
 ---
@@ -255,8 +255,8 @@ scp -r C:\dev\divvy\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
 
 **Option A � From Windows (recommended for first deploy):**
 ```powershell
-cd C:\dev\divvy\server\src\Divvy.Api
-$env:ConnectionStrings__DefaultConnection = "Host=<server-ip>;Port=5432;Database=Divvy;Username=Divvy;Password=3lr01tec2024##"
+cd C:\dev\Batanai\server\src\Batanai.Api
+$env:ConnectionStrings__DefaultConnection = "Host=<server-ip>;Port=5432;Database=Batanai;Username=Batanai;Password=3lr01tec2024##"
 dotnet ef database update
 ```
 
@@ -264,12 +264,12 @@ dotnet ef database update
 ```bash
 cd /home/elroitecProjects/api
 export ASPNETCORE_ENVIRONMENT=Production
-dotnet Divvy.Api.dll --migrate
+dotnet Batanai.Api.dll --migrate
 ```
 
 **Generate idempotent SQL script (apply only unapplied migrations):**
 ```powershell
-cd C:\dev\divvy\server\src\Divvy.Api
+cd C:\dev\Batanai\server\src\Batanai.Api
 dotnet ef migrations script --idempotent -o migration.sql
 ```
 
@@ -279,22 +279,22 @@ dotnet ef migrations script --idempotent -o migration.sql
 
 On the server:
 ```bash
-sudo nano /etc/systemd/system/divvy-api.service
+sudo nano /etc/systemd/system/Batanai-api.service
 ```
 
 Paste:
 ```ini
 [Unit]
-Description=Divvy .NET API
+Description=Batanai .NET API
 After=network.target postgresql.service
 
 [Service]
 WorkingDirectory=/home/elroitecProjects/api
-ExecStart=/usr/bin/dotnet /home/elroitecProjects/api/Divvy.Api.dll
+ExecStart=/usr/bin/dotnet /home/elroitecProjects/api/Batanai.Api.dll
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
-SyslogIdentifier=divvy-api
+SyslogIdentifier=Batanai-api
 User=ubuntu
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://localhost:1954
@@ -307,9 +307,9 @@ WantedBy=multi-user.target
 Enable and start:
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable divvy-api
-sudo systemctl start divvy-api
-sudo systemctl status divvy-api
+sudo systemctl enable Batanai-api
+sudo systemctl start Batanai-api
+sudo systemctl status Batanai-api
 ```
 
 Verify:
@@ -321,14 +321,14 @@ curl -s http://localhost:1954/api/health
 
 ## Step 8 � Configure Nginx
 
-### 8.1 Frontend (`divvy.elroitec.com` on port 4300)
+### 8.1 Frontend (`batanai.elroitec.com` on port 4300)
 ```bash
-sudo nano /etc/nginx/sites-available/divvy
+sudo nano /etc/nginx/sites-available/Batanai
 ```
 ```nginx
 server {
     listen 4300;
-    server_name divvy.elroitec.com;
+    server_name batanai.elroitec.com;
 
     root /home/elroitecProjects/app;
     index index.html;
@@ -366,14 +366,14 @@ server {
 }
 ```
 
-### 8.2 Backend (`divvyapi.elroitec.com` on port 1954)
+### 8.2 Backend (`batanaiapi.elroitec.com` on port 1954)
 ```bash
-sudo nano /etc/nginx/sites-available/divvyapi
+sudo nano /etc/nginx/sites-available/Batanaiapi
 ```
 ```nginx
 server {
     listen 80;
-    server_name divvyapi.elroitec.com;
+    server_name batanaiapi.elroitec.com;
 
     location / {
         proxy_pass         http://127.0.0.1:1954;
@@ -394,8 +394,8 @@ server {
 
 ### 8.3 Enable both sites
 ```bash
-sudo ln -s /etc/nginx/sites-available/divvy    /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/divvyapi /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/Batanai    /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/Batanaiapi /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -405,7 +405,7 @@ sudo systemctl reload nginx
 ## Step 9 � SSL Certificates (Let's Encrypt)
 
 ```bash
-sudo certbot --nginx -d divvy.elroitec.com -d divvyapi.elroitec.com
+sudo certbot --nginx -d batanai.elroitec.com -d batanaiapi.elroitec.com
 ```
 
 - Enter email, agree to terms (`A`), choose **Redirect** (option 2)
@@ -422,28 +422,28 @@ sudo certbot renew --dry-run
 
 ```bash
 # Services
-sudo systemctl status divvy-api
+sudo systemctl status Batanai-api
 sudo systemctl status nginx
 
 # API on localhost
 curl -s http://localhost:1954/api/health
 
 # Frontend
-curl -s -o /dev/null -w "%{http_code}" https://divvy.elroitec.com:4300/
+curl -s -o /dev/null -w "%{http_code}" https://batanai.elroitec.com:4300/
 
 # API HTTPS
-curl -s -o /dev/null -w "%{http_code}" https://divvyapi.elroitec.com/api/health
+curl -s -o /dev/null -w "%{http_code}" https://batanaiapi.elroitec.com/api/health
 
 # Firewall
 sudo ufw status
 
 # Live API logs
-sudo journalctl -u divvy-api -f
+sudo journalctl -u Batanai-api -f
 ```
 
 Open in browser:
-- `https://divvy.elroitec.com:4300` ? Angular login screen
-- `https://divvyapi.elroitec.com/api/swagger` ? Swagger UI
+- `https://batanai.elroitec.com:4300` ? Angular login screen
+- `https://batanaiapi.elroitec.com/api/swagger` ? Swagger UI
 
 ---
 
@@ -451,33 +451,33 @@ Open in browser:
 
 ### Frontend only
 ```powershell
-cd C:\dev\divvy\client
+cd C:\dev\Batanai\client
 npx ng build --configuration production
-scp -r C:\Publish\divvy\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
+scp -r C:\Publish\Batanai\app\* ubuntu@<server-ip>:/home/elroitecProjects/app/
 ```
 No restart needed � Nginx serves static files directly.
 
 ### Backend only
 ```powershell
-cd C:\dev\divvy\server\src\Divvy.Api
-dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\divvy\publish\api
-scp -r C:\dev\divvy\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
+cd C:\dev\Batanai\server\src\Batanai.Api
+dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\Batanai\publish\api
+scp -r C:\dev\Batanai\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
 ```
 Then on server:
 ```bash
-sudo systemctl restart divvy-api
-sudo systemctl status divvy-api
+sudo systemctl restart Batanai-api
+sudo systemctl status Batanai-api
 ```
 
 ### Config only (no rebuild)
 ```bash
 nano /home/elroitecProjects/api/appsettings.Production.json
-sudo systemctl restart divvy-api
+sudo systemctl restart Batanai-api
 ```
 
 ### Generate new VAPID keys
 ```powershell
-cd C:\dev\divvy\server\vapid-keygen
+cd C:\dev\Batanai\server\vapid-keygen
 dotnet run
 ```
 Copy output into `appsettings.Production.json` (`Vapid` section) **and** `environment.prod.ts` (`vapidPublicKey`), then rebuild and redeploy both.
@@ -488,23 +488,23 @@ Copy output into `appsettings.Production.json` (`Vapid` section) **and** `enviro
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
-| `504 Gateway Timeout` | API not running | `sudo systemctl restart divvy-api` then `sudo journalctl -u divvy-api -n 50` |
+| `504 Gateway Timeout` | API not running | `sudo systemctl restart Batanai-api` then `sudo journalctl -u Batanai-api -n 50` |
 | `400 Bad Request - Invalid Hostname` | Domain missing from `AllowedHosts` | Add domain to `AllowedHosts` in `appsettings.Production.json`, restart API |
-| `401 Unauthorized` on all calls | `Jwt:Issuer`/`Jwt:Audience` mismatch | Ensure both are `divvyapi.elroitec.com` in `appsettings.Production.json` |
-| `CORS error` in browser | Frontend origin not allowed | Add `https://divvy.elroitec.com` to `Cors:AllowedOrigins`, restart API |
+| `401 Unauthorized` on all calls | `Jwt:Issuer`/`Jwt:Audience` mismatch | Ensure both are `batanaiapi.elroitec.com` in `appsettings.Production.json` |
+| `CORS error` in browser | Frontend origin not allowed | Add `https://batanai.elroitec.com` to `Cors:AllowedOrigins`, restart API |
 | `styles.css 404` | Stale service worker | DevTools ? Application ? Service Workers ? Unregister ? hard refresh |
 | `404` on page refresh | Missing Angular fallback | Ensure `try_files $uri $uri/ /index.html;` in Nginx config |
 | DB connection error | Wrong credentials | Check `ConnectionStrings` in `appsettings.Production.json` |
 | SSL certificate error | Cert expired | `sudo certbot certificates` then `sudo certbot renew` |
-| API not starting | Missing runtime | `sudo journalctl -u divvy-api -n 100 --no-pager` and `dotnet --version` |
+| API not starting | Missing runtime | `sudo journalctl -u Batanai-api -n 100 --no-pager` and `dotnet --version` |
 | Port not reachable | Firewall blocking | `sudo ufw allow 4300/tcp` and `sudo ufw allow 1954/tcp` |
 
 ### Useful debug commands
 ```bash
-sudo journalctl -u divvy-api.service -n 200 --no-pager
-dotnet /home/elroitecProjects/api/Divvy.Api.dll
+sudo journalctl -u Batanai-api.service -n 200 --no-pager
+dotnet /home/elroitecProjects/api/Batanai.Api.dll
 dotnet --info
-sudo cat /etc/systemd/system/divvy-api.service
+sudo cat /etc/systemd/system/Batanai-api.service
 sudo ufw status numbered
 sudo ss -tlnp | grep -E '4300|1954'
 ```

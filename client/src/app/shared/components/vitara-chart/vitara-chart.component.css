@@ -1,4 +1,4 @@
-.divvy-chart-card {
+.batanai-chart-card {
   background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -8,7 +8,7 @@
   margin-bottom: 1.5rem;
 }
 
-.divvy-chart-header {
+.batanai-chart-header {
   background: var(--primary);
   color: #fff;
   padding: 0.65rem 1rem;
@@ -16,13 +16,13 @@
   align-items: center;
 }
 
-.divvy-chart-title {
+.batanai-chart-title {
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-.divvy-chart-body {
+.batanai-chart-body {
   padding: 1rem;
   height: 350px;
   position: relative;
@@ -30,7 +30,7 @@
 
 /* Mobile */
 @media (max-width: 760px) {
-  .divvy-chart-body {
+  .batanai-chart-body {
     height: 250px;
     padding: 0.75rem;
   }

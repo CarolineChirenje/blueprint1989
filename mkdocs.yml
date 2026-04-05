@@ -1,6 +1,6 @@
-site_name: Divvy Technical Docs
-site_description: Technical documentation for the Divvy expense-sharing platform
-site_author: Divvy Team
+site_name: Batanai Technical Docs
+site_description: Technical documentation for the Batanai expense-sharing platform
+site_author: Batanai Team
 docs_dir: "docs/technical documents"
 site_dir: site
 

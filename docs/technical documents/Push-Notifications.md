@@ -32,7 +32,7 @@ Client (browser / service worker)
 
 ### Controller — `PushController`
 
-**File:** `server/src/Divvy.Api/Controllers/PushController.cs`
+**File:** `server/src/Batanai.Api/Controllers/PushController.cs`
 
 Base route: `/api/push`
 
@@ -74,7 +74,7 @@ Sends a push immediately with payload:
 
 ### Model — `PushSubscription`
 
-**File:** `server/src/Divvy.Api/Models/PushSubscription.cs`
+**File:** `server/src/Batanai.Api/Models/PushSubscription.cs`
 
 | Field | Type | Notes |
 |---|---|---|
@@ -91,7 +91,7 @@ Sends a push immediately with payload:
 
 ### Service — `PushNotificationSender`
 
-**File:** `server/src/Divvy.Api/Services/PushNotificationSender.cs`
+**File:** `server/src/Batanai.Api/Services/PushNotificationSender.cs`
 
 The `PushNotificationSender` is the central dispatch service used by all features that emit push notifications.
 
@@ -128,7 +128,7 @@ If the push service returns **HTTP 410 Gone** (subscription expired/removed by t
 
 ### Background Timer — `BgTimerHostedService`
 
-**File:** `server/src/Divvy.Api/Services/BgTimerHostedService.cs`
+**File:** `server/src/Batanai.Api/Services/BgTimerHostedService.cs`
 
 A hosted background service that polls for scheduled push reminders.
 
@@ -252,7 +252,7 @@ The service worker listens for the `push` event and renders a system notificatio
 ```js
 self.addEventListener('push', event => {
   const data = event.data?.json() ?? {};
-  const title = data.title ?? 'Divvy';
+  const title = data.title ?? 'Batanai';
   const options = {
     body: data.body ?? '',
     icon: '/assets/icons/icon-192x192.png',

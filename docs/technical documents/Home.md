@@ -1,6 +1,6 @@
-﻿# Divvy — Technical Documentation
+# Batanai � Technical Documentation
 
-Welcome to the Divvy developer wiki. This covers every feature of the Divvy expense-sharing platform in detail, including backend (.NET 10 API) and frontend (Angular 21 PWA) implementation for each feature.
+Welcome to the Batanai developer wiki. This covers every feature of the Batanai expense-sharing platform in detail, including backend (.NET 10 API) and frontend (Angular 21 PWA) implementation for each feature.
 
 ---
 
@@ -52,11 +52,11 @@ To publish / update the GitHub Wiki:
 
 ```bash
 # Clone the wiki repo (separate from the main repo)
-git clone https://github.com/CarolineChirenje/divvy.wiki.git
-cd divvy.wiki
+git clone https://github.com/CarolineChirenje/Batanai.wiki.git
+cd Batanai.wiki
 
-# Copy all docs — rename files to match wiki page names (no spaces, use hyphens)
-# Home.md        ← this file (wiki landing page)
+# Copy all docs � rename files to match wiki page names (no spaces, use hyphens)
+# Home.md        ? this file (wiki landing page)
 # Authentication.md
 # Biometric-Authentication.md
 # Dashboard.md

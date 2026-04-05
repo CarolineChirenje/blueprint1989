@@ -1,5 +1,5 @@
 ﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="icon-title icon-desc">
-  <title id="icon-title">Divvy - 6299 Home Finance</title>
+  <title id="icon-title">Batanai - 6299 Home Finance</title>
   <desc id="icon-desc">A green house with the number 6299 inside and a pink piggy bank in front, representing shared home finances.</desc>
 
   <defs>
@@ -63,6 +63,6 @@
     <path d="M168 349 C175 381,328 384,339 352" class="pig-green"/>
   </g>
 
-  <!-- DIVVY wordmark -->
-  <text x="256" y="500" text-anchor="middle" class="label">DIVVY</text>
+  <!-- BATANAI wordmark -->
+  <text x="256" y="500" text-anchor="middle" class="label">BATANAI</text>
 </svg>

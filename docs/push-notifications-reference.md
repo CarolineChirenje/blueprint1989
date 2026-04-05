@@ -1,11 +1,11 @@
-﻿# Divvy Push Notifications Reference
+# Batanai Push Notifications Reference
 
 All push notifications fall into two delivery types:
 
 | Type | How it works | Survives closed browser? |
 |------|-------------|--------------------------|
-| **VAPID server-sent** | Server sends via Web Push Protocol; browser push service delivers it | ✅ Yes |
-| **Local SW scheduled** | Service worker fires a `showNotification` after a `setTimeout` | ❌ No — requires tab/browser to be open |
+| **VAPID server-sent** | Server sends via Web Push Protocol; browser push service delivers it | ? Yes |
+| **Local SW scheduled** | Service worker fires a `showNotification` after a `setTimeout` | ? No � requires tab/browser to be open |
 
 Each server-sent notification also creates an **in-app Notification row** in the database (via `NotificationService.CreateAsync`), which appears in the in-app notification bell.
 
@@ -21,7 +21,7 @@ Each server-sent notification also creates an **in-app Notification row** in the
 | **Title** | `Payment Due` |
 | **Body** | `You owe {creditorName} {amount} in cycle {cycleName}.` |
 | **Deep link** | `/cycles/{id}/obligations` |
-| **Source** | `ExpenseCycleController.cs` → `POST /api/expense-cycle/{id}/close` |
+| **Source** | `ExpenseCycleController.cs` ? `POST /api/expense-cycle/{id}/close` |
 | **NotificationType** | `PaymentDue (2)` |
 
 ---
@@ -34,7 +34,7 @@ Each server-sent notification also creates an **in-app Notification row** in the
 | **Title** | `Payment Received` |
 | **Body** | `{debtorName} has paid you {amount}.` |
 | **Deep link** | `/payments/{id}` |
-| **Source** | `PaymentController.cs` → `PATCH /api/payment/{id}/confirm` |
+| **Source** | `PaymentController.cs` ? `PATCH /api/payment/{id}/confirm` |
 | **NotificationType** | `PaymentReceived (3)` |
 
 ---
@@ -47,7 +47,7 @@ Each server-sent notification also creates an **in-app Notification row** in the
 | **Title** | `New Expense Cycle` |
 | **Body** | `{cycleName} is now active. Start adding expenses.` |
 | **Deep link** | `/cycles/{id}` |
-| **Source** | `ExpenseCycleController.cs` → `POST /api/expense-cycle` |
+| **Source** | `ExpenseCycleController.cs` ? `POST /api/expense-cycle` |
 | **NotificationType** | `CycleCreated (4)` |
 
 ---
@@ -58,9 +58,9 @@ Each server-sent notification also creates an **in-app Notification row** in the
 | **Trigger** | An Admin triggers a system restart via `POST /api/system/restart` |
 | **Sent to** | All users |
 | **Title** | `System Restart` |
-| **Body** | `Divvy will restart shortly for maintenance. Please save your work.` |
+| **Body** | `Batanai will restart shortly for maintenance. Please save your work.` |
 | **Deep link** | (none) |
-| **Source** | `SystemController.cs` → `POST /api/system/restart` |
+| **Source** | `SystemController.cs` ? `POST /api/system/restart` |
 | **NotificationType** | `SystemRestart (5)` |
 
 ---
@@ -70,7 +70,7 @@ Each server-sent notification also creates an **in-app Notification row** in the
 |-------|-------|
 | **Trigger** | Any ad-hoc notification sent by the system or admin |
 | **Sent to** | Targeted user(s) |
-| **Title** | `Divvy` |
+| **Title** | `Batanai` |
 | **Body** | Custom message |
 | **Deep link** | Optional |
 | **Source** | `NotificationService.CreateAsync` called directly |

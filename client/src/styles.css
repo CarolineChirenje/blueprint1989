@@ -5,7 +5,7 @@
 @import '@fontsource/inter/latin-600.css';
 @import '@fontsource/inter/latin-700.css';
 
-/* ── Shepherd.js Tour Theme (divvyBlue) ───────────────────────────────── */
+/* ── Shepherd.js Tour Theme (batanaiBlue) ───────────────────────────────── */
 .shepherd-has-cancel-icon .shepherd-cancel-icon {
   color: #666;
 }
@@ -218,7 +218,7 @@
   margin-top: 0.25rem;
   align-self: safe;
 }
-/* Design Tokens — Divvy Green Theme */
+/* Design Tokens — Batanai Green Theme */
 :root {
   color-scheme: light;
 

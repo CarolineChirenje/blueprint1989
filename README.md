@@ -1,8 +1,8 @@
-# Divvy
+# Batanai
 
 A cloud-hosted, mobile-first **Progressive Web App (PWA)** for shared expense management — built for flatmates, families, and travel groups.
 
-**Live:** [divvy.elroitec.com](https://divvy.elroitec.com) · **Docs:** [divvy-docs.pages.dev](https://divvy-docs.pages.dev)
+**Live:** [batanai.elroitec.com](https://batanai.elroitec.com) · **Docs:** [batanai-docs.pages.dev](https://batanai-docs.pages.dev)
 
 ## Features
 
@@ -41,14 +41,14 @@ A cloud-hosted, mobile-first **Progressive Web App (PWA)** for shared expense ma
 
 ```bash
 git clone <repo-url>
-cd divvy
+cd Batanai
 
 # Client
 cd client
 npm install
 
 # Server
-cd ../server/src/Divyy.Api
+cd ../server/src/Batanai.Api
 dotnet restore
 ```
 
@@ -62,7 +62,7 @@ export const environment = {
   apiUrl: 'http://localhost:1954/api',
   vapidPublicKey: '',
   version: '1.0.0',
-  docsUrl: 'https://divvy-docs.pages.dev'
+  docsUrl: 'https://batanai-docs.pages.dev'
 };
 ```
 
@@ -72,13 +72,13 @@ export const environment = {
 
 ```bash
 # Terminal 1 — API
-cd server/src/Divyy.Api
+cd server/src/Batanai.Api
 dotnet run
 
 # Terminal 2 — Build & serve client
 cd client
 npx ng build
-http-server ./dist/Divvy/browser -p 80 -c-1
+http-server ./dist/Batanai/browser -p 80 -c-1
 
 # Terminal 3 — ngrok tunnel for client HTTPS
 ngrok http 80

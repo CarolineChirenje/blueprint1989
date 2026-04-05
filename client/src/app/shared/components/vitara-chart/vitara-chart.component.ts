@@ -13,14 +13,14 @@ Chart.register(
   CategoryScale, Title, Tooltip, Legend, Filler
 );
 
-export interface DivvyChartDataset {
+export interface BatanaiChartDataset {
   label: string;
   data: (number | null)[];
   color: string;
   fill?: boolean;
 }
 
-export interface DivvyReferenceBand {
+export interface BatanaiReferenceBand {
   /** Y value where the dashed line is drawn */
   y: number;
   label: string;
@@ -28,19 +28,19 @@ export interface DivvyReferenceBand {
 }
 
 @Component({
-  selector: 'app-divvy-chart',
+  selector: 'app-batanai-chart',
   templateUrl: './vitara-chart.component.html',
   styleUrls: ['./vitara-chart.component.css'],
   standalone: false
 })
-export class DivvyChartComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class BatanaiChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('chartCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   @Input() title = '';
   @Input() labels: string[] = [];
-  @Input() datasets: DivvyChartDataset[] = [];
+  @Input() datasets: BatanaiChartDataset[] = [];
   @Input() yAxisLabel = '';
-  @Input() referenceBands: DivvyReferenceBand[] = [];
+  @Input() referenceBands: BatanaiReferenceBand[] = [];
 
   private chart: Chart | null = null;
   private viewReady = false;
@@ -74,7 +74,7 @@ export class DivvyChartComponent implements AfterViewInit, OnChanges, OnDestroy 
     if (!this.labels?.length || !this.datasets?.length) return;
 
     const refLinePlugin: Plugin<'line'> = {
-      id: 'divvyRefLines',
+      id: 'batanaiRefLines',
       afterDraw: (chartInstance) => {
         if (!this.referenceBands?.length) return;
         const { ctx, chartArea, scales } = chartInstance as any;

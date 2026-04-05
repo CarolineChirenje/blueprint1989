@@ -13,7 +13,7 @@ export interface WebAuthnCredentialDto {
 
 /**
  * BiometricService — wraps the browser WebAuthn (FIDO2) API to provide
- * fingerprint / Face ID / Windows Hello login for the Divvy PWA.
+ * fingerprint / Face ID / Windows Hello login for the Batanai PWA.
  *
  * How it works:
  *  - Registration: Server generates a challenge → browser invokes platform authenticator

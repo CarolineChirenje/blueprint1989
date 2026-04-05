@@ -2,7 +2,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Divvy": {
+    "Batanai": {
       "projectType": "application",
       "root": "src",
       "sourceRoot": "src",
@@ -11,7 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "C:/Publish/divvy/app",
+            "outputPath": "C:/Publish/batanai/app",
             "index": "src/index.html",
             "polyfills": [
               "src/polyfills.ts"
@@ -61,13 +61,13 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "Divvy:build",
+            "buildTarget": "Batanai:build",
             "port": 4300,
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "buildTarget": "Divvy:build:production"
+              "buildTarget": "Batanai:build:production"
             }
           }
         },

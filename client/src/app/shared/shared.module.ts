@@ -8,7 +8,7 @@ import { PasswordFieldComponent } from './components/password-field/password-fie
 import { CloseReportDialogComponent } from './components/close-report-dialog/close-report-dialog.component';
 import { ViewReportDialogComponent } from './components/view-report-dialog/view-report-dialog.component';
 import { ReportFeatureBugDialogComponent } from './components/report-feature-bug-dialog/report-feature-bug-dialog.component';
-import { DivvyChartComponent } from './components/vitara-chart/vitara-chart.component';
+import { BatanaiChartComponent } from './components/vitara-chart/vitara-chart.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +17,7 @@ import { DivvyChartComponent } from './components/vitara-chart/vitara-chart.comp
     CloseReportDialogComponent,
     ViewReportDialogComponent,
     ReportFeatureBugDialogComponent,
-    DivvyChartComponent
+    BatanaiChartComponent
   ],
   imports: [
     CommonModule,
@@ -32,7 +32,7 @@ import { DivvyChartComponent } from './components/vitara-chart/vitara-chart.comp
     CloseReportDialogComponent,
     ViewReportDialogComponent,
     ReportFeatureBugDialogComponent,
-    DivvyChartComponent,
+    BatanaiChartComponent,
     RouterModule,
     ReactiveFormsModule,
     MaterialModule,

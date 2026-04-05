@@ -12,7 +12,7 @@
 <div class="app-container">
   @if (shouldShowNavigation()) {
     <header>
-      <h1>Divvy</h1>
+      <h1>Batanai</h1>
       <p>Shared Expense Management</p>
     </header>
 
@@ -332,10 +332,10 @@
 
 <!-- PWA Install Banner -->
 @if (showInstallBanner) {
-  <div class="pwa-install-banner" role="dialog" aria-label="Install Divvy app">
+  <div class="pwa-install-banner" role="dialog" aria-label="Install Batanai app">
     <img class="pwa-banner-icon" src="/assets/icons/icon-192x192.png" alt="App icon" />
     <div class="pwa-banner-text">
-      <strong>Install Divvy</strong>
+      <strong>Install Batanai</strong>
       <span>Add to home screen for the best experience</span>
     </div>
     <button class="pwa-install-btn" (click)="installApp()">Install</button>
@@ -364,7 +364,7 @@
         <span>This update contains breaking changes. Skipping it may cause features to stop working.</span>
       } @else {
         <strong>New version available</strong>
-        <span>A new version of Divvy is ready to install.</span>
+        <span>A new version of Batanai is ready to install.</span>
       }
     </div>
     <div class="pwa-update-actions">

@@ -1,4 +1,4 @@
-﻿# Expense Cycles
+# Expense Cycles
 
 ## Overview
 
@@ -20,9 +20,9 @@ Admins create and manage cycles through the Management console. Members can view
 
 ## Backend
 
-### Controller — `ExpenseCycleController`
+### Controller � `ExpenseCycleController`
 
-**File:** `server/src/Divvy.Api/Controllers/ExpenseCycleController.cs`
+**File:** `server/src/Batanai.Api/Controllers/ExpenseCycleController.cs`
 
 Base route: `/api/expense-cycle`
 
@@ -40,9 +40,9 @@ Base route: `/api/expense-cycle`
 
 ---
 
-### Model — `ExpenseCycle`
+### Model � `ExpenseCycle`
 
-**File:** `server/src/Divvy.Api/Models/ExpenseCycle.cs`
+**File:** `server/src/Batanai.Api/Models/ExpenseCycle.cs`
 
 | Field | Type | Notes |
 |---|---|---|
@@ -53,38 +53,38 @@ Base route: `/api/expense-cycle`
 | `Status` | `CycleStatus` | `Active` or `Closed` |
 | `CreatedAt` | `DateTime` | |
 | `UpdatedAt` | `DateTime` | |
-| `CycleMembers` | `ICollection<CycleMember>` | Navigation — members of this cycle |
-| `Expenses` | `ICollection<Expense>` | Navigation — all expenses in this cycle |
-| `MemberObligations` | `ICollection<MemberObligation>` | Navigation — calculated on close |
+| `CycleMembers` | `ICollection<CycleMember>` | Navigation � members of this cycle |
+| `Expenses` | `ICollection<Expense>` | Navigation � all expenses in this cycle |
+| `MemberObligations` | `ICollection<MemberObligation>` | Navigation � calculated on close |
 
 ---
 
-### Model — `CycleMember`
+### Model � `CycleMember`
 
 | Field | Type | Notes |
 |---|---|---|
-| `CycleId` | `int` | PK (composite) — FK → ExpenseCycle |
-| `UserId` | `int` | PK (composite) — FK → User |
+| `CycleId` | `int` | PK (composite) � FK ? ExpenseCycle |
+| `UserId` | `int` | PK (composite) � FK ? User |
 | `JoinedAt` | `DateTime` | |
 
 ---
 
-### Model — `MemberObligation`
+### Model � `MemberObligation`
 
 | Field | Type | Notes |
 |---|---|---|
 | `Id` | `int` | PK |
-| `CycleId` | `int` | FK → ExpenseCycle |
-| `DebtorUserId` | `int` | FK → User — who owes |
-| `CreditorUserId` | `int` | FK → User — who is owed |
+| `CycleId` | `int` | FK ? ExpenseCycle |
+| `DebtorUserId` | `int` | FK ? User � who owes |
+| `CreditorUserId` | `int` | FK ? User � who is owed |
 | `Amount` | `decimal` | Amount owed |
 | `IsPaid` | `bool` | Cleared when payment is confirmed |
 
 ---
 
-### Service — `ExpenseCycleService`
+### Service � `ExpenseCycleService`
 
-**File:** `server/src/Divvy.Api/Services/ExpenseCycleService.cs`
+**File:** `server/src/Batanai.Api/Services/ExpenseCycleService.cs`
 
 #### Key Methods
 
@@ -92,7 +92,7 @@ Base route: `/api/expense-cycle`
 |---|---|
 | `GetAllAsync()` | Returns all cycles ordered by start date descending |
 | `GetByIdAsync(id)` | Returns a single cycle with members and expense totals |
-| `CreateAsync(dto)` | Creates a cycle; validates start ≤ end date |
+| `CreateAsync(dto)` | Creates a cycle; validates start = end date |
 | `UpdateAsync(id, dto)` | Updates name/dates; blocked if cycle is `Closed` |
 | `DeleteAsync(id)` | Deletes a cycle only if it has no expenses |
 | `CloseAsync(id)` | Sets status to `Closed`, calculates and saves `MemberObligation` rows |
@@ -140,8 +140,8 @@ Columns: Name | Start Date | End Date | Status Badge | Actions (edit, close, del
 #### Create / Edit Form (Inline)
 
 Fields:
-- `name` — required text input.
-- `startDate` / `endDate` — date pickers.
+- `name` � required text input.
+- `startDate` / `endDate` � date pickers.
 
 #### Close Cycle
 
@@ -175,22 +175,22 @@ Confirmation dialog. If the cycle has expenses, the API returns 400 and the comp
 
 ```
 Admin creates "January 2026" cycle via /management/cycles
-  → POST /api/expense-cycle { name: "January 2026", startDate: ..., endDate: ... }
-  → Cycle created with status Active
+  ? POST /api/expense-cycle { name: "January 2026", startDate: ..., endDate: ... }
+  ? Cycle created with status Active
 
 Admin adds members
-  → POST /api/expense-cycle/{id}/members for each user
+  ? POST /api/expense-cycle/{id}/members for each user
 
 Members add expenses throughout the month
-  → POST /api/expense { cycleId, amount, category, description }
+  ? POST /api/expense { cycleId, amount, category, description }
 
 At end of month, Admin closes the cycle
-  → POST /api/expense-cycle/{id}/close
-  → System calculates each member's share and creates MemberObligation rows
-  → Members receive push notification: "January 2026 cycle closed. View your obligations."
+  ? POST /api/expense-cycle/{id}/close
+  ? System calculates each member's share and creates MemberObligation rows
+  ? Members receive push notification: "January 2026 cycle closed. View your obligations."
 
 Members settle obligations
-  → POST /api/payment { obligationId, amount }
-  → Admin or creditor confirms: PATCH /api/payment/{id}/confirm
-  → MemberObligation.IsPaid set to true
+  ? POST /api/payment { obligationId, amount }
+  ? Admin or creditor confirms: PATCH /api/payment/{id}/confirm
+  ? MemberObligation.IsPaid set to true
 ```

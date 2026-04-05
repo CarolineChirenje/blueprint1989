@@ -1,6 +1,6 @@
-# Divvy Client Application
+# Batanai Client Application
 
-This is the client-side application for the Divvy project, built using Angular and TypeScript. Divvy is a shared expense management PWA that helps groups track, split, and settle expenses across billing cycles.
+This is the client-side application for the Batanai project, built using Angular and TypeScript. Batanai is a shared expense management PWA that helps groups track, split, and settle expenses across billing cycles.
 
 ## Features
 
@@ -18,14 +18,14 @@ This is the client-side application for the Divvy project, built using Angular a
 
 - Node.js (version 18 or later)
 - Angular CLI (install via npm: `npm install -g @angular/cli`)
-- The Divvy API running at `http://localhost:5000` (see `server/` for setup)
+- The Batanai API running at `http://localhost:5000` (see `server/` for setup)
 
 ### Installation
 
 1. Clone the repository:
    ```   
    git clone <repository-url>
-   cd divvy/client
+   cd batanai/client
    ```
 
 2. Install dependencies:

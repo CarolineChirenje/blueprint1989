@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-const MUTE_KEY = 'divvy-alarm-muted';
+const MUTE_KEY = 'batanai-alarm-muted';
 
 export type AlarmSound = 'chime' | 'pulse' | 'ding';
 

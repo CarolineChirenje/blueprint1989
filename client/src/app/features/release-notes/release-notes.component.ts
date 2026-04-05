@@ -41,7 +41,7 @@ export interface ReleaseNote {
 export class ReleaseNotesComponent implements OnInit {
 
   readonly appVersion = '1.0.0';
-  readonly appName = 'Divvy';
+  readonly appName = 'Batanai';
 
   docsUrl = environment.docsUrl;
 
@@ -172,13 +172,13 @@ export class ReleaseNotesComponent implements OnInit {
           items: [
             {
               title: 'Progressive Web App (PWA)',
-              description: 'Divvy is fully installable as a PWA on mobile and desktop. A custom install prompt encourages installation with RemindLater and NeverAskAgain options. Device registration tracks install status per user per device.',
+              description: 'Batanai is fully installable as a PWA on mobile and desktop. A custom install prompt encourages installation with RemindLater and NeverAskAgain options. Device registration tracks install status per user per device.',
               technical: '@angular/service-worker with ngsw-config.json (app-shell prefetch; API routes on network-first freshness). Custom custom-sw.js handles push events. manifest.webmanifest: display standalone, 192×192 and 512×512 icons. DeviceService manages BeforeInstallPromptEvent.'
             },
             {
               title: 'Offline Entry Queue',
               description: 'Expenses and payments submitted without connectivity are queued in IndexedDB and automatically synced when the connection is restored.',
-              technical: 'OfflineQueueService uses IndexedDB (idb) DB name divvyDb to persist pending requests with a 24-hour TTL. Queue types: expense, payment. SyncService listens to navigator.onLine events; queued items replayed sequentially on reconnect. Failed items retained with error state for manual review.'
+              technical: 'OfflineQueueService uses IndexedDB (idb) DB name batanaiDb to persist pending requests with a 24-hour TTL. Queue types: expense, payment. SyncService listens to navigator.onLine events; queued items replayed sequentially on reconnect. Failed items retained with error state for manual review.'
             }
           ]
         },

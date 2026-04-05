@@ -1,8 +1,8 @@
-﻿# Authentication
+# Authentication
 
 ## Overview
 
-The authentication feature handles all aspects of user identity in Divvy, including account registration, email/password login, multi-factor authentication (TOTP), password expiry enforcement, forgot/reset password flows, and JWT issuance. Every request to a protected API endpoint is authorised via a JWT Bearer token. The JWT embeds the user's `id`, `email`, `role`, `firstName`, and `lastName` claims.
+The authentication feature handles all aspects of user identity in Batanai, including account registration, email/password login, multi-factor authentication (TOTP), password expiry enforcement, forgot/reset password flows, and JWT issuance. Every request to a protected API endpoint is authorised via a JWT Bearer token. The JWT embeds the user's `id`, `email`, `role`, `firstName`, and `lastName` claims.
 
 ---
 
@@ -18,7 +18,7 @@ The authentication feature handles all aspects of user identity in Divvy, includ
 
 ## Backend
 
-### Controller: `AuthController` â€” `/api/auth`
+### Controller: `AuthController` — `/api/auth`
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
@@ -84,7 +84,7 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 #### `LoginByEmailAsync`
 1. Looks up user by email (case-insensitive).
 2. Verifies `PasswordHash` via `IPasswordHashingService`.
-3. Checks `PasswordExpirationDays` from `AppConfigService`; if elapsed since `PasswordLastChanged`, sets `isPasswordExpired = true` â€” no JWT issued, returns userId for change-expired-password flow.
+3. Checks `PasswordExpirationDays` from `AppConfigService`; if elapsed since `PasswordLastChanged`, sets `isPasswordExpired = true` — no JWT issued, returns userId for change-expired-password flow.
 4. If user has `IsMfaEnabled = true`, returns `requiresMfa = true` with no full token; client must call `/verify-mfa`.
 5. On success, calls `GenerateJwtToken` and returns `AuthResponse`.
 
@@ -126,7 +126,7 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 | `LastName` | string | |
 | `PasswordHash` | string | BCrypt or PBKDF2 |
 | `PasswordLastChanged` | DateTime? | Null = never changed |
-| `Role` | enum (1–3) | |
+| `Role` | enum (1�3) | |
 | `IsActive` | bool | |
 | `IsMfaEnabled` | bool | |
 | `MfaSecret` | string? | Base32 TOTP secret |
@@ -140,7 +140,7 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 | Field | Type | Notes |
 |---|---|---|
 | `Id` | int | PK |
-| `UserId` | int | FK â†’ User |
+| `UserId` | int | FK → User |
 | `Token` | string | Secure random token |
 | `ExpiresAt` | DateTime | From `PasswordResetTokenValidityMinutes` |
 | `UsedAt` | DateTime? | Null = still valid |
@@ -152,7 +152,7 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 - **Email uniqueness:** checked case-insensitively against the `Users` table before any insert.
 - **Password expiry:** `PasswordExpirationDays` from `AppConfig`. If `PasswordLastChanged` (or `CreatedAt` if null) is more than this many days ago, login is blocked and the change-expired-password flow is triggered.
 - **Admin PIN:** required when registering with `role = Admin`. Compared against `AdminSignupPin` AppConfig key.
-- **Rate limiting on password reset:** limited to `PasswordResetRequestLimitPerHour` requests per email per hour. No-reveal design â€” identical response returned for known and unknown emails.
+- **Rate limiting on password reset:** limited to `PasswordResetRequestLimitPerHour` requests per email per hour. No-reveal design — identical response returned for known and unknown emails.
 
 ---
 
@@ -170,7 +170,7 @@ newPassword     string?   Min 8 chars, upper + lower + digit
 
 All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 
-### `LoginComponent` â€” `/login`
+### `LoginComponent` — `/login`
 
 **File:** `client/src/app/auth/login.component.ts`
 
@@ -178,8 +178,8 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 1. Displays an email + password form.
 2. If the user has previously registered a biometric credential (`localStorage` key `bgl_biometric_email` matches the typed email) AND the browser has a platform authenticator available (`PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()`), a biometric login button appears and the password field becomes optional.
 3. On standard login, calls `POST /auth/login`:
-   - If `isPasswordExpired` is returned â†’ navigates to `/change-expired-password?userId=â€¦`.
-   - If `requiresMfa` is returned â†’ reveals the inline MFA step with a 6-digit TOTP code input.
+   - If `isPasswordExpired` is returned → navigates to `/change-expired-password?userId=…`.
+   - If `requiresMfa` is returned → reveals the inline MFA step with a 6-digit TOTP code input.
 4. **MFA step:** calls `POST /auth/verify-mfa` with the code; on success stores the JWT via `AuthService`.
 5. On successful login (either path), calls `PushNotificationService.subscribeToServer()` to register/refresh the browser push subscription.
 6. "Remember Me" checkbox persists login state.
@@ -188,10 +188,10 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 **Service calls:**
 - `AuthService.login(email, password)`
 - `AuthService.verifyMfa(code)`
-- `BiometricService.authenticate(email)` â€” triggers OS biometric prompt
+- `BiometricService.authenticate(email)` — triggers OS biometric prompt
 - `PushNotificationService.subscribeToServer()`
 
-### `SignupComponent` â€” `/signup`
+### `SignupComponent` — `/signup`
 
 **File:** `client/src/app/auth/signup.component.ts`
 
@@ -202,7 +202,7 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 - Password strength enforced client-side: minimum 8 chars, uppercase, lowercase, digit.
 - Calls `POST /auth/signup` and navigates to `/login` on success.
 
-### `ForgotPasswordComponent` â€” `/forgot-password`
+### `ForgotPasswordComponent` — `/forgot-password`
 
 **File:** `client/src/app/auth/forgot-password.component.ts`
 
@@ -210,20 +210,20 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 - Calls `POST /auth/forgot-password`.
 - Displays the same success message regardless of whether the email exists (no-reveal design).
 
-### `ResetPasswordComponent` â€” `/reset-password`
+### `ResetPasswordComponent` — `/reset-password`
 
 **File:** `client/src/app/auth/reset-password.component.ts`
 
-- Reads `?token=â€¦` from query params on init.
-- Validates the token via `GET /auth/validate-reset-token?token=â€¦`; shows an error message if invalid or expired.
+- Reads `?token=…` from query params on init.
+- Validates the token via `GET /auth/validate-reset-token?token=…`; shows an error message if invalid or expired.
 - New password input with real-time strength indicator (Weak / Medium / Strong) and a confirmation field.
 - Calls `POST /auth/reset-password` with token + new password; navigates to `/login` on success.
 
-### `ChangeExpiredPasswordComponent` â€” `/change-expired-password`
+### `ChangeExpiredPasswordComponent` — `/change-expired-password`
 
 **File:** `client/src/app/auth/change-expired-password.component.ts`
 
-- Reads `?userId=â€¦` from query params.
+- Reads `?userId=…` from query params.
 - New password form (no current-password required; the userId acts as the credential for this one-time change).
 - Calls `POST /auth/change-expired-password`; on success stores the returned JWT (full login) and navigates to `/dashboard`.
 
@@ -234,8 +234,8 @@ All auth routes are in `AuthModule` (`client/src/app/auth/auth.module.ts`).
 **Responsibilities:**
 - Stores JWT and user claims in `localStorage`.
 - Exposes `getUserRole()`, `getUserRoleId()`, `getUserId()`, `getEmail()`, `getUserName()` helpers parsed from the JWT payload.
-- `isAuthenticated()` — checks for a non-expired token.
-- `logout()` — clears `localStorage`, navigates to `/login`.
+- `isAuthenticated()` � checks for a non-expired token.
+- `logout()` � clears `localStorage`, navigates to `/login`.
 
 ---
 
