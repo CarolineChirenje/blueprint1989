@@ -806,65 +806,8 @@ public class MukandoService
 
             await _context.SaveChangesAsync();
 
-            // Regenerate all rounds with remaining members
-            var memberIds = await _context.CycleMembers
-                .Where(m => m.ExpenseCycleId == req.ExpenseCycleId).Select(m => m.UserId).ToListAsync();
-
-            if (memberIds.Count >= 2 && cycle.ContributionAmount.HasValue && cycle.Frequency.HasValue)
-            {
-                // Delete all swap requests referencing rounds (FK RESTRICT prevents round deletion otherwise)
-                var allSwaps = await _context.MukandoSwapRequests
-                    .Where(s => s.ExpenseCycleId == req.ExpenseCycleId).ToListAsync();
-                _context.MukandoSwapRequests.RemoveRange(allSwaps);
-                await _context.SaveChangesAsync();
-
-                // Remove old rounds
-                var oldRounds = await _context.MukandoRounds
-                    .Where(r => r.ExpenseCycleId == req.ExpenseCycleId).ToListAsync();
-                _context.MukandoRounds.RemoveRange(oldRounds);
-                await _context.SaveChangesAsync();
-
-                // Recreate rounds for remaining members
-                int memberCount = memberIds.Count;
-                decimal expectedPool = cycle.ContributionAmount.Value * (memberCount - 1);
-
-                for (int i = 0; i < memberCount; i++)
-                {
-                    var recipientId = memberIds[i]; // maintain order
-                    var dueDate = ExpenseCycleService.CalculateRoundDueDate(cycle.StartDate, cycle.Frequency.Value, i);
-
-                    var round = new MukandoRound
-                    {
-                        ExpenseCycleId  = req.ExpenseCycleId,
-                        RoundNumber     = i + 1,
-                        RecipientUserId = recipientId,
-                        Status          = RoundStatus.Pending,
-                        ExpectedPool    = expectedPool,
-                        ActualCollected = 0,
-                        PayoutConfirmed = false,
-                        DueDate         = dueDate,
-                        CreatedAt       = DateTime.UtcNow,
-                        UpdatedAt       = DateTime.UtcNow
-                    };
-
-                    _context.MukandoRounds.Add(round);
-                    await _context.SaveChangesAsync();
-
-                    foreach (var uid in memberIds.Where(m => m != recipientId))
-                    {
-                        _context.MukandoContributions.Add(new MukandoContribution
-                        {
-                            MukandoRoundId = round.Id,
-                            UserId         = uid,
-                            Amount         = cycle.ContributionAmount.Value,
-                            Status         = ContributionStatus.Pending,
-                            CreatedAt      = DateTime.UtcNow
-                        });
-                    }
-                }
-
-                cycle.EndDate = ExpenseCycleService.CalculateRoundDueDate(cycle.StartDate, cycle.Frequency.Value, memberCount - 1);
-            }
+            // Regenerate rounds for remaining members (adjusts round count, payout order, and EndDate)
+            await RegenerateRoundsAfterMemberChangeAsync(req.ExpenseCycleId);
         }
 
         await _context.SaveChangesAsync();
