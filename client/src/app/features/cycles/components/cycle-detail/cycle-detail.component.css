@@ -281,6 +281,18 @@
 .optout-date { font-size: .8rem; color: var(--text-disabled); }
 .optout-actions { display: flex; gap: .5rem; margin-top: .25rem; }
 
+/* ── Mukando: Payout Order ── */
+.order-hint { font-size: .88rem; color: var(--text-secondary); margin-bottom: 1rem; }
+.payout-order-list { display: flex; flex-direction: column; gap: 0; }
+.payout-order-row {
+  display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border); background: var(--surface);
+}
+.payout-order-row:first-child { border-radius: var(--radius-md) var(--radius-md) 0 0; }
+.payout-order-row:last-child { border-radius: 0 0 var(--radius-md) var(--radius-md); border-bottom: none; }
+.payout-order-num { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 28px; text-align: center; }
+.payout-order-name { flex: 1; font-weight: 500; }
+
 /* ── Mobile / tablet responsive ── */
 @media (max-width: 1023px) {
   .detail-page { padding: 1rem; overflow-x: hidden; max-width: 100vw; }

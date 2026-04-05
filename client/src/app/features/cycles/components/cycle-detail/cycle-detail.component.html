@@ -106,6 +106,11 @@
         <button [class.active]="activeTab==='rounds'" (click)="activeTab='rounds'">
           Rounds ({{ rounds.length }})
         </button>
+        @if (isDraft() && canManageCycle()) {
+          <button [class.active]="activeTab==='order'" (click)="activeTab='order'">
+            Payout Order
+          </button>
+        }
         <button [class.active]="activeTab==='stats'" (click)="activeTab='stats'">
           Stats
         </button>
@@ -508,6 +513,31 @@
                     }
                   </div>
                 }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ═══════ Mukando: Payout Order Tab ═══════ -->
+    @if (activeTab === 'order') {
+      <div class="tab-content">
+        @if (payoutOrderFromRounds.length === 0) {
+          <div class="empty-state">No rounds yet.</div>
+        } @else {
+          <p class="order-hint">Reorder who receives the pool each round. Changes regenerate all rounds.</p>
+          <div class="payout-order-list">
+            @for (entry of payoutOrderFromRounds; track entry.userId; let i = $index) {
+              <div class="payout-order-row">
+                <span class="payout-order-num">{{ i + 1 }}</span>
+                <span class="payout-order-name">{{ entry.name }}</span>
+                <button mat-icon-button (click)="movePayoutUp(i)" [disabled]="i === 0" matTooltip="Move up">
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button mat-icon-button (click)="movePayoutDown(i)" [disabled]="i === payoutOrderFromRounds.length - 1" matTooltip="Move down">
+                  <mat-icon>arrow_downward</mat-icon>
+                </button>
               </div>
             }
           </div>

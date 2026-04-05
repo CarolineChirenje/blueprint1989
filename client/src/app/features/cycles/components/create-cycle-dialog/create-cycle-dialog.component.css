@@ -29,21 +29,9 @@
 .type-btn small { font-size: 11px; color: #666; }
 .type-btn mat-icon { font-size: 28px; height: 28px; width: 28px; color: #1976d2; }
 
-.payout-order-section {
-  margin: 8px 0 16px;
+.mukando-hint {
+  display: block; font-size: 12px; color: #888; margin-bottom: 12px;
 }
-.payout-label {
-  font-weight: 500; font-size: 13px; margin-bottom: 8px; display: block; color: #555;
-}
-.payout-label small { font-weight: 400; color: #999; }
-.payout-row {
-  display: flex; align-items: center; gap: 8px; padding: 4px 8px;
-  border-bottom: 1px solid #f0f0f0;
-}
-.payout-num {
-  font-weight: 700; font-size: 14px; color: #1976d2; min-width: 24px; text-align: center;
-}
-.payout-name { flex: 1; font-size: 14px; }
 
 .mukando-preview {
   background: #e8f5e9; border-radius: 6px; padding: 8px 12px;

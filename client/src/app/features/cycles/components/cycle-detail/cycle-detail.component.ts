@@ -48,7 +48,7 @@ export class CycleDetailComponent implements OnInit {
   loading = true;
   error = '';
   reminderSending = false;
-  activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' | 'rounds' | 'stats' | 'activity' | 'swaps' | 'optouts' = 'expenses';
+  activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' | 'rounds' | 'stats' | 'activity' | 'swaps' | 'optouts' | 'order' = 'expenses';
   isAdmin = false;
   currentUserId: number | null = null;
   addableMembers: GroupMemberDto[] = [];
@@ -554,6 +554,46 @@ export class CycleDetailComponent implements OnInit {
 
   isMyContribution(c: MukandoContributionDto): boolean {
     return c.userId === this.currentUserId;
+  }
+
+  // ── Payout Order management (Draft Mukando) ────────────────────────
+
+  get payoutOrderFromRounds(): { userId: number; name: string }[] {
+    return this.rounds
+      .slice()
+      .sort((a, b) => a.roundNumber - b.roundNumber)
+      .map(r => ({ userId: r.recipientUserId, name: r.recipientName }));
+  }
+
+  movePayoutUp(index: number): void {
+    const order = this.payoutOrderFromRounds;
+    if (index <= 0 || index >= order.length) return;
+    const reordered = order.map(o => o.userId);
+    [reordered[index - 1], reordered[index]] = [reordered[index], reordered[index - 1]];
+    this.savePayoutOrder(reordered);
+  }
+
+  movePayoutDown(index: number): void {
+    const order = this.payoutOrderFromRounds;
+    if (index < 0 || index >= order.length - 1) return;
+    const reordered = order.map(o => o.userId);
+    [reordered[index], reordered[index + 1]] = [reordered[index + 1], reordered[index]];
+    this.savePayoutOrder(reordered);
+  }
+
+  private savePayoutOrder(order: number[]): void {
+    if (!this.cycle) return;
+    this.cycleService.updateMukandoSettings(this.cycle.id, {
+      contributionAmount: this.cycle.contributionAmount!,
+      frequency: this.cycle.frequency!,
+      payoutOrder: order
+    }).subscribe({
+      next: () => {
+        this.snackBar.open('Payout order updated.', 'OK', { duration: 2000 });
+        this.loadRounds();
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed to update order.', 'Dismiss', { duration: 5000 })
+    });
   }
 
   deleteCycle(): void {

@@ -86,27 +86,14 @@
       <mat-hint>{{ cycleType === 'Mukando' ? 'Each member receives the pool once' : 'Select all members who share expenses' }}</mat-hint>
     </mat-form-field>
 
-    <!-- Mukando payout order -->
-    @if (cycleType === 'Mukando' && payoutOrder.length > 0) {
-      <div class="payout-order-section">
-        <label class="payout-label">Payout Order <small>(drag to reorder)</small></label>
-        @for (userId of payoutOrder; track userId; let i = $index) {
-          <div class="payout-row">
-            <span class="payout-num">{{ i + 1 }}</span>
-            <span class="payout-name">{{ getUserName(userId) }}</span>
-            <button mat-icon-button type="button" (click)="movePayoutUp(i)" [disabled]="i === 0" matTooltip="Move up"><mat-icon>arrow_upward</mat-icon></button>
-            <button mat-icon-button type="button" (click)="movePayoutDown(i)" [disabled]="i === payoutOrder.length - 1" matTooltip="Move down"><mat-icon>arrow_downward</mat-icon></button>
-          </div>
-        }
+    <!-- Mukando preview -->
+    @if (cycleType === 'Mukando' && mukandoPreview) {
+      <div class="mukando-preview">
+        <span>{{ mukandoPreview.rounds }} rounds</span>
+        <span class="sep">·</span>
+        <span>Pool per round: {{ mukandoPreview.poolPerRound | number:'1.2-2' }}</span>
       </div>
-
-      @if (mukandoPreview) {
-        <div class="mukando-preview">
-          <span>{{ mukandoPreview.rounds }} rounds</span>
-          <span class="sep">·</span>
-          <span>Pool per round: {{ mukandoPreview.poolPerRound | number:'1.2-2' }}</span>
-        </div>
-      }
+      <mat-hint class="mukando-hint">You can reorder the payout order after creating the cycle.</mat-hint>
     }
 
     @if (!presetGroupId) {
