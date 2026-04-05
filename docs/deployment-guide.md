@@ -246,7 +246,7 @@ dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\Batanai\
 
 ### 5.3 Copy to server
 ```powershell
-scp -r C:\dev\Batanai\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
+scp -r C:\dev\Batanai\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/Batanai/api/
 ```
 
 ---
@@ -262,7 +262,7 @@ dotnet ef database update
 
 **Option B � From the server:**
 ```bash
-cd /home/elroitecProjects/api
+cd /home/elroitecProjects/Batanai/api
 export ASPNETCORE_ENVIRONMENT=Production
 dotnet Batanai.Api.dll --migrate
 ```
@@ -289,8 +289,8 @@ Description=Batanai .NET API
 After=network.target postgresql.service
 
 [Service]
-WorkingDirectory=/home/elroitecProjects/api
-ExecStart=/usr/bin/dotnet /home/elroitecProjects/api/Batanai.Api.dll
+WorkingDirectory=/home/elroitecProjects/Batanai/api
+ExecStart=/usr/bin/dotnet /home/elroitecProjects/Batanai/api/Batanai.Api.dll
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
@@ -461,7 +461,7 @@ No restart needed � Nginx serves static files directly.
 ```powershell
 cd C:\dev\Batanai\server\src\Batanai.Api
 dotnet publish -c Release -r linux-x64 --self-contained false -o C:\dev\Batanai\publish\api
-scp -r C:\dev\Batanai\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/api/
+scp -r C:\dev\Batanai\publish\api\* ubuntu@<server-ip>:/home/elroitecProjects/Batanai/api/
 ```
 Then on server:
 ```bash
@@ -471,7 +471,7 @@ sudo systemctl status Batanai-api
 
 ### Config only (no rebuild)
 ```bash
-nano /home/elroitecProjects/api/appsettings.Production.json
+nano /home/elroitecProjects/Batanai/api/appsettings.Production.json
 sudo systemctl restart Batanai-api
 ```
 
@@ -502,7 +502,7 @@ Copy output into `appsettings.Production.json` (`Vapid` section) **and** `enviro
 ### Useful debug commands
 ```bash
 sudo journalctl -u Batanai-api.service -n 200 --no-pager
-dotnet /home/elroitecProjects/api/Batanai.Api.dll
+dotnet /home/elroitecProjects/Batanai/api/Batanai.Api.dll
 dotnet --info
 sudo cat /etc/systemd/system/Batanai-api.service
 sudo ufw status numbered
