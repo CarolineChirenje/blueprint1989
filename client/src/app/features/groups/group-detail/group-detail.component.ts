@@ -153,8 +153,11 @@ export class GroupDetailComponent implements OnInit {
 
   copyJoinCode(): void {
     if (!this.group?.joinCode) return;
-    navigator.clipboard.writeText(this.group.joinCode).then(() => {
-      this.snackBar.open('Join code copied to clipboard.', 'OK', { duration: 3000 });
+    const text = this.group.joinUrl
+      ? `Join "${this.group.name}" using code ${this.group.joinCode}\n${this.group.joinUrl}`
+      : `Join "${this.group.name}" using code ${this.group.joinCode}`;
+    navigator.clipboard.writeText(text).then(() => {
+      this.snackBar.open('Join code & link copied to clipboard.', 'OK', { duration: 3000 });
     });
   }
 
@@ -162,7 +165,8 @@ export class GroupDetailComponent implements OnInit {
     if (!this.group?.joinCode) return;
     navigator.share({
       title: `Join ${this.group.name}`,
-      text: `Use this code to join the group "${this.group.name}": ${this.group.joinCode}`
+      text: `Use code ${this.group.joinCode} to join "${this.group.name}"`,
+      url: this.group.joinUrl ?? undefined
     }).catch(() => {});
   }
 
@@ -179,7 +183,7 @@ export class GroupDetailComponent implements OnInit {
       this.regeneratingCode = true;
       this.groupService.regenerateJoinCode(this.group!.id).subscribe({
         next: res => {
-          this.group = { ...this.group!, joinCode: res.joinCode };
+          this.group = { ...this.group!, joinCode: res.joinCode, joinUrl: res.joinUrl };
           this.regeneratingCode = false;
           this.snackBar.open('Join code regenerated.', 'OK', { duration: 3000 });
           this.cdr.detectChanges();

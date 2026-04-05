@@ -7,6 +7,7 @@ export interface GroupDto {
   createdAt: string;
   canManage: boolean;
   joinCode: string | null;
+  joinUrl: string | null;
 }
 
 export interface GroupMemberDto {

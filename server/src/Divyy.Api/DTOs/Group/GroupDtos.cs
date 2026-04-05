@@ -37,7 +37,8 @@ public record GroupDto(
     int MemberCount,
     DateTime CreatedAt,
     bool CanManage,
-    string? JoinCode = null);
+    string? JoinCode = null,
+    string? JoinUrl = null);
 
 public record GroupDetailDto(
     int Id,
@@ -48,7 +49,8 @@ public record GroupDetailDto(
     DateTime CreatedAt,
     bool CanManage,
     IReadOnlyList<GroupMemberDto> Members,
-    string? JoinCode = null);
+    string? JoinCode = null,
+    string? JoinUrl = null);
 
 public record GroupMemberDto(
     int UserId,

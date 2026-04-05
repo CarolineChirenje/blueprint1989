@@ -13,13 +13,23 @@ public class GroupService : IGroupService
     private readonly NotificationService  _notifications;
     private readonly IPushNotificationSender _push;
     private readonly ILogger<GroupService> _logger;
+    private readonly AppConfigService _appConfig;
 
-    public GroupService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push, ILogger<GroupService> logger)
+    public GroupService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push, ILogger<GroupService> logger, AppConfigService appConfig)
     {
         _context       = context;
         _notifications = notifications;
         _push          = push;
         _logger        = logger;
+        _appConfig     = appConfig;
+    }
+
+    private async Task<string?> BuildJoinUrlAsync(string? joinCode)
+    {
+        if (string.IsNullOrEmpty(joinCode)) return null;
+        var domain = await _appConfig.GetStringAsync(AppConfigKeys.AppDomain, "");
+        if (string.IsNullOrEmpty(domain)) return null;
+        return $"{domain.TrimEnd('/')}/groups?join={joinCode}";
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -56,8 +66,10 @@ public class GroupService : IGroupService
                 .CountAsync(gm => gm.GroupId == g.Id && gm.Status == GroupInviteStatus.Accepted);
 
             var canManage = isAdmin || await IsGroupAdminAsync(g.Id, userId);
+            var code = canManage ? g.JoinCode : null;
+            var joinUrl = canManage ? await BuildJoinUrlAsync(g.JoinCode) : null;
             result.Add(new GroupDto(g.Id, g.Name, g.Description, g.IsActive, memberCount, g.CreatedAt, canManage,
-                canManage ? g.JoinCode : null));
+                code, joinUrl));
         }
 
         return result;
@@ -75,10 +87,13 @@ public class GroupService : IGroupService
         var memberCount = members.Count(m => m.Status == GroupInviteStatus.Accepted.ToString());
         var canManage = await CanManageGroupAsync(groupId, userId, userRole);
 
+        var code = canManage ? group.JoinCode : null;
+        var joinUrl = canManage ? await BuildJoinUrlAsync(group.JoinCode) : null;
+
         return new GroupDetailDto(
             group.Id, group.Name, group.Description, group.IsActive,
             memberCount, group.CreatedAt, canManage, members,
-            canManage ? group.JoinCode : null);
+            code, joinUrl);
     }
 
     public async Task<List<GroupMemberDto>> GetMembersAsync(int groupId, int userId, Role userRole)
@@ -710,19 +725,20 @@ public class GroupService : IGroupService
         .ToList();
     }
 
-    public async Task<(string? newCode, string? error)> RegenerateJoinCodeAsync(int groupId, int userId, Role userRole)
+    public async Task<(string? newCode, string? newUrl, string? error)> RegenerateJoinCodeAsync(int groupId, int userId, Role userRole)
     {
         if (!await CanManageGroupAsync(groupId, userId, userRole))
-            return (null, "Forbidden.");
+            return (null, null, "Forbidden.");
 
         var group = await _context.Groups.FindAsync(groupId);
-        if (group == null) return (null, "Group not found.");
+        if (group == null) return (null, null, "Group not found.");
 
         group.JoinCode            = await GenerateUniqueJoinCodeAsync();
         group.JoinCodeGeneratedAt = DateTime.UtcNow;
         group.UpdatedAt           = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
-        return (group.JoinCode, null);
+        var joinUrl = await BuildJoinUrlAsync(group.JoinCode);
+        return (group.JoinCode, joinUrl, null);
     }
 }

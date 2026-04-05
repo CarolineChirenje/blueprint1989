@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { ChangeDetectorRef, Component, Inject, Optional } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GroupService } from '../../../core/services/group.service';
 
 @Component({
@@ -17,8 +17,13 @@ export class JoinGroupDialogComponent {
   constructor(
     private dialogRef: MatDialogRef<JoinGroupDialogComponent>,
     private groupService: GroupService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    @Optional() @Inject(MAT_DIALOG_DATA) data: { joinCode: string } | null
+  ) {
+    if (data?.joinCode) {
+      this.joinCode = data.joinCode.toUpperCase();
+    }
+  }
 
   submit(): void {
     const code = this.joinCode.trim().toUpperCase();

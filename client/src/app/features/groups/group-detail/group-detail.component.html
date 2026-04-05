@@ -67,9 +67,9 @@
             </button>
           </div>
           <div class="join-code-qr">
-            <qrcode [qrdata]="group.joinCode" [width]="160" errorCorrectionLevel="M"></qrcode>
+            <qrcode [qrdata]="group.joinUrl || group.joinCode" [width]="160" errorCorrectionLevel="M"></qrcode>
           </div>
-          <p class="join-code-hint">Share this code or QR with people. They'll need admin approval to join.</p>
+          <p class="join-code-hint">Share this code or scan the QR to open the join page. Admin approval is required.</p>
         </mat-card-content>
       </mat-card>
     }

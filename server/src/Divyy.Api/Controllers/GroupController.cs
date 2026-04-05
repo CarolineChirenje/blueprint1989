@@ -204,8 +204,8 @@ public class GroupController : ControllerBase
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
 
-        var (newCode, error) = await _groupService.RegenerateJoinCodeAsync(id, userId.Value, GetCurrentUserRole());
-        if (error == null) return Ok(new { joinCode = newCode });
+        var (newCode, newUrl, error) = await _groupService.RegenerateJoinCodeAsync(id, userId.Value, GetCurrentUserRole());
+        if (error == null) return Ok(new { joinCode = newCode, joinUrl = newUrl });
         return error == "Forbidden." ? Forbid()
              : error == "Group not found." ? NotFound(new { message = error })
              : BadRequest(new { message = error });

@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { GroupService } from '../../../core/services/group.service';
 import { DialogService } from '../../../shared/services/dialog.service';
@@ -24,11 +24,18 @@ export class GroupListComponent implements OnInit {
     private dialog: MatDialog,
     private dialogService: DialogService,
     private router: Router,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadGroups();
+    // Auto-open join dialog if ?join=CODE is present (from QR scan)
+    const joinCode = this.route.snapshot.queryParamMap.get('join');
+    if (joinCode) {
+      this.router.navigate([], { queryParams: {}, replaceUrl: true });
+      this.openJoinDialog(joinCode);
+    }
   }
 
   loadGroups(): void {
@@ -48,8 +55,12 @@ export class GroupListComponent implements OnInit {
     ref.afterClosed().subscribe(created => { if (created) this.loadGroups(); });
   }
 
-  openJoinDialog(): void {
-    const ref = this.dialog.open(JoinGroupDialogComponent, { width: '420px', disableClose: true });
+  openJoinDialog(prefillCode?: string): void {
+    const ref = this.dialog.open(JoinGroupDialogComponent, {
+      width: '420px',
+      disableClose: true,
+      data: prefillCode ? { joinCode: prefillCode } : null
+    });
     ref.afterClosed().subscribe(joined => { if (joined) this.loadGroups(); });
   }
 

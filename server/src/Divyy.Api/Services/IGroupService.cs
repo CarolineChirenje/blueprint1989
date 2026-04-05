@@ -23,5 +23,5 @@ public interface IGroupService
     Task<(JoinByCodeResponse? dto, string? error)> RequestJoinByCodeAsync(string joinCode, int userId);
     Task<string?> RespondToJoinRequestAsync(int groupId, int requestingUserId, bool approve, int respondingUserId, Role respondingUserRole);
     Task<List<JoinRequestDto>> GetPendingJoinRequestsAsync(int groupId, int userId, Role userRole);
-    Task<(string? newCode, string? error)> RegenerateJoinCodeAsync(int groupId, int userId, Role userRole);
+    Task<(string? newCode, string? newUrl, string? error)> RegenerateJoinCodeAsync(int groupId, int userId, Role userRole);
 }

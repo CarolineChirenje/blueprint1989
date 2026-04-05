@@ -78,7 +78,7 @@ export class GroupService {
     return this.http.post<JoinByCodeResponse>(`${this.url}/join`, req);
   }
 
-  regenerateJoinCode(groupId: number): Observable<{ joinCode: string }> {
+  regenerateJoinCode(groupId: number): Observable<{ joinCode: string; joinUrl: string | null }> {
     return this.http.post<{ joinCode: string }>(`${this.url}/${groupId}/regenerate-code`, {});
   }
 
