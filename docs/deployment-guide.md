@@ -367,7 +367,54 @@ server {
 }
 ```
 
-### 8.2 Backend (`batanaiapi.elroitec.com` on port 1954)
+### 8.2 Combined frontend + API proxy (alternative)
+
+If you want a single-domain setup where the API is proxied under `/api/` on port 80 (no separate `batanaiapi` subdomain needed):
+
+```bash
+sudo nano /etc/nginx/sites-available/Batanai
+```
+```nginx
+server {
+    server_name batanai.elroitec.com;
+
+    # Frontend app location
+    root /home/elroitecProjects/Batanai/app;
+    index index.html;
+
+    # API proxy to .NET backend
+    location /api/ {
+      proxy_pass         http://127.0.0.1:1954/api/;
+      proxy_http_version 1.1;
+      proxy_set_header   Upgrade $http_upgrade;
+      proxy_set_header   Connection keep-alive;
+      proxy_set_header   Host $host;
+      proxy_set_header   X-Real-IP $remote_addr;
+      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Proto $scheme;
+      proxy_cache_bypass $http_upgrade;
+      proxy_read_timeout 120s;
+    }
+
+    # Angular routing fallback
+    location / {
+      try_files $uri $uri/ /index.html;
+    }
+
+    # Static assets cache
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
+      expires 1y;
+      add_header Cache-Control "public, immutable";
+      try_files $uri =404;
+    }
+
+    listen 80;
+}
+```
+
+> **Note:** With this approach, update `environment.prod.ts` to use `apiUrl: 'https://batanai.elroitec.com/api'` instead of the separate `batanaiapi` subdomain.
+
+### 8.3 Backend (`batanaiapi.elroitec.com` on port 1954)
 ```bash
 sudo nano /etc/nginx/sites-available/Batanaiapi
 ```
@@ -393,9 +440,8 @@ server {
 }
 ```
 
-### 8.3 Enable both sites
+### 8.4 Enable both sites
 ```bash
-sudo ln -s /etc/nginx/sites-available/Batanai    /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/Batanaiapi /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
