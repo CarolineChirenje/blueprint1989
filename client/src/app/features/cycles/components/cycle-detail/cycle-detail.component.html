@@ -412,7 +412,7 @@
                           <span class="contrib-status-chip" [ngClass]="contributionStatusClass(c.status)">{{ c.status }}</span>
                           @if (c.proofUrl) {
                             <a [href]="c.proofUrl" target="_blank" class="proof-link" matTooltip="View proof">
-                              <mat-icon>receipt_long</mat-icon>
+                              <mat-icon>{{ c.proofUrl.endsWith('.pdf') ? 'picture_as_pdf' : 'receipt_long' }}</mat-icon>
                             </a>
                           }
                           @if (c.reference) {
@@ -429,20 +429,32 @@
                       }
                     </div>
 
-                    <!-- Member: record own contribution -->
-                    @if (isActive() && isCurrentUserCycleMember && !selectedRound.payoutConfirmed) {
+                    <!-- Member: record own contribution (hidden for the round recipient) -->
+                    @if (isActive() && isCurrentUserCycleMember && !selectedRound.payoutConfirmed && selectedRound.recipientUserId !== currentUserId) {
                       <div class="record-contribution-form">
                         <h4>Record Your Contribution</h4>
-                        <mat-form-field appearance="outline">
-                          <mat-label>Proof URL</mat-label>
-                          <input matInput [(ngModel)]="contributionProofUrl" placeholder="Upload proof link">
-                        </mat-form-field>
+                        <div class="proof-upload-area">
+                          <input type="file" #contribFileInput hidden
+                                 accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                 (change)="onContributionFileSelected($event)">
+                          <button mat-stroked-button type="button" (click)="contribFileInput.click()"
+                                  [disabled]="contributionUploading">
+                            <mat-icon>cloud_upload</mat-icon>
+                            {{ contributionUploading ? 'Uploading…' : 'Upload Proof (image or PDF)' }}
+                          </button>
+                          @if (contributionFileName) {
+                            <span class="proof-file-name"><mat-icon>check_circle</mat-icon> {{ contributionFileName }}</span>
+                          }
+                          @if (contributionUploadError) {
+                            <span class="proof-upload-error">{{ contributionUploadError }}</span>
+                          }
+                        </div>
                         <mat-form-field appearance="outline">
                           <mat-label>Reference (optional)</mat-label>
                           <input matInput [(ngModel)]="contributionReference">
                         </mat-form-field>
                         <button mat-raised-button color="primary"
-                                [disabled]="!contributionProofUrl"
+                                [disabled]="!contributionProofUrl || contributionUploading"
                                 (click)="recordContribution(selectedRound.id)">
                           Submit Contribution
                         </button>
@@ -469,17 +481,29 @@
                                 <mat-option value="Other">Other</mat-option>
                               </mat-select>
                             </mat-form-field>
-                            <mat-form-field appearance="outline">
-                              <mat-label>Proof URL</mat-label>
-                              <input matInput [(ngModel)]="payoutProofUrl">
-                            </mat-form-field>
+                            <div class="proof-upload-area">
+                              <input type="file" #payoutFileInput hidden
+                                     accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                     (change)="onPayoutFileSelected($event)">
+                              <button mat-stroked-button type="button" (click)="payoutFileInput.click()"
+                                      [disabled]="payoutUploading">
+                                <mat-icon>cloud_upload</mat-icon>
+                                {{ payoutUploading ? 'Uploading…' : 'Upload Proof' }}
+                              </button>
+                              @if (payoutFileName) {
+                                <span class="proof-file-name"><mat-icon>check_circle</mat-icon> {{ payoutFileName }}</span>
+                              }
+                              @if (payoutUploadError) {
+                                <span class="proof-upload-error">{{ payoutUploadError }}</span>
+                              }
+                            </div>
                             <mat-form-field appearance="outline">
                               <mat-label>Reference</mat-label>
                               <input matInput [(ngModel)]="payoutReference">
                             </mat-form-field>
                           </div>
                           <button mat-raised-button color="primary"
-                                  [disabled]="!payoutAmount || !payoutMethod || !payoutProofUrl"
+                                  [disabled]="!payoutAmount || !payoutMethod || !payoutProofUrl || payoutUploading"
                                   (click)="recordPayout(selectedRound.id)">
                             <mat-icon>payment</mat-icon> Record Payout
                           </button>

@@ -10,7 +10,7 @@ public interface IFileStorageService
 public class FileStorageService : IFileStorageService
 {
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
-        { ".jpg", ".jpeg", ".png", ".webp" };
+        { ".jpg", ".jpeg", ".png", ".webp", ".pdf" };
 
     private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
 
@@ -28,7 +28,7 @@ public class FileStorageService : IFileStorageService
 
         var ext = Path.GetExtension(file.FileName);
         if (string.IsNullOrEmpty(ext) || !AllowedExtensions.Contains(ext))
-            throw new ArgumentException("Only jpg, png, and webp images are allowed.");
+            throw new ArgumentException("Only jpg, png, webp images and pdf documents are allowed.");
 
         // Sanitise folder to prevent path traversal
         var safeName = SanitisePath(folder);

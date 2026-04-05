@@ -64,10 +64,16 @@ export class CycleDetailComponent implements OnInit {
   optOutRequests: MukandoOptOutRequestDto[] = [];
   contributionProofUrl = '';
   contributionReference = '';
+  contributionUploading = false;
+  contributionUploadError = '';
+  contributionFileName = '';
   payoutAmount: number | null = null;
   payoutMethod = '';
   payoutProofUrl = '';
   payoutReference = '';
+  payoutUploading = false;
+  payoutUploadError = '';
+  payoutFileName = '';
   swapTargetUserId: number | null = null;
   optOutReason = '';
 
@@ -400,6 +406,79 @@ export class CycleDetailComponent implements OnInit {
     });
   }
 
+  private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+  private readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+
+  onContributionFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    this.contributionUploadError = '';
+    this.contributionFileName = '';
+    this.contributionProofUrl = '';
+
+    if (file.size > this.MAX_FILE_SIZE) {
+      this.contributionUploadError = 'File exceeds the 5 MB limit.';
+      return;
+    }
+    if (!this.ALLOWED_TYPES.includes(file.type)) {
+      this.contributionUploadError = 'Only JPG, PNG, WebP, or PDF files are allowed.';
+      return;
+    }
+
+    this.contributionUploading = true;
+    this.cycleService.uploadFile(file, 'proofs').subscribe({
+      next: res => {
+        this.contributionProofUrl = res.url;
+        this.contributionFileName = file.name;
+        this.contributionUploading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.contributionUploadError = 'Upload failed. Please try again.';
+        this.contributionUploading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onPayoutFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+
+    this.payoutUploadError = '';
+    this.payoutFileName = '';
+    this.payoutProofUrl = '';
+
+    if (file.size > this.MAX_FILE_SIZE) {
+      this.payoutUploadError = 'File exceeds the 5 MB limit.';
+      return;
+    }
+    if (!this.ALLOWED_TYPES.includes(file.type)) {
+      this.payoutUploadError = 'Only JPG, PNG, WebP, or PDF files are allowed.';
+      return;
+    }
+
+    this.payoutUploading = true;
+    this.cycleService.uploadFile(file, 'proofs').subscribe({
+      next: res => {
+        this.payoutProofUrl = res.url;
+        this.payoutFileName = file.name;
+        this.payoutUploading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.payoutUploadError = 'Upload failed. Please try again.';
+        this.payoutUploading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   recordContribution(roundId: number): void {
     if (!this.cycle || !this.contributionProofUrl) return;
     this.cycleService.recordContribution(this.cycle.id, roundId, {
@@ -409,6 +488,7 @@ export class CycleDetailComponent implements OnInit {
       next: () => {
         this.contributionProofUrl = '';
         this.contributionReference = '';
+        this.contributionFileName = '';
         this.snackBar.open('Contribution recorded.', 'OK', { duration: 3000 });
         this.selectRound(this.selectedRound!);
       },
@@ -441,6 +521,7 @@ export class CycleDetailComponent implements OnInit {
         this.payoutMethod = '';
         this.payoutProofUrl = '';
         this.payoutReference = '';
+        this.payoutFileName = '';
         this.snackBar.open('Payout recorded.', 'OK', { duration: 3000 });
         this.loadRounds();
         this.loadMukandoSummary();
