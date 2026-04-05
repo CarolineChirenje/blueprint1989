@@ -265,6 +265,15 @@
 .swap-date { font-size: .8rem; color: var(--text-disabled); }
 .swap-actions { display: flex; gap: .5rem; margin-top: .25rem; }
 
+/* Swap / Opt-out create forms */
+.swap-create-form, .optout-create-form {
+  background: var(--surface); border-radius: var(--radius-md); padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-sm); margin-bottom: 1rem;
+}
+.swap-create-form h4, .optout-create-form h4 { margin: 0 0 .75rem; font-size: .95rem; }
+.swap-create-row, .optout-create-row { display: flex; align-items: flex-start; gap: .75rem; flex-wrap: wrap; }
+.swap-create-row mat-form-field, .optout-reason-field { flex: 1; min-width: 200px; }
+
 /* ── Mukando: Opt-outs ── */
 .optout-list { display: flex; flex-direction: column; gap: .75rem; }
 .optout-card {

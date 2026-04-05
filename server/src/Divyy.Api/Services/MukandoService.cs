@@ -377,6 +377,11 @@ public class MukandoService
         cycle.Frequency          = freq;
         cycle.UpdatedAt          = DateTime.UtcNow;
 
+        // Delete swap requests first (FK RESTRICT prevents round deletion otherwise)
+        var existingSwaps = await _context.MukandoSwapRequests
+            .Where(s => s.ExpenseCycleId == cycleId).ToListAsync();
+        _context.MukandoSwapRequests.RemoveRange(existingSwaps);
+
         // Delete existing rounds and contributions (cascade handles contributions)
         var existingRounds = await _context.MukandoRounds
             .Where(r => r.ExpenseCycleId == cycleId).ToListAsync();
@@ -723,6 +728,12 @@ public class MukandoService
 
             if (memberIds.Count >= 2 && cycle.ContributionAmount.HasValue && cycle.Frequency.HasValue)
             {
+                // Delete all swap requests referencing rounds (FK RESTRICT prevents round deletion otherwise)
+                var allSwaps = await _context.MukandoSwapRequests
+                    .Where(s => s.ExpenseCycleId == req.ExpenseCycleId).ToListAsync();
+                _context.MukandoSwapRequests.RemoveRange(allSwaps);
+                await _context.SaveChangesAsync();
+
                 // Remove old rounds
                 var oldRounds = await _context.MukandoRounds
                     .Where(r => r.ExpenseCycleId == req.ExpenseCycleId).ToListAsync();

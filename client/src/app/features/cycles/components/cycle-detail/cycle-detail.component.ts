@@ -68,6 +68,8 @@ export class CycleDetailComponent implements OnInit {
   payoutMethod = '';
   payoutProofUrl = '';
   payoutReference = '';
+  swapTargetUserId: number | null = null;
+  optOutReason = '';
 
   expenseDataSource = new MatTableDataSource<ExpenseDto>([]);
   paymentDataSource = new MatTableDataSource<PaymentDto>([]);
@@ -496,6 +498,18 @@ export class CycleDetailComponent implements OnInit {
     });
   }
 
+  createSwap(): void {
+    if (!this.cycle || !this.swapTargetUserId) return;
+    this.cycleService.createSwapRequest(this.cycle.id, this.swapTargetUserId).subscribe({
+      next: () => {
+        this.swapTargetUserId = null;
+        this.snackBar.open('Swap request sent.', 'OK', { duration: 3000 });
+        this.loadSwapRequests();
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
   cancelSwap(swapId: number): void {
     if (!this.cycle) return;
     this.cycleService.cancelSwapRequest(this.cycle.id, swapId).subscribe({
@@ -517,6 +531,25 @@ export class CycleDetailComponent implements OnInit {
       },
       error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
     });
+  }
+
+  createOptOut(): void {
+    if (!this.cycle || !this.optOutReason.trim()) return;
+    this.cycleService.createOptOutRequest(this.cycle.id, this.optOutReason.trim()).subscribe({
+      next: () => {
+        this.optOutReason = '';
+        this.snackBar.open('Opt-out request submitted.', 'OK', { duration: 3000 });
+        this.loadOptOutRequests();
+      },
+      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+    });
+  }
+
+  get swappableMembers(): { userId: number; name: string }[] {
+    if (!this.cycle) return [];
+    return this.cycle.members
+      .filter(m => m.userId !== this.currentUserId)
+      .map(m => ({ userId: m.userId, name: `${m.firstName} ${m.lastName}` }));
   }
 
   contributionStatusClass(status: string): string {

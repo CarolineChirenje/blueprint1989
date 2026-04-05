@@ -600,6 +600,26 @@
     <!-- ═══════ Mukando: Swaps Tab ═══════ -->
     @if (activeTab === 'swaps') {
       <div class="tab-content">
+        <!-- Create swap request -->
+        @if (isDraft() && isCurrentUserCycleMember) {
+          <div class="swap-create-form">
+            <h4>Request a Swap</h4>
+            <div class="swap-create-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Swap my round with</mat-label>
+                <mat-select [(ngModel)]="swapTargetUserId">
+                  @for (m of swappableMembers; track m.userId) {
+                    <mat-option [value]="m.userId">{{ m.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <button mat-raised-button color="primary" [disabled]="!swapTargetUserId" (click)="createSwap()">
+                <mat-icon>swap_horiz</mat-icon> Request Swap
+              </button>
+            </div>
+          </div>
+        }
+
         @if (swapRequests.length === 0) {
           <div class="empty-state">No swap requests.</div>
         } @else {
@@ -636,6 +656,22 @@
     <!-- ═══════ Mukando: Opt-outs Tab ═══════ -->
     @if (activeTab === 'optouts') {
       <div class="tab-content">
+        <!-- Create opt-out request -->
+        @if (isDraft() && isCurrentUserCycleMember) {
+          <div class="optout-create-form">
+            <h4>Request to Opt Out</h4>
+            <div class="optout-create-row">
+              <mat-form-field appearance="outline" class="optout-reason-field">
+                <mat-label>Reason</mat-label>
+                <input matInput [(ngModel)]="optOutReason" placeholder="Why do you want to opt out?">
+              </mat-form-field>
+              <button mat-raised-button color="primary" [disabled]="!optOutReason.trim()" (click)="createOptOut()">
+                <mat-icon>logout</mat-icon> Request Opt-out
+              </button>
+            </div>
+          </div>
+        }
+
         @if (optOutRequests.length === 0) {
           <div class="empty-state">No opt-out requests.</div>
         } @else {

@@ -23,7 +23,7 @@ This is the client-side application for the Divvy project, built using Angular a
 ### Installation
 
 1. Clone the repository:
-   ```
+   ```   
    git clone <repository-url>
    cd divvy/client
    ```
