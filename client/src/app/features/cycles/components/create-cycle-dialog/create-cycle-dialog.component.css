@@ -15,6 +15,30 @@
   z-index: 1;
 }
 
+/* Members section */
+.members-section { margin-bottom: 16px; }
+.members-label { font-weight: 500; font-size: 13px; color: #555; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.members-count { font-weight: 600; color: #1976d2; font-size: 12px; }
+.member-search {
+  width: 100%; box-sizing: border-box; padding: 8px 12px; border: 1px solid #ccc;
+  border-radius: 6px; font-size: 14px; margin-bottom: 6px; outline: none;
+}
+.member-search:focus { border-color: #1976d2; }
+.members-list {
+  max-height: 180px; overflow-y: auto; border: 1px solid #e0e0e0;
+  border-radius: 6px; background: #fafafa;
+}
+.member-check {
+  display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+  cursor: pointer; transition: background .1s; font-size: 13px;
+}
+.member-check:hover { background: #e3f2fd; }
+.member-check.select-all { font-weight: 600; border-bottom: 1px solid #e0e0e0; background: #f5f5f5; }
+.member-check-name { font-weight: 500; }
+.member-check-email { color: #888; font-size: 12px; margin-left: auto; }
+.no-members-match { padding: 12px; text-align: center; color: #999; font-size: 13px; }
+.members-hint { font-size: 12px; color: #888; margin-top: 4px; }
+
 .cycle-type-row {
   display: flex; gap: 12px; margin-bottom: 16px;
 }

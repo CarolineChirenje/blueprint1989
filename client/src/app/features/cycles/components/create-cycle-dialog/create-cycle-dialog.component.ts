@@ -27,6 +27,7 @@ export class CreateCycleDialogComponent implements OnInit {
   saving = false;
   error = '';
   cycleType: 'Majana' | 'Mukando' = 'Majana';
+  memberSearch = '';
 
   /** When opened from a group detail page, these are set and the group selector is hidden. */
   presetGroupId: number | null = null;
@@ -96,13 +97,60 @@ export class CreateCycleDialogComponent implements OnInit {
     if (type === 'Mukando') {
       this.form.get('contributionAmount')!.setValidators([Validators.required, Validators.min(0.01)]);
       this.form.get('frequency')!.setValidators(Validators.required);
+      this.form.get('endDate')!.clearValidators();
       this.form.get('copyFromCycleId')!.setValue(null);
     } else {
       this.form.get('contributionAmount')!.clearValidators();
       this.form.get('frequency')!.clearValidators();
+      this.form.get('endDate')!.setValidators(Validators.required);
     }
     this.form.get('contributionAmount')!.updateValueAndValidity();
     this.form.get('frequency')!.updateValueAndValidity();
+    this.form.get('endDate')!.updateValueAndValidity();
+  }
+
+  get filteredUsers(): UserOption[] {
+    if (!this.memberSearch) return this.users;
+    const q = this.memberSearch.toLowerCase();
+    return this.users.filter(u =>
+      u.firstName.toLowerCase().includes(q) ||
+      u.lastName.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q)
+    );
+  }
+
+  get selectedMemberIds(): number[] {
+    return this.form.value.memberIds ?? [];
+  }
+
+  isMemberSelected(userId: number): boolean {
+    return this.selectedMemberIds.includes(userId);
+  }
+
+  toggleMember(userId: number): void {
+    const ids = [...this.selectedMemberIds];
+    const idx = ids.indexOf(userId);
+    if (idx >= 0) ids.splice(idx, 1);
+    else ids.push(userId);
+    this.form.get('memberIds')!.setValue(ids);
+    this.form.get('memberIds')!.markAsTouched();
+  }
+
+  toggleAllMembers(): void {
+    if (this.selectedMemberIds.length === this.users.length) {
+      this.form.get('memberIds')!.setValue([]);
+    } else {
+      this.form.get('memberIds')!.setValue(this.users.map(u => u.id));
+    }
+    this.form.get('memberIds')!.markAsTouched();
+  }
+
+  get allMembersSelected(): boolean {
+    return this.users.length > 0 && this.selectedMemberIds.length === this.users.length;
+  }
+
+  get someMembersSelected(): boolean {
+    return this.selectedMemberIds.length > 0 && this.selectedMemberIds.length < this.users.length;
   }
 
   get mukandoPreview(): { rounds: number; poolPerRound: number; endDate: string } | null {
@@ -132,7 +180,9 @@ export class CreateCycleDialogComponent implements OnInit {
     this.cycleService.create({
       name: v.name,
       startDate: v.startDate,
-      endDate: v.endDate,
+      endDate: this.cycleType === 'Mukando'
+        ? new Date(new Date(v.startDate).getTime() + 86400000).toISOString().split('T')[0]
+        : v.endDate,
       memberUserIds: v.memberIds,
       groupId: v.groupId,
       currencyId: v.currencyId,

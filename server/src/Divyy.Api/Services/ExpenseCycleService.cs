@@ -261,16 +261,16 @@ public class ExpenseCycleService
         if (!groupExists)
             return (null, "Group not found or is inactive.");
 
-        if (request.StartDate >= request.EndDate)
+        // Parse cycle type early so we can skip EndDate check for Mukando (auto-calculated)
+        if (!Enum.TryParse<CycleType>(request.CycleType, true, out var cycleType))
+            return (null, "Invalid cycle type. Must be 'Majana' or 'Mukando'.");
+
+        if (cycleType != CycleType.Mukando && request.StartDate >= request.EndDate)
             return (null, "EndDate must be after StartDate.");
 
         var currencyExists = await _context.Currencies.AnyAsync(c => c.Id == request.CurrencyId && c.IsActive);
         if (!currencyExists)
             return (null, "Invalid currency.");
-
-        // Parse cycle type
-        if (!Enum.TryParse<CycleType>(request.CycleType, true, out var cycleType))
-            return (null, "Invalid cycle type. Must be 'Majana' or 'Mukando'.");
 
         // Mukando-specific validation
         CycleFrequency? frequency = null;
@@ -329,7 +329,7 @@ public class ExpenseCycleService
 
         await _context.SaveChangesAsync();
 
-        // Notify added members (excluding the creator) that they've been added to the cycle
+        // Notify added members (excluding the creator) that they have been added to the cycle
         var notifyIds = memberIds.Where(id => id != createdByUserId).ToList();
         if (notifyIds.Count > 0)
         {
@@ -340,7 +340,7 @@ public class ExpenseCycleService
                 notifyIds,
                 NotificationType.CycleMemberAdded,
                 $"Added to {cycle.Name}",
-                $"You've been added to the {typeLabel} cycle \"{cycle.Name}\" in {groupName}.".Trim(),
+                $"You have been added to the {typeLabel} cycle \"{cycle.Name}\" in {groupName}.".Trim(),
                 $"/cycles/{cycle.Id}",
                 cycle.Id);
         }
@@ -631,7 +631,7 @@ public class ExpenseCycleService
             userId,
             NotificationType.CycleMemberAdded,
             $"Added to {cycle.Name}",
-            $"You've been added to the {cycle.Name} cycle in {groupName}.",
+            $"You have been added to the {cycle.Name} cycle in {groupName}.",
             $"/cycles/{cycleId}",
             cycleId);
 
@@ -656,7 +656,7 @@ public class ExpenseCycleService
                 userId,
                 NotificationType.CycleMemberRemoved,
                 $"Removed from {cycle.Name}",
-                $"You've been removed from the {cycle.Name} cycle in {groupName}.",
+                $"You have been removed from the {cycle.Name} cycle in {groupName}.",
                 $"/cycles/{cycleId}",
                 cycleId);
         }
