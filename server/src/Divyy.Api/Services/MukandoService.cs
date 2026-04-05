@@ -433,6 +433,90 @@ public class MukandoService
         return null;
     }
 
+    /// <summary>
+    /// Regenerates Mukando rounds after a member is added or removed in Draft mode.
+    /// Preserves the existing payout order for remaining members and appends any new member.
+    /// </summary>
+    public async Task RegenerateRoundsAfterMemberChangeAsync(int cycleId)
+    {
+        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
+        if (cycle == null || cycle.CycleType != CycleType.Mukando || cycle.Status != CycleStatus.Draft)
+            return;
+        if (!cycle.ContributionAmount.HasValue || !cycle.Frequency.HasValue)
+            return;
+
+        var memberIds = await _context.CycleMembers
+            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
+        if (memberIds.Count < 2) return;
+
+        // Preserve existing payout order where possible
+        var existingRounds = await _context.MukandoRounds
+            .Where(r => r.ExpenseCycleId == cycleId)
+            .OrderBy(r => r.RoundNumber)
+            .ToListAsync();
+
+        var orderedIds = existingRounds
+            .Select(r => r.RecipientUserId)
+            .Where(id => memberIds.Contains(id))
+            .ToList();
+
+        // Append any new members not yet in the payout order
+        foreach (var id in memberIds.Where(id => !orderedIds.Contains(id)))
+            orderedIds.Add(id);
+
+        // Delete swap requests first (FK RESTRICT)
+        var swaps = await _context.MukandoSwapRequests
+            .Where(s => s.ExpenseCycleId == cycleId).ToListAsync();
+        _context.MukandoSwapRequests.RemoveRange(swaps);
+        await _context.SaveChangesAsync();
+
+        // Delete existing rounds (cascade handles contributions)
+        _context.MukandoRounds.RemoveRange(existingRounds);
+        await _context.SaveChangesAsync();
+
+        // Recreate rounds
+        int memberCount = orderedIds.Count;
+        decimal expectedPool = cycle.ContributionAmount.Value * (memberCount - 1);
+
+        for (int i = 0; i < orderedIds.Count; i++)
+        {
+            var recipientId = orderedIds[i];
+            var dueDate = ExpenseCycleService.CalculateRoundDueDate(cycle.StartDate, cycle.Frequency.Value, i);
+
+            var round = new MukandoRound
+            {
+                ExpenseCycleId  = cycleId,
+                RoundNumber     = i + 1,
+                RecipientUserId = recipientId,
+                Status          = RoundStatus.Pending,
+                ExpectedPool    = expectedPool,
+                ActualCollected = 0,
+                PayoutConfirmed = false,
+                DueDate         = dueDate,
+                CreatedAt       = DateTime.UtcNow,
+                UpdatedAt       = DateTime.UtcNow
+            };
+
+            _context.MukandoRounds.Add(round);
+            await _context.SaveChangesAsync();
+
+            foreach (var uid in orderedIds.Where(m => m != recipientId))
+            {
+                _context.MukandoContributions.Add(new MukandoContribution
+                {
+                    MukandoRoundId = round.Id,
+                    UserId         = uid,
+                    Amount         = cycle.ContributionAmount.Value,
+                    Status         = ContributionStatus.Pending,
+                    CreatedAt      = DateTime.UtcNow
+                });
+            }
+        }
+
+        cycle.EndDate = ExpenseCycleService.CalculateRoundDueDate(cycle.StartDate, cycle.Frequency.Value, orderedIds.Count - 1);
+        await _context.SaveChangesAsync();
+    }
+
     // ── Swap Requests ─────────────────────────────────────────────────────────
 
     public async Task<List<MukandoSwapRequestDto>> GetSwapRequestsAsync(int cycleId)

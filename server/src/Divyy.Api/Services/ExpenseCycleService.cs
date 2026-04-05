@@ -640,6 +640,10 @@ public class ExpenseCycleService
 
     public async Task<string?> RemoveMemberAsync(int cycleId, int userId)
     {
+        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
+        if (cycle == null) return "Cycle not found.";
+        if (cycle.Status != CycleStatus.Draft) return "Cannot remove members from an active or closed cycle.";
+
         var member = await _context.CycleMembers
             .FirstOrDefaultAsync(m => m.ExpenseCycleId == cycleId && m.UserId == userId);
         if (member == null) return "User is not a member of this cycle.";
@@ -647,19 +651,15 @@ public class ExpenseCycleService
         _context.CycleMembers.Remove(member);
         await _context.SaveChangesAsync();
 
-        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
-        if (cycle != null)
-        {
-            var group = await _context.Groups.FindAsync(cycle.GroupId);
-            var groupName = group?.Name ?? "your group";
-            await _push.SendToUserAsync(
-                userId,
-                NotificationType.CycleMemberRemoved,
-                $"Removed from {cycle.Name}",
-                $"You have been removed from the {cycle.Name} cycle in {groupName}.",
-                $"/cycles/{cycleId}",
-                cycleId);
-        }
+        var group = await _context.Groups.FindAsync(cycle.GroupId);
+        var groupName = group?.Name ?? "your group";
+        await _push.SendToUserAsync(
+            userId,
+            NotificationType.CycleMemberRemoved,
+            $"Removed from {cycle.Name}",
+            $"You have been removed from the {cycle.Name} cycle in {groupName}.",
+            $"/cycles/{cycleId}",
+            cycleId);
 
         return null;
     }
