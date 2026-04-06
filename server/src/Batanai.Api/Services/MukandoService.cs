@@ -207,6 +207,17 @@ public class MukandoService
         if (request.AmountDisbursed <= 0)
             return "Amount must be positive.";
 
+        // Ensure all contributions are confirmed or resolved before payout
+        var unresolvedCount = await _context.MukandoContributions
+            .CountAsync(c => c.MukandoRoundId == roundId
+                          && (c.Status == ContributionStatus.Pending || c.Status == ContributionStatus.Paid));
+        if (unresolvedCount > 0)
+            return $"{unresolvedCount} contribution(s) are still pending or unconfirmed. Confirm them or force-close the round first.";
+
+        // Payout must match what was actually collected
+        if (request.AmountDisbursed != round.ActualCollected)
+            return $"Payout amount ({request.AmountDisbursed:F2}) does not match the collected amount ({round.ActualCollected:F2}).";
+
         var payout = new MukandoPayout
         {
             MukandoRoundId    = roundId,

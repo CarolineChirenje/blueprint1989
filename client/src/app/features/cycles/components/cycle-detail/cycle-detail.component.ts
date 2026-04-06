@@ -376,6 +376,7 @@ export class CycleDetailComponent implements OnInit {
     this.cycleService.getRoundDetail(this.cycle.id, round.id).subscribe({
       next: r => {
         this.selectedRound = r;
+        this.payoutAmount = r.actualCollected ?? null;
         this.loadRoundActivities(r.id);
         this.cdr.detectChanges();
       }
@@ -389,6 +390,7 @@ export class CycleDetailComponent implements OnInit {
     this.cycleService.getRoundDetail(this.cycle.id, roundId).subscribe({
       next: r => {
         this.selectedRound = r;
+        this.payoutAmount = r.actualCollected ?? null;
         this.loadRoundActivities(r.id);
         this.cdr.detectChanges();
       }
