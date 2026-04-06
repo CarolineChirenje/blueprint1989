@@ -107,10 +107,12 @@
           }
 
           <button
-            type="submit"
+            type="button"
             class="submit-btn submit-btn-blue"
             [class.form-ready]="signupForm.valid"
             [disabled]="isSubmitting"
+            (click)="submit()"
+            (touchend)="$event.preventDefault(); submit()"
           >
             {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
           </button>
