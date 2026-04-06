@@ -146,6 +146,7 @@
   padding: 2px 8px;
   margin: 2px 4px 2px 0;
   border-radius: 12px;
-  background: var(--surface-alt, #e8e8e8);
+  background: var(--border);
+  color: var(--text-primary);
   font-size: 0.72rem;
 }

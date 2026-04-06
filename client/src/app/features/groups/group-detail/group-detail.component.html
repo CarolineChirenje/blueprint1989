@@ -75,9 +75,9 @@
     }
 
     <!-- Cycles section -->
-    <mat-card class="content-card">
-      <mat-card-header>
-        <mat-card-title>Cycles</mat-card-title>
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Cycles</h3>
         <div class="card-header-actions">
           @if (group.canManage) {
             <button mat-raised-button color="primary" (click)="openNewCycle()">
@@ -85,9 +85,9 @@
             </button>
           }
         </div>
-      </mat-card-header>
+      </div>
 
-      <mat-card-content>
+      <div class="card-body">
         @if (cycles.length === 0) {
           <div class="empty-state">
             <p>No cycles yet.</p>
@@ -141,8 +141,8 @@
                 (click)="viewCycle(row.id)" style="cursor:pointer"></tr>
           </table>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
   }
 </div>

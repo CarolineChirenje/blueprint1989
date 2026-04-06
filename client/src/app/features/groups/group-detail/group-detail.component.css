@@ -5,9 +5,10 @@
 .header-left h1 { font-size: 1.8rem; color: var(--text-primary); margin: 0; }
 .group-description { font-size: .9rem; color: var(--text-secondary); }
 .header-right { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
-.content-card { margin-top: 1rem; }
-mat-card-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: .5rem; }
-.card-header-actions { margin-left: auto; }
+.content-card { margin-top: 1rem; background: var(--surface); border-radius: var(--radius-lg, 12px); box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; }
+.card-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--divider); }
+.card-title { margin: 0; font-size: 1.1rem; color: var(--text-primary); }
+.card-body { padding: 0; }
 .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); display: flex; flex-direction: column; align-items: center; gap: 1rem; }
 .row-chevron { color: var(--text-disabled); vertical-align: middle; }
 .cycle-status-badge { padding: .2rem .65rem; border-radius: 10px; font-size: .78rem; font-weight: 600; }
@@ -24,6 +25,20 @@ mat-card-header { display: flex; justify-content: space-between; align-items: ce
 .join-code-text { font-family: 'Roboto Mono', monospace; font-size: 1.8rem; font-weight: 700; letter-spacing: .3rem; color: var(--text-primary); user-select: all; }
 .join-code-qr { padding: .5rem; background: #fff; border-radius: 8px; }
 .join-code-hint { font-size: .85rem; color: var(--text-secondary); text-align: center; margin: 0; }
+
+@media (max-width: 1023px) {
+  .content-card {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .card-header {
+    padding: 0.5rem 0;
+    border-bottom: none;
+  }
+}
 
 @media (max-width: 600px) {
   .detail-page { padding: 1rem; }

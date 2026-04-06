@@ -752,6 +752,19 @@ tbody tr:last-child td {
     --mat-tab-header-active-indicator-color:              #34A85A;
     --mdc-switch-selected-track-color:                    #34A85A;
     --mdc-switch-selected-hover-track-color:              #2D9150;
+
+    /* MDC card dark overrides */
+    --mdc-elevated-card-container-color:                  #162719;
+    --mdc-outlined-card-container-color:                  #162719;
+    --mat-card-elevated-container-color:                  #162719;
+    --mat-card-outlined-container-color:                  #162719;
+
+    /* MDC table dark overrides */
+    --mat-table-background-color:                         #162719;
+    --mat-sys-surface:                                    #162719;
+    --mat-table-row-item-outline-color:                   #2E4A35;
+    --mat-table-header-headline-color:                    #D4E8D7;
+    --mat-table-row-item-label-text-color:                #D4E8D7;
   }
 
   body {
@@ -790,6 +803,24 @@ tbody tr:last-child td {
     background: var(--surface);
   }
 
+  .mat-mdc-table {
+    background: var(--surface) !important;
+  }
+
+  .mat-mdc-row,
+  .mat-mdc-header-row {
+    background: transparent !important;
+  }
+
+  .mat-mdc-cell {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--divider) !important;
+  }
+
+  .mat-mdc-row:hover {
+    background-color: var(--surface-raised) !important;
+  }
+
   tbody tr:hover {
     background-color: var(--surface-raised);
   }
@@ -816,6 +847,7 @@ tbody tr:last-child td {
 
   /* ── Material Card ────────────────────────────────────────────────── */
   .mat-mdc-card,
+  .mdc-card,
   mat-card {
     background-color: var(--surface) !important;
     color: var(--text-primary) !important;
@@ -1117,6 +1149,137 @@ tbody tr:last-child td {
   .mobile-sticky-actions button {
     width: 100%;
     min-height: 44px;
+  }
+
+  /* ── Global mobile table → card layout ───────────────────────────── */
+  /* These rules are GLOBAL (not component-scoped) to bypass Angular    */
+  /* Material's view encapsulation on mat-table internal elements.      */
+  .shared-table.mat-mdc-table,
+  table.shared-table {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+  }
+
+  .shared-table thead,
+  .shared-table .mat-mdc-header-row {
+    display: none !important;
+  }
+
+  .shared-table tbody,
+  .shared-table .mdc-data-table__content {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .shared-table .mat-mdc-row,
+  .shared-table tr {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin: 0 0 1rem 0 !important;
+    border: 1px solid var(--border) !important;
+    border-left: 4px solid var(--primary) !important;
+    padding: 0 !important;
+    background: var(--surface) !important;
+    overflow: hidden !important;
+  }
+
+  .shared-table .mat-mdc-cell,
+  .shared-table td {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    min-height: unset !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    padding: 0.5rem 0.85rem !important;
+    border-bottom: 1px solid var(--divider) !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-radius: 0 !important;
+    font-size: 0.9rem !important;
+    gap: 0.75rem;
+    white-space: normal !important;
+    word-break: break-word;
+    line-height: 1.45;
+    text-align: right;
+    overflow: visible !important;
+    text-overflow: unset !important;
+  }
+
+  .shared-table .mat-mdc-cell:nth-child(even),
+  .shared-table td:nth-child(even) {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .shared-table .mat-mdc-cell:last-child,
+  .shared-table td:last-child {
+    border-bottom: none !important;
+  }
+
+  .shared-table .mat-mdc-cell::before,
+  .shared-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    width: 40%;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left !important;
+    padding-top: 0.1rem;
+  }
+
+  .shared-table .mat-mdc-cell > *,
+  .shared-table td > * {
+    flex: 1;
+    text-align: right;
+    min-width: 0;
+  }
+
+  .shared-table td[data-label='']::before,
+  .shared-table .mat-mdc-cell[data-label='']::before {
+    display: none !important;
+  }
+
+  .shared-table .actions-cell,
+  .shared-table .mat-column-actions {
+    justify-content: flex-end !important;
+    border-bottom: none !important;
+    gap: 0.25rem;
+    min-height: 52px !important;
+    align-items: center !important;
+    background-color: var(--primary-light) !important;
+  }
+
+  .shared-table .actions-cell::before,
+  .shared-table .mat-column-actions::before {
+    display: none !important;
+  }
+
+  /* Content-card container: transparent on mobile */
+  .content-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
   }
 }
 
