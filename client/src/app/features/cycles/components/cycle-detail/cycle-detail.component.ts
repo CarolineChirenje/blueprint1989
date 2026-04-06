@@ -382,6 +382,19 @@ export class CycleDetailComponent implements OnInit {
     });
   }
 
+  /** Reload the currently expanded round without toggling it closed. */
+  private refreshSelectedRound(): void {
+    if (!this.cycle || !this.selectedRound) return;
+    const roundId = this.selectedRound.id;
+    this.cycleService.getRoundDetail(this.cycle.id, roundId).subscribe({
+      next: r => {
+        this.selectedRound = r;
+        this.loadRoundActivities(r.id);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   loadRoundActivities(roundId: number): void {
     if (!this.cycle) return;
     this.cycleService.getRoundActivity(this.cycle.id, roundId).subscribe({
@@ -474,7 +487,8 @@ export class CycleDetailComponent implements OnInit {
         this.contributionFileName = '';
         this.contributionUploading = false;
         this.snackBar.open('Contribution recorded.', 'OK', { duration: 3000 });
-        this.selectRound(this.selectedRound!);
+        this.refreshSelectedRound();
+        this.loadRounds();
       },
       error: err => {
         this.contributionUploading = false;
@@ -488,7 +502,7 @@ export class CycleDetailComponent implements OnInit {
     this.cycleService.confirmContribution(this.cycle.id, roundId, memberId).subscribe({
       next: () => {
         this.snackBar.open('Contribution confirmed.', 'OK', { duration: 3000 });
-        this.selectRound(this.selectedRound!);
+        this.refreshSelectedRound();
         this.loadRounds();
       },
       error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
