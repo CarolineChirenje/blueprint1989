@@ -1,43 +1,43 @@
 export enum ReportStatus {
-  New = 1,
-  InReview = 2,
-  Closed = 3
+  New = 'New',
+  InReview = 'InReview',
+  Closed = 'Closed'
 }
 
 export enum ReportType {
-  Feature = 1,
-  Bug = 2
+  Feature = 'Feature',
+  Bug = 'Bug'
 }
 
 export enum ReportPriority {
-  Critical = 1,
-  High = 2,
-  Medium = 3,
-  Low = 4
+  Critical = 'Critical',
+  High = 'High',
+  Medium = 'Medium',
+  Low = 'Low'
 }
 
 export enum ReportCategory {
-  UI = 1,
-  Backend = 2,
-  Performance = 3,
-  Security = 4,
-  API = 5,
-  Mobile = 6,
-  Desktop = 7,
-  Other = 8
+  UI = 'UI',
+  Backend = 'Backend',
+  Performance = 'Performance',
+  Security = 'Security',
+  API = 'API',
+  Mobile = 'Mobile',
+  Desktop = 'Desktop',
+  Other = 'Other'
 }
 
 export interface FeatureBugReportResponseDto {
   id: number;
   title: string;
   description: string;
-  type: number;
+  type: ReportType;
   typeName: string;
-  status: number;
+  status: ReportStatus;
   statusName: string;
-  priority: number;
+  priority: ReportPriority;
   priorityName: string;
-  categories: number[];
+  categories: ReportCategory[];
   categoryNames: string[];
   versionNumber: string | null;
   submittedByUserId: number;
@@ -63,11 +63,11 @@ export interface UpdateFeatureBugReportRequest {
 }
 
 export interface UpdateReportStatusRequest {
-  status: number;
+  status: ReportStatus;
   versionNumber?: string;
 }
 
 export interface DropdownOption {
-  value: number;
+  value: string;
   label: string;
 }

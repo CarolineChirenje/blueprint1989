@@ -33,8 +33,8 @@ export class ReportFeatureBugDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.typeOptions = this.service.getTypeOptions().filter(o => o.value !== 0);
-    this.priorityOptions = this.service.getPriorityOptions().filter(o => o.value !== 0);
+    this.typeOptions = this.service.getTypeOptions().filter(o => o.value !== '');
+    this.priorityOptions = this.service.getPriorityOptions().filter(o => o.value !== '');
     this.categoryOptions = this.service.getCategoryOptions();
 
     this.form = this.fb.group({

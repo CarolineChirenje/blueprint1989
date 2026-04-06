@@ -8,12 +8,12 @@ namespace Batanai.Api.Services;
 public class FeatureBugReportService
 {
     private readonly ApplicationDbContext _context;
-    private readonly NotificationService _notificationService;
+    private readonly IPushNotificationSender _push;
 
-    public FeatureBugReportService(ApplicationDbContext context, NotificationService notificationService)
+    public FeatureBugReportService(ApplicationDbContext context, IPushNotificationSender push)
     {
         _context = context;
-        _notificationService = notificationService;
+        _push = push;
     }
 
     // ── Queries ────────────────────────────────────────────────────────────
@@ -149,10 +149,12 @@ public class FeatureBugReportService
             ? $"Your report \"{report.Title}\" has been closed in version {report.VersionNumber}."
             : $"Your report \"{report.Title}\" status changed to {statusLabel}.";
 
-        await _notificationService.CreateAsync(
+        await _push.SendToUserAsync(
             report.SubmittedByUserId,
-            message,
             NotificationType.FeatureBugReportResolved,
+            "Report Update",
+            message,
+            deepLinkUrl: "/profile/my-reports",
             relatedEntityId: report.Id);
 
         return ToDto(report);

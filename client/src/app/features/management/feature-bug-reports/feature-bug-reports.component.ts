@@ -17,9 +17,9 @@ export class FeatureBugReportsComponent implements OnInit {
   filteredReports: FeatureBugReportResponseDto[] = [];
   processingIds = new Set<number>();
 
-  statusFilter = 0;
-  typeFilter = 0;
-  priorityFilter = 0;
+  statusFilter = '';
+  typeFilter = '';
+  priorityFilter = '';
 
   isLoading = false;
   successMessage = '';
@@ -132,12 +132,12 @@ export class FeatureBugReportsComponent implements OnInit {
     });
   }
 
-  canMarkInReview(status: number, id: number): boolean {
+  canMarkInReview(status: ReportStatus, id: number): boolean {
     return status === ReportStatus.New && !this.processingIds.has(id);
   }
 
-  canClose(status: number, id: number): boolean {
-    return status < ReportStatus.Closed && !this.processingIds.has(id);
+  canClose(status: ReportStatus, id: number): boolean {
+    return status !== ReportStatus.Closed && !this.processingIds.has(id);
   }
 
   deleteReport(id: number): void {
@@ -170,7 +170,7 @@ export class FeatureBugReportsComponent implements OnInit {
     });
   }
 
-  getStatusBadgeClass(status: number): string {
+  getStatusBadgeClass(status: ReportStatus): string {
     switch (status) {
       case ReportStatus.New: return 'badge-new';
       case ReportStatus.InReview: return 'badge-review';

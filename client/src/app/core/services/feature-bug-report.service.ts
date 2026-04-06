@@ -21,14 +21,14 @@ export class FeatureBugReportService {
   constructor(private http: HttpClient) {}
 
   getFiltered(
-    status?: number,
-    type?: number,
-    priority?: number
+    status?: string,
+    type?: string,
+    priority?: string
   ): Observable<FeatureBugReportResponseDto[]> {
     let params = new HttpParams();
-    if (status !== undefined) params = params.set('status', status);
-    if (type !== undefined) params = params.set('type', type);
-    if (priority !== undefined) params = params.set('priority', priority);
+    if (status) params = params.set('status', status);
+    if (type) params = params.set('type', type);
+    if (priority) params = params.set('priority', priority);
     return this.http.get<FeatureBugReportResponseDto[]>(this.apiUrl, { params });
   }
 
@@ -58,7 +58,7 @@ export class FeatureBugReportService {
 
   getStatusOptions(): DropdownOption[] {
     return [
-      { value: 0, label: 'All Statuses' },
+      { value: '', label: 'All Statuses' },
       { value: ReportStatus.New, label: 'New' },
       { value: ReportStatus.InReview, label: 'In Review' },
       { value: ReportStatus.Closed, label: 'Closed' }
@@ -67,7 +67,7 @@ export class FeatureBugReportService {
 
   getTypeOptions(): DropdownOption[] {
     return [
-      { value: 0, label: 'All Types' },
+      { value: '', label: 'All Types' },
       { value: ReportType.Feature, label: 'Feature Request' },
       { value: ReportType.Bug, label: 'Bug Report' }
     ];
@@ -75,7 +75,7 @@ export class FeatureBugReportService {
 
   getPriorityOptions(): DropdownOption[] {
     return [
-      { value: 0, label: 'All Priorities' },
+      { value: '', label: 'All Priorities' },
       { value: ReportPriority.Critical, label: 'Critical' },
       { value: ReportPriority.High, label: 'High' },
       { value: ReportPriority.Medium, label: 'Medium' },
