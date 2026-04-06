@@ -43,7 +43,7 @@ export class ExpenseCycleService {
     name: string;
     startDate: string;
     endDate: string;
-    memberUserIds: number[];
+    memberUserIds: number[] | null;
     groupId?: number | null;
     currencyId: number;
     cycleType?: string;

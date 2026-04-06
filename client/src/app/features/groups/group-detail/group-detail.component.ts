@@ -115,10 +115,10 @@ export class GroupDetailComponent implements OnInit {
       width: '520px',
       maxHeight: '90vh',
       disableClose: true,
-      data: { groupId: this.group.id, groupMembers: this.acceptedMembers }
+      data: { groupId: this.group.id }
     });
-    ref.afterClosed().subscribe(created => {
-      if (created) this.loadAll(this.group!.id);
+    ref.afterClosed().subscribe(result => {
+      if (result) this.router.navigate(['/cycles', result]);
     });
   }
 

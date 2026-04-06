@@ -277,16 +277,17 @@ public class ExpenseCycleService
             if (string.IsNullOrWhiteSpace(request.Frequency) || !Enum.TryParse<CycleFrequency>(request.Frequency, true, out var freq))
                 return (null, "Frequency is required for Mukando cycles (Weekly, Biweekly, Monthly).");
             frequency = freq;
-            if (request.MemberUserIds == null || request.MemberUserIds.Count < 2)
-                return (null, "Mukando cycles require at least 2 members.");
-            if (request.PayoutOrder == null || request.PayoutOrder.Count == 0)
-                return (null, "Payout order is required for Mukando cycles.");
-            var memberSet = new HashSet<int>(request.MemberUserIds) { createdByUserId };
-            var payoutSet = new HashSet<int>(request.PayoutOrder);
-            if (!payoutSet.SetEquals(memberSet))
-                return (null, "Payout order must contain exactly the same members as the member list.");
-            if (request.PayoutOrder.Count != request.PayoutOrder.Distinct().Count())
-                return (null, "Payout order must not contain duplicate members.");
+            // Member and payout order validation deferred to StartAsync —
+            // cycles are created as Draft and members are added on the detail page.
+            if (request.PayoutOrder != null && request.PayoutOrder.Count > 0)
+            {
+                var memberSet = new HashSet<int>(request.MemberUserIds ?? new List<int>()) { createdByUserId };
+                var payoutSet = new HashSet<int>(request.PayoutOrder);
+                if (!payoutSet.SetEquals(memberSet))
+                    return (null, "Payout order must contain exactly the same members as the member list.");
+                if (request.PayoutOrder.Count != request.PayoutOrder.Distinct().Count())
+                    return (null, "Payout order must not contain duplicate members.");
+            }
         }
 
         var cycle = new ExpenseCycle
@@ -341,8 +342,8 @@ public class ExpenseCycleService
                 cycle.Id);
         }
 
-        // Mukando: generate rounds and contributions
-        if (cycleType == CycleType.Mukando && request.PayoutOrder != null)
+        // Mukando: generate rounds and contributions (only if payout order was provided at creation)
+        if (cycleType == CycleType.Mukando && request.PayoutOrder != null && request.PayoutOrder.Count > 0)
         {
             int memberCount = memberIds.Count;
             decimal contributionAmount = request.ContributionAmount!.Value;

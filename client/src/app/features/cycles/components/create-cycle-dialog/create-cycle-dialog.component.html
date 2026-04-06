@@ -76,40 +76,8 @@
       </mat-form-field>
     }
 
-    <!-- Members -->
-    <div class="members-section">
-      <label class="members-label">
-        Members
-        <span class="members-count" *ngIf="selectedMemberIds.length">({{ selectedMemberIds.length }} selected)</span>
-      </label>
-      <input class="member-search" type="text" placeholder="Search members…" [(ngModel)]="memberSearch" [ngModelOptions]="{ standalone: true }">
-      <div class="members-list">
-        <label class="member-check select-all" (click)="toggleAllMembers(); $event.preventDefault()">
-          <mat-checkbox [checked]="allMembersSelected" [indeterminate]="someMembersSelected" (click)="$event.stopPropagation()"></mat-checkbox>
-          <span>Select All</span>
-        </label>
-        @for (user of filteredUsers; track user.id) {
-          <label class="member-check" (click)="toggleMember(user.id); $event.preventDefault()">
-            <mat-checkbox [checked]="isMemberSelected(user.id)" (click)="$event.stopPropagation()"></mat-checkbox>
-            <span class="member-check-name">{{ user.firstName }} {{ user.lastName }}</span>
-            <span class="member-check-email">{{ user.email }}</span>
-          </label>
-        }
-        @if (filteredUsers.length === 0) {
-          <div class="no-members-match">No members match "{{ memberSearch }}"</div>
-        }
-      </div>
-      <div class="members-hint">{{ cycleType === 'Mukando' ? 'Each member receives the pool once' : 'Select all members who share expenses' }}</div>
-    </div>
-
-    <!-- Mukando preview -->
-    @if (cycleType === 'Mukando' && mukandoPreview) {
-      <div class="mukando-preview">
-        <span>{{ mukandoPreview.rounds }} rounds</span>
-        <span class="sep">·</span>
-        <span>Pool per round: {{ mukandoPreview.poolPerRound | number:'1.2-2' }}</span>
-      </div>
-      <mat-hint class="mukando-hint">You can reorder the payout order after creating the cycle.</mat-hint>
+    @if (cycleType === 'Mukando') {
+      <mat-hint class="mukando-hint">After creating, add members and set the payout order on the cycle detail page.</mat-hint>
     }
 
     @if (!presetGroupId) {

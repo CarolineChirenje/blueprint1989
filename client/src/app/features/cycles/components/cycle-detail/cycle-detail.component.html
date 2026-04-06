@@ -45,6 +45,17 @@
       </div>
     </div>
 
+    <!-- Prompt to add members for newly created Draft cycles -->
+    @if (isDraft() && canManageCycle() && cycle.members.length < 2) {
+      <div class="add-members-banner">
+        <mat-icon>group_add</mat-icon>
+        <span>Add members to get started with this cycle.</span>
+        <button mat-stroked-button color="primary" (click)="activeTab = 'members'">
+          <mat-icon>person_add</mat-icon> Add Members
+        </button>
+      </div>
+    }
+
     <!-- Contribution totals strip (Majana) -->
     @if (!isMukando && contributionSummary && contributionSummary.totalExpenses > 0) {
       <div class="summary-strip">

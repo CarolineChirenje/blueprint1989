@@ -8,6 +8,13 @@
 .badge { padding: .25rem .75rem; border-radius: 12px; font-size: .8rem; font-weight: 600; }
 .badge-active { background: var(--success-bg); color: var(--success); }
 .badge-closed { background: var(--surface-raised); color: var(--text-secondary); }
+.add-members-banner {
+  display: flex; align-items: center; gap: .75rem; padding: 1rem 1.25rem;
+  background: #e3f2fd; border: 1px solid #90caf9; border-radius: 8px;
+  margin-bottom: 1.5rem; font-size: .95rem; color: #1565c0; flex-wrap: wrap;
+}
+.add-members-banner mat-icon:first-child { font-size: 28px; width: 28px; height: 28px; color: #1976d2; }
+.add-members-banner span { flex: 1; }
 .tabs { display: flex; gap: .25rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
 .tabs button { background: none; border: none; padding: .75rem 1.25rem; cursor: pointer; font-size: .95rem; color: var(--text-secondary); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .15s; white-space: nowrap; }
 .tabs button.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
