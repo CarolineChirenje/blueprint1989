@@ -41,8 +41,8 @@ type NotificationGroup = {
     animations: [
       trigger('fadeRoute', [
         transition('* <=> *', [
-          style({ opacity: 0 }),
-          animate('150ms ease-in', style({ opacity: 1 }))
+          style({ opacity: 0, pointerEvents: 'none' }),
+          animate('150ms ease-in', style({ opacity: 1, pointerEvents: 'auto' }))
         ])
       ])
     ]

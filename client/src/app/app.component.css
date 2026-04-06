@@ -619,6 +619,7 @@ main {
   background-color: var(--bg);
   overflow-x: hidden;
   max-width: 100%;
+  pointer-events: auto;
 }
 
 @media (max-width: 599px) {
