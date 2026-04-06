@@ -109,6 +109,7 @@
           <button
             type="submit"
             class="submit-btn submit-btn-blue"
+            [class.form-ready]="signupForm.valid"
             [disabled]="isSubmitting"
           >
             {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}

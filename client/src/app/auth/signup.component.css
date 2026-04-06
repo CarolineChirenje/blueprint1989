@@ -426,6 +426,11 @@
   cursor: not-allowed;
 }
 
+.submit-btn-blue.form-ready {
+  background: #1a5c36;
+  box-shadow: 0 0 0 3px rgba(26, 92, 54, 0.25);
+}
+
 /* ─── Conditions / Medication signup styles ─────────────────────────────── */
 .section-sublabel {
   display: block;
