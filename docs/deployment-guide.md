@@ -322,55 +322,7 @@ curl -s http://localhost:1954/api/health
 
 ## Step 8 � Configure Nginx
 
-### 8.1 Frontend (`batanai.elroitec.com` on port 4300)
-```bash
-sudo nano /etc/nginx/sites-available/Batanai
-```
-```nginx
-server {
-    listen 4300;
-    server_name batanai.elroitec.com;
-
-    root /home/elroitecProjects/app;
-    index index.html;
-
-    # Service worker � no cache
-    location = /ngsw-worker.js {
-        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
-        add_header Service-Worker-Allowed "/";
-        try_files $uri =404;
-    }
-
-    location = /custom-sw.js {
-        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
-        add_header Service-Worker-Allowed "/";
-        try_files $uri =404;
-    }
-
-    # PWA manifest
-    location = /manifest.webmanifest {
-        add_header Content-Type "application/manifest+json";
-        try_files $uri =404;
-    }
-
-    # Static assets � long cache
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-        try_files $uri =404;
-    }
-
-    # Angular router � fallback to index.html
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-
-### 8.2 Combined frontend + API proxy (alternative)
-
-If you want a single-domain setup where the API is proxied under `/api/` on port 80 (no separate `batanaiapi` subdomain needed):
-
+### 8.1 Frontend + API proxy (`batanai.elroitec.com`)
 ```bash
 sudo nano /etc/nginx/sites-available/Batanai
 ```
@@ -384,37 +336,49 @@ server {
 
     # API proxy to .NET backend
     location /api/ {
-      proxy_pass         http://127.0.0.1:1954/api/;
-      proxy_http_version 1.1;
-      proxy_set_header   Upgrade $http_upgrade;
-      proxy_set_header   Connection keep-alive;
-      proxy_set_header   Host $host;
-      proxy_set_header   X-Real-IP $remote_addr;
-      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header   X-Forwarded-Proto $scheme;
-      proxy_cache_bypass $http_upgrade;
-      proxy_read_timeout 120s;
+        proxy_pass http://127.0.0.1:1954/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 120s;
     }
 
     # Angular routing fallback
     location / {
-      try_files $uri $uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 
     # Static assets cache
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp)$ {
-      expires 1y;
-      add_header Cache-Control "public, immutable";
-      try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/batanai.elroitec.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/batanai.elroitec.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+server {
+    if ($host = batanai.elroitec.com) {
+        return 301 https://$host$request_uri;
     }
 
     listen 80;
+    server_name batanai.elroitec.com;
+    return 404;
 }
 ```
 
-> **Note:** With this approach, update `environment.prod.ts` to use `apiUrl: 'https://batanai.elroitec.com/api'` instead of the separate `batanaiapi` subdomain.
-
-### 8.3 Backend (`batanaiapi.elroitec.com` on port 1954)
+### 8.2 Backend (`batanaiapi.elroitec.com` on port 1954)
 ```bash
 sudo nano /etc/nginx/sites-available/Batanaiapi
 ```
@@ -440,7 +404,7 @@ server {
 }
 ```
 
-### 8.4 Enable both sites
+### 8.3 Enable both sites
 ```bash
 sudo ln -s /etc/nginx/sites-available/Batanaiapi /etc/nginx/sites-enabled/
 sudo nginx -t
