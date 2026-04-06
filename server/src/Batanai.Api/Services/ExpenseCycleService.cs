@@ -84,10 +84,26 @@ public class ExpenseCycleService
         foreach (var cycle in cycles)
         {
             var memberCount = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycle.Id);
-            var expenses    = await _context.Expenses.Where(e => e.ExpenseCycleId == cycle.Id).ToListAsync();
             groupNames.TryGetValue(cycle.GroupId, out var groupName);
             groupRoles.TryGetValue(cycle.GroupId, out var groupRole);
             currencies.TryGetValue(cycle.CurrencyId, out var currency);
+
+            decimal totalAmount;
+            int expenseCount;
+            if (cycle.CycleType == CycleType.Mukando)
+            {
+                // For Mukando, total is the sum of actual collected across all rounds
+                totalAmount = await _context.MukandoRounds
+                    .Where(r => r.ExpenseCycleId == cycle.Id)
+                    .SumAsync(r => r.ActualCollected);
+                expenseCount = 0;
+            }
+            else
+            {
+                var expenses = await _context.Expenses.Where(e => e.ExpenseCycleId == cycle.Id).ToListAsync();
+                totalAmount = expenses.Sum(e => e.Amount);
+                expenseCount = expenses.Count;
+            }
 
             summaries.Add(new ExpenseCycleSummaryDto(
                 cycle.Id,
@@ -97,8 +113,8 @@ public class ExpenseCycleService
                 cycle.Status.ToString(),
                 cycle.CycleType.ToString(),
                 memberCount,
-                expenses.Count,
-                expenses.Sum(e => e.Amount),
+                expenseCount,
+                totalAmount,
                 cycle.CreatedAt,
                 cycle.GroupId,
                 groupName ?? "(Unknown group)",

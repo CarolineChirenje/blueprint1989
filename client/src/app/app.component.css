@@ -272,9 +272,9 @@ nav {
   top: calc(100% + 0.5rem);
   right: 0;
   min-width: 220px;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   z-index: 1000;
   animation: dropdownFadeIn 0.2s ease;
@@ -320,7 +320,7 @@ nav {
 }
 
 .dropdown-item.logout:hover {
-  background: #fff3f3;
+  background: var(--error-bg);
   color: #dc3545;
 }
 

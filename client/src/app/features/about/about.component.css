@@ -167,12 +167,12 @@
 .about-info-label {
   min-width: 110px;
   font-weight: 600;
-  color: #555;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
 .about-info-value {
-  color: #222;
+  color: var(--text-primary);
   line-height: 1.5;
 }
 
@@ -187,7 +187,7 @@
 .about-description-block p {
   margin: 0;
   font-size: 14px;
-  color: #333;
+  color: var(--text-secondary);
   line-height: 1.7;
 }
 
@@ -291,7 +291,7 @@
 
 .about-tech-desc {
   font-size: 11px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 /* ── Responsive ── */
