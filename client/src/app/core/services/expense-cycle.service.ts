@@ -12,7 +12,7 @@ import {
   MukandoRoundDto,
   MukandoPayoutDto,
   MukandoSwapRequestDto,
-  MukandoOptOutRequestDto,
+  OptOutRequestDto,
   MukandoRoundActivityDto,
   MukandoCycleSummaryDto,
   MukandoDashboardDto
@@ -181,12 +181,12 @@ export class ExpenseCycleService {
 
   // ── Opt-out Requests ────────────────────────────────────────────────────────
 
-  getOptOutRequests(cycleId: number): Observable<MukandoOptOutRequestDto[]> {
-    return this.http.get<MukandoOptOutRequestDto[]>(`${this.url}/${cycleId}/opt-out-requests`);
+  getOptOutRequests(cycleId: number): Observable<OptOutRequestDto[]> {
+    return this.http.get<OptOutRequestDto[]>(`${this.url}/${cycleId}/opt-out-requests`);
   }
 
-  createOptOutRequest(cycleId: number, reason: string): Observable<MukandoOptOutRequestDto> {
-    return this.http.post<MukandoOptOutRequestDto>(`${this.url}/${cycleId}/opt-out`, { reason });
+  createOptOutRequest(cycleId: number, reason: string): Observable<OptOutRequestDto> {
+    return this.http.post<OptOutRequestDto>(`${this.url}/${cycleId}/opt-out`, { reason });
   }
 
   respondOptOutRequest(cycleId: number, requestId: number, approve: boolean): Observable<void> {

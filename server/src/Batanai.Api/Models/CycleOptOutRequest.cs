@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Batanai.Api.Models;
 
-public class MukandoOptOutRequest
+public class CycleOptOutRequest
 {
     [Key]
     public int Id { get; set; }

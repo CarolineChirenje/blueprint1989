@@ -227,7 +227,7 @@ export interface MukandoSwapRequestDto {
   respondedAt: string | null;
 }
 
-export interface MukandoOptOutRequestDto {
+export interface OptOutRequestDto {
   id: number;
   userId: number;
   userName: string;

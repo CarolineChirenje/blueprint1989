@@ -161,10 +161,12 @@
           <button [class.active]="activeTab==='swaps'" (click)="activeTab='swaps'">
             Swaps @if (pendingSwapCount() > 0) { <span class="dispute-badge">{{ pendingSwapCount() }}</span> }
           </button>
-          <button [class.active]="activeTab==='optouts'" (click)="activeTab='optouts'">
-            Opt-outs @if (pendingOptOutCount() > 0) { <span class="dispute-badge">{{ pendingOptOutCount() }}</span> }
-          </button>
         }
+      }
+      @if (isDraft()) {
+        <button [class.active]="activeTab==='optouts'" (click)="activeTab='optouts'">
+          Opt-outs @if (pendingOptOutCount() > 0) { <span class="dispute-badge">{{ pendingOptOutCount() }}</span> }
+        </button>
       }
       <button [class.active]="activeTab==='disputes'" (click)="activeTab='disputes'">
         Disputes @if (pendingDisputeCount() > 0) { <span class="dispute-badge">{{ pendingDisputeCount() }}</span> }
@@ -717,7 +719,7 @@
       </div>
     }
 
-    <!-- ═══════ Mukando: Opt-outs Tab ═══════ -->
+    <!-- ═══════ Opt-outs Tab ═══════ -->
     @if (activeTab === 'optouts') {
       <div class="tab-content">
         <!-- Create opt-out request -->

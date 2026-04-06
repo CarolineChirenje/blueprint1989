@@ -146,6 +146,28 @@ public class ExpenseService
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Recalculates obligations for all expenses in a cycle based on the current member list.
+    /// Called after member changes (opt-out approval or direct removal) in Majana cycles.
+    /// </summary>
+    public async Task RecalculateAllObligationsAsync(int cycleId)
+    {
+        var expenses = await _context.Expenses
+            .Where(e => e.ExpenseCycleId == cycleId)
+            .ToListAsync();
+
+        foreach (var expense in expenses)
+        {
+            // Remove existing obligations for this expense
+            var existing = await _context.MemberObligations
+                .Where(o => o.ExpenseId == expense.Id)
+                .ToListAsync();
+            _context.MemberObligations.RemoveRange(existing);
+
+            await RecalculateObligationsAsync(expense);
+        }
+    }
+
     private async Task RecalculateObligationsAsync(Expense expense)
     {
         var memberIds = await _context.CycleMembers

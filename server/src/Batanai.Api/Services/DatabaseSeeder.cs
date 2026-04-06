@@ -66,8 +66,8 @@ public static class DatabaseSeeder
             new NotificationTypeEntity { Id = 28, Name = "MukandoSwapAccepted",               Description = "A swap request was accepted",                                   IsAdminControlled = false },
             new NotificationTypeEntity { Id = 29, Name = "MukandoSwapDeclined",               Description = "A swap request was declined",                                   IsAdminControlled = false },
             new NotificationTypeEntity { Id = 30, Name = "MukandoContributionDue",            Description = "Reminder: contribution is due soon or overdue",                 IsAdminControlled = true  },
-            new NotificationTypeEntity { Id = 31, Name = "MukandoOptOutRequested",            Description = "A member requested to opt out of a Mukando cycle",              IsAdminControlled = false },
-            new NotificationTypeEntity { Id = 32, Name = "MukandoOptOutResponded",            Description = "Admin responded to an opt-out request",                         IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 31, Name = "CycleOptOutRequested",              Description = "A member requested to opt out of a cycle",                     IsAdminControlled = false },
+            new NotificationTypeEntity { Id = 32, Name = "CycleOptOutResponded",              Description = "Admin responded to an opt-out request",                         IsAdminControlled = false },
         };
 
         foreach (var e in expected)

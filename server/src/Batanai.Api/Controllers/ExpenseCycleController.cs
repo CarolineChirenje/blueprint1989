@@ -433,7 +433,7 @@ public class ExpenseCycleController : ControllerBase
     [HttpGet("{id:int}/opt-out-requests")]
     public async Task<IActionResult> GetOptOutRequests(int id)
     {
-        var requests = await _mukandoService.GetOptOutRequestsAsync(id);
+        var requests = await _cycleService.GetOptOutRequestsAsync(id);
         return Ok(requests);
     }
 
@@ -444,7 +444,7 @@ public class ExpenseCycleController : ControllerBase
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
 
-        var (dto, error) = await _mukandoService.CreateOptOutRequestAsync(id, userId.Value, request.Reason);
+        var (dto, error) = await _cycleService.CreateOptOutRequestAsync(id, userId.Value, request.Reason);
         if (error != null) return BadRequest(new { message = error });
         return Ok(dto);
     }
@@ -458,7 +458,7 @@ public class ExpenseCycleController : ControllerBase
         var adminId = GetCurrentUserId();
         if (adminId == null) return Unauthorized();
 
-        var error = await _mukandoService.RespondOptOutRequestAsync(requestId, adminId.Value, request.Approve);
+        var error = await _cycleService.RespondOptOutRequestAsync(requestId, adminId.Value, request.Approve);
         if (error != null) return BadRequest(new { message = error });
         return NoContent();
     }

@@ -98,11 +98,11 @@ public enum NotificationType
     /// <summary>Reminder: a Mukando contribution is due soon or overdue.</summary>
     MukandoContributionDue = 30,
 
-    /// <summary>A member requested to opt out of a Mukando cycle.</summary>
-    MukandoOptOutRequested = 31,
+    /// <summary>A member requested to opt out of a cycle.</summary>
+    CycleOptOutRequested = 31,
 
     /// <summary>Admin responded to an opt-out request.</summary>
-    MukandoOptOutResponded = 32,
+    CycleOptOutResponded = 32,
 
     // -- Join codes -----------------------------------------------------------
 

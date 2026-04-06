@@ -24,7 +24,7 @@ import {
   MukandoCycleSummaryDto,
   MukandoRoundActivityDto,
   MukandoSwapRequestDto,
-  MukandoOptOutRequestDto,
+  OptOutRequestDto,
 } from '../../../../shared/models/expense-cycle.model';
 import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dialog.component';
 import { AddPaymentDialogComponent } from '../add-payment-dialog/add-payment-dialog.component';
@@ -61,7 +61,7 @@ export class CycleDetailComponent implements OnInit {
   mukandoSummary: MukandoCycleSummaryDto | null = null;
   roundActivities: MukandoRoundActivityDto[] = [];
   swapRequests: MukandoSwapRequestDto[] = [];
-  optOutRequests: MukandoOptOutRequestDto[] = [];
+  optOutRequests: OptOutRequestDto[] = [];
   contributionProofUrl = '';
   contributionReference = '';
   contributionUploading = false;
@@ -137,12 +137,12 @@ export class CycleDetailComponent implements OnInit {
           this.loadRounds();
           this.loadMukandoSummary();
           this.loadSwapRequests();
-          this.loadOptOutRequests();
         } else {
           this.loadExpenses();
           this.loadPayments();
           this.loadContributionSummary();
         }
+        this.loadOptOutRequests();
         this.loadDisputes();
         if (this.canManageCycle() && cycle.status === 'Draft') {
           this.loadAddableMembers(cycle);
@@ -615,7 +615,7 @@ export class CycleDetailComponent implements OnInit {
       next: () => {
         this.snackBar.open(approve ? 'Opt-out approved.' : 'Opt-out rejected.', 'OK', { duration: 3000 });
         this.loadOptOutRequests();
-        if (approve) { this.loadRounds(); this.loadAll(this.cycle!.id); }
+        if (approve) { if (this.isMukando) { this.loadRounds(); } this.loadAll(this.cycle!.id); }
       },
       error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
     });

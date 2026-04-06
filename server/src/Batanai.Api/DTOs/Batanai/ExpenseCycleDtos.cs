@@ -236,13 +236,13 @@ public record MukandoSwapRequestDto(
     DateTime CreatedAt,
     DateTime? RespondedAt);
 
-// ── Mukando Opt-out ──────────────────────────────────────────────────────────
+// ── Cycle Opt-out ────────────────────────────────────────────────────────────
 
 public record CreateOptOutRequest(string Reason);
 
 public record RespondOptOutRequest(bool Approve);
 
-public record MukandoOptOutRequestDto(
+public record OptOutRequestDto(
     int Id,
     int UserId,
     string UserName,

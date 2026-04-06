@@ -37,7 +37,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<MukandoContribution>    MukandoContributions     { get; set; } = null!;
     public DbSet<MukandoPayout>          MukandoPayouts           { get; set; } = null!;
     public DbSet<MukandoSwapRequest>     MukandoSwapRequests      { get; set; } = null!;
-    public DbSet<MukandoOptOutRequest>   MukandoOptOutRequests    { get; set; } = null!;
+    public DbSet<CycleOptOutRequest>     CycleOptOutRequests      { get; set; } = null!;
     public DbSet<MukandoRoundActivity>   MukandoRoundActivities   { get; set; } = null!;
 
     // ── Feedback ───────────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ public class ApplicationDbContext : DbContext
         ConfigureMukandoContributionEntity(modelBuilder);
         ConfigureMukandoPayoutEntity(modelBuilder);
         ConfigureMukandoSwapRequestEntity(modelBuilder);
-        ConfigureMukandoOptOutRequestEntity(modelBuilder);
+        ConfigureCycleOptOutRequestEntity(modelBuilder);
         ConfigureMukandoRoundActivityEntity(modelBuilder);
 
         // Feedback
@@ -391,11 +391,11 @@ public class ApplicationDbContext : DbContext
         });
     }
 
-    private static void ConfigureMukandoOptOutRequestEntity(ModelBuilder modelBuilder)
+    private static void ConfigureCycleOptOutRequestEntity(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<MukandoOptOutRequest>(entity =>
+        modelBuilder.Entity<CycleOptOutRequest>(entity =>
         {
-            entity.ToTable("MukandoOptOutRequests");
+            entity.ToTable("CycleOptOutRequests");
             entity.HasKey(o => o.Id);
             entity.Property(o => o.Reason).IsRequired().HasMaxLength(500);
             entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(o => o.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);

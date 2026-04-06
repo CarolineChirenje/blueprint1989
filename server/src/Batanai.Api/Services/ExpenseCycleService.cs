@@ -10,12 +10,14 @@ public class ExpenseCycleService
     private readonly ApplicationDbContext    _context;
     private readonly IPushNotificationSender _push;
     private readonly MukandoService          _mukandoService;
+    private readonly ExpenseService           _expenseService;
 
-    public ExpenseCycleService(ApplicationDbContext context, IPushNotificationSender push, MukandoService mukandoService)
+    public ExpenseCycleService(ApplicationDbContext context, IPushNotificationSender push, MukandoService mukandoService, ExpenseService expenseService)
     {
         _context        = context;
         _push           = push;
         _mukandoService = mukandoService;
+        _expenseService = expenseService;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -732,7 +734,126 @@ public class ExpenseCycleService
         if (cycle.CycleType == CycleType.Mukando)
             await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
 
+        // Majana: recalculate expense obligations for remaining members
+        if (cycle.CycleType == CycleType.Majana)
+            await _expenseService.RecalculateAllObligationsAsync(cycleId);
+
         return null;
+    }
+
+    // ── Opt-out Requests ────────────────────────────────────────────────────
+
+    public async Task<List<OptOutRequestDto>> GetOptOutRequestsAsync(int cycleId)
+    {
+        var requests = await _context.CycleOptOutRequests
+            .Where(o => o.ExpenseCycleId == cycleId)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+
+        var userIds = requests.Select(o => o.UserId).Distinct().ToList();
+        var users = await _context.Users.Where(u => userIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
+
+        return requests.Select(o =>
+        {
+            users.TryGetValue(o.UserId, out var user);
+            return new OptOutRequestDto(
+                o.Id, o.UserId,
+                user != null ? $"{user.FirstName} {user.LastName}" : "Unknown",
+                o.Reason, o.Status.ToString(), o.CreatedAt, o.RespondedAt);
+        }).ToList();
+    }
+
+    public async Task<(OptOutRequestDto? dto, string? error)> CreateOptOutRequestAsync(int cycleId, int userId, string reason)
+    {
+        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
+        if (cycle == null) return (null, "Cycle not found.");
+        if (cycle.Status != CycleStatus.Draft) return (null, "Opt-out requests can only be made in Draft mode.");
+
+        var isMember = await _context.CycleMembers.AnyAsync(m => m.ExpenseCycleId == cycleId && m.UserId == userId);
+        if (!isMember) return (null, "You are not a member of this cycle.");
+
+        var hasPending = await _context.CycleOptOutRequests
+            .AnyAsync(o => o.ExpenseCycleId == cycleId && o.UserId == userId && o.Status == OptOutRequestStatus.Pending);
+        if (hasPending) return (null, "You already have a pending opt-out request.");
+
+        var req = new CycleOptOutRequest
+        {
+            ExpenseCycleId = cycleId,
+            UserId         = userId,
+            Reason         = reason,
+            Status         = OptOutRequestStatus.Pending,
+            CreatedAt      = DateTime.UtcNow
+        };
+        _context.CycleOptOutRequests.Add(req);
+        await _context.SaveChangesAsync();
+
+        // Notify admins
+        var user = await _context.Users.FindAsync(userId);
+        var adminIds = await GetCycleAdminIdsAsync(cycleId);
+        await _push.SendToUsersAsync(
+            adminIds,
+            NotificationType.CycleOptOutRequested,
+            $"Opt-out request: {cycle.Name}",
+            $"{user?.FirstName} has requested to leave the cycle \"{cycle.Name}\".",
+            $"/cycles/{cycleId}",
+            cycleId);
+
+        var requests = await GetOptOutRequestsAsync(cycleId);
+        return (requests.FirstOrDefault(o => o.Id == req.Id), null);
+    }
+
+    public async Task<string?> RespondOptOutRequestAsync(int requestId, int adminUserId, bool approve)
+    {
+        var req = await _context.CycleOptOutRequests.FindAsync(requestId);
+        if (req == null) return "Opt-out request not found.";
+        if (req.Status != OptOutRequestStatus.Pending) return "Request is no longer pending.";
+
+        var cycle = await _context.ExpenseCycles.FindAsync(req.ExpenseCycleId);
+        if (cycle?.Status != CycleStatus.Draft) return "Opt-out can only be approved in Draft mode.";
+
+        req.Status            = approve ? OptOutRequestStatus.Approved : OptOutRequestStatus.Rejected;
+        req.RespondedByUserId = adminUserId;
+        req.RespondedAt       = DateTime.UtcNow;
+
+        if (approve)
+        {
+            // Remove member from cycle
+            var member = await _context.CycleMembers
+                .FirstOrDefaultAsync(m => m.ExpenseCycleId == req.ExpenseCycleId && m.UserId == req.UserId);
+            if (member != null) _context.CycleMembers.Remove(member);
+
+            await _context.SaveChangesAsync();
+
+            // Type-specific recalculation
+            if (cycle.CycleType == CycleType.Mukando)
+                await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(req.ExpenseCycleId);
+            else if (cycle.CycleType == CycleType.Majana)
+                await _expenseService.RecalculateAllObligationsAsync(req.ExpenseCycleId);
+        }
+
+        await _context.SaveChangesAsync();
+
+        // Notify the member
+        var message = approve
+            ? $"Your request to leave \"{cycle.Name}\" has been approved."
+            : $"Your request to leave \"{cycle.Name}\" has been declined.";
+
+        await _push.SendToUserAsync(req.UserId, NotificationType.CycleOptOutResponded,
+            $"Opt-out {(approve ? "approved" : "declined")}",
+            message, $"/cycles/{req.ExpenseCycleId}", req.ExpenseCycleId);
+
+        return null;
+    }
+
+    private async Task<List<int>> GetCycleAdminIdsAsync(int cycleId)
+    {
+        var groupId = await _context.ExpenseCycles
+            .Where(c => c.Id == cycleId).Select(c => c.GroupId).FirstOrDefaultAsync();
+
+        return await _context.GroupMembers
+            .Where(gm => gm.GroupId == groupId && gm.GroupRole == GroupRole.GroupAdmin && gm.Status == GroupInviteStatus.Accepted)
+            .Select(gm => gm.UserId)
+            .ToListAsync();
     }
 
     // ── Contribution summary ──────────────────────────────────────────────────
