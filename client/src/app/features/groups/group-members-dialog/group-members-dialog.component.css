@@ -102,13 +102,13 @@
 }
 
 .chip.accepted {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: var(--success-bg, #e8f5e9);
+  color: var(--success, #2e7d32);
 }
 
 .chip.pending {
-  background: #fff8e1;
-  color: #f57f17;
+  background: var(--warning-bg, #fff8e1);
+  color: var(--warning, #f57f17);
 }
 
 .role-inline-select {

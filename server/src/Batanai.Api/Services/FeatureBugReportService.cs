@@ -163,7 +163,7 @@ public class FeatureBugReportService
         var report = await _context.FeatureBugReports.FindAsync(id);
         if (report == null) return false;
         if (report.SubmittedByUserId != userId) return false;
-        if (report.Status != ReportStatus.New) return false;
+        if (report.Status == ReportStatus.InReview) return false;
 
         _context.FeatureBugReports.Remove(report);
         await _context.SaveChangesAsync();

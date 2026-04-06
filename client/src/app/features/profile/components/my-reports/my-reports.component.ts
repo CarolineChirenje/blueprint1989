@@ -94,7 +94,7 @@ export class MyReportsComponent implements OnInit {
   }
 
   canDelete(status: number): boolean {
-    return status === ReportStatus.New;
+    return status !== ReportStatus.InReview;
   }
 
   getStatusBadgeClass(status: number): string {

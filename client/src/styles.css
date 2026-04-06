@@ -301,7 +301,8 @@
 
 /* ── Global Force-Dark prevention ──────────────────────────────────────────
    Chrome Android "Force Dark" auto-inverts colours on native form controls
-   and Angular Material elements. color-scheme: light opts them out entirely.
+   and Angular Material elements. In LIGHT mode only, color-scheme: light
+   opts them out entirely. In dark mode we let our own dark CSS take control.
 ────────────────────────────────────────────────────────────────────────── */
 input:not(.mat-mdc-input-element),
 input[type="text"]:not(.mat-mdc-input-element),
@@ -315,9 +316,25 @@ input[type="date"]:not(.mat-mdc-input-element),
 input[type="time"]:not(.mat-mdc-input-element),
 textarea:not(.mat-mdc-input-element),
 select:not([class*="mat-"]) {
-  color-scheme: light;
   background-color: var(--surface);
   color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: light) {
+  input:not(.mat-mdc-input-element),
+  input[type="text"]:not(.mat-mdc-input-element),
+  input[type="email"]:not(.mat-mdc-input-element),
+  input[type="password"]:not(.mat-mdc-input-element),
+  input[type="search"]:not(.mat-mdc-input-element),
+  input[type="number"]:not(.mat-mdc-input-element),
+  input[type="tel"]:not(.mat-mdc-input-element),
+  input[type="url"]:not(.mat-mdc-input-element),
+  input[type="date"]:not(.mat-mdc-input-element),
+  input[type="time"]:not(.mat-mdc-input-element),
+  textarea:not(.mat-mdc-input-element),
+  select:not([class*="mat-"]) {
+    color-scheme: light;
+  }
 }
 
 /* Angular Material MDC form fields, selects, options, autocomplete */
@@ -332,13 +349,33 @@ select:not([class*="mat-"]) {
 .mdc-text-field,
 .mdc-text-field--filled,
 .mdc-text-field--outlined {
-  color-scheme: light !important;
   color: var(--text-primary) !important;
 }
 
+@media (prefers-color-scheme: light) {
+  .mat-mdc-form-field,
+  .mat-mdc-text-field-wrapper,
+  .mat-mdc-input-element,
+  .mat-mdc-select,
+  .mat-mdc-select-trigger,
+  .mat-mdc-select-value,
+  .mat-mdc-option,
+  .mat-mdc-autocomplete-panel,
+  .mdc-text-field,
+  .mdc-text-field--filled,
+  .mdc-text-field--outlined {
+    color-scheme: light !important;
+  }
+}
+
 .mat-mdc-select-panel {
-  color-scheme: light !important;
   background-color: var(--surface) !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .mat-mdc-select-panel {
+    color-scheme: light !important;
+  }
 }
 
 .mat-mdc-option .mdc-list-item__primary-text {
@@ -350,7 +387,7 @@ select:not([class*="mat-"]) {
 }
 
 html, body {
-  color-scheme: light;
+  color-scheme: light dark;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -676,6 +713,45 @@ tbody tr:last-child td {
     --shadow-sm:       0 1px 4px rgba(0, 0, 0, 0.4);
     --shadow-md:       0 4px 16px rgba(0, 0, 0, 0.5);
     --shadow-lg:       0 8px 32px rgba(0, 0, 0, 0.6);
+
+    /* Semantic colors — dark mode */
+    --success:           #4CAF50;
+    --success-bg:        #1B3A1E;
+    --success-border:    #2E5931;
+    --warning:           #FFB74D;
+    --warning-bg:        #3A2E10;
+    --warning-border:    #5C4A1A;
+    --warning-text:      #FFD180;
+    --error:             #EF5350;
+    --error-bg:          #3D1212;
+    --error-border:      #5D1A1A;
+    --info:              #42A5F5;
+    --info-bg:           #0D2740;
+    --info-border:       #1A3D5C;
+
+    /* Angular Material MDC dark overrides */
+    --mdc-theme-primary:                                  #34A85A;
+    --mdc-theme-on-primary:                               #FFFFFF;
+    --mdc-theme-secondary:                                #34A85A;
+    --mdc-theme-surface:                                  #162719;
+    --mdc-theme-background:                               #0F1E14;
+    --mdc-theme-error:                                    #EF5350;
+    --mdc-filled-text-field-active-indicator-color:       #34A85A;
+    --mdc-filled-text-field-focus-active-indicator-color: #34A85A;
+    --mdc-filled-text-field-focus-label-text-color:       #34A85A;
+    --mdc-filled-text-field-container-color:              #1C3020;
+    --mdc-outlined-text-field-focus-outline-color:        #34A85A;
+    --mdc-outlined-text-field-focus-label-text-color:     #34A85A;
+    --mdc-checkbox-selected-icon-color:                   #34A85A;
+    --mdc-checkbox-selected-hover-icon-color:             #2D9150;
+    --mdc-radio-selected-icon-color:                      #34A85A;
+    --mdc-filled-button-container-color:                  #237A49;
+    --mdc-filled-button-label-text-color:                 #FFFFFF;
+    --mdc-linear-progress-active-indicator-color:         #34A85A;
+    --mat-tab-header-active-label-text-color:             #34A85A;
+    --mat-tab-header-active-indicator-color:              #34A85A;
+    --mdc-switch-selected-track-color:                    #34A85A;
+    --mdc-switch-selected-hover-track-color:              #2D9150;
   }
 
   body {
@@ -720,6 +796,176 @@ tbody tr:last-child td {
 
   td {
     border-bottom-color: var(--divider);
+  }
+
+  /* ── Material Dialog surfaces ─────────────────────────────────────── */
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface,
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-dialog-title {
+    color: #A8D5B5 !important;
+  }
+
+  .mat-mdc-dialog-content {
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Material Card ────────────────────────────────────────────────── */
+  .mat-mdc-card,
+  mat-card {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+  }
+
+  /* ── Material Form Fields ─────────────────────────────────────────── */
+  .mdc-text-field--outlined,
+  .mdc-text-field--filled {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .mat-mdc-form-field .mat-mdc-input-element {
+    color: var(--text-primary) !important;
+    caret-color: #34A85A !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-text-field--outlined {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading,
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch,
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+    border-color: var(--border) !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mat-mdc-floating-label {
+    color: var(--text-secondary) !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mat-mdc-floating-label {
+    color: #34A85A !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__leading,
+  .mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__notch,
+  .mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__trailing,
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__leading,
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch,
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
+    border-color: #34A85A !important;
+  }
+
+  /* ── Material Select panels & options ─────────────────────────────── */
+  .mat-mdc-select-panel {
+    background-color: var(--surface) !important;
+  }
+
+  .mat-mdc-option {
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-option:hover,
+  .mat-mdc-option.mdc-list-item--selected {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .mat-mdc-option .mdc-list-item__primary-text {
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-autocomplete-panel {
+    background-color: var(--surface) !important;
+  }
+
+  /* ── Material Select value & arrow ────────────────────────────────── */
+  .mat-mdc-select-value-text {
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-select-arrow {
+    color: var(--text-secondary) !important;
+  }
+
+  /* ── Material Buttons ─────────────────────────────────────────────── */
+  .mat-mdc-raised-button:not([color]) {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-outlined-button:not([color]) {
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-icon-button {
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Material Slide Toggle ────────────────────────────────────────── */
+  .mat-mdc-slide-toggle .mdc-switch__track {
+    background-color: var(--border) !important;
+  }
+
+  /* ── Material Tabs ────────────────────────────────────────────────── */
+  .mat-mdc-tab-header {
+    background-color: var(--surface) !important;
+    border-bottom-color: var(--divider) !important;
+  }
+
+  .mat-mdc-tab .mdc-tab__text-label {
+    color: var(--text-secondary) !important;
+  }
+
+  .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    color: #34A85A !important;
+  }
+
+  /* ── Material Paginator ───────────────────────────────────────────── */
+  .mat-mdc-paginator {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-top-color: var(--divider) !important;
+  }
+
+  /* ── Material Snackbar ────────────────────────────────────────────── */
+  .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Material Tooltip ─────────────────────────────────────────────── */
+  .mat-mdc-tooltip .mdc-tooltip__surface {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Form system (auth pages, profile) ────────────────────────────── */
+  .form-control {
+    background-color: var(--surface-raised) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .form-control:focus {
+    border-color: #34A85A !important;
+  }
+
+  .auth-card {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Status/Alert banners ─────────────────────────────────────────── */
+  .error-banner {
+    background-color: #3D1212 !important;
+    color: #EF9A9A !important;
+    border-color: #5D1A1A !important;
   }
 }
 
@@ -858,7 +1104,7 @@ tbody tr:last-child td {
   .mobile-sticky-actions {
     position: sticky;
     bottom: 0;
-    background: white;
+    background: var(--surface);
     padding: 0.875rem 1rem;
     margin: 1rem -1rem -1rem;
     box-shadow: 0 -2px 8px rgba(37, 49, 40, 0.14);

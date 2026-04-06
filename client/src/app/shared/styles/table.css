@@ -309,8 +309,8 @@ td.actions-cell {
 
 /* Paginator Styling */
 ::ng-deep .mat-mdc-paginator {
-  background: #f8fbff !important;
-  border-top: 2px solid #e0e7ff;
+  background: var(--surface-raised, #f8fbff) !important;
+  border-top: 2px solid var(--divider, #e0e7ff);
 }
 
 ::ng-deep .mat-mdc-paginator-container {
@@ -374,7 +374,7 @@ td.actions-cell {
     justify-content: space-between !important;
     align-items: flex-start !important;
     padding: 0.5rem 0.85rem !important;
-    border-bottom: 1px solid #edf2f9 !important;
+    border-bottom: 1px solid var(--divider) !important;
     border-right: none !important;
     border-radius: 0 !important;
     font-size: 0.9rem !important;
@@ -388,7 +388,7 @@ td.actions-cell {
   /* Alternating row tint within a card */
   td:nth-child(even),
   .mat-mdc-cell:nth-child(even) {
-    background-color: #f7faff;
+    background-color: var(--surface-raised);
   }
 
   td:last-child,
@@ -447,7 +447,7 @@ td.actions-cell {
     gap: 0.25rem;
     min-height: 52px !important;
     align-items: center !important;
-    background-color: #f0f5ff !important;
+    background-color: var(--primary-light) !important;
   }
 
   .actions-cell::before,
@@ -474,9 +474,9 @@ td.actions-cell {
     box-shadow: none !important;
   }
 
-  /* Strip mat-card padding so table cards go edge-to-edge */
-  mat-card, .mat-mdc-card { padding: 0 !important; box-shadow: none !important; border: none !important; }
-  mat-card-content, .mat-mdc-card-content { padding: 0 !important; }
+  /* Strip mat-card chrome so table cards go edge-to-edge */
+  mat-card, .mat-mdc-card { padding: 0 !important; box-shadow: none !important; border: none !important; background: transparent !important; }
+  mat-card-content, .mat-mdc-card-content { padding: 0 !important; background: transparent !important; }
   mat-card-header, .mat-mdc-card-header { padding: 0.5rem 0 !important; }
 }
 

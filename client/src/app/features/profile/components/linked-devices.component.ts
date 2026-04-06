@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { DeviceService } from '../../../core/services/device.service';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { UserDeviceDto, InstallPromptStatus } from '../../../shared/models/device.model';
 
 @Component({
@@ -19,7 +21,7 @@ export class LinkedDevicesComponent implements OnInit {
   renamingDeviceId: number | null = null;
   renameValue = '';
 
-  constructor(private deviceService: DeviceService, private cdr: ChangeDetectorRef) {
+  constructor(private deviceService: DeviceService, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
     this.currentClientId = this.deviceService.getClientId();
   }
 
@@ -71,20 +73,29 @@ export class LinkedDevicesComponent implements OnInit {
   }
 
   removeDevice(device: UserDeviceDto): void {
-    if (!confirm(`Remove "${this.getDeviceLabel(device)}"? It will no longer appear in this list.`)) {
-      return;
-    }
-    this.deviceService.deleteDevice(device.id).subscribe({
-      next: () => {
-        this.devices = this.devices.filter(d => d.id !== device.id);
-        this.successMessage = 'Device removed successfully.';
-        setTimeout(() => { this.successMessage = ''; }, 3000);
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.errorMessage = 'Failed to remove device.';
-        this.cdr.detectChanges();
-      }
+    this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Remove Device',
+        message: `Remove "${this.getDeviceLabel(device)}"? It will no longer appear in this list.`,
+        confirmText: 'Remove',
+        cancelText: 'Cancel',
+        confirmColor: 'warn'
+      } satisfies ConfirmDialogData
+    }).afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+
+      this.deviceService.deleteDevice(device.id).subscribe({
+        next: () => {
+          this.devices = this.devices.filter(d => d.id !== device.id);
+          this.successMessage = 'Device removed successfully.';
+          setTimeout(() => { this.successMessage = ''; }, 3000);
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.errorMessage = 'Failed to remove device.';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 
