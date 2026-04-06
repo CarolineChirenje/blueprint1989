@@ -8,17 +8,19 @@ This folder contains detailed technical documentation for every feature in the B
 
 | # | Document | Feature Summary |
 |---|---|---|
-| 1 | [Authentication](Authentication.md) | Login, signup, MFA, password reset, JWT token lifecycle |
-| 2 | [Biometric Authentication](Biometric-Authentication.md) | WebAuthn/FIDO2 passwordless login and credential management |
-| 3 | [Dashboard](Dashboard.md) | Role-based navigation cards and time-of-day greeting |
-| 4 | [Expense Cycles](Cycles.md) | Expense cycle management, member balances, close workflow |
-| 5 | [Profile](Profile.md) | Profile sub-pages: name/password, MFA, biometric, devices, reports, notifications |
-| 6 | [Notifications](Notifications.md) | In-app notification bell inbox, Web Push pipeline, and per-user preferences |
-| 7 | [Management (Admin Hub)](Management.md) | Centralised admin hub: users, cycles, reports, app config |
-| 8 | [Offline Queue](Offline-Queue.md) | IndexedDB offline queue with 24-hour TTL and auto-sync on reconnect |
-| 9 | [Push Notifications](Push-Notifications.md) | VAPID Web Push pipeline and service worker handler |
-| 10 | [Feature & Bug Reports](Feature-Bug-Reports.md) | User-submitted feature requests and bug reports with admin review workflow |
-| 11 | [App Configuration](App-Configuration.md) | Runtime key-value configuration store with secret masking and bulk update |
+| 1 | [Business Overview](Business-Overview.md) | Platform vision, target market, capabilities, and technology stack |
+| 2 | [Authentication](Authentication.md) | Login, signup, MFA, password reset, JWT token lifecycle |
+| 3 | [Biometric Authentication](Biometric-Authentication.md) | WebAuthn/FIDO2 passwordless login and credential management |
+| 4 | [Dashboard](Dashboard.md) | Role-based navigation cards and time-of-day greeting |
+| 5 | [Groups](Groups.md) | Group management, membership, invites, join-by-code, and role management |
+| 6 | [Expense Cycles](Cycles.md) | Expense cycle management, member balances, close workflow |
+| 7 | [Profile](Profile.md) | Profile sub-pages: name/password, MFA, biometric, devices, reports, notifications |
+| 8 | [Notifications](Notifications.md) | In-app notification bell inbox, Web Push pipeline, and per-user preferences |
+| 9 | [Management (Admin Hub)](Management.md) | Centralised admin hub: users, cycles, reports, app config |
+| 10 | [Offline Queue](Offline-Queue.md) | IndexedDB offline queue with 24-hour TTL and auto-sync on reconnect |
+| 11 | [Push Notifications](Push-Notifications.md) | VAPID Web Push pipeline and service worker handler |
+| 12 | [Feature & Bug Reports](Feature-Bug-Reports.md) | User-submitted feature requests and bug reports with admin review workflow |
+| 13 | [App Configuration](App-Configuration.md) | Runtime key-value configuration store with secret masking and bulk update |
 
 ---
 

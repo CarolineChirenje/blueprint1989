@@ -56,7 +56,7 @@ export const memberTourSteps: TourStepDef[] = [
     text: `
       <p>Use <strong>New Group</strong> to create one, or <strong>Join Group</strong>
       to enter a group code someone shared with you.</p>
-      <p>Inside a group you'll manage shared expense cycles and Mukando rounds.</p>
+      <p>Inside a group you will manage shared expense cycles and Mukando rounds.</p>
     `,
     attachTo: { element: '#new-group-btn', on: 'bottom' },
     route: '/groups',
