@@ -9,7 +9,7 @@ importScripts('/ngsw-worker.js');
 //   1. Scheduled local notifications (ketone recheck timer)
 //   2. Server-sent push notifications (VAPID-signed)
 
-const CACHE_NAME = 'batanai-v1';
+const CACHE_NAME = 'batanai-v2';
 const NOTIFICATION_CHECK_INTERVAL = 60000; // Check every minute
 
 // Default app icon
