@@ -844,6 +844,15 @@ export class CycleDetailComponent implements OnInit {
     return (this.cycle.contributionAmount ?? 0) * ((this.cycle.members?.length ?? 1) - 1);
   }
 
+  goToTab(tab: typeof this.activeTab): void {
+    this.activeTab = tab;
+    this.cdr.detectChanges();
+    // Scroll the tab content into view
+    setTimeout(() => {
+      document.querySelector('.tab-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   netBalanceClass(net: number): string {
     if (net > 0) return 'balance-positive';
     if (net < 0) return 'balance-negative';

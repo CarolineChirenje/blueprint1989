@@ -53,15 +53,24 @@
           <mat-icon>{{ cycle.members.length >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
           <span>Add members ({{ cycle.members.length }}/2 minimum)</span>
           @if (cycle.members.length < 2) {
-            <button mat-stroked-button color="primary" (click)="activeTab = 'members'">Add</button>
+            <button mat-stroked-button color="primary" (click)="goToTab('members')">Add</button>
           }
         </div>
+        @if (!isMukando) {
+          <div class="check-item" [class.done]="expenses.length > 0">
+            <mat-icon>{{ expenses.length > 0 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>Add expenses ({{ expenses.length }} added)</span>
+            @if (expenses.length === 0) {
+              <button mat-stroked-button color="primary" (click)="goToTab('expenses')">Add</button>
+            }
+          </div>
+        }
         @if (isMukando) {
           <div class="check-item" [class.done]="rounds.length > 0">
             <mat-icon>{{ rounds.length > 0 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
             <span>Payout order set</span>
             @if (rounds.length === 0) {
-              <button mat-stroked-button color="primary" (click)="activeTab = 'order'">Set Order</button>
+              <button mat-stroked-button color="primary" (click)="goToTab('order')">Set Order</button>
             }
           </div>
         }
@@ -86,6 +95,10 @@
         <div class="strip-item">
           <span class="strip-label">Each owes</span>
           <span class="strip-value primary">{{ currencySymbol }}{{ contributionSummary.sharePerMember | number:'1.2-2' }}</span>
+        </div>
+        <div class="strip-item">
+          <span class="strip-label">Total payments</span>
+          <span class="strip-value">{{ currencySymbol }}{{ totalPayments | number:'1.2-2' }}</span>
         </div>
       </div>
     }

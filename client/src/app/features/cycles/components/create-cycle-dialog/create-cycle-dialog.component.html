@@ -27,7 +27,7 @@
       <mat-label>Currency</mat-label>
       <mat-select formControlName="currencyId" required>
         @for (cur of currencies; track cur.id) {
-          <mat-option [value]="cur.id">{{ cur.symbol }} — {{ cur.name }} ({{ cur.code }})</mat-option>
+          <mat-option [value]="cur.id">{{ cur.symbol }} - {{ cur.name }} ({{ cur.code }})</mat-option>
         }
       </mat-select>
     </mat-form-field>
