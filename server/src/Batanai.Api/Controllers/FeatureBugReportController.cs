@@ -72,9 +72,9 @@ public class FeatureBugReportController : ControllerBase
 
     // ── User endpoints ─────────────────────────────────────────────────────
 
-    /// <summary>Submit a new feature request or bug report.</summary>
+    /// <summary>Submit a new feature request or bug report with optional screenshot.</summary>
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateFeatureBugReportRequest request)
+    public async Task<IActionResult> Create([FromForm] CreateFeatureBugReportRequest request, IFormFile? image)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -85,8 +85,15 @@ public class FeatureBugReportController : ControllerBase
         if (request.Categories == null || request.Categories.Count == 0)
             return BadRequest(new { message = "At least one category is required." });
 
-        var report = await _service.CreateAsync(userId.Value, request);
-        return CreatedAtAction(nameof(GetById), new { id = report.Id }, report);
+        try
+        {
+            var report = await _service.CreateAsync(userId.Value, request, image);
+            return CreatedAtAction(nameof(GetById), new { id = report.Id }, report);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     /// <summary>Get the current user's own reports.</summary>

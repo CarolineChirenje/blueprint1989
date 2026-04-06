@@ -39,5 +39,6 @@ public record FeatureBugReportResponseDto(
     int SubmittedByUserId,
     string SubmittedByName,
     DateTime SubmittedAt,
-    DateTime UpdatedAt
+    DateTime UpdatedAt,
+    string? ImageUrl
 );

@@ -68,6 +68,10 @@ public class FeatureBugReport
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    // Optional screenshot
+    public int? ImageFileId { get; set; }
+    public UploadedFile? ImageFile { get; set; }
+
     // Navigation – many-to-many categories
     public ICollection<FeatureBugReportCategory> Categories { get; set; } = new List<FeatureBugReportCategory>();
 }

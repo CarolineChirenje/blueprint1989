@@ -39,6 +39,15 @@
     <div class="report-title">{{ report.title }}</div>
     <div class="report-description">{{ report.description }}</div>
 
+    @if (fullImageUrl) {
+      <div class="report-image-wrap">
+        <span class="meta-label">Screenshot</span>
+        <a [href]="fullImageUrl" target="_blank" rel="noopener">
+          <img [src]="fullImageUrl" alt="Report screenshot" class="report-image">
+        </a>
+      </div>
+    }
+
     @if (errorMessage) {
       <div class="error-message">{{ errorMessage }}</div>
     }

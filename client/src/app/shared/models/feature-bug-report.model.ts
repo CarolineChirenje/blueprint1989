@@ -44,6 +44,7 @@ export interface FeatureBugReportResponseDto {
   submittedByName: string;
   submittedAt: string;
   updatedAt: string;
+  imageUrl: string | null;
 }
 
 export interface CreateFeatureBugReportRequest {

@@ -117,6 +117,13 @@ export class CycleDetailComponent implements OnInit {
     this.isAdmin = this.auth.isAdminOrAbove();
     this.currentUserId = this.auth.getUserId();
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab) {
+      const validTabs = ['expenses', 'payments', 'summary', 'disputes', 'members', 'rounds', 'stats', 'activity', 'swaps', 'optouts', 'order'];
+      if (validTabs.includes(tab)) {
+        this.activeTab = tab as typeof this.activeTab;
+      }
+    }
     this.loadAll(id);
   }
 
@@ -813,6 +820,28 @@ export class CycleDetailComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  addAllMembers(): void {
+    if (!this.cycle || this.addableMembers.length === 0) return;
+    this.addingMember = true;
+    const userIds = this.addableMembers.map(m => m.userId);
+    this.cycleService.addMembersBatch(this.cycle.id, userIds).subscribe({
+      next: () => {
+        this.addingMember = false;
+        this.loadAll(this.cycle!.id);
+      },
+      error: err => {
+        this.snackBar.open(err?.error?.message ?? 'Failed to add members.', 'Dismiss', { duration: 5000 });
+        this.addingMember = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  get poolPerRound(): number {
+    if (!this.cycle) return 0;
+    return (this.cycle.contributionAmount ?? 0) * ((this.cycle.members?.length ?? 1) - 1);
   }
 
   netBalanceClass(net: number): string {

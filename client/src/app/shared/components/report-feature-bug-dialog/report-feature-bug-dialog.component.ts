@@ -20,6 +20,8 @@ import {
 export class ReportFeatureBugDialogComponent implements OnInit {
   form!: FormGroup;
   isSubmitting = false;
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
 
   typeOptions: DropdownOption[] = [];
   priorityOptions: DropdownOption[] = [];
@@ -59,7 +61,7 @@ export class ReportFeatureBugDialogComponent implements OnInit {
     };
 
     this.isSubmitting = true;
-    this.service.create(request).subscribe({
+    this.service.create(request, this.selectedFile ?? undefined).subscribe({
       next: (report) => {
         this.isSubmitting = false;
         this.snackBar.open('Report submitted successfully', 'Dismiss', { duration: 3000 });
@@ -70,6 +72,28 @@ export class ReportFeatureBugDialogComponent implements OnInit {
         this.snackBar.open(err?.error?.message || 'Failed to submit report', 'Dismiss', { duration: 4000 });
       }
     });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.snackBar.open('Image must be under 5 MB', 'Dismiss', { duration: 4000 });
+      input.value = '';
+      return;
+    }
+
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => this.imagePreview = reader.result as string;
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
   }
 
   cancel(): void {

@@ -31,6 +31,8 @@ public record UpdateMukandoSettingsRequest(
 
 public record DuplicateCycleRequest(DateTime NewStartDate);
 
+public record AddMembersBatchRequest(List<int> UserIds);
+
 // ── Responses ─────────────────────────────────────────────────────────────────
 
 public record ExpenseCycleDto(

@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 import { FeatureBugReportResponseDto, ReportStatus, UpdateReportStatusRequest } from '../../models/feature-bug-report.model';
 import { FeatureBugReportService } from '../../../core/services/feature-bug-report.service';
+import { environment } from '../../../../environments/environment';
 
 export interface ViewReportDialogData {
   report: FeatureBugReportResponseDto;
@@ -29,6 +30,12 @@ export class ViewReportDialogComponent {
   ) {
     this.report = data.report;
     this.isAdmin = data.isAdmin;
+  }
+
+  get fullImageUrl(): string | null {
+    if (!this.report.imageUrl) return null;
+    const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+    return baseUrl + this.report.imageUrl;
   }
 
   close(): void {

@@ -9,11 +9,13 @@ public class FeatureBugReportService
 {
     private readonly ApplicationDbContext _context;
     private readonly IPushNotificationSender _push;
+    private readonly IFileStorageService _fileStorage;
 
-    public FeatureBugReportService(ApplicationDbContext context, IPushNotificationSender push)
+    public FeatureBugReportService(ApplicationDbContext context, IPushNotificationSender push, IFileStorageService fileStorage)
     {
         _context = context;
         _push = push;
+        _fileStorage = fileStorage;
     }
 
     // ── Queries ────────────────────────────────────────────────────────────
@@ -59,8 +61,15 @@ public class FeatureBugReportService
 
     // ── Commands ───────────────────────────────────────────────────────────
 
-    public async Task<FeatureBugReportResponseDto> CreateAsync(int userId, CreateFeatureBugReportRequest request)
+    public async Task<FeatureBugReportResponseDto> CreateAsync(int userId, CreateFeatureBugReportRequest request, IFormFile? image = null)
     {
+        int? imageFileId = null;
+        if (image != null)
+        {
+            var (fileId, _) = await _fileStorage.UploadAsync(image, "reports", userId);
+            imageFileId = fileId;
+        }
+
         var report = new Models.FeatureBugReport
         {
             Title = request.Title,
@@ -69,6 +78,7 @@ public class FeatureBugReportService
             Priority = request.Priority,
             Status = ReportStatus.New,
             SubmittedByUserId = userId,
+            ImageFileId = imageFileId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -190,6 +200,7 @@ public class FeatureBugReportService
         r.SubmittedByUserId,
         $"{r.SubmittedByUser.FirstName} {r.SubmittedByUser.LastName}",
         r.CreatedAt,  // maps to SubmittedAt in DTO
-        r.UpdatedAt
+        r.UpdatedAt,
+        r.ImageFileId.HasValue ? $"/api/files/{r.ImageFileId.Value}" : null
     );
 }

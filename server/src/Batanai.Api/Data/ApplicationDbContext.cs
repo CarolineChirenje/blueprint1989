@@ -428,6 +428,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(r => r.Description).IsRequired().HasMaxLength(2000);
             entity.Property(r => r.VersionNumber).HasMaxLength(20);
             entity.HasOne(r => r.SubmittedByUser).WithMany().HasForeignKey(r => r.SubmittedByUserId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(r => r.ImageFile).WithMany().HasForeignKey(r => r.ImageFileId).OnDelete(DeleteBehavior.SetNull);
         });
     }
 

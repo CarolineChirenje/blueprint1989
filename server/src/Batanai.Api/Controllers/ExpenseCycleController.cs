@@ -204,6 +204,20 @@ public class ExpenseCycleController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Adds multiple users to a cycle in a single operation.</summary>
+    [HttpPost("{id:int}/members/batch")]
+    public async Task<IActionResult> AddMembersBatch(int id, [FromBody] AddMembersBatchRequest request)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var userId = GetCurrentUserId();
+        var (addedUserIds, error) = await _cycleService.AddMembersBatchAsync(id, request.UserIds, userId ?? 0);
+        if (error != null)
+            return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
+
+        return Ok(new { addedUserIds });
+    }
+
     /// <summary>Removes a user from a cycle. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
     [HttpDelete("{id:int}/members/{userId:int}")]
     public async Task<IActionResult> RemoveMember(int id, int userId)

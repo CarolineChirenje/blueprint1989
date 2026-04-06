@@ -52,6 +52,21 @@
       }
     </mat-form-field>
 
+    <div class="image-upload">
+      <label class="upload-label">Screenshot (optional)</label>
+      <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" #fileInput hidden>
+      @if (!imagePreview) {
+        <button type="button" mat-stroked-button (click)="fileInput.click()">Attach Image</button>
+      } @else {
+        <div class="image-preview-wrap">
+          <img [src]="imagePreview" alt="Preview" class="image-preview">
+          <button type="button" mat-icon-button class="remove-image-btn" (click)="removeImage()" title="Remove image">
+            <span class="remove-icon">&times;</span>
+          </button>
+        </div>
+      }
+    </div>
+
     <div class="dialog-actions">
       <button mat-button type="button" (click)="cancel()">Cancel</button>
       <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isSubmitting">

@@ -45,14 +45,30 @@
       </div>
     </div>
 
-    <!-- Prompt to add members for newly created Draft cycles -->
-    @if (isDraft() && canManageCycle() && cycle.members.length < 2) {
-      <div class="add-members-banner">
-        <mat-icon>group_add</mat-icon>
-        <span>Add members to get started with this cycle.</span>
-        <button mat-stroked-button color="primary" (click)="activeTab = 'members'">
-          <mat-icon>person_add</mat-icon> Add Members
-        </button>
+    <!-- Draft setup checklist -->
+    @if (isDraft() && canManageCycle()) {
+      <div class="draft-checklist">
+        <h3><mat-icon>checklist</mat-icon> Setup Checklist</h3>
+        <div class="check-item" [class.done]="cycle.members.length >= 2">
+          <mat-icon>{{ cycle.members.length >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          <span>Add members ({{ cycle.members.length }}/2 minimum)</span>
+          @if (cycle.members.length < 2) {
+            <button mat-stroked-button color="primary" (click)="activeTab = 'members'">Add</button>
+          }
+        </div>
+        @if (isMukando) {
+          <div class="check-item" [class.done]="rounds.length > 0">
+            <mat-icon>{{ rounds.length > 0 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>Payout order set</span>
+            @if (rounds.length === 0) {
+              <button mat-stroked-button color="primary" (click)="activeTab = 'order'">Set Order</button>
+            }
+          </div>
+        }
+        <div class="check-item">
+          <mat-icon>radio_button_unchecked</mat-icon>
+          <span>Start cycle</span>
+        </div>
       </div>
     }
 
@@ -787,6 +803,19 @@
                     (click)="addCycleMember()">
               <mat-icon>person_add</mat-icon> Add
             </button>
+            @if (addableMembers.length > 1) {
+              <button mat-stroked-button color="primary"
+                      [disabled]="addingMember"
+                      (click)="addAllMembers()">
+                <mat-icon>group_add</mat-icon> Add All ({{ addableMembers.length }})
+              </button>
+            }
+          </div>
+        }
+        @if (isMukando && isDraft() && cycle.members.length >= 2) {
+          <div class="mukando-draft-preview">
+            <mat-icon>info_outline</mat-icon>
+            <span>{{ cycle.members.length }} rounds · Pool per round: {{ currencySymbol }}{{ poolPerRound | number:'1.2-2' }}</span>
           </div>
         }
         <div class="member-list">

@@ -118,7 +118,7 @@ export class GroupDetailComponent implements OnInit {
       data: { groupId: this.group.id }
     });
     ref.afterClosed().subscribe(result => {
-      if (result) this.router.navigate(['/cycles', result]);
+      if (result) this.router.navigate(['/cycles', result], { queryParams: { tab: 'members' } });
     });
   }
 

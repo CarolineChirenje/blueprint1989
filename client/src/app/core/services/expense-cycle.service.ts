@@ -83,6 +83,10 @@ export class ExpenseCycleService {
     return this.http.post<void>(`${this.url}/${cycleId}/members/${userId}`, {});
   }
 
+  addMembersBatch(cycleId: number, userIds: number[]): Observable<{ addedUserIds: number[] }> {
+    return this.http.post<{ addedUserIds: number[] }>(`${this.url}/${cycleId}/members/batch`, { userIds });
+  }
+
   removeMember(cycleId: number, userId: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${cycleId}/members/${userId}`);
   }

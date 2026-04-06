@@ -40,8 +40,17 @@ export class FeatureBugReportService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  create(body: CreateFeatureBugReportRequest): Observable<FeatureBugReportResponseDto> {
-    return this.http.post<FeatureBugReportResponseDto>(this.apiUrl, body);
+  create(body: CreateFeatureBugReportRequest, image?: File): Observable<FeatureBugReportResponseDto> {
+    const formData = new FormData();
+    formData.append('title', body.title);
+    formData.append('description', body.description);
+    formData.append('type', body.type);
+    formData.append('priority', body.priority);
+    body.categories.forEach(cat => formData.append('categories', cat));
+    if (image) {
+      formData.append('image', image);
+    }
+    return this.http.post<FeatureBugReportResponseDto>(this.apiUrl, formData);
   }
 
   update(id: number, body: UpdateFeatureBugReportRequest): Observable<FeatureBugReportResponseDto> {

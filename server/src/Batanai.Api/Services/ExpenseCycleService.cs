@@ -467,6 +467,20 @@ public class ExpenseCycleService
 
         cycle.Status    = CycleStatus.Active;
         cycle.UpdatedAt = DateTime.UtcNow;
+
+        // Mukando: validate rounds exist before activating
+        if (cycle.CycleType == CycleType.Mukando)
+        {
+            var roundCount = await _context.MukandoRounds.CountAsync(r => r.ExpenseCycleId == cycleId);
+            if (roundCount == 0)
+            {
+                // Don't persist the status change
+                _context.Entry(cycle).Property(c => c.Status).IsModified = false;
+                _context.Entry(cycle).Property(c => c.UpdatedAt).IsModified = false;
+                return (null, "Cannot start Mukando cycle: no rounds exist. Ensure members have been added.");
+            }
+        }
+
         await _context.SaveChangesAsync();
 
         var memberIds = await _context.CycleMembers
@@ -478,25 +492,25 @@ public class ExpenseCycleService
             var firstRound = await _context.MukandoRounds
                 .Where(r => r.ExpenseCycleId == cycleId && r.RoundNumber == 1)
                 .FirstOrDefaultAsync();
-            if (firstRound != null)
-            {
-                firstRound.Status = RoundStatus.Active;
-                firstRound.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
+            if (firstRound == null)
+                return (null, "Cannot start Mukando cycle: round 1 not found.");
 
-                var recipient = await _context.Users.FindAsync(firstRound.RecipientUserId);
-                var currency = await _context.Currencies.FindAsync(cycle.CurrencyId);
-                var symbol = currency?.Symbol ?? "$";
-                var recipientName = recipient != null ? $"{recipient.FirstName} {recipient.LastName}" : "Unknown";
+            firstRound.Status = RoundStatus.Active;
+            firstRound.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
 
-                await _push.SendToUsersAsync(
-                    memberIds,
-                    NotificationType.MukandoRoundStarted,
-                    $"Mukando started: {cycle.Name}",
-                    $"Round 1 has started. {recipientName} receives this round. Contribute {symbol}{cycle.ContributionAmount:F2} by {firstRound.DueDate:MMM d, yyyy}.",
-                    $"/cycles/{cycleId}",
-                    cycleId);
-            }
+            var recipient = await _context.Users.FindAsync(firstRound.RecipientUserId);
+            var currency = await _context.Currencies.FindAsync(cycle.CurrencyId);
+            var symbol = currency?.Symbol ?? "$";
+            var recipientName = recipient != null ? $"{recipient.FirstName} {recipient.LastName}" : "Unknown";
+
+            await _push.SendToUsersAsync(
+                memberIds,
+                NotificationType.MukandoRoundStarted,
+                $"Mukando started: {cycle.Name}",
+                $"Round 1 has started. {recipientName} receives this round. Contribute {symbol}{cycle.ContributionAmount:F2} by {firstRound.DueDate:MMM d, yyyy}.",
+                $"/cycles/{cycleId}",
+                cycleId);
         }
         else
         {
@@ -637,6 +651,58 @@ public class ExpenseCycleService
             await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
 
         return null;
+    }
+
+    public async Task<(List<int>? addedUserIds, string? error)> AddMembersBatchAsync(int cycleId, List<int> userIds, int requestedByUserId)
+    {
+        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
+        if (cycle == null) return (null, "Cycle not found.");
+        if (cycle.Status != CycleStatus.Draft) return (null, "Cannot add members to an active or closed cycle.");
+
+        if (userIds == null || userIds.Count == 0)
+            return (null, "No user IDs provided.");
+
+        var existingMemberIds = await _context.CycleMembers
+            .Where(m => m.ExpenseCycleId == cycleId)
+            .Select(m => m.UserId)
+            .ToListAsync();
+        var existingSet = new HashSet<int>(existingMemberIds);
+
+        var newUserIds = userIds.Where(uid => !existingSet.Contains(uid)).Distinct().ToList();
+        if (newUserIds.Count == 0)
+            return (new List<int>(), null);
+
+        foreach (var uid in newUserIds)
+        {
+            _context.CycleMembers.Add(new CycleMember
+            {
+                ExpenseCycleId = cycleId,
+                UserId         = uid,
+                AddedAt        = DateTime.UtcNow
+            });
+        }
+        await _context.SaveChangesAsync();
+
+        // Notify all newly added members in a single batch
+        var notifyIds = newUserIds.Where(uid => uid != requestedByUserId).ToList();
+        if (notifyIds.Count > 0)
+        {
+            var group = await _context.Groups.FindAsync(cycle.GroupId);
+            var groupName = group?.Name ?? "your group";
+            await _push.SendToUsersAsync(
+                notifyIds,
+                NotificationType.CycleMemberAdded,
+                $"Added to {cycle.Name}",
+                $"You have been added to the {cycle.Name} cycle in {groupName}.",
+                $"/cycles/{cycleId}",
+                cycleId);
+        }
+
+        // Mukando: regenerate rounds once after all members added
+        if (cycle.CycleType == CycleType.Mukando)
+            await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
+
+        return (newUserIds, null);
     }
 
     public async Task<string?> RemoveMemberAsync(int cycleId, int userId)

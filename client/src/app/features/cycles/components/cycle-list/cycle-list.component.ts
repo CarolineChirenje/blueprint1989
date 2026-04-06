@@ -64,7 +64,7 @@ export class CycleListComponent implements OnInit {
   openCreate(): void {
     const ref = this.dialog.open(CreateCycleDialogComponent, { width: '520px', maxHeight: '90vh' });
     ref.afterClosed().subscribe(result => {
-      if (result) this.router.navigate(['/cycles', result]);
+      if (result) this.router.navigate(['/cycles', result], { queryParams: { tab: 'members' } });
     });
   }
 
