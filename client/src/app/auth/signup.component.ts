@@ -71,6 +71,7 @@ export class SignupComponent implements OnInit {
   }
 
   submit(): void {
+    this.signupForm.markAllAsTouched();
     if (this.signupForm.invalid || this.isSubmitting) return;
     this.isSubmitting = true;
     const v = this.signupForm.value;
