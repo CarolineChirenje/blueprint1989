@@ -17,7 +17,6 @@ export class SignupComponent implements OnInit {
   isSubmitting: boolean = false;
   newUserId: number | null = null;
   skipMfaToken: string | null = null;
-  debugLog: string[] = [];
 
   readonly Role = Role;
 
@@ -72,17 +71,9 @@ export class SignupComponent implements OnInit {
   }
 
   submit(): void {
-    this.debugLog.unshift('TAP');
-    this.cdr.detectChanges();
     this.signupForm.markAllAsTouched();
-    if (this.signupForm.invalid || this.isSubmitting) {
-      this.debugLog.unshift(`INVALID:${JSON.stringify(Object.keys(this.signupForm.controls).filter(k=>this.signupForm.get(k)?.invalid))}`);
-      this.cdr.detectChanges();
-      return;
-    }
+    if (this.signupForm.invalid || this.isSubmitting) return;
     this.isSubmitting = true;
-    this.debugLog.unshift('HTTP_START');
-    this.cdr.detectChanges();
     const v = this.signupForm.value;
 
     this.auth.signup({
@@ -94,7 +85,6 @@ export class SignupComponent implements OnInit {
       adminPin:  this.isAdmin ? v.adminPin : undefined
     }).subscribe({
       next: (res) => {
-        this.debugLog.unshift('HTTP_OK');
         this.signupSuccess = true;
         this.newUserId = res?.userId ?? null;
         this.skipMfaToken = res?.skipMfaToken ?? null;
@@ -104,7 +94,6 @@ export class SignupComponent implements OnInit {
       },
       error: (err) => {
         const msg = err.error?.message || err.message || err.status || JSON.stringify(err);
-        this.debugLog.unshift(`ERR:${msg}`);
         this.errorMsg = msg || 'Signup failed. Please try again.';
         this.signupSuccess = false;
         this.isSubmitting = false;

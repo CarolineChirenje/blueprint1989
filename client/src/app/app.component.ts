@@ -119,7 +119,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isBreakingUpdate = manifest
           ? (manifest.breaking === true || this.isVersionOlder(environment.version, manifest.minRequired))
           : false;
-        this.showUpdatePrompt = true;
+        if (!this.isAuthPage) this.showUpdatePrompt = true;
       });
       // Trigger an immediate check on startup (SW normally checks every 6 hours)
       this.swUpdate.checkForUpdate();
@@ -198,7 +198,17 @@ export class AppComponent implements OnInit, OnDestroy {
           this.navProgressVisible = true;
         } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
           this.navProgressVisible = false;
-          if (event instanceof NavigationEnd) this.routeCounter++;
+          if (event instanceof NavigationEnd) {
+            this.routeCounter++;
+            // Hide install and update banners on auth pages — they overlay buttons
+            const url = (event as NavigationEnd).urlAfterRedirects;
+            if (url.startsWith('/login') || url.startsWith('/signup') ||
+                url.startsWith('/register') || url.startsWith('/forgot-password') ||
+                url.startsWith('/reset-password') || url.startsWith('/verify-email')) {
+              this.showInstallBanner = false;
+              this.showUpdatePrompt = false;
+            }
+          }
         }
       })
     );
@@ -295,6 +305,9 @@ export class AppComponent implements OnInit, OnDestroy {
     // Only show on mobile/tablet devices
     if (!DeviceService.isMobileOrTablet) return;
 
+    // Never show on auth pages — fixed banners overlap form buttons
+    if (this.isAuthPage) return;
+
     const status = this.deviceService.currentInstallStatus;
     if (status === InstallPromptStatus.Installed) return;
     if (status === InstallPromptStatus.NeverAskAgain) return;
@@ -370,7 +383,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (!manifest) return;
     if (this.isVersionOlder(environment.version, manifest.minRequired)) {
       this.isBreakingUpdate = true;
-      this.showUpdatePrompt = true;
+      if (!this.isAuthPage) this.showUpdatePrompt = true;
     }
   }
 

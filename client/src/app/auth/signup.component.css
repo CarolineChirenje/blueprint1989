@@ -4,12 +4,16 @@
 .signup-page {
   margin: -2rem;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 2rem 1rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px) + 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .signup-card {
@@ -26,7 +30,12 @@
 }
 
 @media (max-width: 520px) {
-  .signup-page { margin: -1rem; padding: 1.25rem 0.85rem; }
+  .signup-page {
+    margin: -1rem;
+    padding: 1.25rem 0.85rem;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px) + 80px);
+    justify-content: flex-start;
+  }
   .signup-card { padding: 1.5rem; border-radius: var(--radius-md); }
 }
 
@@ -401,14 +410,20 @@
 
 .submit-btn {
   margin-top: 1.5rem;
+  margin-bottom: 1rem;
   width: 100%;
   padding: 0.85rem;
+  min-height: 48px;
   /* font-family and font-size inherited from the shared rule above */
   font-weight: 600;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .submit-btn-blue {
@@ -437,6 +452,11 @@
 .submit-btn-blue.form-ready:hover:not(:disabled) {
   background: #145229;
   transform: translateY(-1px);
+}
+
+.submit-btn-blue:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.05s;
 }
 
 /* ─── Conditions / Medication signup styles ─────────────────────────────── */

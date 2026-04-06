@@ -5,6 +5,27 @@
 @import '@fontsource/inter/latin-600.css';
 @import '@fontsource/inter/latin-700.css';
 
+/*
+ * Safety: hide fixed PWA banners when auth pages are displayed.
+ * These banners (z-index:9999, position:fixed, bottom:0) can cover form buttons.
+ * The JS also hides them, but this catches race conditions on first paint.
+ */
+body:has(app-signup) .pwa-install-banner,
+body:has(app-signup) .pwa-update-banner,
+body:has(app-login) .pwa-install-banner,
+body:has(app-login) .pwa-update-banner,
+body:has(app-forgot-password) .pwa-install-banner,
+body:has(app-forgot-password) .pwa-update-banner,
+body:has(app-reset-password) .pwa-install-banner,
+body:has(app-reset-password) .pwa-update-banner {
+  display: none !important;
+}
+
+/* Ensure all form controls/buttons on auth pages receive touch events */
+app-signup, app-login, app-signup *, app-login * {
+  touch-action: manipulation;
+}
+
 /* ── Shepherd.js Tour Theme (batanaiBlue) ───────────────────────────────── */
 .shepherd-has-cancel-icon .shepherd-cancel-icon {
   color: #666;

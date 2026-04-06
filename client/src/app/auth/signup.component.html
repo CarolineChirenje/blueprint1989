@@ -106,12 +106,6 @@
             </div>
           }
 
-          @if (debugLog.length) {
-            <div style="margin-top:0.75rem;padding:0.5rem 0.75rem;background:#111;color:#0f0;font-size:12px;border-radius:6px;font-family:monospace;">
-              @for (line of debugLog; track $index) { <div>{{ line }}</div> }
-            </div>
-          }
-
           <button
             type="button"
             class="submit-btn submit-btn-blue"
@@ -119,7 +113,7 @@
             [disabled]="isSubmitting"
             (click)="submit()"
           >
-            {{ isSubmitting ? 'Creating Account...' : (debugLog.length ? debugLog[0] : 'Create Account') }}
+            {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
           </button>
         }
 
