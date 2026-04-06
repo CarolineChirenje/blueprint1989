@@ -259,7 +259,7 @@ public class MukandoService
             round.ExpenseCycleId);
 
         // Activate next round or complete cycle
-        await ActivateNextRoundOrCompleteCycleAsync(round.ExpenseCycleId);
+        await ActivateNextRoundOrCompleteCycleAsync(round.ExpenseCycleId, adminUserId);
 
         return null;
     }
@@ -294,7 +294,7 @@ public class MukandoService
         return null; // Admin must still record payout separately
     }
 
-    private async Task ActivateNextRoundOrCompleteCycleAsync(int cycleId)
+    private async Task ActivateNextRoundOrCompleteCycleAsync(int cycleId, int triggeredByUserId)
     {
         var nextRound = await _context.MukandoRounds
             .Where(r => r.ExpenseCycleId == cycleId && r.Status == RoundStatus.Pending)
@@ -307,7 +307,7 @@ public class MukandoService
             nextRound.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            await LogActivityAsync(nextRound.Id, 0, RoundActivityAction.RoundActivated,
+            await LogActivityAsync(nextRound.Id, triggeredByUserId, RoundActivityAction.RoundActivated,
                 $"Round {nextRound.RoundNumber} activated automatically");
 
             var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
