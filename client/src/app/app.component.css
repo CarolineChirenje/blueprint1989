@@ -1181,6 +1181,10 @@ footer p {
     align-items: stretch;
     gap: 6px;
     padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+    max-width: 100vw;
+    width: 100%;
   }
 
   .pwa-update-icon {
@@ -1204,30 +1208,38 @@ footer p {
   .pwa-update-actions {
     flex-shrink: unset;
     width: 100%;
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 6px;
+    box-sizing: border-box;
   }
 
   .pwa-update-btn {
-    flex: 1;
+    flex: none;
+    width: 100%;
     text-align: center;
-    padding: 7px 10px;
-    font-size: 0.82rem;
+    padding: 10px;
+    font-size: 0.88rem;
+    box-sizing: border-box;
   }
 
   .pwa-update-later-btn {
     flex: 1;
+    min-width: 0;
     text-align: center;
     padding: 6px 10px;
     font-size: 0.8rem;
+    box-sizing: border-box;
   }
 
   .pwa-whats-new-btn {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     text-align: center;
-    padding: 2px 0;
+    padding: 6px 4px;
     font-size: 0.78rem;
+    box-sizing: border-box;
   }
 }
 

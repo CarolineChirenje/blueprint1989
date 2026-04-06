@@ -204,7 +204,8 @@ loginWithBiometric() {
       lastName: r.lastName,
       role: r.role,
       isMfaEnabled: r.isMfaEnabled,
-      mfaEnabledAt: r.mfaEnabledAt
+      mfaEnabledAt: r.mfaEnabledAt,
+      tourCompleted: r.tourCompleted
     }, rememberMe);
     // Auto-subscribe to push notifications on login (silently fails if denied)
     this.pushNotifications.subscribeToServer().catch(() => {});
@@ -230,7 +231,8 @@ loginWithBiometric() {
         lastName: r.lastName,
         role: r.role,
         isMfaEnabled: r.isMfaEnabled,
-        mfaEnabledAt: r.mfaEnabledAt
+        mfaEnabledAt: r.mfaEnabledAt,
+        tourCompleted: r.tourCompleted
       });
       // Auto-subscribe to push notifications on MFA login (silently fails if denied)
       this.pushNotifications.subscribeToServer().catch(() => {});
