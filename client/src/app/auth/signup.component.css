@@ -412,23 +412,31 @@
 }
 
 .submit-btn-blue {
-  background: var(--primary);
+  background: #1565C0;
   color: white;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.1s;
 }
 
-.submit-btn-blue:hover:not(:disabled) {
-  background: var(--primary-hover);
+.submit-btn-blue:hover:not(:disabled):not(.form-ready) {
+  background: #0D47A1;
   transform: translateY(-1px);
 }
 
 .submit-btn-blue:disabled {
-  background: var(--primary-light);
+  background: #90CAF9;
+  color: #fff;
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .submit-btn-blue.form-ready {
   background: #1a5c36;
   box-shadow: 0 0 0 3px rgba(26, 92, 54, 0.25);
+}
+
+.submit-btn-blue.form-ready:hover:not(:disabled) {
+  background: #145229;
+  transform: translateY(-1px);
 }
 
 /* ─── Conditions / Medication signup styles ─────────────────────────────── */
