@@ -62,14 +62,14 @@ export class CycleDetailComponent implements OnInit {
   roundActivities: MukandoRoundActivityDto[] = [];
   swapRequests: MukandoSwapRequestDto[] = [];
   optOutRequests: OptOutRequestDto[] = [];
-  contributionProofUrl = '';
+  contributionProofFile: File | null = null;
   contributionReference = '';
   contributionUploading = false;
   contributionUploadError = '';
   contributionFileName = '';
   payoutAmount: number | null = null;
   payoutMethod = '';
-  payoutProofUrl = '';
+  payoutProofFile: File | null = null;
   payoutReference = '';
   payoutUploading = false;
   payoutUploadError = '';
@@ -424,7 +424,7 @@ export class CycleDetailComponent implements OnInit {
 
     this.contributionUploadError = '';
     this.contributionFileName = '';
-    this.contributionProofUrl = '';
+    this.contributionProofFile = null;
 
     if (file.size > this.MAX_FILE_SIZE) {
       this.contributionUploadError = 'File exceeds the 5 MB limit.';
@@ -435,20 +435,8 @@ export class CycleDetailComponent implements OnInit {
       return;
     }
 
-    this.contributionUploading = true;
-    this.cycleService.uploadFile(file, 'proofs').subscribe({
-      next: res => {
-        this.contributionProofUrl = res.url;
-        this.contributionFileName = file.name;
-        this.contributionUploading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.contributionUploadError = 'Upload failed. Please try again.';
-        this.contributionUploading = false;
-        this.cdr.detectChanges();
-      }
-    });
+    this.contributionProofFile = file;
+    this.contributionFileName = file.name;
   }
 
   onPayoutFileSelected(event: Event): void {
@@ -459,7 +447,7 @@ export class CycleDetailComponent implements OnInit {
 
     this.payoutUploadError = '';
     this.payoutFileName = '';
-    this.payoutProofUrl = '';
+    this.payoutProofFile = null;
 
     if (file.size > this.MAX_FILE_SIZE) {
       this.payoutUploadError = 'File exceeds the 5 MB limit.';
@@ -470,36 +458,28 @@ export class CycleDetailComponent implements OnInit {
       return;
     }
 
-    this.payoutUploading = true;
-    this.cycleService.uploadFile(file, 'proofs').subscribe({
-      next: res => {
-        this.payoutProofUrl = res.url;
-        this.payoutFileName = file.name;
-        this.payoutUploading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.payoutUploadError = 'Upload failed. Please try again.';
-        this.payoutUploading = false;
-        this.cdr.detectChanges();
-      }
-    });
+    this.payoutProofFile = file;
+    this.payoutFileName = file.name;
   }
 
   recordContribution(roundId: number): void {
-    if (!this.cycle || !this.contributionProofUrl) return;
+    if (!this.cycle || !this.contributionProofFile) return;
+    this.contributionUploading = true;
     this.cycleService.recordContribution(this.cycle.id, roundId, {
-      proofUrl: this.contributionProofUrl,
       reference: this.contributionReference || undefined
-    }).subscribe({
+    }, this.contributionProofFile).subscribe({
       next: () => {
-        this.contributionProofUrl = '';
+        this.contributionProofFile = null;
         this.contributionReference = '';
         this.contributionFileName = '';
+        this.contributionUploading = false;
         this.snackBar.open('Contribution recorded.', 'OK', { duration: 3000 });
         this.selectRound(this.selectedRound!);
       },
-      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+      error: err => {
+        this.contributionUploading = false;
+        this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 });
+      }
     });
   }
 
@@ -516,25 +496,29 @@ export class CycleDetailComponent implements OnInit {
   }
 
   recordPayout(roundId: number): void {
-    if (!this.cycle || !this.payoutProofUrl || !this.payoutAmount || !this.payoutMethod) return;
+    if (!this.cycle || !this.payoutProofFile || !this.payoutAmount || !this.payoutMethod) return;
+    this.payoutUploading = true;
     this.cycleService.recordPayout(this.cycle.id, roundId, {
       amountDisbursed: this.payoutAmount,
       paymentMethod: this.payoutMethod,
-      proofUrl: this.payoutProofUrl,
       reference: this.payoutReference || undefined
-    }).subscribe({
+    }, this.payoutProofFile).subscribe({
       next: () => {
         this.payoutAmount = null;
         this.payoutMethod = '';
-        this.payoutProofUrl = '';
+        this.payoutProofFile = null;
         this.payoutReference = '';
         this.payoutFileName = '';
+        this.payoutUploading = false;
         this.snackBar.open('Payout recorded.', 'OK', { duration: 3000 });
         this.loadRounds();
         this.loadMukandoSummary();
         this.selectedRound = null;
       },
-      error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+      error: err => {
+        this.payoutUploading = false;
+        this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 });
+      }
     });
   }
 

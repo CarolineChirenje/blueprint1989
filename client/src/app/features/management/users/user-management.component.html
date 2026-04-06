@@ -11,7 +11,7 @@
     </div>
 
     <div class="table-scroll">
-    <table mat-table [dataSource]="users" class="shared-table" *ngIf="!isLoading">
+    <table id="users-table" mat-table [dataSource]="users" class="shared-table" *ngIf="!isLoading">
 
       <ng-container matColumnDef="fullName">
         <th mat-header-cell *matHeaderCellDef>Name</th>

@@ -14,12 +14,14 @@ public class ExpenseCycleController : ControllerBase
     private readonly ExpenseCycleService _cycleService;
     private readonly MukandoService      _mukandoService;
     private readonly IGroupService _groupService;
+    private readonly IFileStorageService _fileStorage;
 
-    public ExpenseCycleController(ExpenseCycleService cycleService, MukandoService mukandoService, IGroupService groupService)
+    public ExpenseCycleController(ExpenseCycleService cycleService, MukandoService mukandoService, IGroupService groupService, IFileStorageService fileStorage)
     {
         _cycleService   = cycleService;
         _mukandoService = mukandoService;
         _groupService   = groupService;
+        _fileStorage    = fileStorage;
     }
 
     private int? GetCurrentUserId()
@@ -261,14 +263,31 @@ public class ExpenseCycleController : ControllerBase
         return Ok(payout);
     }
 
-    /// <summary>Member records their contribution for a round (with proof URL).</summary>
+    /// <summary>Member records their contribution for a round (with proof file).</summary>
     [HttpPost("{id:int}/rounds/{roundId:int}/contribute")]
-    public async Task<IActionResult> RecordContribution(int id, int roundId, [FromBody] RecordContributionRequest request)
+    [RequestSizeLimit(6 * 1024 * 1024)]
+    public async Task<IActionResult> RecordContribution(int id, int roundId, [FromForm] RecordContributionRequest request, IFormFile? proof)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
 
-        var error = await _mukandoService.RecordContributionAsync(roundId, userId.Value, request);
+        // Upload proof file if provided
+        string? proofUrl = request.ProofUrl;
+        if (proof != null && proof.Length > 0)
+        {
+            try
+            {
+                var (fileId, _) = await _fileStorage.UploadAsync(proof, "proofs", userId.Value);
+                proofUrl = $"/api/files/{fileId}";
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        var req = request with { ProofUrl = proofUrl ?? "" };
+        var error = await _mukandoService.RecordContributionAsync(roundId, userId.Value, req);
         if (error != null) return BadRequest(new { message = error });
         return NoContent();
     }
@@ -289,14 +308,31 @@ public class ExpenseCycleController : ControllerBase
 
     /// <summary>Admin records payout to round recipient (with proof).</summary>
     [HttpPost("{id:int}/rounds/{roundId:int}/payout")]
-    public async Task<IActionResult> RecordPayout(int id, int roundId, [FromBody] RecordPayoutRequest request)
+    [RequestSizeLimit(6 * 1024 * 1024)]
+    public async Task<IActionResult> RecordPayout(int id, int roundId, [FromForm] RecordPayoutRequest request, IFormFile? proof)
     {
         if (!await CanManageCycleAsync(id)) return Forbid();
 
         var adminId = GetCurrentUserId();
         if (adminId == null) return Unauthorized();
 
-        var error = await _mukandoService.RecordPayoutAsync(roundId, adminId.Value, request);
+        // Upload proof file if provided
+        string? proofUrl = request.ProofUrl;
+        if (proof != null && proof.Length > 0)
+        {
+            try
+            {
+                var (fileId, _) = await _fileStorage.UploadAsync(proof, "proofs", adminId.Value);
+                proofUrl = $"/api/files/{fileId}";
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        var req = request with { ProofUrl = proofUrl ?? "" };
+        var error = await _mukandoService.RecordPayoutAsync(roundId, adminId.Value, req);
         if (error != null) return BadRequest(new { message = error });
         return NoContent();
     }

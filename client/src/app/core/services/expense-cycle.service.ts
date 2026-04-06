@@ -115,16 +115,25 @@ export class ExpenseCycleService {
     return this.http.get<MukandoPayoutDto>(`${this.url}/${cycleId}/rounds/${roundId}/payout`);
   }
 
-  recordContribution(cycleId: number, roundId: number, payload: { proofUrl: string; reference?: string; notes?: string }): Observable<void> {
-    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/contribute`, payload);
+  recordContribution(cycleId: number, roundId: number, payload: { reference?: string; notes?: string }, proof?: File): Observable<void> {
+    const formData = new FormData();
+    if (payload.reference) formData.append('reference', payload.reference);
+    if (payload.notes) formData.append('notes', payload.notes);
+    if (proof) formData.append('proof', proof);
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/contribute`, formData);
   }
 
   confirmContribution(cycleId: number, roundId: number, memberId: number): Observable<void> {
     return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/confirm-contribution/${memberId}`, {});
   }
 
-  recordPayout(cycleId: number, roundId: number, payload: { amountDisbursed: number; paymentMethod: string; proofUrl: string; reference?: string }): Observable<void> {
-    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/payout`, payload);
+  recordPayout(cycleId: number, roundId: number, payload: { amountDisbursed: number; paymentMethod: string; reference?: string }, proof?: File): Observable<void> {
+    const formData = new FormData();
+    formData.append('amountDisbursed', payload.amountDisbursed.toString());
+    formData.append('paymentMethod', payload.paymentMethod);
+    if (payload.reference) formData.append('reference', payload.reference);
+    if (proof) formData.append('proof', proof);
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/payout`, formData);
   }
 
   forceCloseRound(cycleId: number, roundId: number): Observable<void> {

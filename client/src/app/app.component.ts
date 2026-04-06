@@ -17,6 +17,7 @@ import { SyncService } from './core/services/sync.service';
 import { SystemService } from './shared/services/system.service';
 import { DialogService } from './shared/services/dialog.service';
 import { GroupService } from './core/services/group.service';
+import { TourService } from './core/services/tour.service';
 
 type BellNotificationItem = {
   ids: number[];
@@ -99,7 +100,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private systemService: SystemService,
     private dialogService: DialogService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private tourService: TourService
   ) {}
   
   ngOnInit() {
@@ -177,6 +179,15 @@ export class AppComponent implements OnInit, OnDestroy {
         this.initPush();
         this.registerDevice();
         this.loadGroupAccess();
+
+        // Auto-start onboarding tour on first login (dashboard only)
+        const navEnd = event as NavigationEnd;
+        if (navEnd.urlAfterRedirects === '/dashboard' && !this.tourService.isTourCompleted()) {
+          setTimeout(() => {
+            const role = this.auth.getUserRole() || 'Member';
+            this.tourService.startTour(role);
+          }, 600);
+        }
       }
     });
 
@@ -832,6 +843,8 @@ export class AppComponent implements OnInit, OnDestroy {
   /** Called from the Help → Take a Tour menu item. Always relaunches, ignoring completion flag. */
   startTour(): void {
     this.helpDropdownOpen = false;
+    const role = this.auth.getUserRole() || 'Member';
+    this.tourService.startTour(role);
   }
 
   navigateToBglReading(): void {

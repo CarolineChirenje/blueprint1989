@@ -113,7 +113,8 @@ namespace Batanai.Api.Controllers
                 IsMfaEnabled = user.IsMfaEnabled,
                 MfaEnabledAt = _timeZoneService.ConvertFromUtc(user.MfaEnabledAt),
                 MfaTempToken = requiresMfa ? GenerateTempToken(user.Id) : null,
-                PasswordExpired = passwordExpired
+                PasswordExpired = passwordExpired,
+                TourCompleted = user.TourCompletedAt != null
             };
 
             return Ok(response);
@@ -148,7 +149,8 @@ namespace Batanai.Api.Controllers
                 IsMfaEnabled = authenticatedUser?.IsMfaEnabled ?? false,
                 MfaEnabledAt = _timeZoneService.ConvertFromUtc(authenticatedUser?.MfaEnabledAt),
                 Token = token ?? string.Empty,
-                TokenExpiresAt = _timeZoneService.ConvertFromUtc(tokenExpiresAt)
+                TokenExpiresAt = _timeZoneService.ConvertFromUtc(tokenExpiresAt),
+                TourCompleted = authenticatedUser?.TourCompletedAt != null
             };
 
             return Ok(response);
@@ -180,7 +182,8 @@ namespace Batanai.Api.Controllers
                 TokenExpiresAt = _timeZoneService.ConvertFromUtc(tokenExpiresAt),
                 IsMfaEnabled = user.IsMfaEnabled,
                 MfaEnabledAt = _timeZoneService.ConvertFromUtc(user.MfaEnabledAt),
-                PasswordExpired = false
+                PasswordExpired = false,
+                TourCompleted = user.TourCompletedAt != null
             };
 
             return Ok(response);
@@ -281,7 +284,8 @@ namespace Batanai.Api.Controllers
                 IsMfaEnabled = user.IsMfaEnabled,
                 MfaEnabledAt = _timeZoneService.ConvertFromUtc(user.MfaEnabledAt),
                 MfaTempToken = null,
-                PasswordExpired = false
+                PasswordExpired = false,
+                TourCompleted = user.TourCompletedAt != null
             };
 
             return Ok(response);
@@ -323,7 +327,8 @@ namespace Batanai.Api.Controllers
                 IsMfaEnabled = user.IsMfaEnabled,
                 MfaEnabledAt = _timeZoneService.ConvertFromUtc(user.MfaEnabledAt),
                 MfaTempToken = null,
-                PasswordExpired = false
+                PasswordExpired = false,
+                TourCompleted = user.TourCompletedAt != null
             };
 
             return Ok(response);
@@ -461,7 +466,8 @@ namespace Batanai.Api.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                Token = token
+                Token = token,
+                TourCompleted = user.TourCompletedAt != null
             };
 
             return Ok(response);

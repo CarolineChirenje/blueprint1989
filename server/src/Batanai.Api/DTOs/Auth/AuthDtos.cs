@@ -67,6 +67,7 @@ public class AuthResponse
     public DateTime? MfaEnabledAt { get; set; }
     public string? MfaTempToken { get; set; }
     public bool PasswordExpired { get; set; } = false;
+    public bool TourCompleted { get; set; } = false;
 }
 
 public class SeenVersionRequest

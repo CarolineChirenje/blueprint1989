@@ -78,7 +78,7 @@ public class EmailTemplateService
       <div class=""cta-wrapper"">
         <a href=""{verificationUrl}"" class=""cta-button"">Verify Email</a>
       </div>
-      <p class=""fallback"">If the button doesn&apos;t work, copy and paste this link into your browser:<br />{verificationUrl}</p>
+      <p class=""fallback"">If the button does not work, copy and paste this link into your browser:<br />{verificationUrl}</p>
       <p>This link will expire in <strong>{validityHours} hours</strong>.</p>
       <div class=""security-note"">If you did not create a {appName} account, you can safely ignore this email.</div>";
 
@@ -96,7 +96,7 @@ This link will expire in {validityHours} hours.
 
 If you did not create a {appName} account, you can safely ignore this email.
 
-—
+ï¿½
 {appDisplayName}
 Keeping your account secure";
 
@@ -138,7 +138,7 @@ This link will expire in {validityMinutes} minutes for security reasons.
 
 If you did not request a password reset, you can safely ignore this email. Your account password remains unchanged.
 
-—
+ï¿½
 {appDisplayName}
 Keeping your account secure";
 
@@ -180,7 +180,7 @@ Your {appName} account password has been successfully updated. You can now log i
 {loginLine}
 If you did not make this change, please contact your system administrator immediately as your account security may be at risk.
 
-—
+ï¿½
 {appDisplayName}
 Security notification";
 

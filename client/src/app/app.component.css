@@ -108,9 +108,9 @@ nav {
   top: 100%;
   left: 0;
   min-width: 200px;
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   z-index: 1001;
   animation: dropdownFadeIn 0.2s ease;
@@ -147,7 +147,7 @@ nav {
 
 /* Management accordion groups */
 .mgmt-group {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--divider);
 }
 
 .mgmt-group:last-child {
@@ -221,7 +221,7 @@ nav {
 }
 
 .nav-dropdown-item--danger:hover {
-  background: #fdf2f2 !important;
+  background: var(--error-bg) !important;
   border-left-color: #c0392b !important;
 }
 
@@ -326,7 +326,7 @@ nav {
 
 .dropdown-divider {
   height: 1px;
-  background: #e9ecef;
+  background: var(--divider);
   margin: 0.25rem 0;
 }
 

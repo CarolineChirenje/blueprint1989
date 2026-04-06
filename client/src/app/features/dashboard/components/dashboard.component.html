@@ -7,12 +7,12 @@
     (pickCancelled)="onRecordPickerCancelled()">
   </app-record-type-picker>
 
-  <div class="welcome-section">
+  <div id="dashboard-greeting" class="welcome-section">
     <h1>{{ getGreeting() }}, {{ userName }}!</h1>
     <p class="current-time">{{ currentTime | date: 'fullDate' }} - {{ currentTime | date: 'shortTime' }}</p>
   </div>
 
-  <div class="obligations-section">
+  <div id="outstanding-balance-section" class="obligations-section">
     <h2>My Outstanding Balance</h2>
 
     <!-- Loading skeleton -->

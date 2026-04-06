@@ -212,6 +212,24 @@ export class AuthService {
     }
   }
 
+  isTourCompleted(): boolean {
+    const user = this.getUserInfo();
+    return user?.tourCompleted === true;
+  }
+
+  markTourCompletedLocally(): void {
+    const user = this.getUserInfo();
+    if (user) {
+      user.tourCompleted = true;
+      // Persist to whichever storage is active
+      if (localStorage.getItem(this.userKey)) {
+        localStorage.setItem(this.userKey, JSON.stringify(user));
+      } else {
+        sessionStorage.setItem(this.userKey, JSON.stringify(user));
+      }
+    }
+  }
+
   checkTokenExpiration(): void {
     // Only clear the stale token — do NOT navigate here.
     // Calling router.navigate() during service construction fires before Angular

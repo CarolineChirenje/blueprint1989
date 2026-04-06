@@ -19,6 +19,7 @@
   border: 1px solid var(--border) !important;
   max-width: 340px !important;
   font-family: inherit !important;
+  background: #ffffff !important;
 }
 
 .shepherd-element.shepherd-mobile {
@@ -44,7 +45,7 @@
 
 .shepherd-text {
   padding: 14px 16px !important;
-  color: var(--text-primary) !important;
+  color: #253128 !important;
   font-size: 0.9rem !important;
   line-height: 1.5 !important;
 }
@@ -54,6 +55,7 @@
   gap: 8px !important;
   display: flex !important;
   justify-content: flex-end !important;
+  background: #ffffff !important;
 }
 
 /* Primary (Next / Start / Done) */
@@ -83,13 +85,13 @@
   cursor: pointer !important;
 }
 .shepherd-btn-secondary:hover {
-  background: var(--primary-light) !important;
+  background: rgba(62, 180, 137, 0.1) !important;
 }
 
 /* Skip */
 .shepherd-btn-skip {
   background: transparent !important;
-  color: var(--text-secondary) !important;
+  color: #5F6B62 !important;
   border: none !important;
   padding: 6px 10px !important;
   font-size: 0.8rem !important;
@@ -97,7 +99,7 @@
   margin-right: auto !important;
 }
 .shepherd-btn-skip:hover {
-  color: var(--text-primary) !important;
+  color: #253128 !important;
   text-decoration: underline !important;
 }
 
@@ -161,6 +163,60 @@
   .shepherd-element:not(.shepherd-mobile) {
     max-width: 92vw !important;
   }
+  /* Touch-friendly buttons on mobile */
+  .shepherd-footer .shepherd-button,
+  .shepherd-btn-primary,
+  .shepherd-btn-secondary,
+  .shepherd-btn-skip {
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .shepherd-footer {
+    padding-bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Tablet: slightly wider tooltip, comfortable spacing */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .shepherd-element {
+    max-width: 380px !important;
+  }
+  .shepherd-text {
+    padding: 16px 18px !important;
+  }
+  .shepherd-footer .shepherd-button,
+  .shepherd-btn-primary,
+  .shepherd-btn-secondary {
+    min-height: 44px !important;
+    padding: 8px 20px !important;
+  }
+}
+
+/* Landscape phone: reduce padding so steps fit without scroll */
+@media (max-height: 500px) and (orientation: landscape) {
+  .shepherd-header {
+    padding: 10px 14px 8px !important;
+  }
+  .shepherd-title {
+    font-size: 0.9rem !important;
+  }
+  .shepherd-text {
+    padding: 8px 14px !important;
+    font-size: 0.82rem !important;
+  }
+  .shepherd-footer {
+    padding: 0 14px 8px !important;
+  }
+}
+
+/* Ensure tour sits above Angular Material overlays + mobile nav */
+.shepherd-element {
+  z-index: 10010 !important;
+}
+.shepherd-modal-overlay-container {
+  z-index: 10000 !important;
 }
 /* ─────────────────────────────────────────────────────────────────────────── */
 
@@ -927,6 +983,12 @@ tbody tr:last-child td {
   .mat-mdc-raised-button:not([color]) {
     background-color: var(--surface-raised) !important;
     color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-raised-button.mat-mdc-button-disabled,
+  .mat-mdc-raised-button:disabled {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-disabled) !important;
   }
 
   .mat-mdc-outlined-button:not([color]) {

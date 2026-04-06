@@ -61,6 +61,9 @@ public class User
     [Required]
     public bool IsEmailVerified { get; set; } = false;
 
+    /// <summary>When the user completed (or dismissed) the onboarding tour. Null = not yet completed.</summary>
+    public DateTime? TourCompletedAt { get; set; }
+
     [NotMapped]
     public List<string> BackupCodes
     { 

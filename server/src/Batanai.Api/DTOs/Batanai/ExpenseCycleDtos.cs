@@ -176,15 +176,15 @@ public record MukandoPayoutDto(
     DateTime CreatedAt);
 
 public record RecordContributionRequest(
-    string ProofUrl,
-    string? Reference,
-    string? Notes);
+    string ProofUrl = "",
+    string? Reference = null,
+    string? Notes = null);
 
 public record RecordPayoutRequest(
-    decimal AmountDisbursed,
-    string PaymentMethod,
-    string ProofUrl,
-    string? Reference);
+    decimal AmountDisbursed = 0,
+    string PaymentMethod = "",
+    string ProofUrl = "",
+    string? Reference = null);
 
 // ── Mukando Summary ──────────────────────────────────────────────────────────
 

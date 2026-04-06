@@ -479,10 +479,9 @@
                           <input type="file" #contribFileInput hidden
                                  accept=".jpg,.jpeg,.png,.webp,.pdf"
                                  (change)="onContributionFileSelected($event)">
-                          <button mat-stroked-button type="button" (click)="contribFileInput.click()"
-                                  [disabled]="contributionUploading">
+                          <button mat-stroked-button type="button" (click)="contribFileInput.click()">
                             <mat-icon>cloud_upload</mat-icon>
-                            {{ contributionUploading ? 'Uploading…' : 'Upload Proof (image or PDF)' }}
+                            Upload Proof (image or PDF)
                           </button>
                           @if (contributionFileName) {
                             <span class="proof-file-name"><mat-icon>check_circle</mat-icon> {{ contributionFileName }}</span>
@@ -496,9 +495,9 @@
                           <input matInput [(ngModel)]="contributionReference">
                         </mat-form-field>
                         <button mat-raised-button color="primary"
-                                [disabled]="!contributionProofUrl || contributionUploading"
+                                [disabled]="!contributionProofFile || contributionUploading"
                                 (click)="recordContribution(selectedRound.id)">
-                          Submit Contribution
+                          {{ contributionUploading ? 'Submitting…' : 'Submit Contribution' }}
                         </button>
                       </div>
                     }
@@ -527,10 +526,9 @@
                               <input type="file" #payoutFileInput hidden
                                      accept=".jpg,.jpeg,.png,.webp,.pdf"
                                      (change)="onPayoutFileSelected($event)">
-                              <button mat-stroked-button type="button" (click)="payoutFileInput.click()"
-                                      [disabled]="payoutUploading">
+                              <button mat-stroked-button type="button" (click)="payoutFileInput.click()">
                                 <mat-icon>cloud_upload</mat-icon>
-                                {{ payoutUploading ? 'Uploading…' : 'Upload Proof' }}
+                                Upload Proof
                               </button>
                               @if (payoutFileName) {
                                 <span class="proof-file-name"><mat-icon>check_circle</mat-icon> {{ payoutFileName }}</span>
@@ -545,9 +543,9 @@
                             </mat-form-field>
                           </div>
                           <button mat-raised-button color="primary"
-                                  [disabled]="!payoutAmount || !payoutMethod || !payoutProofUrl || payoutUploading"
+                                  [disabled]="!payoutAmount || !payoutMethod || !payoutProofFile || payoutUploading"
                                   (click)="recordPayout(selectedRound.id)">
-                            <mat-icon>payment</mat-icon> Record Payout
+                            <mat-icon>payment</mat-icon> {{ payoutUploading ? 'Submitting…' : 'Record Payout' }}
                           </button>
                         </div>
                         <button mat-stroked-button color="warn" class="force-close-btn"

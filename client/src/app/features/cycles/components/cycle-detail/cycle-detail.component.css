@@ -226,7 +226,7 @@
 .proof-upload-error { color: var(--warn, #d32f2f); font-size: 0.875rem; }
 
 /* Admin payout */
-.admin-actions-section { margin-top: 1.25rem; padding: 1rem; background: #fafafa; border: 1px solid var(--border); border-radius: var(--radius-md); }
+.admin-actions-section { margin-top: 1.25rem; padding: 1rem; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-md); }
 .payout-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .5rem; }
 .payout-fields mat-form-field { width: 100%; }
 .force-close-btn { margin-top: .75rem; }

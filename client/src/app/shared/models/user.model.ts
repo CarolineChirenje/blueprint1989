@@ -12,6 +12,7 @@ export interface User {
     role?: Role;
     roleName?: string;
     isActive?: boolean;
+    tourCompleted?: boolean;
 }
 
 export interface UserManagementDto {
