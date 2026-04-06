@@ -351,6 +351,7 @@ namespace Batanai.Api.Controllers
                 IsActive = u.IsActive,
                 ActiveStatus = u.IsActive ? "Yes" : "No",
                 IsMfaEnabled = u.IsMfaEnabled,
+                IsEmailVerified = u.IsEmailVerified,
                 CreatedAt = _timeZoneService.ConvertFromUtc(u.CreatedAt)
             }).ToList();
 
@@ -441,6 +442,33 @@ namespace Batanai.Api.Controllers
                 .ToListAsync();
 
             return Ok(memberships);
+        }
+
+        [HttpPut("users/{userId}/verify-email")]
+        [Authorize(Policy = "AdminOrAbove")]
+        public async Task<IActionResult> AdminVerifyEmail(int userId)
+        {
+            var adminId = int.Parse(User.FindFirst("id")!.Value);
+            var (success, error) = await _authService.AdminVerifyEmailAsync(adminId, userId);
+            if (!success)
+                return BadRequest(new { message = error });
+
+            return Ok(new { message = "User email verified successfully" });
+        }
+
+        [HttpPut("users/{userId}/reset-password")]
+        [Authorize(Policy = "AdminOrAbove")]
+        public async Task<IActionResult> AdminResetPassword(int userId, [FromBody] AdminResetPasswordRequest request)
+        {
+            if (userId != request.UserId)
+                return BadRequest(new { message = "User ID in URL does not match request body" });
+
+            var adminId = int.Parse(User.FindFirst("id")!.Value);
+            var (success, error) = await _authService.AdminResetPasswordAsync(adminId, userId, request.NewPassword);
+            if (!success)
+                return BadRequest(new { message = error });
+
+            return Ok(new { message = "User password reset successfully" });
         }
 
         [HttpPost("register")]

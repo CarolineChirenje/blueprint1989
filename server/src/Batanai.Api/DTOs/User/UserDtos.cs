@@ -15,6 +15,7 @@ public class UserManagementDto
     public bool IsActive { get; set; }
     public string ActiveStatus { get; set; } = string.Empty;
     public bool IsMfaEnabled { get; set; }
+    public bool IsEmailVerified { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 
@@ -46,6 +47,17 @@ public class UpdateUserRequest
 
     [Required]
     public Role Role { get; set; }
+}
+
+public class AdminResetPasswordRequest
+{
+    [Required]
+    [Range(1, int.MaxValue)]
+    public int UserId { get; set; }
+
+    [Required]
+    [MinLength(8)]
+    public string NewPassword { get; set; } = string.Empty;
 }
 
 public class UserGroupMembershipDto

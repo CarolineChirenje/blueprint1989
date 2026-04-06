@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { UserManagementDto } from '../../../shared/models/user.model';
 import { UserGroupRolesDialogComponent } from './user-group-roles-dialog/user-group-roles-dialog.component';
 import { EditUserDialogComponent } from './edit-user-dialog/edit-user-dialog.component';
+import { AdminResetPasswordDialogComponent } from './admin-reset-password-dialog/admin-reset-password-dialog.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { DialogService } from '../../../shared/services/dialog.service';
 
@@ -117,6 +118,39 @@ export class UserManagementComponent implements OnInit {
           this.cdr.detectChanges();
         }
       });
+    });
+  }
+
+  verifyEmail(user: UserManagementDto): void {
+    this.dialogService.confirm({
+      title:        'Verify Email',
+      message:      `Manually verify the email for <strong>${user.fullName}</strong> (${user.email})?<br><br>This will allow them to log in without clicking the email verification link.`,
+      confirmText:  'Verify',
+      confirmColor: 'primary'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.http.put(`${environment.apiUrl}/auth/users/${user.id}/verify-email`, {}).subscribe({
+        next: () => {
+          user.isEmailVerified = true;
+          this.cdr.detectChanges();
+        },
+        error: err => {
+          this.errorMessage = err.error?.message || 'Failed to verify email.';
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
+
+  openResetPasswordDialog(user: UserManagementDto): void {
+    const ref = this.dialog.open(AdminResetPasswordDialogComponent, {
+      width: '440px',
+      data: { user }
+    });
+    ref.afterClosed().subscribe(result => {
+      if (result) {
+        this.errorMessage = '';
+      }
     });
   }
 }

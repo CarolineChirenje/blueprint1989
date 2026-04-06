@@ -26,6 +26,7 @@ export interface UserManagementDto {
     isActive: boolean;
     activeStatus: string;
     isMfaEnabled: boolean;
+    isEmailVerified: boolean;
     createdAt: string;
 }
 

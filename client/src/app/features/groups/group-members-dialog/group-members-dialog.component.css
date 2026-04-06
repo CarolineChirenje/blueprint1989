@@ -70,6 +70,12 @@
   -webkit-overflow-scrolling: touch;
 }
 
+@media (max-width: 1023px) {
+  .table-scroll {
+    overflow-x: visible;
+  }
+}
+
 .loading-wrap {
   display: flex;
   justify-content: center;

@@ -7,6 +7,7 @@ import { FeatureBugReportsComponent } from './feature-bug-reports/feature-bug-re
 import { UserManagementComponent } from './users/user-management.component';
 import { UserGroupRolesDialogComponent } from './users/user-group-roles-dialog/user-group-roles-dialog.component';
 import { EditUserDialogComponent } from './users/edit-user-dialog/edit-user-dialog.component';
+import { AdminResetPasswordDialogComponent } from './users/admin-reset-password-dialog/admin-reset-password-dialog.component';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -15,7 +16,8 @@ import { SharedModule } from '../../shared/shared.module';
     FeatureBugReportsComponent,
     UserManagementComponent,
     UserGroupRolesDialogComponent,
-    EditUserDialogComponent
+    EditUserDialogComponent,
+    AdminResetPasswordDialogComponent
   ],
   imports: [
     CommonModule,

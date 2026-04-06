@@ -385,7 +385,7 @@ namespace Batanai.Api.Services
             }
             await _context.SaveChangesAsync();
 
-            // Send email verification — non-blocking, errors are logged only
+            // Send email verification ï¿½ non-blocking, errors are logged only
             try
             {
                 await SendVerificationEmailAsync(user);
@@ -481,7 +481,7 @@ namespace Batanai.Api.Services
         /// Deterministic SHA-256 hash for reset tokens.
         /// PBKDF2 (used by HashPassword) produces a different hash every call due to a random salt,
         /// making it impossible to look up stored tokens. Reset tokens are already 32 random bytes,
-        /// so salting is unnecessary — SHA-256 gives sufficient one-way security.
+        /// so salting is unnecessary ï¿½ SHA-256 gives sufficient one-way security.
         /// </summary>
         private static string HashResetToken(string plainToken)
         {
@@ -536,7 +536,7 @@ namespace Batanai.Api.Services
             if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(path))
             {
                 _logger.LogWarning(
-                    "AppDomain and/or EmailVerificationUrlPath not configured — verification email not sent for user {UserId}. " +
+                    "AppDomain and/or EmailVerificationUrlPath not configured ï¿½ verification email not sent for user {UserId}. " +
                     "To manually verify in development, use token: {PlainToken}",
                     user.Id, plainToken);
                 return (false, "not_configured");
@@ -840,6 +840,73 @@ namespace Batanai.Api.Services
                 _logger.LogError(ex, "Error in ResetPasswordAsync");
                 return (false, "An error occurred while resetting password", null);
             }
+        }
+
+        /// <summary>
+        /// Admin: manually verify a user's email, bypassing the token-based flow.
+        /// </summary>
+        public async Task<(bool success, string? error)> AdminVerifyEmailAsync(int adminUserId, int targetUserId)
+        {
+            var user = await _context.Users.FindAsync(targetUserId);
+            if (user == null)
+                return (false, "User not found");
+
+            if (user.IsEmailVerified)
+                return (false, "User's email is already verified");
+
+            user.IsEmailVerified = true;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            // Invalidate any outstanding verification tokens
+            var pendingTokens = await _context.EmailVerificationTokens
+                .Where(t => t.UserId == targetUserId && !t.IsUsed)
+                .ToListAsync();
+
+            foreach (var token in pendingTokens)
+            {
+                token.IsUsed = true;
+                token.UsedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Admin {AdminUserId} manually verified email for user {TargetUserId}", adminUserId, targetUserId);
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Admin: reset a user's password directly, bypassing the token-based flow.
+        /// </summary>
+        public async Task<(bool success, string? error)> AdminResetPasswordAsync(int adminUserId, int targetUserId, string newPassword)
+        {
+            // Validate password strength
+            var passwordRegex = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$";
+            if (!System.Text.RegularExpressions.Regex.IsMatch(newPassword, passwordRegex))
+                return (false, "Password must be at least 8 characters long and contain uppercase, lowercase, and numeric characters");
+
+            var user = await _context.Users.FindAsync(targetUserId);
+            if (user == null)
+                return (false, "User not found");
+
+            user.PasswordHash = _passwordHashingService.HashPassword(newPassword);
+            user.PasswordLastChanged = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            // Invalidate any outstanding password reset tokens
+            var pendingTokens = await _context.PasswordResetTokens
+                .Where(t => t.UserId == targetUserId && !t.IsUsed)
+                .ToListAsync();
+
+            foreach (var token in pendingTokens)
+            {
+                token.IsUsed = true;
+                token.UsedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Admin {AdminUserId} reset password for user {TargetUserId}", adminUserId, targetUserId);
+            return (true, null);
         }
     }
 }
