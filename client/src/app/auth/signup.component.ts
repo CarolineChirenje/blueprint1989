@@ -17,6 +17,7 @@ export class SignupComponent implements OnInit {
   isSubmitting: boolean = false;
   newUserId: number | null = null;
   skipMfaToken: string | null = null;
+  debugLog: string[] = [];
 
   readonly Role = Role;
 
@@ -71,9 +72,11 @@ export class SignupComponent implements OnInit {
   }
 
   submit(): void {
+    this.debugLog.unshift(`[${new Date().toISOString().slice(11,19)}] submit() called. valid=${this.signupForm.valid} submitting=${this.isSubmitting}`);
     this.signupForm.markAllAsTouched();
     if (this.signupForm.invalid || this.isSubmitting) return;
     this.isSubmitting = true;
+    this.debugLog.unshift(`[${new Date().toISOString().slice(11,19)}] HTTP call starting...`);
     const v = this.signupForm.value;
 
     this.auth.signup({
@@ -85,6 +88,7 @@ export class SignupComponent implements OnInit {
       adminPin:  this.isAdmin ? v.adminPin : undefined
     }).subscribe({
       next: (res) => {
+        this.debugLog.unshift(`[${new Date().toISOString().slice(11,19)}] HTTP success`);
         this.signupSuccess = true;
         this.newUserId = res?.userId ?? null;
         this.skipMfaToken = res?.skipMfaToken ?? null;
@@ -93,7 +97,9 @@ export class SignupComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.errorMsg = err.error?.message || 'Signup failed. Please try again.';
+        const msg = err.error?.message || err.message || err.status || JSON.stringify(err);
+        this.debugLog.unshift(`[${new Date().toISOString().slice(11,19)}] HTTP error: ${msg}`);
+        this.errorMsg = msg || 'Signup failed. Please try again.';
         this.signupSuccess = false;
         this.isSubmitting = false;
         this.cdr.detectChanges();

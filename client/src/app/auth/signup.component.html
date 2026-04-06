@@ -106,6 +106,12 @@
             </div>
           }
 
+          @if (debugLog.length) {
+            <div style="margin-top:1rem;padding:0.75rem;background:#111;color:#0f0;font-size:11px;border-radius:6px;font-family:monospace;max-height:120px;overflow-y:auto;word-break:break-all;">
+              @for (line of debugLog; track $index) { <div>{{ line }}</div> }
+            </div>
+          }
+
           <button
             type="button"
             class="submit-btn submit-btn-blue"
