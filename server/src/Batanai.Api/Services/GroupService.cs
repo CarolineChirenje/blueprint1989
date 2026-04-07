@@ -732,47 +732,58 @@ public class GroupService : IGroupService
 
         await _context.SaveChangesAsync();
 
-        // Notify the requester
-        var group = await _context.Groups.FindAsync(groupId);
-        if (group != null)
+        // Send notifications — wrapped so a delivery failure never blocks the response
+        try
         {
-            var notifType = approve ? NotificationType.JoinRequestApproved : NotificationType.JoinRequestDeclined;
-            var body = approve
-                ? $"Your request to join \"{group.Name}\" has been approved."
-                : $"Your request to join \"{group.Name}\" has been declined.";
-
-            await _push.SendToUserAsync(
-                userId: requestingUserId,
-                type: notifType,
-                title: group.Name,
-                body: body,
-                deepLinkUrl: approve ? $"/groups/{groupId}" : "/groups",
-                relatedEntityId: groupId);
-
-            // If approved, notify existing members that a new member joined
-            if (approve)
+            var group = await _context.Groups.FindAsync(groupId);
+            if (group != null)
             {
-                var joiningUser = await _context.Users.FindAsync(requestingUserId);
-                var joinerName = joiningUser != null ? $"{joiningUser.FirstName} {joiningUser.LastName}".Trim() : "A member";
+                var notifType = approve ? NotificationType.JoinRequestApproved : NotificationType.JoinRequestDeclined;
+                var body = approve
+                    ? $"Your request to join \"{group.Name}\" has been approved."
+                    : $"Your request to join \"{group.Name}\" has been declined.";
 
-                var otherMemberIds = await _context.GroupMembers
-                    .Where(gm => gm.GroupId == groupId
-                              && gm.Status == GroupInviteStatus.Accepted
-                              && gm.UserId != requestingUserId)
-                    .Select(gm => gm.UserId)
-                    .ToListAsync();
+                _logger.LogInformation(
+                    "Sending {NotifType} notification to user {UserId} for group {GroupId}",
+                    notifType, requestingUserId, groupId);
 
-                if (otherMemberIds.Count > 0)
+                await _push.SendToUserAsync(
+                    userId: requestingUserId,
+                    type: notifType,
+                    title: group.Name,
+                    body: body,
+                    deepLinkUrl: approve ? $"/groups/{groupId}" : "/groups",
+                    relatedEntityId: groupId);
+
+                // If approved, notify existing members that a new member joined
+                if (approve)
                 {
-                    await _push.SendToUsersAsync(
-                        userIds: otherMemberIds,
-                        type: NotificationType.MemberJoinedGroup,
-                        title: group.Name,
-                        body: $"{joinerName} has joined the group.",
-                        deepLinkUrl: $"/groups/{groupId}",
-                        relatedEntityId: groupId);
+                    var joiningUser = await _context.Users.FindAsync(requestingUserId);
+                    var joinerName = joiningUser != null ? $"{joiningUser.FirstName} {joiningUser.LastName}".Trim() : "A member";
+
+                    var otherMemberIds = await _context.GroupMembers
+                        .Where(gm => gm.GroupId == groupId
+                                  && gm.Status == GroupInviteStatus.Accepted
+                                  && gm.UserId != requestingUserId)
+                        .Select(gm => gm.UserId)
+                        .ToListAsync();
+
+                    if (otherMemberIds.Count > 0)
+                    {
+                        await _push.SendToUsersAsync(
+                            userIds: otherMemberIds,
+                            type: NotificationType.MemberJoinedGroup,
+                            title: group.Name,
+                            body: $"{joinerName} has joined the group.",
+                            deepLinkUrl: $"/groups/{groupId}",
+                            relatedEntityId: groupId);
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send join-request response notification for group {GroupId}, user {UserId}", groupId, requestingUserId);
         }
 
         return null;

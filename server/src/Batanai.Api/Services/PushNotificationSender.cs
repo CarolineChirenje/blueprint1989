@@ -61,9 +61,14 @@ public class PushNotificationSender : IPushNotificationSender
         int? relatedEntityId = null)
     {
         // 1. Create in-app notification row
+        _logger.LogInformation("Push [{Type}] → user {UserId}: creating in-app notification", type, userId);
         await _notificationService.CreateAsync(userId, $"{title}: {body}", type, deepLinkUrl, relatedEntityId, sentViaPush: true);
 
-        if (_pushClient is null) return; // VAPID not configured � in-app notification still created above
+        if (_pushClient is null)
+        {
+            _logger.LogWarning("Push [{Type}] → user {UserId}: _pushClient is null (VAPID not configured). In-app notification created, no push sent.", type, userId);
+            return;
+        }
 
         // 2. Check whether this user has opted out of push for this notification type.
         //    In-app notification is always created above regardless of preference.
@@ -73,7 +78,10 @@ public class PushNotificationSender : IPushNotificationSender
             .FirstOrDefaultAsync(p => p.UserId == userId && p.NotificationTypeId == typeId);
 
         if (preference != null && !preference.IsEnabled)
-            return; // User opted out of push for this type; in-app notification still created above
+        {
+            _logger.LogInformation("Push [{Type}] → user {UserId}: user opted out of push for this type. In-app only.", type, userId);
+            return;
+        }
 
         // 3. Load all push subscriptions for this user
         var subscriptions = await _context.PushSubscriptions
@@ -82,9 +90,11 @@ public class PushNotificationSender : IPushNotificationSender
 
         if (subscriptions.Count == 0)
         {
-            _logger.LogDebug("No push subscriptions found for user {UserId}; in-app notification created but no push sent.", userId);
+            _logger.LogWarning("Push [{Type}] → user {UserId}: no push subscriptions found. In-app notification created, no push sent.", type, userId);
             return;
         }
+
+        _logger.LogInformation("Push [{Type}] → user {UserId}: found {Count} subscription(s), dispatching.", type, userId, subscriptions.Count);
 
         // 4. Build message payload
         var payload = BuildPayload(type, title, body, deepLinkUrl, relatedEntityId);
