@@ -21,8 +21,16 @@
         <h3>Verify your email</h3>
         <p>Your email address has not been verified yet. Please check your inbox for the verification link we sent when you signed up.</p>
 
+        <div class="email-tip">
+          <span class="material-icons">info</span>
+          <div>
+            Check your <strong>Spam</strong> or <strong>Junk</strong> folder — especially if you use
+            Yahoo, Hotmail, or Outlook. Still can't find it? Contact an Admin with proof this email belongs to you.
+          </div>
+        </div>
+
         @if (resendState === 'sent') {
-          <p class="resend-success">{{ resendMessage }}</p>
+          <p class="resend-success">Verification email sent! Check your inbox and spam folder.</p>
         } @else {
           <button class="submit-btn submit-btn-blue" (click)="resendVerification()" [disabled]="resendState === 'sending'">
             {{ resendState === 'sending' ? 'Sending…' : 'Resend Verification Email' }}

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
@@ -10,13 +10,19 @@ import { Role } from '../shared/models/user.model';
     styleUrls: ['./signup.component.css'],
     standalone: false
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnInit, OnDestroy {
   signupForm: FormGroup;
   errorMsg: string = '';
   signupSuccess: boolean = false;
   isSubmitting: boolean = false;
-  newUserId: number | null = null;
-  skipMfaToken: string | null = null;
+
+  // Email verification flow state
+  confirmedEmail: string = '';
+  emailSent: boolean = false;
+  isSendingEmail: boolean = false;
+  sendError: string = '';
+  resendCooldown: number = 0;
+  private cooldownInterval: ReturnType<typeof setInterval> | null = null;
 
   readonly Role = Role;
 
@@ -29,13 +35,14 @@ export class SignupComponent implements OnInit {
     this.signupForm = this.fb.group({
       role:            [null, Validators.required],
       email:           ['', [Validators.required, Validators.email]],
+      confirmEmail:    ['', [Validators.required, Validators.email]],
       firstName:       ['', Validators.required],
       lastName:        ['', Validators.required],
       password:        ['', [Validators.required, Validators.minLength(8),
                              Validators.pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)]],
       confirmPassword: ['', Validators.required],
       adminPin:        ['']
-    }, { validators: this.passwordMatchValidator });
+    }, { validators: [this.passwordMatchValidator, this.emailMatchValidator] });
   }
 
   ngOnInit(): void {
@@ -61,6 +68,12 @@ export class SignupComponent implements OnInit {
     return pw === cpw ? null : { mismatch: true };
   }
 
+  emailMatchValidator(form: AbstractControl): ValidationErrors | null {
+    const email = form.get('email')?.value;
+    const confirmEmail = form.get('confirmEmail')?.value;
+    return email === confirmEmail ? null : { emailMismatch: true };
+  }
+
   updateConditionalValidators(): void {
     const adminPin = this.signupForm.get('adminPin')!;
     adminPin.clearValidators();
@@ -75,6 +88,7 @@ export class SignupComponent implements OnInit {
     if (this.signupForm.invalid || this.isSubmitting) return;
     this.isSubmitting = true;
     const v = this.signupForm.value;
+    this.confirmedEmail = v.email;
 
     this.auth.signup({
       email:     v.email,
@@ -84,10 +98,8 @@ export class SignupComponent implements OnInit {
       role:      v.role,
       adminPin:  this.isAdmin ? v.adminPin : undefined
     }).subscribe({
-      next: (res) => {
+      next: () => {
         this.signupSuccess = true;
-        this.newUserId = res?.userId ?? null;
-        this.skipMfaToken = res?.skipMfaToken ?? null;
         this.errorMsg = '';
         this.isSubmitting = false;
         this.cdr.detectChanges();
@@ -102,11 +114,63 @@ export class SignupComponent implements OnInit {
     });
   }
 
-  setupMfaNow(): void {
-    this.router.navigate(['/login'], { queryParams: { promptMfa: 'true' } });
+  sendVerificationEmail(): void {
+    if (this.isSendingEmail) return;
+    this.isSendingEmail = true;
+    this.sendError = '';
+
+    this.auth.resendVerificationEmail(this.confirmedEmail).subscribe({
+      next: () => {
+        this.emailSent = true;
+        this.isSendingEmail = false;
+        this.startResendCooldown();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.sendError = 'Failed to send verification email. Please try again.';
+        this.isSendingEmail = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  skipMfa(): void {
+  resendEmail(): void {
+    if (this.resendCooldown > 0) return;
+    this.sendVerificationEmail();
+  }
+
+  goBackToForm(): void {
+    this.signupSuccess = false;
+    this.emailSent = false;
+    this.isSendingEmail = false;
+    this.sendError = '';
+  }
+
+  goToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  private startResendCooldown(): void {
+    this.clearCooldown();
+    this.resendCooldown = 60;
+    this.cooldownInterval = setInterval(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) {
+        this.clearCooldown();
+      }
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  private clearCooldown(): void {
+    if (this.cooldownInterval) {
+      clearInterval(this.cooldownInterval);
+      this.cooldownInterval = null;
+    }
+    this.resendCooldown = 0;
+  }
+
+  ngOnDestroy(): void {
+    this.clearCooldown();
   }
 }

@@ -549,6 +549,149 @@
   margin: 0;
 }
 
+/* ─── Email verification flow (success screen) ─────────────────────────── */
+
+.verify-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--info-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.verify-icon .material-icons {
+  font-size: 40px;
+  color: var(--info);
+}
+
+.success-icon .material-icons {
+  font-size: 40px;
+}
+
+.email-display {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--primary-subtle);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.resend-row {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 1rem 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.resend-row button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+  margin: 0;
+  width: auto;
+}
+
+.resend-row button:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+  text-decoration: none;
+}
+
+.go-back-link {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 0.75rem;
+  min-height: 44px;
+  line-height: 1.5;
+}
+
+.go-back-link a {
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.go-back-link a:hover {
+  color: var(--primary-hover);
+}
+
+/* Spinner animation for send button */
+.spinner {
+  font-size: 1.125rem;
+  vertical-align: middle;
+  margin-right: 0.35rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Responsive: mobile ─── */
+@media (max-width: 520px) {
+  .success-message {
+    padding: 1.25rem 0;
+  }
+
+  .verify-icon,
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+  }
+
+  .verify-icon .material-icons,
+  .success-icon .material-icons {
+    font-size: 32px;
+  }
+
+  .email-display {
+    font-size: 0.9375rem;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .success-message h2 {
+    font-size: 1.25rem;
+  }
+}
+
+/* ─── Responsive: tablet+ ─── */
+@media (min-width: 768px) {
+  .email-display {
+    font-size: 1.1rem;
+  }
+}
+
 @media (max-width: 1023px) {
   /* Reduce the tall top margin so the card sits near the top on mobile */
   .signup-card {

@@ -304,6 +304,47 @@ app-signup, app-login, app-signup *, app-login * {
   margin-top: 0.25rem;
   align-self: safe;
 }
+
+/* ─── Shared email tip callout (signup + login) ─────────────────────────── */
+.email-tip {
+  display: flex;
+  gap: 0.75rem;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin: 1.25rem 0;
+  text-align: left;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.email-tip .material-icons {
+  color: var(--warning);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 520px) {
+  .email-tip {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.875rem;
+  }
+
+  .email-tip .material-icons {
+    align-self: flex-start;
+  }
+}
+
+@media (min-width: 768px) {
+  .email-tip {
+    font-size: 0.875rem;
+    padding: 1.25rem;
+  }
+}
 /* Design Tokens — Batanai Green Theme */
 :root {
   color-scheme: light;

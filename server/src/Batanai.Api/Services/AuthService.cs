@@ -385,15 +385,8 @@ namespace Batanai.Api.Services
             }
             await _context.SaveChangesAsync();
 
-            // Send email verification � non-blocking, errors are logged only
-            try
-            {
-                await SendVerificationEmailAsync(user);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send verification email for new user: {UserId}", user.Id);
-            }
+            // Verification email is now triggered by the client after the user
+            // confirms their address on the signup success screen.
 
             return (user, null);
         }

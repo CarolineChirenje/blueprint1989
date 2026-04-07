@@ -3,22 +3,68 @@
   <h1>Create Account</h1>
 
   @if (signupSuccess) {
-    <div class="success-message">
-      <div class="success-icon">✓</div>
-      <h2>Account Created Successfully...</h2>
-      <p>Your account has been created. Secure it with Two-Factor Authentication?</p>
-      <div class="mfa-prompt">
-        <div class="mfa-info">
-          <span class="shield-icon">🛡️</span>
-          <h3>Recommended: Enable Two-Factor Authentication</h3>
-          <p>Add an extra layer of security by using your phone to verify logins.</p>
+    @if (!emailSent) {
+      <!-- State 1: Confirm email before sending -->
+      <div class="success-message">
+        <div class="verify-icon">
+          <span class="material-icons">mark_email_read</span>
         </div>
-        <div class="button-group">
-          <button type="button" class="btn btn-primary" (click)="setupMfaNow()">Set Up Now (Recommended)</button>
-          <button type="button" class="btn btn-secondary" (click)="skipMfa()">Skip for Now</button>
-        </div>
+        <h2>Verify Your Email</h2>
+        <p>We'll send a verification link to:</p>
+        <p class="email-display">{{ confirmedEmail }}</p>
+
+        @if (sendError) {
+          <div class="error">{{ sendError }}</div>
+        }
+
+        <button
+          type="button"
+          class="submit-btn submit-btn-blue form-ready"
+          [disabled]="isSendingEmail"
+          (click)="sendVerificationEmail()"
+        >
+          @if (isSendingEmail) {
+            <span class="material-icons spinner">autorenew</span> Sending…
+          } @else {
+            Send Verification Email
+          }
+        </button>
+        <p class="go-back-link">Not your email? <a (click)="goBackToForm()">Go back</a></p>
       </div>
-    </div>
+    } @else {
+      <!-- State 2: Email sent — check inbox -->
+      <div class="success-message">
+        <div class="success-icon">
+          <span class="material-icons">mark_email_unread</span>
+        </div>
+        <h2>Check Your Inbox</h2>
+        <p>A verification link has been sent to <strong>{{ confirmedEmail }}</strong>.</p>
+
+        <div class="email-tip">
+          <span class="material-icons">info</span>
+          <div>
+            <strong>Can't find it?</strong> Check your <strong>Spam</strong> or <strong>Junk</strong>
+            folder — especially if you use Yahoo, Hotmail, or Outlook.
+            If it's still not there, contact an Admin with proof that this email belongs to you.
+          </div>
+        </div>
+
+        <div class="resend-row">
+          Didn't receive it?
+          <button type="button" [disabled]="resendCooldown > 0" (click)="resendEmail()">
+            Resend{{ resendCooldown > 0 ? ' (' + resendCooldown + 's)' : '' }}
+          </button>
+        </div>
+
+        @if (sendError) {
+          <div class="error">{{ sendError }}</div>
+        }
+
+        <button type="button" class="submit-btn submit-btn-blue form-ready" (click)="goToLogin()">
+          Go to Login
+        </button>
+      </div>
+    }
   } @else {
     @if (errorMsg) {
       <div class="error-message">
@@ -75,6 +121,12 @@
             <input type="email" formControlName="email" placeholder="email@example.com" autocomplete="email" />
             @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
               <div class="error">Valid email is required</div>
+            }
+
+            <label>Confirm Email <span class="required">*</span></label>
+            <input type="email" formControlName="confirmEmail" placeholder="Re-enter your email" autocomplete="email" />
+            @if (signupForm.errors?.['emailMismatch'] && signupForm.get('confirmEmail')?.touched) {
+              <div class="error">Email addresses do not match</div>
             }
 
             <label>Password <span class="required">*</span></label>
