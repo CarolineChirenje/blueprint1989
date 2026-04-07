@@ -63,7 +63,7 @@ public class PushNotificationSender : IPushNotificationSender
         // 1. Create in-app notification row
         await _notificationService.CreateAsync(userId, $"{title}: {body}", type, deepLinkUrl, relatedEntityId, sentViaPush: true);
 
-        if (_pushClient is null) return; // VAPID not configured — in-app notification still created above
+        if (_pushClient is null) return; // VAPID not configured ï¿½ in-app notification still created above
 
         // 2. Check whether this user has opted out of push for this notification type.
         //    In-app notification is always created above regardless of preference.
@@ -87,7 +87,7 @@ public class PushNotificationSender : IPushNotificationSender
         }
 
         // 4. Build message payload
-        var payload = BuildPayload(type, title, body, deepLinkUrl);
+        var payload = BuildPayload(type, title, body, deepLinkUrl, relatedEntityId);
         var expiredEndpoints = new List<int>();
 
         // 5. Dispatch in parallel, collect expired subscriptions to prune
@@ -135,7 +135,7 @@ public class PushNotificationSender : IPushNotificationSender
         string? deepLinkUrl = null,
         int? relatedEntityId = null)
     {
-        // Process sequentially — all user deliveries share the same scoped DbContext,
+        // Process sequentially ï¿½ all user deliveries share the same scoped DbContext,
         // so concurrent Task.WhenAll would trigger a "second operation started" exception.
         foreach (var uid in userIds)
         {
@@ -145,7 +145,7 @@ public class PushNotificationSender : IPushNotificationSender
 
     // --- helpers ------------------------------------------------------------
 
-    private static string BuildPayload(NotificationType type, string title, string body, string? url)
+    private static string BuildPayload(NotificationType type, string title, string body, string? url, int? relatedEntityId)
     {
         var payload = new
         {
@@ -155,6 +155,7 @@ public class PushNotificationSender : IPushNotificationSender
             badge = "/assets/icons/icon-192x192.png",
             url = url ?? "/",
             type = (int)type,
+            relatedEntityId = relatedEntityId,
             timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
         };
         return JsonSerializer.Serialize(payload);

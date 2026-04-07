@@ -142,6 +142,28 @@ public class GroupController : ControllerBase
         return Ok(invites);
     }
 
+    /// <summary>Returns all pending join requests submitted by the currently authenticated user.</summary>
+    [HttpGet("my-join-requests")]
+    public async Task<IActionResult> GetMyJoinRequests()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var requests = await _groupService.GetMyJoinRequestsAsync(userId.Value);
+        return Ok(requests);
+    }
+
+    /// <summary>Returns all pending join requests across groups the current user can manage.</summary>
+    [HttpGet("pending-join-requests")]
+    public async Task<IActionResult> GetAllPendingJoinRequests()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var requests = await _groupService.GetAllPendingJoinRequestsForAdminAsync(userId.Value, GetCurrentUserRole());
+        return Ok(requests);
+    }
+
     /// <summary>Removes an accepted or pending member from the group. Admin+ or GroupAdmin.</summary>
     [HttpDelete("{id:int}/members/{targetUserId:int}")]
     public async Task<IActionResult> RemoveMember(int id, int targetUserId)
@@ -209,6 +231,18 @@ public class GroupController : ControllerBase
         return error == "Forbidden." ? Forbid()
              : error == "Group not found." ? NotFound(new { message = error })
              : BadRequest(new { message = error });
+    }
+
+    /// <summary>Cancels the current user's pending join request for a group.</summary>
+    [HttpPost("{id:int}/cancel-join-request")]
+    public async Task<IActionResult> CancelJoinRequest(int id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _groupService.CancelJoinRequestAsync(id, userId.Value);
+        if (error == null) return NoContent();
+        return BadRequest(new { message = error });
     }
 
     /// <summary>Returns all pending join requests for a group. Admin+ or GroupAdmin.</summary>

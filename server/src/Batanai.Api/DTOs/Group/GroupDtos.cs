@@ -82,3 +82,18 @@ public record JoinRequestDto(
     string LastName,
     string Email,
     DateTime RequestedAt);
+
+public record MyJoinRequestDto(
+    int GroupId,
+    string GroupName,
+    string? GroupDescription,
+    DateTime RequestedAt);
+
+public record AdminPendingJoinRequestDto(
+    int GroupId,
+    string GroupName,
+    int UserId,
+    string FirstName,
+    string LastName,
+    string Email,
+    DateTime RequestedAt);

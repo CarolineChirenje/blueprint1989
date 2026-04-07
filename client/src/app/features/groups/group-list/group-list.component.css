@@ -43,6 +43,16 @@
   color: var(--text-secondary, #757575);
 }
 
+.status-chip.pending-request {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.pending-row {
+  opacity: 0.8;
+  background: var(--surface-raised, #fafafa);
+}
+
 .view-btn {
   color: var(--primary);
 }

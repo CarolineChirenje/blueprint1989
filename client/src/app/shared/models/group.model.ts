@@ -80,3 +80,20 @@ export interface JoinRequestDto {
   email: string;
   requestedAt: string;
 }
+
+export interface MyJoinRequestDto {
+  groupId: number;
+  groupName: string;
+  groupDescription: string | null;
+  requestedAt: string;
+}
+
+export interface AdminPendingJoinRequestDto {
+  groupId: number;
+  groupName: string;
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  requestedAt: string;
+}

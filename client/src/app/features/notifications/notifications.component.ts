@@ -1,11 +1,14 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { NotificationDto, NotificationService } from '../../core/services/notification.service';
 import { NotificationType } from '../../core/services/push-notification.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { GroupService } from '../../core/services/group.service';
-import { GroupInviteDto } from '../../shared/models/group.model';
+import { PushMessageService } from '../../core/services/push-message.service';
+import { GroupInviteDto, AdminPendingJoinRequestDto } from '../../shared/models/group.model';
 
 type NotificationFilter = 'all' | 'unread' | 'archived';
 
@@ -20,7 +23,7 @@ type NotificationGroup = {
   styleUrls: ['./notifications.component.css'],
   standalone: false
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
   readonly pageSize = 25;
 
   selectedFilter: NotificationFilter = 'all';
@@ -36,12 +39,19 @@ export class NotificationsComponent implements OnInit {
   inviteError = '';
   inviteResponding = false;
 
+  pendingJoinRequests: AdminPendingJoinRequestDto[] = [];
+  joinRequestError = '';
+  joinRequestResponding = false;
+
+  private pushSub?: Subscription;
+
   constructor(
     private notificationService: NotificationService,
     private router: Router,
     private dialog: MatDialog,
     private groupService: GroupService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private pushMessage: PushMessageService
   ) {}
 
   get hasReadNotifications(): boolean {
@@ -51,6 +61,18 @@ export class NotificationsComponent implements OnInit {
   ngOnInit(): void {
     this.loadNotifications(true);
     this.loadPendingInvites();
+    this.loadPendingJoinRequests();
+    // Auto-reload when a join request arrives or another admin responds
+    this.pushSub = this.pushMessage.pushReceived$.pipe(
+      filter(e => e.notificationType === 33 || e.notificationType === 34 || e.notificationType === 35)
+    ).subscribe(() => {
+      this.loadPendingJoinRequests();
+      this.loadNotifications(true);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.pushSub?.unsubscribe();
   }
 
   loadPendingInvites(): void {
@@ -66,6 +88,22 @@ export class NotificationsComponent implements OnInit {
     this.groupService.respondToInvite(invite.groupId, { accept }).subscribe({
       next: () => { this.inviteResponding = false; this.loadPendingInvites(); this.cdr.detectChanges(); },
       error: err => { this.inviteError = err.error?.message || 'Failed to respond to invite.'; this.inviteResponding = false; this.cdr.detectChanges(); }
+    });
+  }
+
+  loadPendingJoinRequests(): void {
+    this.groupService.getPendingJoinRequestsForAdmin().subscribe({
+      next: requests => { this.pendingJoinRequests = requests; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  respondToJoinRequest(request: AdminPendingJoinRequestDto, approve: boolean): void {
+    this.joinRequestError = '';
+    this.joinRequestResponding = true;
+    this.groupService.respondToJoinRequest(request.groupId, request.userId, { approve }).subscribe({
+      next: () => { this.joinRequestResponding = false; this.loadPendingJoinRequests(); this.cdr.detectChanges(); },
+      error: err => { this.joinRequestError = err.error?.message || 'Failed to respond to join request.'; this.joinRequestResponding = false; this.cdr.detectChanges(); }
     });
   }
 

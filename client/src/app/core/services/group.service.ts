@@ -15,7 +15,9 @@ import {
   JoinByCodeRequest,
   JoinByCodeResponse,
   JoinRequestDto,
-  RespondToJoinRequestRequest
+  RespondToJoinRequestRequest,
+  MyJoinRequestDto,
+  AdminPendingJoinRequestDto
 } from '../../shared/models/group.model';
 
 @Injectable({ providedIn: 'root' })
@@ -88,5 +90,17 @@ export class GroupService {
 
   respondToJoinRequest(groupId: number, userId: number, req: RespondToJoinRequestRequest): Observable<void> {
     return this.http.post<void>(`${this.url}/${groupId}/join-requests/${userId}/respond`, req);
+  }
+
+  getMyJoinRequests(): Observable<MyJoinRequestDto[]> {
+    return this.http.get<MyJoinRequestDto[]>(`${this.url}/my-join-requests`);
+  }
+
+  cancelJoinRequest(groupId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${groupId}/cancel-join-request`, {});
+  }
+
+  getPendingJoinRequestsForAdmin(): Observable<AdminPendingJoinRequestDto[]> {
+    return this.http.get<AdminPendingJoinRequestDto[]>(`${this.url}/pending-join-requests`);
   }
 }

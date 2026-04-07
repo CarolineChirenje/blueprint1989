@@ -196,6 +196,12 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(
     self.registration.showNotification(payload.title, notificationOptions)
+      .then(() => self.clients.matchAll({ type: 'window', includeUncontrolled: true }))
+      .then(clients => clients.forEach(c => c.postMessage({
+        type: 'PUSH_RECEIVED',
+        notificationType: payload.type,
+        relatedEntityId: payload.relatedEntityId || null
+      })))
   );
 });
 

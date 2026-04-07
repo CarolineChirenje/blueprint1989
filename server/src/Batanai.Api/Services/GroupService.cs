@@ -150,6 +150,82 @@ public class GroupService : IGroupService
         .ToList();
     }
 
+    public async Task<List<MyJoinRequestDto>> GetMyJoinRequestsAsync(int userId)
+    {
+        var rows = await _context.GroupMembers
+            .Where(gm => gm.UserId == userId && gm.Status == GroupInviteStatus.JoinRequested)
+            .Join(_context.Groups.Where(g => g.IsActive),
+                  gm => gm.GroupId,
+                  g  => g.Id,
+                  (gm, g) => new { gm, g })
+            .ToListAsync();
+
+        return rows.Select(r => new MyJoinRequestDto(
+            r.g.Id,
+            r.g.Name,
+            r.g.Description,
+            r.gm.JoinRequestedAt ?? r.gm.InvitedAt))
+        .OrderByDescending(r => r.RequestedAt)
+        .ToList();
+    }
+
+    public async Task<string?> CancelJoinRequestAsync(int groupId, int userId)
+    {
+        var member = await _context.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId
+                                    && gm.UserId == userId
+                                    && gm.Status == GroupInviteStatus.JoinRequested);
+
+        if (member == null)
+            return "Join request not found.";
+
+        _context.GroupMembers.Remove(member);
+        await _context.SaveChangesAsync();
+        return null;
+    }
+
+    public async Task<List<AdminPendingJoinRequestDto>> GetAllPendingJoinRequestsForAdminAsync(int userId, Role userRole)
+    {
+        var isAdmin = userRole == Role.SuperAdmin || userRole == Role.Admin;
+
+        IQueryable<GroupMember> query = _context.GroupMembers
+            .Where(gm => gm.Status == GroupInviteStatus.JoinRequested);
+
+        if (!isAdmin)
+        {
+            var managedGroupIds = await _context.GroupMembers
+                .Where(gm => gm.UserId == userId
+                           && gm.GroupRole == GroupRole.GroupAdmin
+                           && gm.Status == GroupInviteStatus.Accepted)
+                .Select(gm => gm.GroupId)
+                .ToListAsync();
+
+            query = query.Where(gm => managedGroupIds.Contains(gm.GroupId));
+        }
+
+        var rows = await query
+            .Join(_context.Groups.Where(g => g.IsActive),
+                  gm => gm.GroupId,
+                  g  => g.Id,
+                  (gm, g) => new { gm, g })
+            .Join(_context.Users,
+                  x  => x.gm.UserId,
+                  u  => u.Id,
+                  (x, u) => new { x.gm, x.g, u })
+            .ToListAsync();
+
+        return rows.Select(r => new AdminPendingJoinRequestDto(
+            r.g.Id,
+            r.g.Name,
+            r.u.Id,
+            r.u.FirstName,
+            r.u.LastName,
+            r.u.Email,
+            r.gm.JoinRequestedAt ?? r.gm.InvitedAt))
+        .OrderBy(r => r.RequestedAt)
+        .ToList();
+    }
+
     // ── Mutations ─────────────────────────────────────────────────────────────
 
     public async Task<(GroupDto? dto, string? error)> CreateAsync(CreateGroupRequest request, int creatorId)
@@ -622,7 +698,7 @@ public class GroupService : IGroupService
                 type: NotificationType.JoinRequestReceived,
                 title: group.Name,
                 body: $"{requesterName} has requested to join the group.",
-                deepLinkUrl: $"/groups/{group.Id}",
+                deepLinkUrl: "/notifications",
                 relatedEntityId: group.Id);
         }
 

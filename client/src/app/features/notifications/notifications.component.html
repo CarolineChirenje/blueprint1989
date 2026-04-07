@@ -85,6 +85,38 @@
     </div>
   }
 
+  @if (pendingJoinRequests.length > 0) {
+    <div class="notifications-page__invites">
+      <div class="notifications-page__invites-heading">
+        <span class="material-icons" aria-hidden="true">how_to_reg</span>
+        <strong>Pending join requests ({{ pendingJoinRequests.length }})</strong>
+      </div>
+      @if (joinRequestError) {
+        <div class="notifications-page__state notifications-page__state--error">{{ joinRequestError }}</div>
+      }
+      @for (request of pendingJoinRequests; track request.groupId + '-' + request.userId) {
+        <div class="notifications-page__invite-item">
+          <div class="notifications-page__invite-info">
+            <span class="notifications-page__invite-group">{{ request.groupName }}</span>
+            <span class="notifications-page__invite-meta">
+              {{ request.firstName }} {{ request.lastName }} ({{ request.email }}) &middot; {{ request.requestedAt | date:'dd MMM yyyy' }}
+            </span>
+          </div>
+          <div class="notifications-page__invite-actions">
+            <button type="button" class="notifications-page__invite-btn notifications-page__invite-btn--accept"
+              [disabled]="joinRequestResponding" (click)="respondToJoinRequest(request, true)">
+              Accept
+            </button>
+            <button type="button" class="notifications-page__invite-btn notifications-page__invite-btn--decline"
+              [disabled]="joinRequestResponding" (click)="respondToJoinRequest(request, false)">
+              Decline
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
   <div class="notifications-page__summary">
     <span>{{ unreadCount }} unread</span>
     <span>Showing {{ notifications.length }} notification{{ notifications.length === 1 ? '' : 's' }}</span>

@@ -24,4 +24,7 @@ public interface IGroupService
     Task<string?> RespondToJoinRequestAsync(int groupId, int requestingUserId, bool approve, int respondingUserId, Role respondingUserRole);
     Task<List<JoinRequestDto>> GetPendingJoinRequestsAsync(int groupId, int userId, Role userRole);
     Task<(string? newCode, string? newUrl, string? error)> RegenerateJoinCodeAsync(int groupId, int userId, Role userRole);
+    Task<List<MyJoinRequestDto>> GetMyJoinRequestsAsync(int userId);
+    Task<string?> CancelJoinRequestAsync(int groupId, int userId);
+    Task<List<AdminPendingJoinRequestDto>> GetAllPendingJoinRequestsForAdminAsync(int userId, Role userRole);
 }
