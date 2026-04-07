@@ -22,13 +22,20 @@ public interface IPushNotificationSender
         int? relatedEntityId = null);
 
     /// <summary>
-    /// Sends a push notification to multiple users in parallel.
+    /// Sends a push notification to multiple users sequentially.
     /// </summary>
+    /// <param name="excludeUserIds">
+    /// Optional set of user IDs to skip (e.g. the actor who triggered the event).
+    /// Defence-in-depth: callers should also filter their own lists, but this
+    /// guarantees the excluded users never receive the notification even if the
+    /// caller's query has tracking or race-condition issues.
+    /// </param>
     Task SendToUsersAsync(
         IEnumerable<int> userIds,
         NotificationType type,
         string title,
         string body,
         string? deepLinkUrl = null,
-        int? relatedEntityId = null);
+        int? relatedEntityId = null,
+        IEnumerable<int>? excludeUserIds = null);
 }

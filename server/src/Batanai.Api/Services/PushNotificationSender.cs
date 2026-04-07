@@ -143,12 +143,20 @@ public class PushNotificationSender : IPushNotificationSender
         string title,
         string body,
         string? deepLinkUrl = null,
-        int? relatedEntityId = null)
+        int? relatedEntityId = null,
+        IEnumerable<int>? excludeUserIds = null)
     {
-        // Process sequentially � all user deliveries share the same scoped DbContext,
+        var excluded = excludeUserIds is null ? null : new HashSet<int>(excludeUserIds);
+
+        // Process sequentially — all user deliveries share the same scoped DbContext,
         // so concurrent Task.WhenAll would trigger a "second operation started" exception.
         foreach (var uid in userIds)
         {
+            if (excluded is not null && excluded.Contains(uid))
+            {
+                _logger.LogInformation("Push [{Type}] → user {UserId}: skipped (excluded).", type, uid);
+                continue;
+            }
             await SendToUserAsync(uid, type, title, body, deepLinkUrl, relatedEntityId);
         }
     }

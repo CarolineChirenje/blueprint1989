@@ -139,7 +139,8 @@ public class ExpenseCycleController : ControllerBase
     {
         if (!await CanManageCycleAsync(id)) return Forbid();
 
-        var (dto, error) = await _cycleService.StartAsync(id);
+        var userId = GetCurrentUserId();
+        var (dto, error) = await _cycleService.StartAsync(id, userId);
         if (error != null)
             return error == "Cycle not found." ? NotFound(new { message = error }) : BadRequest(new { message = error });
 

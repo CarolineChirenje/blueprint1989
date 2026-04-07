@@ -452,7 +452,7 @@ public class ExpenseCycleService
         };
     }
 
-    public async Task<(ExpenseCycleDto? dto, string? error)> StartAsync(int cycleId)
+    public async Task<(ExpenseCycleDto? dto, string? error)> StartAsync(int cycleId, int? startedByUserId = null)
     {
         var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
         if (cycle == null) return (null, "Cycle not found.");
@@ -528,7 +528,8 @@ public class ExpenseCycleService
                 $"Mukando started: {cycle.Name}",
                 $"Round 1 has started. {recipientName} receives this round. Contribute {symbol}{cycle.ContributionAmount:F2} by {firstRound.DueDate:MMM d, yyyy}.",
                 $"/cycles/{cycleId}",
-                cycleId);
+                cycleId,
+                excludeUserIds: startedByUserId.HasValue ? new[] { startedByUserId.Value } : null);
         }
         else
         {
@@ -568,7 +569,8 @@ public class ExpenseCycleService
                 $"Cycle started: {cycle.Name}",
                 $"The cycle has started. Your share is {sym}{sharePerMember:F2}. Due by {cycle.EndDate:MMM d, yyyy}.",
                 $"/cycles/{cycleId}",
-                cycleId);
+                cycleId,
+                excludeUserIds: startedByUserId.HasValue ? new[] { startedByUserId.Value } : null);
         }
 
         cycle.StartNotificationSent = true;

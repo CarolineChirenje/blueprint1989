@@ -404,7 +404,8 @@ public class GroupService : IGroupService
                     title: group.Name,
                     body: $"{joinerName} has joined the group.",
                     deepLinkUrl: $"/groups/{groupId}",
-                    relatedEntityId: groupId);
+                    relatedEntityId: groupId,
+                    excludeUserIds: new[] { userId });
             }
         }
 
@@ -473,7 +474,8 @@ public class GroupService : IGroupService
                             title: group.Name,
                             body: $"{removedName} was removed from the group.",
                             deepLinkUrl: $"/groups/{groupId}",
-                            relatedEntityId: groupId);
+                            relatedEntityId: groupId,
+                            excludeUserIds: new[] { userId });
                     }
                 }
             }
@@ -776,14 +778,8 @@ public class GroupService : IGroupService
                             title: group.Name,
                             body: $"{joinerName} has joined the group.",
                             deepLinkUrl: $"/groups/{groupId}",
-                            relatedEntityId: groupId);
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to send join-request response notification for group {GroupId}, user {UserId}", groupId, requestingUserId);
+                            relatedEntityId: groupId,
+                            excludeUserIds: new[] { requestingUserId, respondingUserId });
         }
 
         return null;
