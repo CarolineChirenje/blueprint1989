@@ -39,14 +39,53 @@ This folder contains detailed technical documentation for every feature in the B
 
 ## User Roles
 
-| Role ID | Role Name | Access Level |
+### System Roles
+
+| Role ID | Role Name | Description |
 |---|---|---|
-| 1 | SuperAdmin | Full system access |
-| 2 | Administrator | Full access except system-level config |
-| 3 | Carer | Clinical entry for linked Care Recipients |
-| 4 | SupportWorker | Clinical entry for linked Care Recipients |
-| 5 | CareRecipient | Own data only |
-| 6 | HealthCareProvider | Read access for linked Care Recipients |
+| 1 | SuperAdmin | Full system access – manage all users, app config, system restart, role definitions. Cannot self-register; must be created by an existing SuperAdmin. |
+| 2 | Admin | Manage users, app config, reset passwords, verify emails. Can self-register with an admin PIN. |
+| 3 | Member | Standard user – create/join groups, participate in cycles, manage own profile. |
+
+### Group Roles
+
+| Role ID | Role Name | Description |
+|---|---|---|
+| 1 | GroupAdmin | Invite/remove members, update member roles, manage join requests, regenerate join code, delete group. Automatically assigned to the group creator. Cannot leave if sole admin. |
+| 2 | GroupMember | View group details, participate in cycles, leave group. |
+
+### Authorization Policies
+
+| Policy | Allowed Roles |
+|---|---|
+| SuperAdminOnly | SuperAdmin |
+| AdminOrAbove | SuperAdmin, Admin |
+| MemberOrAbove | SuperAdmin, Admin, Member (all authenticated users) |
+
+### Signup Restrictions
+
+| Role | Registration |
+|---|---|
+| SuperAdmin | Cannot self-register – must be created by the system |
+| Admin | Self-register with admin PIN (configured in App Config) |
+| Member | Self-register (no PIN required) |
+
+### Permissions Summary
+
+| Action | SuperAdmin | Admin | Member | GroupAdmin | GroupMember |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Manage users | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Manage app config | ✓ | ✓ | ✗ | ✗ | ✗ |
+| System restart | ✓ | ✗ | ✗ | ✗ | ✗ |
+| Manage role definitions | ✓ | ✗ | ✗ | ✗ | ✗ |
+| Create groups | ✓ | ✓ | ✓ | – | – |
+| Invite/remove group members | ✓ | ✓ | ✗ | ✓ | ✗ |
+| Manage cycles | ✓ | ✓ | ✗ | ✓ | ✗ |
+| Join groups | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Participate in cycles | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Leave group | ✓ | ✓ | ✓ | ✓* | ✓ |
+
+\* GroupAdmin cannot leave if they are the sole admin – must assign another admin first.
 
 ---
 
