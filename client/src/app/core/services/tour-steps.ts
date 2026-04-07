@@ -15,39 +15,74 @@ export interface TourStepDef {
   openMobileNav?: boolean;
 }
 
+// ─── Shared Constants ───────────────────────────────────────────────────────
+// Single source of truth — change a value here and every step reflects it.
+
+const APP_NAME = 'Batanai';
+const TAGLINE  = 'Bambanani';
+
+const CLASSES = {
+  WELCOME: 'shepherd-welcome',
+} as const;
+
+const ROUTES = {
+  DASHBOARD:       '/dashboard',
+  GROUPS:          '/groups',
+  MGMT_USERS:      '/management/users',
+  MGMT_APP_CONFIG: '/management/app-config',
+} as const;
+
+const SEL = {
+  DASHBOARD_GREETING:    '#dashboard-greeting',
+  OUTSTANDING_BALANCE:   '#outstanding-balance-section',
+  NAV_GROUPS:            '#nav-groups',
+  NEW_GROUP_BTN:         '#new-group-btn',
+  NOTIFICATION_BELL:     '#notification-bell',
+  HELP_MENU_BTN:         '#help-menu-btn',
+  USER_MENU:             '#user-menu',
+  NAV_MANAGEMENT:        '#nav-management',
+  USERS_TABLE:           '#users-table',
+  CONFIG_HEADER:         '#config-header',
+} as const;
+
+/** Factory for the final "done" step — keeps id + classes consistent. */
+function buildDoneStep(title: string, text: string): TourStepDef {
+  return { id: 'tour-done', title, text, classes: CLASSES.WELCOME };
+}
+
 // ─── Member Tour ────────────────────────────────────────────────────────────
 
 export const memberTourSteps: TourStepDef[] = [
   {
     id: 'welcome',
-    title: 'Batanai - Bambanani',
+    title: `${APP_NAME} - ${TAGLINE}`,
     text: `
-      <p>Batanai makes it easy to <strong>share expenses</strong> and run
+      <p>${APP_NAME} makes it easy to <strong>share expenses</strong> and run
       <strong>rotating savings groups</strong> (Mukando) with friends, family or colleagues.</p>
       <p>Let us take a quick tour of the key features.</p>
     `,
-    classes: 'shepherd-welcome',
-    route: '/dashboard',
+    classes: CLASSES.WELCOME,
+    route: ROUTES.DASHBOARD,
   },
   {
     id: 'dashboard-greeting',
     title: 'Your Dashboard',
     text: 'This is your home base. You will see a personalised greeting and today\'s date here.',
-    attachTo: { element: '#dashboard-greeting', on: 'bottom' },
-    route: '/dashboard',
+    attachTo: { element: SEL.DASHBOARD_GREETING, on: 'bottom' },
+    route: ROUTES.DASHBOARD,
   },
   {
     id: 'outstanding-balance',
     title: 'Outstanding Balance',
-    text: 'Your total outstanding balance across all active cycles is shown here,so you always know where you stand.',
-    attachTo: { element: '#outstanding-balance-section', on: 'bottom' },
-    route: '/dashboard',
+    text: 'Your total outstanding balance across all active cycles is shown here, so you always know where you stand.',
+    attachTo: { element: SEL.OUTSTANDING_BALANCE, on: 'bottom' },
+    route: ROUTES.DASHBOARD,
   },
   {
     id: 'nav-groups',
     title: 'Groups',
     text: 'All your expense-sharing groups live here. Click <strong>Groups</strong> to view, create or join a group.',
-    attachTo: { element: '#nav-groups', on: 'bottom' },
+    attachTo: { element: SEL.NAV_GROUPS, on: 'bottom' },
     openMobileNav: true,
   },
   {
@@ -58,38 +93,36 @@ export const memberTourSteps: TourStepDef[] = [
       to enter a group code someone shared with you.</p>
       <p>Inside a group you will manage shared expense cycles and Mukando rounds.</p>
     `,
-    attachTo: { element: '#new-group-btn', on: 'bottom' },
-    route: '/groups',
+    attachTo: { element: SEL.NEW_GROUP_BTN, on: 'bottom' },
+    route: ROUTES.GROUPS,
   },
   {
     id: 'notification-bell',
     title: 'Notifications',
     text: 'Invitations, payment confirmations, reminders and other updates appear here. A red badge shows your unread count.',
-    attachTo: { element: '#notification-bell', on: 'bottom' },
+    attachTo: { element: SEL.NOTIFICATION_BELL, on: 'bottom' },
     openMobileNav: true,
   },
   {
     id: 'help-menu',
     title: 'Help & Info',
     text: 'Find release notes, app info and you can <strong>re-launch this tour</strong> anytime from this menu.',
-    attachTo: { element: '#help-menu-btn', on: 'bottom' },
+    attachTo: { element: SEL.HELP_MENU_BTN, on: 'bottom' },
     openMobileNav: true,
   },
   {
     id: 'user-menu',
     title: 'Your Profile',
     text: 'Manage your profile, change your password, set up biometric login and configure notification preferences.',
-    attachTo: { element: '#user-menu', on: 'bottom' },
+    attachTo: { element: SEL.USER_MENU, on: 'bottom' },
   },
-  {
-    id: 'tour-done',
-    title: 'You are All Set!',
-    text: `
+  buildDoneStep(
+    'You are All Set!',
+    `
       <p>That is everything to get started. Your next step:</p>
-      <p><strong>Create a group</strong> or <strong>join one</strong> and start sharing expenses - Bambanani!</p>
+      <p><strong>Create a group</strong> or <strong>join one</strong> and start sharing expenses - ${TAGLINE}!</p>
     `,
-    classes: 'shepherd-welcome',
-  },
+  ),
 ];
 
 // ─── Admin Tour ─────────────────────────────────────────────────────────────
@@ -99,42 +132,38 @@ const adminExtraSteps: TourStepDef[] = [
   {
     id: 'nav-management',
     title: 'Management',
-    text: 'As an administrator you have access to the <strong>Management</strong> section  user accounts, app configuration, and feedback reports.',
-    attachTo: { element: '#nav-management', on: 'bottom' },
+    text: 'As an administrator you have access to the <strong>Management</strong> section — user accounts, app configuration, and feedback reports.',
+    attachTo: { element: SEL.NAV_MANAGEMENT, on: 'bottom' },
     openMobileNav: true,
   },
   {
     id: 'user-management',
     title: 'User Management',
     text: 'View all users, edit roles, activate or deactivate accounts and manage group memberships.',
-    attachTo: { element: '#users-table', on: 'top' },
-    route: '/management/users',
+    attachTo: { element: SEL.USERS_TABLE, on: 'top' },
+    route: ROUTES.MGMT_USERS,
   },
   {
     id: 'app-config',
     title: 'App Configuration',
     text: 'Configure runtime settings like SMTP, JWT expiry, password policies and more. Changes take effect immediately unless a restart is required.',
-    attachTo: { element: '#config-header', on: 'bottom' },
-    route: '/management/app-config',
+    attachTo: { element: SEL.CONFIG_HEADER, on: 'bottom' },
+    route: ROUTES.MGMT_APP_CONFIG,
   },
 ];
-
-const adminDoneStep: TourStepDef = {
-  id: 'tour-done',
-  title: 'You are All Set, Admin!',
-  text: `
-    <p>You have full admin access. Besides sharing expenses, you can manage
-    users and app settings from the <strong>Management</strong> menu.</p>
-    <p>Explore the management tools anytime,Bambanani!</p>
-  `,
-  classes: 'shepherd-welcome',
-};
 
 // Member steps minus the final "done", then admin extras, then admin done.
 export const adminTourSteps: TourStepDef[] = [
   ...memberTourSteps.slice(0, -1),
   ...adminExtraSteps,
-  adminDoneStep,
+  buildDoneStep(
+    'You are All Set, Admin!',
+    `
+      <p>You have full admin access. Besides sharing expenses, you can manage
+      users and app settings from the <strong>Management</strong> menu.</p>
+      <p>Explore the management tools anytime, ${TAGLINE}!</p>
+    `,
+  ),
 ];
 
 // ─── SuperAdmin Tour ────────────────────────────────────────────────────────
