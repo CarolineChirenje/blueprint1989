@@ -121,11 +121,11 @@ const adminExtraSteps: TourStepDef[] = [
 
 const adminDoneStep: TourStepDef = {
   id: 'tour-done',
-  title: 'You are All Set!',
+  title: 'You are All Set, Admin!',
   text: `
     <p>You have full admin access. Besides sharing expenses, you can manage
     users and app settings from the <strong>Management</strong> menu.</p>
-    <p>Explore the management tools anytime,!</p>
+    <p>Explore the management tools anytime,Bambanani!</p>
   `,
   classes: 'shepherd-welcome',
 };
