@@ -22,11 +22,11 @@ Groups are managed by one or more **Group Admins** who can invite members, appro
 
 ## Backend
 
-### Controller — `GroupController`
+### Controller â€” `GroupController`
 
 **File:** `server/src/Batanai.Api/Controllers/GroupController.cs`
 
-Base route: `/api/groups` — all endpoints require `[Authorize]`
+Base route: `/api/groups` â€” all endpoints require `[Authorize]`
 
 | Method | Route | Description |
 |---|---|---|
@@ -49,7 +49,7 @@ Base route: `/api/groups` — all endpoints require `[Authorize]`
 
 ---
 
-### Model — `Group`
+### Model â€” `Group`
 
 **File:** `server/src/Batanai.Api/Models/Group.cs`
 
@@ -59,7 +59,7 @@ Base route: `/api/groups` — all endpoints require `[Authorize]`
 | `Name` | `string` | Required, max 150 characters |
 | `Description` | `string?` | Optional, max 500 characters |
 | `IsActive` | `bool` | Defaults to `true` |
-| `CreatedByUserId` | `int` | FK → User |
+| `CreatedByUserId` | `int` | FK â†’ User |
 | `CreatedAt` | `DateTime` | UTC timestamp |
 | `UpdatedAt` | `DateTime` | UTC timestamp |
 | `JoinCode` | `string` | 8-character unique code, required |
@@ -67,21 +67,21 @@ Base route: `/api/groups` — all endpoints require `[Authorize]`
 
 ---
 
-### Model — `GroupMember`
+### Model â€” `GroupMember`
 
 **File:** `server/src/Batanai.Api/Models/GroupMember.cs`
 
 | Field | Type | Notes |
 |---|---|---|
-| `GroupId` | `int` | Composite PK — FK → Group (cascade delete) |
-| `UserId` | `int` | Composite PK — FK → User (cascade delete) |
+| `GroupId` | `int` | Composite PK â€” FK â†’ Group (cascade delete) |
+| `UserId` | `int` | Composite PK â€” FK â†’ User (cascade delete) |
 | `GroupRole` | `GroupRole` | `GroupAdmin = 1` or `GroupMember = 2` |
 | `Status` | `GroupInviteStatus` | `Pending = 1`, `Accepted = 2`, `Declined = 3`, `JoinRequested = 4` |
-| `InvitedByUserId` | `int?` | FK → User — who sent the invite |
+| `InvitedByUserId` | `int?` | FK â†’ User â€” who sent the invite |
 | `InvitedAt` | `DateTime` | When the member was invited |
 | `RespondedAt` | `DateTime?` | When the user accepted or declined |
 | `JoinRequestedAt` | `DateTime?` | When the user submitted a join-by-code request |
-| `ApprovedByUserId` | `int?` | FK → User — who approved the join request |
+| `ApprovedByUserId` | `int?` | FK â†’ User â€” who approved the join request |
 | `ApprovedAt` | `DateTime?` | When the join request was approved |
 
 ---
@@ -108,7 +108,7 @@ public enum GroupInviteStatus
 
 ---
 
-### Service — `GroupService`
+### Service â€” `GroupService`
 
 **File:** `server/src/Batanai.Api/Services/GroupService.cs`
 **Interface:** `server/src/Batanai.Api/Services/IGroupService.cs`
@@ -133,10 +133,10 @@ public enum GroupInviteStatus
 | `InviteMemberAsync(groupId, request, inviterId, inviterRole)` | `(GroupMemberDto?, string?)` | Creates `GroupMember` with `Pending` status; sends notification |
 | `RespondToInviteAsync(groupId, userId, request)` | `string?` | Accept or decline; if accepted, notifies existing members |
 | `RemoveMemberAsync(groupId, targetUserId, userId, userRole)` | `string?` | Remove member; cannot remove last Group Admin |
-| `UpdateMemberRoleAsync(groupId, targetUserId, request, userId, userRole)` | `string?` | Change role (Admin ↔ Member); cannot demote last Group Admin |
+| `UpdateMemberRoleAsync(groupId, targetUserId, request, userId, userRole)` | `string?` | Change role (Admin â†” Member); cannot demote last Group Admin |
 | `LeaveGroupAsync(groupId, userId)` | `string?` | User leaves; cannot leave if last Group Admin |
 | `RequestJoinByCodeAsync(joinCode, userId)` | `(JoinByCodeResponse?, string?)` | Creates member with `JoinRequested` status; notifies all Group Admins |
-| `RespondToJoinRequestAsync(groupId, requestingUserId, approve, respondingUserId, userRole)` | `string?` | Approve → `Accepted` + notify; decline → `Declined` + notify |
+| `RespondToJoinRequestAsync(groupId, requestingUserId, approve, respondingUserId, userRole)` | `string?` | Approve â†’ `Accepted` + notify; decline â†’ `Declined` + notify |
 | `RegenerateJoinCodeAsync(groupId, userId, userRole)` | `(string?, string?, string?)` | Generates new 8-char code; old code becomes invalid |
 | `IsGroupAdminOfGroupAsync(groupId, userId)` | `bool` | Check if user is admin of specific group |
 
@@ -192,17 +192,17 @@ public DbSet<Group> Groups { get; set; } = null!;
 public DbSet<GroupMember> GroupMembers { get; set; } = null!;
 ```
 
-**Group entity** — Table `"Groups"`:
+**Group entity** â€” Table `"Groups"`:
 - `JoinCode`: Required, max 8 chars, unique index
 - `Name`: Required, max 150 chars
-- `CreatedByUserId`: FK → User with Restrict delete
+- `CreatedByUserId`: FK â†’ User with Restrict delete
 
-**GroupMember entity** — Table `"GroupMembers"`:
+**GroupMember entity** â€” Table `"GroupMembers"`:
 - Composite key: `(GroupId, UserId)`
-- `GroupId` → Group with Cascade delete
-- `UserId` → User with Cascade delete
-- `InvitedByUserId` → User with Restrict delete
-- `ApprovedByUserId` → User with Restrict delete
+- `GroupId` â†’ Group with Cascade delete
+- `UserId` â†’ User with Cascade delete
+- `InvitedByUserId` â†’ User with Restrict delete
+- `ApprovedByUserId` â†’ User with Restrict delete
 
 ---
 
@@ -366,7 +366,7 @@ Modal dialog for joining a group by code:
 
 1. User clicks **New Group** on the groups list
 2. Modal opens with name and description fields
-3. User submits → `POST /api/groups`
+3. User submits â†’ `POST /api/groups`
 4. Server creates `Group` with a generated join code
 5. Creator is automatically added as `GroupAdmin` with `Accepted` status
 6. Modal closes, groups list reloads
@@ -375,7 +375,7 @@ Modal dialog for joining a group by code:
 
 1. Group Admin opens **Manage Members** dialog
 2. Searches for user by name or email, selects role
-3. Clicks **Send Invite** → `POST /api/groups/{id}/invites`
+3. Clicks **Send Invite** â†’ `POST /api/groups/{id}/invites`
 4. Server creates `GroupMember` with `Status = Pending`
 5. Invited user receives `GroupInviteReceived` in-app notification
 6. Members table updates with new pending entry
@@ -384,25 +384,25 @@ Modal dialog for joining a group by code:
 
 1. User receives `GroupInviteReceived` notification
 2. Navigates to pending invites (via notification or `/groups/my-invites`)
-3. Clicks Accept or Decline → `POST /api/groups/{id}/invites/respond`
-4. If accepted: status → `Accepted`; existing members receive `MemberJoinedGroup` push notification
-5. If declined: status → `Declined`
+3. Clicks Accept or Decline â†’ `POST /api/groups/{id}/invites/respond`
+4. If accepted: status â†’ `Accepted`; existing members receive `MemberJoinedGroup` push notification
+5. If declined: status â†’ `Declined`
 
 ### Join by Code
 
 1. Group Admin shares the 8-character join code or QR link
-2. User enters code in **Join Group** dialog or scans QR → `POST /api/groups/join`
+2. User enters code in **Join Group** dialog or scans QR â†’ `POST /api/groups/join`
 3. Server creates `GroupMember` with `Status = JoinRequested`
 4. All Group Admins receive `JoinRequestReceived` push notification
-5. Admin approves or declines → `POST /api/groups/{id}/join-requests/{userId}/respond`
-6. If approved: status → `Accepted`; user receives `JoinRequestApproved`; existing members receive `MemberJoinedGroup`
-7. If declined: status → `Declined`; user receives `JoinRequestDeclined`
+5. Admin approves or declines â†’ `POST /api/groups/{id}/join-requests/{userId}/respond`
+6. If approved: status â†’ `Accepted`; user receives `JoinRequestApproved`; existing members receive `MemberJoinedGroup`
+7. If declined: status â†’ `Declined`; user receives `JoinRequestDeclined`
 
 ### Leave Group
 
 1. Member clicks **Leave Group** on group detail
 2. Confirmation dialog appears
-3. User confirms → `POST /api/groups/{id}/leave`
+3. User confirms â†’ `POST /api/groups/{id}/leave`
 4. Server removes `GroupMember` (blocked if last Group Admin)
 5. Remaining members receive `MemberLeftGroup` push notification
 6. User is redirected to `/groups`
@@ -411,6 +411,6 @@ Modal dialog for joining a group by code:
 
 1. Group Admin clicks **Regenerate** on the join code section
 2. Confirmation warning: old code becomes invalid immediately
-3. User confirms → `POST /api/groups/{id}/regenerate-code`
+3. User confirms â†’ `POST /api/groups/{id}/regenerate-code`
 4. Server generates new 8-character code
 5. QR code and displayed code update in the UI

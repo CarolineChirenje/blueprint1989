@@ -1,4 +1,4 @@
-# Batanai — Brand Identity
+# Batanai â€” Brand Identity
 
 ## Overview
 
@@ -8,43 +8,43 @@ This document defines the Batanai visual identity system: the meaning behind the
 
 ## Brand Name
 
-**Batanai** is a Shona word meaning **"togetherness"** or **"unity."** It captures the platform's core purpose — bringing people together to manage shared finances transparently.
+**Batanai** is a Shona word meaning **"togetherness"** or **"unity."** It captures the platform's core purpose â€” bringing people together to manage shared finances transparently.
 
 The tagline **"Bambanani"** (Zulu/Ndebele for "hold each other" / "support one another") reinforces the communal philosophy. Together, the name and tagline communicate trust, mutual accountability, and collective financial well-being.
 
 ---
 
-## Brand Mark — "Unity Savings"
+## Brand Mark â€” "Unity Savings"
 
 The Batanai icon is a circular emblem that encodes three ideas in a single mark:
 
 ```
-┌─────────────────────────────────────────┐
-│                                         │
-│         ●  (community dot)              │
-│                                         │
-│    ●   ╭━━━━━━━━━━━━━━╮   ●            │
-│        │  ╭──────────╮ │                │
-│        │  │  🐷 + 🪙  │ │                │
-│        │  ╰──────────╯ │                │
-│    ●   ╰━━━━━━━━━━━━━━╯   ●            │
-│                                         │
-│         ●  (community dot)              │
-│                                         │
-└─────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                                         â”‚
+â”‚         â—  (community dot)              â”‚
+â”‚                                         â”‚
+â”‚    â—   â•­â”â”â”â”â”â”â”â”â”â”â”â”â”â”â•®   â—            â”‚
+â”‚        â”‚  â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•® â”‚                â”‚
+â”‚        â”‚  â”‚  ðŸ· + ðŸª™  â”‚ â”‚                â”‚
+â”‚        â”‚  â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯ â”‚                â”‚
+â”‚    â—   â•°â”â”â”â”â”â”â”â”â”â”â”â”â”â”â•¯   â—            â”‚
+â”‚                                         â”‚
+â”‚         â—  (community dot)              â”‚
+â”‚                                         â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### 1. Unity Ring
 
 A bold green ring (`#237A49`) forms the dominant shape. It represents:
 
-- **Togetherness** — a circle with no beginning or end, symbolising ongoing mutual support.
-- **The group** — every Batanai feature operates within the context of a group; the ring is the group boundary.
-- **Trust** — a closed, protective shape encircling the members' shared funds.
+- **Togetherness** â€” a circle with no beginning or end, symbolising ongoing mutual support.
+- **The group** â€” every Batanai feature operates within the context of a group; the ring is the group boundary.
+- **Trust** â€” a closed, protective shape encircling the members' shared funds.
 
 ### 2. Community Dots
 
-Four small green circles are placed on the ring at 12, 3, 6, and 9 o'clock. They represent group members — the people who make Batanai work. Four dots were chosen for visual balance; they do not imply a group-size limit.
+Four small green circles are placed on the ring at 12, 3, 6, and 9 o'clock. They represent group members â€” the people who make Batanai work. Four dots were chosen for visual balance; they do not imply a group-size limit.
 
 At small icon sizes (32px and below), the dots merge naturally into the ring stroke, preserving a clean silhouette without losing the community metaphor at larger sizes.
 
@@ -52,9 +52,9 @@ At small icon sizes (32px and below), the dots merge naturally into the ring str
 
 A flat-design pink piggy bank sits at the centre of the ring. A gold coin drops into its coin slot with a subtle motion trail above it. This element communicates:
 
-- **Savings** — the primary purpose of both Majana (expense splitting) and Mukando (rotating savings) cycles.
-- **Action** — the coin mid-drop conveys active participation rather than a static symbol.
-- **Approachability** — the piggy bank is universally recognised and non-intimidating, intentionally avoiding currency symbols that would tie the brand to a single economy.
+- **Savings** â€” the primary purpose of both Majana (expense splitting) and Mukando (rotating savings) cycles.
+- **Action** â€” the coin mid-drop conveys active participation rather than a static symbol.
+- **Approachability** â€” the piggy bank is universally recognised and non-intimidating, intentionally avoiding currency symbols that would tie the brand to a single economy.
 
 A green accent arc underneath the pig echoes the ring's colour, grounding the pig inside the circle and reinforcing brand-colour consistency.
 
@@ -66,12 +66,12 @@ Two SVG source files exist. All raster assets (PNG, ICO) are machine-generated f
 
 | Variant | File | Canvas | Usage |
 |---|---|---|---|
-| **Emblem** (icon) | `assets/icons/icon.svg` | 512 × 512 | App icon, favicon, manifest, splash screen, about page, Apple touch icon |
-| **Full logo** (emblem + wordmark) | `assets/icons/logo-full.svg` | 512 × 640 | Login screen |
+| **Emblem** (icon) | `assets/icons/icon.svg` | 512 Ã— 512 | App icon, favicon, manifest, splash screen, about page, Apple touch icon |
+| **Full logo** (emblem + wordmark) | `assets/icons/logo-full.svg` | 512 Ã— 640 | Login screen |
 
 ### Why Two Variants?
 
-- **Emblem only** is used wherever icons appear at small sizes (16–512px). Text becomes illegible below ~80px, and mobile home screens already display the app name underneath the icon — duplicating it inside the icon is redundant.
+- **Emblem only** is used wherever icons appear at small sizes (16â€“512px). Text becomes illegible below ~80px, and mobile home screens already display the app name underneath the icon â€” duplicating it inside the icon is redundant.
 - **Full logo** is used only on the login screen (~165px render size), where it is the first brand touchpoint for new users. The wordmark "BATANAI" in Inter 800 weight provides immediate brand-name recognition before the user has seen the app name elsewhere.
 
 ---
@@ -82,10 +82,10 @@ Two SVG source files exist. All raster assets (PNG, ICO) are machine-generated f
 
 | Swatch | Name | Hex | Role |
 |---|---|---|---|
-| 🟩 | **Brand Green** | `#237A49` | Unity ring, community dots, wordmark, all UI primary controls (buttons, toggles, tabs, progress bars) |
-| 🩷 | **Piggy Pink** | `#EF8FA1` | Piggy bank body — secondary accent used only in the icon, not in the UI |
-| 🟡 | **Coin Gold** | `#FFD700` | Dropping coin — tertiary accent used only in the icon |
-| ⬜ | **Clean White** | `#FFFFFF` | Icon inner circle, pig outline strokes, app card backgrounds |
+| ðŸŸ© | **Brand Green** | `#237A49` | Unity ring, community dots, wordmark, all UI primary controls (buttons, toggles, tabs, progress bars) |
+| ðŸ©· | **Piggy Pink** | `#EF8FA1` | Piggy bank body â€” secondary accent used only in the icon, not in the UI |
+| ðŸŸ¡ | **Coin Gold** | `#FFD700` | Dropping coin â€” tertiary accent used only in the icon |
+| â¬œ | **Clean White** | `#FFFFFF` | Icon inner circle, pig outline strokes, app card backgrounds |
 
 ### Extended UI Palette (CSS custom properties)
 
@@ -112,12 +112,12 @@ The icon's green (`#237A49`) is **the same value** used in every CSS variable, M
 |---|---|---|---|
 | **App UI** | Inter | 400 / 500 / 600 / 700 | Loaded from Google Fonts; used for all body text, headings, and form labels |
 | **Logo wordmark** | Inter | 800 (ExtraBold) | "BATANAI" text in `logo-full.svg`, letter-spacing 6px |
-| **Icon internals** | N/A | — | No text inside the emblem icon; all communication is purely graphical |
-| **Material Icons** | Material Icons | — | Google's icon font for UI action icons (not branding) |
+| **Icon internals** | N/A | â€” | No text inside the emblem icon; all communication is purely graphical |
+| **Material Icons** | Material Icons | â€” | Google's icon font for UI action icons (not branding) |
 
 ### Why Inter?
 
-Inter was designed for screen readability at small sizes with tall x-height and open apertures. It renders crisply on both high-DPI and low-DPI mobile screens — critical for a mobile-first PWA.
+Inter was designed for screen readability at small sizes with tall x-height and open apertures. It renders crisply on both high-DPI and low-DPI mobile screens â€” critical for a mobile-first PWA.
 
 ---
 
@@ -129,12 +129,12 @@ All raster icons are generated from `icon.svg` using a Node.js script (`scripts/
 
 ```
 icon.svg (source of truth)
-    │
-    ├──► icon-512x512.png          (regular, rx="72" rounded corners)
-    ├──► icon-192x192.png          (regular, rx="72" rounded corners)
-    ├──► icon-maskable-512x512.png (maskable, rx="0" square edges)
-    ├──► icon-maskable-192x192.png (maskable, rx="0" square edges)
-    └──► favicon.ico               (bundled 16 + 32 + 48 px)
+    â”‚
+    â”œâ”€â”€â–º icon-512x512.png          (regular, rx="72" rounded corners)
+    â”œâ”€â”€â–º icon-192x192.png          (regular, rx="72" rounded corners)
+    â”œâ”€â”€â–º icon-maskable-512x512.png (maskable, rx="0" square edges)
+    â”œâ”€â”€â–º icon-maskable-192x192.png (maskable, rx="0" square edges)
+    â””â”€â”€â–º favicon.ico               (bundled 16 + 32 + 48 px)
 ```
 
 ### How It Works
@@ -162,12 +162,12 @@ The SVG must contain a `<rect id="icon-bg" width="512" height="512" rx="72">` el
 
 | File | Type | Size | Purpose |
 |---|---|---|---|
-| `client/src/assets/icons/icon.svg` | SVG | 512 × 512 | Source emblem — all PNGs and ICO are derived from this |
-| `client/src/assets/icons/logo-full.svg` | SVG | 512 × 640 | Emblem + "BATANAI" wordmark for login screen |
-| `client/src/assets/icons/icon-512x512.png` | PNG | 512 × 512 | PWA manifest icon (`purpose: any`) |
-| `client/src/assets/icons/icon-192x192.png` | PNG | 192 × 192 | PWA manifest icon (`purpose: any`), Apple touch icon |
-| `client/src/assets/icons/icon-maskable-512x512.png` | PNG | 512 × 512 | PWA manifest icon (`purpose: maskable`) |
-| `client/src/assets/icons/icon-maskable-192x192.png` | PNG | 192 × 192 | PWA manifest icon (`purpose: maskable`) |
+| `client/src/assets/icons/icon.svg` | SVG | 512 Ã— 512 | Source emblem â€” all PNGs and ICO are derived from this |
+| `client/src/assets/icons/logo-full.svg` | SVG | 512 Ã— 640 | Emblem + "BATANAI" wordmark for login screen |
+| `client/src/assets/icons/icon-512x512.png` | PNG | 512 Ã— 512 | PWA manifest icon (`purpose: any`) |
+| `client/src/assets/icons/icon-192x192.png` | PNG | 192 Ã— 192 | PWA manifest icon (`purpose: any`), Apple touch icon |
+| `client/src/assets/icons/icon-maskable-512x512.png` | PNG | 512 Ã— 512 | PWA manifest icon (`purpose: maskable`) |
+| `client/src/assets/icons/icon-maskable-192x192.png` | PNG | 192 Ã— 192 | PWA manifest icon (`purpose: maskable`) |
 | `client/src/favicon.ico` | ICO | 16+32+48 | Browser tab favicon |
 
 ---
@@ -180,8 +180,8 @@ The SVG must contain a `<rect id="icon-bg" width="512" height="512" rx="72">` el
 | **PWA home screen** | `manifest.webmanifest` | `icons` array (all 5 entries) |
 | **PWA splash screen** | `index.html` | `<img src="assets/icons/icon.svg">` on `#237A49` background |
 | **Apple touch icon** | `index.html` | `<link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">` |
-| **Login screen** | `login.component.html` | `<img src="assets/icons/logo-full.svg">` at ~165 × 165px |
-| **About screen** | `about.component.html` | `<img src="assets/icons/icon.svg">` at 22 × 22px |
+| **Login screen** | `login.component.html` | `<img src="assets/icons/logo-full.svg">` at ~165 Ã— 165px |
+| **About screen** | `about.component.html` | `<img src="assets/icons/icon.svg">` at 22 Ã— 22px |
 | **Theme colour** | `index.html` + `manifest.webmanifest` | `<meta name="theme-color" content="#237A49">` |
 
 ---
@@ -192,7 +192,7 @@ The emblem was designed to degrade gracefully across all sizes:
 
 | Size | What's Visible | Context |
 |---|---|---|
-| **512px** | Full detail — ring, dots, pig body, ear, snout, nostrils, eye, legs, tail, coin slot, gold coin with trail, green accent arc | PWA install prompt, store listing |
+| **512px** | Full detail â€” ring, dots, pig body, ear, snout, nostrils, eye, legs, tail, coin slot, gold coin with trail, green accent arc | PWA install prompt, store listing |
 | **192px** | Ring, dots, pig shape, coin clearly readable | Home screen icon, Apple touch icon |
 | **48px** | Green ring, pink pig silhouette, gold dot | Favicon (high-DPI) |
 | **32px** | Green circle with pink centre | Favicon (standard) |

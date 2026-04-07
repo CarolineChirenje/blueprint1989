@@ -29,9 +29,9 @@ No server call is made on Dashboard load beyond what is cached from login.
 |---|---|---|
 | `/dashboard` | `DashboardComponent` | `AuthGuard` |
 
-This is the **default route** — navigating to `/` redirects to `/dashboard` after authentication.
+This is the **default route** â€” navigating to `/` redirects to `/dashboard` after authentication.
 
-### `DashboardComponent` — `/dashboard`
+### `DashboardComponent` â€” `/dashboard`
 
 **File:** `client/src/app/features/dashboard/components/dashboard.component.ts`
 

@@ -10,27 +10,27 @@ The Push Notifications system delivers real-time alerts to users via the **Web P
 
 ```
 Event occurs (e.g., BP Incident with Stage 2 classification)
-  → PushNotificationSender.SendAsync(recipientUserId, notificationType, payload)
+  â†’ PushNotificationSender.SendAsync(recipientUserId, notificationType, payload)
      1. Creates in-app Notification row in DB
      2. Loads NotificationPreference for user + type
-     3. If preference disabled → stop
+     3. If preference disabled â†’ stop
      4. Loads all PushSubscriptions for user
      5. For each subscription: sends VAPID push via WebPush library
-        → HTTP 410 Gone: subscription removed from DB (pruned)
-        → HTTP 4xx/5xx: logged, continue to next subscription
+        â†’ HTTP 410 Gone: subscription removed from DB (pruned)
+        â†’ HTTP 4xx/5xx: logged, continue to next subscription
 
 Client (browser / service worker)
-  → SW receives 'push' event
-  → Parses payload JSON
-  → Calls self.registration.showNotification(title, options)
-  → On 'notificationclick': opens app URL (if provided in payload)
+  â†’ SW receives 'push' event
+  â†’ Parses payload JSON
+  â†’ Calls self.registration.showNotification(title, options)
+  â†’ On 'notificationclick': opens app URL (if provided in payload)
 ```
 
 ---
 
 ## Backend
 
-### Controller — `PushController`
+### Controller â€” `PushController`
 
 **File:** `server/src/Batanai.Api/Controllers/PushController.cs`
 
@@ -57,7 +57,7 @@ Accepts a `PushSubscriptionDto`:
 }
 ```
 
-Deduplicates by `endpoint` — if already exists for the user, updates the keys in place.
+Deduplicates by `endpoint` â€” if already exists for the user, updates the keys in place.
 
 #### Unsubscribe
 
@@ -72,14 +72,14 @@ Sends a push immediately with payload:
 
 ---
 
-### Model — `PushSubscription`
+### Model â€” `PushSubscription`
 
 **File:** `server/src/Batanai.Api/Models/PushSubscription.cs`
 
 | Field | Type | Notes |
 |---|---|---|
 | `Id` | `int` | PK |
-| `UserId` | `int` | FK → User |
+| `UserId` | `int` | FK â†’ User |
 | `Endpoint` | `string` | Browser push endpoint URL |
 | `P256dh` | `string` | Client public key (Base64url) |
 | `Auth` | `string` | Client auth secret (Base64url) |
@@ -89,7 +89,7 @@ Sends a push immediately with payload:
 
 ---
 
-### Service — `PushNotificationSender`
+### Service â€” `PushNotificationSender`
 
 **File:** `server/src/Batanai.Api/Services/PushNotificationSender.cs`
 
@@ -99,18 +99,18 @@ The `PushNotificationSender` is the central dispatch service used by all feature
 
 Full 5-step pipeline:
 
-**Step 1 — Create In-App Notification**
+**Step 1 â€” Create In-App Notification**
 Inserts a `Notification` row into the database (see [Notifications.md](Notifications.md)).
 
-**Step 2 — Load Preference**
+**Step 2 â€” Load Preference**
 Calls `NotificationPreferenceService.GetPreferenceAsync(userId, notificationType)`.
-- If the preference is disabled (`IsEnabled = false`) → method returns early. No push is sent.
+- If the preference is disabled (`IsEnabled = false`) â†’ method returns early. No push is sent.
 
-**Step 3 — Load Subscriptions**
+**Step 3 â€” Load Subscriptions**
 Queries all `PushSubscription` rows for the target `userId`.
-- If the user has no subscriptions → returns early.
+- If the user has no subscriptions â†’ returns early.
 
-**Step 4 — Send VAPID Push**
+**Step 4 â€” Send VAPID Push**
 For each subscription, constructs a `WebPushPayload`:
 ```json
 {
@@ -121,12 +121,12 @@ For each subscription, constructs a `WebPushPayload`:
 ```
 Sends via the **WebPush** library using the VAPID private key loaded from `AppConfig` (`VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`).
 
-**Step 5 — Prune Dead Subscriptions**
+**Step 5 â€” Prune Dead Subscriptions**
 If the push service returns **HTTP 410 Gone** (subscription expired/removed by the browser), the subscription row is deleted from the database. Other HTTP errors (400, 413) are logged but do not delete the row.
 
 ---
 
-### Background Timer — `BgTimerHostedService`
+### Background Timer â€” `BgTimerHostedService`
 
 **File:** `server/src/Batanai.Api/Services/BgTimerHostedService.cs`
 
@@ -139,7 +139,7 @@ A hosted background service that polls for scheduled push reminders.
 - For each: calls `PushNotificationSender.SendAsync(timer.UserId, "BgTimerReminder", ...)`.
 - Sets `SentAt = DateTime.UtcNow` on the row to prevent re-sending.
 
-#### Schedule Endpoint — `POST /push/bg-timer/schedule`
+#### Schedule Endpoint â€” `POST /push/bg-timer/schedule`
 
 Request body:
 ```json
@@ -152,7 +152,7 @@ Request body:
 
 Creates a `BgTimer` row: `ScheduledAt = DateTime.UtcNow.AddMinutes(minutesFromNow)`.
 
-#### Cancel Endpoint — `DELETE /push/bg-timer/cancel/{id}`
+#### Cancel Endpoint â€” `DELETE /push/bg-timer/cancel/{id}`
 
 Sets `CancelledAt = DateTime.UtcNow` on the row (soft cancel). The hosted service skips rows with a non-null `CancelledAt`.
 
@@ -161,7 +161,7 @@ Sets `CancelledAt = DateTime.UtcNow` on the row (soft cancel). The hosted servic
 | Field | Type | Notes |
 |---|---|---|
 | `Id` | `int` | PK |
-| `UserId` | `int` | FK → User (push target) |
+| `UserId` | `int` | FK â†’ User (push target) |
 | `CareRecipientId` | `int?` | Context CR |
 | `Message` | `string` | Custom reminder text |
 | `ScheduledAt` | `DateTime` | When to send |
@@ -199,9 +199,9 @@ Keys are generated once using the `vapid-keygen` utility project at `server/vapi
 Called on every successful login (from `LoginComponent` after token is received).
 
 Full flow:
-1. Checks `'PushManager' in window` — if not supported, stops silently.
+1. Checks `'PushManager' in window` â€” if not supported, stops silently.
 2. Gets the service worker registration: `navigator.serviceWorker.ready`.
-3. Checks current permission: if `'denied'` → stops.
+3. Checks current permission: if `'denied'` â†’ stops.
 4. Calls `pushManager.getSubscription()`.
    - If subscription exists: calls `POST /push/subscribe` with existing subscription (re-registering is idempotent).
    - If no subscription: requests permission via `Notification.requestPermission()`.
@@ -299,28 +299,28 @@ The `notificationclick` handler opens the app and navigates to the `url` embedde
 
 ```
 1. User logs in
-   → PushNotificationService.subscribeToServer()
-   → Browser prompts for notification permission
-   → SW pushManager.subscribe({ applicationServerKey: vapidPublicKey })
-   → POST /push/subscribe { endpoint, p256dh, auth }
-   → Server saves PushSubscription row
+   â†’ PushNotificationService.subscribeToServer()
+   â†’ Browser prompts for notification permission
+   â†’ SW pushManager.subscribe({ applicationServerKey: vapidPublicKey })
+   â†’ POST /push/subscribe { endpoint, p256dh, auth }
+   â†’ Server saves PushSubscription row
 
 2. Clinical event occurs (e.g., BP incident with Stage 2)
-   → BpIncidentService creates incident
-   → PushNotificationSender.SendAsync(adminId, "BpHighAlert", ...)
-     → Notification row created in DB (in-app bell)
-     → Preference checked → enabled
-     → Load PushSubscription rows for admin
-     → WebPush.SendNotificationAsync(endpoint, p256dh, auth, payload, VAPID)
-     → Push service delivers to browser
+   â†’ BpIncidentService creates incident
+   â†’ PushNotificationSender.SendAsync(adminId, "BpHighAlert", ...)
+     â†’ Notification row created in DB (in-app bell)
+     â†’ Preference checked â†’ enabled
+     â†’ Load PushSubscription rows for admin
+     â†’ WebPush.SendNotificationAsync(endpoint, p256dh, auth, payload, VAPID)
+     â†’ Push service delivers to browser
 
 3. Browser receives push (app may be closed)
-   → Service worker 'push' event fires
-   → self.registration.showNotification("High BP Alert", { body: "..." })
-   → System tray / lock screen notification shown
+   â†’ Service worker 'push' event fires
+   â†’ self.registration.showNotification("High BP Alert", { body: "..." })
+   â†’ System tray / lock screen notification shown
 
 4. User taps notification
-   → SW 'notificationclick' fires
-   → clients.openWindow("/bp-incidents?careRecipientId=5")
-   → App opens at relevant page
+   â†’ SW 'notificationclick' fires
+   â†’ clients.openWindow("/bp-incidents?careRecipientId=5")
+   â†’ App opens at relevant page
 ```

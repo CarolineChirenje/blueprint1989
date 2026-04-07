@@ -2,7 +2,7 @@
 
 ## Overview
 
-Batanai supports passwordless login via the Web Authentication API (WebAuthn), enabling users on compatible devices to authenticate with biometrics such as Touch ID, Face ID, or Windows Hello. Once a credential is registered, the user can log in by typing their email address and tapping a biometric button — no password is entered and MFA is bypassed. Credentials are stored server-side as FIDO2 `WebAuthnCredential` records and managed from the Profile → Security (Biometric) page.
+Batanai supports passwordless login via the Web Authentication API (WebAuthn), enabling users on compatible devices to authenticate with biometrics such as Touch ID, Face ID, or Windows Hello. Once a credential is registered, the user can log in by typing their email address and tapping a biometric button â€” no password is entered and MFA is bypassed. Credentials are stored server-side as FIDO2 `WebAuthnCredential` records and managed from the Profile â†’ Security (Biometric) page.
 
 ---
 
@@ -14,7 +14,7 @@ All authenticated roles can register and manage biometric credentials. The featu
 
 ## Backend
 
-### Controller: `WebAuthnController` — `/api/webauthn`
+### Controller: `WebAuthnController` â€” `/api/webauthn`
 
 | Method | Route | Auth | Description |
 |---|---|---|---|
@@ -54,20 +54,20 @@ assertionResponse      string    JSON-serialized AuthenticatorAssertionResponse
 
 #### Authentication Flow
 1. **`/authentication/begin`:** Looks up the user by email, loads all their stored `WebAuthnCredential` rows, builds `AssertionOptions` from `Fido2NetLib` with the credential IDs as `allowCredentials`. Caches options keyed to `userId`. Returns options JSON to the client.
-2. **`/authentication/complete`:** Retrieves cached options. Calls `Fido2.MakeAssertionAsync()` to verify the assertion. Updates `SignCount` on the matched `WebAuthnCredential` record (replay attack detection). Calls `AuthService.GenerateJwtToken()` directly — **MFA is not required** for biometric assertion. Returns a full `AuthResponse` with a valid JWT.
+2. **`/authentication/complete`:** Retrieves cached options. Calls `Fido2.MakeAssertionAsync()` to verify the assertion. Updates `SignCount` on the matched `WebAuthnCredential` record (replay attack detection). Calls `AuthService.GenerateJwtToken()` directly â€” **MFA is not required** for biometric assertion. Returns a full `AuthResponse` with a valid JWT.
 
 ### Model: `WebAuthnCredential`
 
 | Field | Type | Notes |
 |---|---|---|
 | `Id` | int | PK |
-| `UserId` | int | FK → User |
+| `UserId` | int | FK â†’ User |
 | `CredentialId` | string | Base64url-encoded credential ID |
 | `PublicKey` | byte[] | COSE-encoded public key |
 | `SignCount` | uint | Incremented counter for replay protection |
 | `Aaguid` | string? | Authenticator AAGUID (device model hint) |
 | `DeviceFriendlyName` | string? | User-assigned label |
-| `UserDeviceId` | int? | FK → UserDevice (optional) |
+| `UserDeviceId` | int? | FK â†’ UserDevice (optional) |
 | `CreatedAt` | DateTime | |
 | `LastUsedAt` | DateTime? | Updated on each successful assertion |
 
@@ -89,7 +89,7 @@ assertionResponse      string    JSON-serialized AuthenticatorAssertionResponse
 |---|---|---|
 | `/profile/biometric` | `BiometricSetupComponent` | `ProfileModule` |
 
-### `BiometricSetupComponent` — `/profile/biometric`
+### `BiometricSetupComponent` â€” `/profile/biometric`
 
 **File:** `client/src/app/features/profile/components/biometric-setup.component.ts`
 
@@ -101,11 +101,11 @@ assertionResponse      string    JSON-serialized AuthenticatorAssertionResponse
 1. User optionally enters a friendly name for the credential.
 2. Calls `BiometricService.registerCredential(friendlyName?)`.
 3. Internally:
-   - `POST /webauthn/registration/begin` → returns `CredentialCreateOptions`.
-   - Browser `navigator.credentials.create({ publicKey: options })` → triggers OS biometric prompt.
+   - `POST /webauthn/registration/begin` â†’ returns `CredentialCreateOptions`.
+   - Browser `navigator.credentials.create({ publicKey: options })` â†’ triggers OS biometric prompt.
    - `POST /webauthn/registration/complete` with the attestation response.
 4. On success, refreshes the credential list.
-5. Stores `bgl_biometric_email` in `localStorage` with the current user's email — this hint causes the `LoginComponent` to display the biometric button when the same email is typed.
+5. Stores `bgl_biometric_email` in `localStorage` with the current user's email â€” this hint causes the `LoginComponent` to display the biometric button when the same email is typed.
 
 **Deleting a credential:**
 1. User clicks the trash icon next to a credential.
@@ -124,26 +124,26 @@ assertionResponse      string    JSON-serialized AuthenticatorAssertionResponse
 **`registerCredential(friendlyName?)`**
 ```
 1. POST /webauthn/registration/begin
-   → receives CredentialCreateOptions JSON
+   â†’ receives CredentialCreateOptions JSON
 2. navigator.credentials.create({ publicKey: parsedOptions })
-   → browser triggers OS biometric prompt
-   → returns AuthenticatorAttestationResponse
+   â†’ browser triggers OS biometric prompt
+   â†’ returns AuthenticatorAttestationResponse
 3. POST /webauthn/registration/complete
    body: { attestationResponse: serialized, friendlyName }
-   → returns saved WebAuthnCredential DTO
+   â†’ returns saved WebAuthnCredential DTO
 ```
 
 **`authenticate(email)`**
 ```
 1. POST /webauthn/authentication/begin
    body: { email }
-   → receives AssertionOptions JSON
+   â†’ receives AssertionOptions JSON
 2. navigator.credentials.get({ publicKey: parsedOptions })
-   → browser triggers OS biometric prompt
-   → returns AuthenticatorAssertionResponse
+   â†’ browser triggers OS biometric prompt
+   â†’ returns AuthenticatorAssertionResponse
 3. POST /webauthn/authentication/complete
    body: { email, assertionResponse: serialized }
-   → returns AuthResponse with JWT
+   â†’ returns AuthResponse with JWT
 ```
 
 **`isAvailable()`**
@@ -164,7 +164,7 @@ When a user navigates to `/login` and types an email address:
 5. `PushNotificationService.subscribeToServer()` is called.
 6. The user is navigated to `/dashboard`.
 
-The password field is never submitted in this flow — an empty string is passed to `navigator.credentials.get()` as the `userHandle`, and the server identifies the user by stored `CredentialId` lookup, not by password.
+The password field is never submitted in this flow â€” an empty string is passed to `navigator.credentials.get()` as the `userHandle`, and the server identifies the user by stored `CredentialId` lookup, not by password.
 
 ---
 

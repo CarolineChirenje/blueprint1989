@@ -17,21 +17,21 @@ Two data types are supported in the queue:
 
 ```
 User submits form (offline)
-  → Feature component calls OfflineQueueService.enqueue(type, payload)
-  → Stored in IndexedDB store "offlineQueue" with timestamp
-  → Toast: "Saved offline. Will sync when back online."
+  â†’ Feature component calls OfflineQueueService.enqueue(type, payload)
+  â†’ Stored in IndexedDB store "offlineQueue" with timestamp
+  â†’ Toast: "Saved offline. Will sync when back online."
 
 Connectivity restored
-  → App detects "online" event OR user opens Offline Queue page
-  → SyncService.syncPending() replays each entry to the correct API
-  → On success: entry removed from IndexedDB
-  → SW posts OFFLINE_SYNC_COMPLETE event to all clients
-  → Toast: "X entries synced successfully."
+  â†’ App detects "online" event OR user opens Offline Queue page
+  â†’ SyncService.syncPending() replays each entry to the correct API
+  â†’ On success: entry removed from IndexedDB
+  â†’ SW posts OFFLINE_SYNC_COMPLETE event to all clients
+  â†’ Toast: "X entries synced successfully."
 ```
 
 ---
 
-## Frontend — `OfflineQueueService`
+## Frontend â€” `OfflineQueueService`
 
 **File:** `client/src/app/core/services/offline-queue.service.ts`
 
@@ -48,7 +48,7 @@ interface OfflineQueueEntry {
   id?: number;           // Auto-assigned by IndexedDB
   type: 'expense' | 'payment';
   payload: unknown;      // The full DTO that would have been POSTed
-  createdAt: number;     // Unix timestamp (ms) — used for TTL checks
+  createdAt: number;     // Unix timestamp (ms) â€” used for TTL checks
   retryCount: number;    // Incremented on each failed sync attempt
 }
 ```
@@ -72,7 +72,7 @@ TTL check: `Date.now() - entry.createdAt > 24 * 60 * 60 * 1000`
 
 ---
 
-## Frontend — `SyncService`
+## Frontend â€” `SyncService`
 
 **File:** `client/src/app/core/services/sync.service.ts`
 
@@ -105,7 +105,7 @@ This means every time network connectivity is restored, pending entries are auto
 
 ---
 
-## Frontend — Service Worker Integration
+## Frontend â€” Service Worker Integration
 
 The service worker (`custom-sw.js`) intercepts failed POST requests to the API when offline and posts a `QUEUE_ITEM` message to the Angular app, which then calls `OfflineQueueService.enqueue()`. This allows network errors at the HTTP level to be captured even outside the normal form submission flow.
 
@@ -113,7 +113,7 @@ When `SyncService.syncPending()` completes, it dispatches a `postMessage` to the
 
 ---
 
-## Frontend — `OfflineQueueComponent`
+## Frontend â€” `OfflineQueueComponent`
 
 **File:** `client/src/app/features/offline-queue/offline-queue.component.ts`
 
@@ -142,7 +142,7 @@ Lists all non-expired entries:
 Lists all entries older than 24 hours:
 - Same display as pending but with a red "Expired" badge.
 - Individual discard buttons.
-- "Clear All Expired" button — calls `OfflineQueueService.clearExpired()`.
+- "Clear All Expired" button â€” calls `OfflineQueueService.clearExpired()`.
 
 ### Queue Badge
 
@@ -192,25 +192,25 @@ Components with offline support:
 
 ```
 Form submitted while offline
-  → OfflineQueueService.enqueue(type, payload)
-  → IndexedDB write: { type, payload, createdAt: now, retryCount: 0 }
-  → Feature component shows "Saved offline" toast
-  → Queue badge count increments in header
+  â†’ OfflineQueueService.enqueue(type, payload)
+  â†’ IndexedDB write: { type, payload, createdAt: now, retryCount: 0 }
+  â†’ Feature component shows "Saved offline" toast
+  â†’ Queue badge count increments in header
 
 Device comes back online
-  → window "online" event fires
-  → SyncService.syncPending()
-    → getPending() → filter by TTL < 24h
-    → For each: POST /api/{endpoint} with payload + auth header
-      → 2xx: OfflineQueueService.remove(id)
-      → Error: increment retryCount, skip if >= 3
-  → SW postMessage: OFFLINE_SYNC_COMPLETE
-  → Toast: "3 entries synced"
-  → Queue badge count decrements
+  â†’ window "online" event fires
+  â†’ SyncService.syncPending()
+    â†’ getPending() â†’ filter by TTL < 24h
+    â†’ For each: POST /api/{endpoint} with payload + auth header
+      â†’ 2xx: OfflineQueueService.remove(id)
+      â†’ Error: increment retryCount, skip if >= 3
+  â†’ SW postMessage: OFFLINE_SYNC_COMPLETE
+  â†’ Toast: "3 entries synced"
+  â†’ Queue badge count decrements
 
 User opens /offline-queue
-  → Sees Pending list and Expired list
-  → Can manually trigger "Sync Now"
-  → Can discard individual items
-  → Can clear all expired items
+  â†’ Sees Pending list and Expired list
+  â†’ Can manually trigger "Sync Now"
+  â†’ Can discard individual items
+  â†’ Can clear all expired items
 ```

@@ -23,7 +23,7 @@ In development, Infisical is **not used**. Secrets are stored in `dotnet user-se
 
 - .NET 10 SDK installed
 - PostgreSQL running locally
-- A copy of `appsettings.Development.json` populated from the template (or user-secrets set individually — see below)
+- A copy of `appsettings.Development.json` populated from the template (or user-secrets set individually â€” see below)
 
 ---
 
@@ -56,7 +56,7 @@ dotnet user-secrets set "WebAuthn:RelyingPartyId" "localhost"
 dotnet user-secrets set "WebAuthn:Origin" "http://localhost:4200"
 ```
 
-> Tip: You can also copy `appsettings.Development.template.json` to `appsettings.Development.json` and fill in the values — that file is gitignored and loaded automatically in the Development environment.
+> Tip: You can also copy `appsettings.Development.template.json` to `appsettings.Development.json` and fill in the values â€” that file is gitignored and loaded automatically in the Development environment.
 
 **4. Run the API**
 
@@ -113,7 +113,7 @@ dotnet user-secrets set "WebAuthn:RelyingPartyId" "localhost"
 dotnet user-secrets set "WebAuthn:Origin" "http://localhost:4200"
 ```
 
-Secrets are stored in `~/.microsoft/usersecrets/<UserSecretsId>/secrets.json` — never inside the project directory.
+Secrets are stored in `~/.microsoft/usersecrets/<UserSecretsId>/secrets.json` â€” never inside the project directory.
 
 **4. Run the API**
 
@@ -200,7 +200,7 @@ scp -r ./publish/* user@your-server-ip:/var/www/Batanai-api/
 
 ## 4. Configure `appsettings.json` on the Server
 
-The committed `appsettings.json` and `appsettings.Production.json` already contain all non-secret config and are part of the published output — no changes needed on the server.
+The committed `appsettings.json` and `appsettings.Production.json` already contain all non-secret config and are part of the published output â€” no changes needed on the server.
 
 Key values already committed:
 
@@ -210,7 +210,7 @@ Key values already committed:
 | `appsettings.json` | `Infisical:EnvironmentSlug` | `prod` |
 | `appsettings.Production.json` | `Infisical:ClientId` | `df238a64-86b5-439d-a3a0-4bed86065119` |
 
-> **`ClientId` is an identifier, not a credential.** It cannot authenticate on its own. Only `ClientSecret` must be kept out of source control — it is injected via the systemd unit file.
+> **`ClientId` is an identifier, not a credential.** It cannot authenticate on its own. Only `ClientSecret` must be kept out of source control â€” it is injected via the systemd unit file.
 
 ---
 
@@ -218,12 +218,12 @@ Key values already committed:
 
 In the Infisical dashboard:
 
-1. Go to your project → **Access Control** → **Machine Identities**
-2. Click **Create Identity** → name it `Batanai-api-production` → Auth method: **Universal Auth**
+1. Go to your project â†’ **Access Control** â†’ **Machine Identities**
+2. Click **Create Identity** â†’ name it `Batanai-api-production` â†’ Auth method: **Universal Auth**
 3. Click **Create**
-4. On the identity page → **Client Secrets** tab → **Generate Client Secret**
+4. On the identity page â†’ **Client Secrets** tab â†’ **Generate Client Secret**
 5. Copy the **Client ID** (always visible) and **Client Secret** (shown once only)
-6. Go to **Project Access** tab → **Add Project** → select the Batanai project → select **Production** environment → role: **Viewer**
+6. Go to **Project Access** tab â†’ **Add Project** â†’ select the Batanai project â†’ select **Production** environment â†’ role: **Viewer**
 
 ---
 
@@ -251,7 +251,7 @@ Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://localhost:5000
 
 # Infisical Machine Identity credential
-# ClientId is in appsettings.Production.json — only the secret goes here
+# ClientId is in appsettings.Production.json â€” only the secret goes here
 Environment=Infisical__ClientSecret=YOUR_CLIENT_SECRET
 
 Restart=always
@@ -307,7 +307,7 @@ You should see output like:
 [Infisical] Loaded 8 secrets from environment 'prod'.
 ```
 
-If you see `[Infisical] Infisical:ClientId not set — falling back to appsettings.`, the `Environment=` lines in the systemd unit are not being read — double-check for typos and run `sudo systemctl daemon-reload` again.
+If you see `[Infisical] Infisical:ClientId not set â€” falling back to appsettings.`, the `Environment=` lines in the systemd unit are not being read â€” double-check for typos and run `sudo systemctl daemon-reload` again.
 
 ---
 
@@ -351,7 +351,7 @@ sudo apt-get install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d batanaiapi.elroitec.com
 ```
 
-Certbot automatically renews — verify the renewal timer:
+Certbot automatically renews â€” verify the renewal timer:
 
 ```bash
 sudo systemctl status certbot.timer
@@ -381,7 +381,7 @@ sudo journalctl -u Batanai-api -f
 
 If the client secret is compromised or expired:
 
-1. In Infisical → Machine Identity → **Client Secrets** → revoke the old secret → generate a new one
+1. In Infisical â†’ Machine Identity â†’ **Client Secrets** â†’ revoke the old secret â†’ generate a new one
 2. On the server, update the systemd unit:
    ```bash
    sudo nano /etc/systemd/system/Batanai-api.service
@@ -400,7 +400,7 @@ Follow these steps whenever you need to expose a new configuration value through
 
 ### Naming Convention
 
-ASP.NET Core uses `:` as the hierarchy separator in `IConfiguration` (e.g. `Jwt:Key`). Because `:` is not valid in most shell/environment variable names, Infisical secrets use **double-underscore `__`** as the separator. The provider maps `__` → `:` automatically at load time.
+ASP.NET Core uses `:` as the hierarchy separator in `IConfiguration` (e.g. `Jwt:Key`). Because `:` is not valid in most shell/environment variable names, Infisical secrets use **double-underscore `__`** as the separator. The provider maps `__` â†’ `:` automatically at load time.
 
 | Config key | Infisical secret name |
 |---|---|
@@ -418,7 +418,7 @@ Rules:
 
 **1. Add the secret in Infisical**
 
-1. Open [app.infisical.com](https://app.infisical.com) → your project → **Secrets** → select the **prod** environment
+1. Open [app.infisical.com](https://app.infisical.com) â†’ your project â†’ **Secrets** â†’ select the **prod** environment
 2. Click **Add Secret**
 3. Enter the secret name using the `__` convention (e.g. `MyService__ApiKey`)
 4. Enter the secret value
@@ -461,7 +461,7 @@ Commit this change.
 
 **5. Use the value in code**
 
-Inject `IConfiguration` as normal — no Infisical-specific code needed:
+Inject `IConfiguration` as normal â€” no Infisical-specific code needed:
 
 ```csharp
 var apiKey = _configuration["MyService:ApiKey"];

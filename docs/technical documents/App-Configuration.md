@@ -18,7 +18,7 @@ App Configuration provides a runtime key-value store for application settings th
 
 ## Backend
 
-### Controller — `AppConfigController`
+### Controller â€” `AppConfigController`
 
 **File:** `server/src/Batanai.Api/Controllers/AppConfigController.cs`
 
@@ -47,7 +47,7 @@ Processes each in a single transaction. Returns the count of updated keys.
 
 ---
 
-### Model — `AppConfigEntry`
+### Model â€” `AppConfigEntry`
 
 **File:** `server/src/Batanai.Api/Models/AppConfigEntry.cs`
 
@@ -62,12 +62,12 @@ Processes each in a single transaction. Returns the count of updated keys.
 | `IsSecret` | `bool` | If true: value masked in UI and API response |
 | `IsReadOnly` | `bool` | If true: cannot be updated via API |
 | `RequiresRestart` | `bool` | If true: server needs restart for change to take effect |
-| `DataType` | `string` | `"string"`, `"int"`, `"bool"` — for UI input type |
+| `DataType` | `string` | `"string"`, `"int"`, `"bool"` â€” for UI input type |
 | `UpdatedAt` | `DateTime` | Last modification timestamp |
 
 ---
 
-### Service — `AppConfigService`
+### Service â€” `AppConfigService`
 
 **File:** `server/src/Batanai.Api/Services/AppConfigService.cs`
 
@@ -80,7 +80,7 @@ Processes each in a single transaction. Returns the count of updated keys.
 | `GetBoolAsync(key)` | `bool?` | Parses value as boolean (`"true"`/`"false"`, `"1"`/`"0"`) |
 | `SetAsync(key, value)` | `void` | Updates single key (validates not IsReadOnly) |
 | `BulkSetAsync(pairs)` | `int` | Updates multiple keys, returns success count |
-| `ResetAsync(key)` | `void` | Copies `DefaultValue` → `Value` |
+| `ResetAsync(key)` | `void` | Copies `DefaultValue` â†’ `Value` |
 
 #### Runtime Reads (No Caching)
 
@@ -151,15 +151,15 @@ Calls `GET /api/app-config`. Groups the returned entries by `category` and displ
 #### Entry Row Display
 
 Each config entry renders as an inline form row:
-- **Key** — read-only label with monospace styling.
-- **Description** — subtitle text.
-- **Value input** — rendered based on `dataType`:
-  - `"string"` → `MatInput` text.
-  - `"int"` → `MatInput` with `type="number"`.
-  - `"bool"` → `MatSlideToggle` (value `"true"`/`"false"`).
-- **Secret masking** — if `isSecret = true`, the input is `type="password"` by default with a visibility-toggle button.
-- **Read-only** — if `isReadOnly = true`, the input is disabled and a lock icon is shown.
-- **Requires restart badge** — if `requiresRestart = true`, a yellow warning chip shown on the row.
+- **Key** â€” read-only label with monospace styling.
+- **Description** â€” subtitle text.
+- **Value input** â€” rendered based on `dataType`:
+  - `"string"` â†’ `MatInput` text.
+  - `"int"` â†’ `MatInput` with `type="number"`.
+  - `"bool"` â†’ `MatSlideToggle` (value `"true"`/`"false"`).
+- **Secret masking** â€” if `isSecret = true`, the input is `type="password"` by default with a visibility-toggle button.
+- **Read-only** â€” if `isReadOnly = true`, the input is disabled and a lock icon is shown.
+- **Requires restart badge** â€” if `requiresRestart = true`, a yellow warning chip shown on the row.
 
 #### Dirty Tracking
 
@@ -202,13 +202,13 @@ if (!await _db.AppConfig.AnyAsync(c => c.Key == key))
 }
 ```
 
-This means runtime changes are safe across restarts — existing rows are never overwritten by the seeder. Only keys that are missing (e.g., after adding a new config key in code) are inserted.
+This means runtime changes are safe across restarts â€” existing rows are never overwritten by the seeder. Only keys that are missing (e.g., after adding a new config key in code) are inserted.
 
 ---
 
 ## Security Notes
 
-- **Secret masking on API response:** If `IsSecret = true`, the `GET /app-config` and `GET /app-config/{key}` endpoints return the value as `"••••••••"` (masked placeholder) rather than the real value. The UI never receives the actual secret.
+- **Secret masking on API response:** If `IsSecret = true`, the `GET /app-config` and `GET /app-config/{key}` endpoints return the value as `"â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"` (masked placeholder) rather than the real value. The UI never receives the actual secret.
 - **Write-only secrets:** To update a secret (e.g., rotating VAPID keys), the admin types the new value and saves. The backend accepts the new value and persists it; the returned response again masks it.
 - **Read-only keys:** Keys marked `IsReadOnly = true` are environment-injected values that should not be changed at runtime. The API rejects any PUT request targeting them.
 - **Admin-only access:** The entire `/api/app-config` route group requires the `AdminOrHigher` policy. Regular users cannot read or write any config values.

@@ -1,4 +1,4 @@
-# Batanai — System Architecture
+# Batanai â€” System Architecture
 
 ## Overview
 
@@ -10,48 +10,48 @@ Batanai is a Progressive Web Application (PWA) for shared expense management, bu
 
 ```mermaid
 graph TB
-    subgraph Users["👤 Users"]
+    subgraph Users["ðŸ‘¤ Users"]
         U1[Admin / Member\nBrowser / PWA]
     end
 
-    subgraph DNS["🌐 DNS"]
+    subgraph DNS["ðŸŒ DNS"]
         NS[Namesilo\nelroitec.com zone]
     end
 
-    subgraph CF["☁️ Cloudflare"]
+    subgraph CF["â˜ï¸ Cloudflare"]
         CFCDN[Cloudflare CDN\nDDoS + WAF]
         CFPAGES[Cloudflare Pages\nbatanai-docs.pages.dev]
         CFZT[Cloudflare Zero Trust\nOptional SSO gate on docs]
     end
 
-    subgraph Server["🖥️ Ubuntu 22.04 VPS"]
-        NGINX[Nginx Reverse Proxy\nTLS — Let's Encrypt]
+    subgraph Server["ðŸ–¥ï¸ Ubuntu 22.04 VPS"]
+        NGINX[Nginx Reverse Proxy\nTLS â€” Let's Encrypt]
 
-        subgraph Frontend["Angular 21 PWA — batanai.elroitec.com"]
+        subgraph Frontend["Angular 21 PWA â€” batanai.elroitec.com"]
             FE_PWA[PWA Shell\nService Worker + Offline Queue]
-            FE_AUTH[Auth Module\nLogin · Signup · MFA · Biometric]
-            FE_FEAT[Feature Modules\nDashboard · Cycles · Expenses\nPayments · Profile · Management]
-            FE_CORE[Core Services\nHTTP Interceptor · Push · Sync\nNotifications]
+            FE_AUTH[Auth Module\nLogin Â· Signup Â· MFA Â· Biometric]
+            FE_FEAT[Feature Modules\nDashboard Â· Cycles Â· Expenses\nPayments Â· Profile Â· Management]
+            FE_CORE[Core Services\nHTTP Interceptor Â· Push Â· Sync\nNotifications]
         end
 
-        subgraph API[".NET 10 API — batanaiapi.elroitec.com"]
+        subgraph API[".NET 10 API â€” batanaiapi.elroitec.com"]
             KESTREL[Kestrel :5000]
-            CTRL[REST Controllers\nAuth · ExpenseCycle · Expense\nPayment · Notifications · Push]
-            SVC[Domain Services\nExpenseCycle · Expense · Payment\nPush · MFA · WebAuthn\nEmail · AppConfig]
+            CTRL[REST Controllers\nAuth Â· ExpenseCycle Â· Expense\nPayment Â· Notifications Â· Push]
+            SVC[Domain Services\nExpenseCycle Â· Expense Â· Payment\nPush Â· MFA Â· WebAuthn\nEmail Â· AppConfig]
             end
 
         subgraph DB["Database"]
-            PG[(PostgreSQL 15+\nEF Core 10 — snake_case\nlocalhost only)]
+            PG[(PostgreSQL 15+\nEF Core 10 â€” snake_case\nlocalhost only)]
         end
     end
 
-    subgraph ExtServices["🔌 External Services"]
+    subgraph ExtServices["ðŸ”Œ External Services"]
         INFISICAL[Infisical\nSecrets Manager\nSDK v3.0.4]
-        VAPID[Web Push — VAPID\nLib.Net.Http.WebPush\nBrowser push notifications]
+        VAPID[Web Push â€” VAPID\nLib.Net.Http.WebPush\nBrowser push notifications]
         EMAIL[Email Service\nPassword reset\nNotifications]
     end
 
-    subgraph Docs["📚 Documentation"]
+    subgraph Docs["ðŸ“š Documentation"]
         MKDOCS[MkDocs + Material\nCloudflare Pages CDN]
     end
 
@@ -78,7 +78,7 @@ graph TB
     CTRL -->|JWT Bearer + TOTP MFA\nWebAuthn FIDO2 Biometric| FE_AUTH
 
     %% External service connections
-    API -->|Fetch secrets at startup\nDB conn · JWT keys · VAPID keys\nWebAuthn config| INFISICAL
+    API -->|Fetch secrets at startup\nDB conn Â· JWT keys Â· VAPID keys\nWebAuthn config| INFISICAL
     SVC -->|VAPID push dispatch\nPer user-device subscription| VAPID
     SVC -->|SMTP / transactional email| EMAIL
 
@@ -94,7 +94,7 @@ graph TB
 
 ## Component Breakdown
 
-### Frontend — Angular 21 PWA
+### Frontend â€” Angular 21 PWA
 
 | Layer | Detail |
 |---|---|
@@ -103,7 +103,7 @@ graph TB
 | **Charts** | Chart.js 4.5.1 |
 | **Excel** | xlsx 0.18.5 (client-side report generation) |
 | **PWA** | Custom service worker (`custom-sw.js`), `ngsw-config.json`, `manifest.webmanifest` |
-| **Offline** | Offline queue service — defers mutations when offline |
+| **Offline** | Offline queue service â€” defers mutations when offline |
 | **Auth** | JWT interceptor (`AuthInterceptor`), TOTP MFA, WebAuthn biometric |
 | **Hosting** | Nginx serving static build at `batanai.elroitec.com` |
 
@@ -125,7 +125,7 @@ graph TB
 
 ---
 
-### Backend — .NET 10 API
+### Backend â€” .NET 10 API
 
 | Layer | Detail |
 |---|---|
@@ -135,7 +135,7 @@ graph TB
 | **MFA** | TOTP via `MfaService` + `QRCoder` v1.7.0 |
 | **Biometric** | FIDO2/WebAuthn via `Fido2NetLib` v3.0.1 |
 | **Documentation** | Swagger / OpenAPI via `Swashbuckle.AspNetCore` v10.1.4 |
-| **Hosting** | Nginx reverse proxy → Kestrel at `batanaiapi.elroitec.com` |
+| **Hosting** | Nginx reverse proxy â†’ Kestrel at `batanaiapi.elroitec.com` |
 
 **Controller Groups**
 
@@ -148,7 +148,7 @@ graph TB
 
 ---
 
-### Database — PostgreSQL 15+
+### Database â€” PostgreSQL 15+
 
 | Detail | Value |
 |---|---|
@@ -162,7 +162,7 @@ graph TB
 
 ### External Services
 
-#### Infisical — Secrets Management
+#### Infisical â€” Secrets Management
 
 | Detail | Value |
 |---|---|
@@ -190,7 +190,7 @@ Not used in Batanai.
 
 | Detail | Value |
 |---|---|
-| **CDN / WAF** | Cloudflare proxies all traffic to the VPS — DDoS protection, caching |
+| **CDN / WAF** | Cloudflare proxies all traffic to the VPS â€” DDoS protection, caching |
 | **DNS** | Domain registered at Namesilo; Cloudflare nameservers manage `elroitec.com` |
 | **Pages** | Hosts MkDocs documentation site at `batanai-docs.pages.dev` |
 | **Zero Trust** | Optional Google Workspace / GitHub IdP SSO gate on the docs site |
@@ -219,7 +219,7 @@ sequenceDiagram
     %% Biometric login
     B->>API: POST /webauthn/assertion/options
     API-->>B: FIDO2 assertion challenge
-    B->>B: navigator.credentials.get() — TouchID/FaceID/PIN
+    B->>B: navigator.credentials.get() â€” TouchID/FaceID/PIN
     B->>API: POST /webauthn/assertion/complete
     API-->>B: Full access JWT
 
@@ -255,7 +255,7 @@ flowchart TD
     B -->|Development| C[dotnet user-secrets\n+ appsettings.Development.json]
     B -->|Production| D[Infisical SDK\nMachine Identity Auth]
     D --> E[Infisical Cloud\nProject: prod env]
-    E -->|Inject at runtime| F[IConfiguration\nJwt · DB · VAPID · WebAuthn]
+    E -->|Inject at runtime| F[IConfiguration\nJwt Â· DB Â· VAPID Â· WebAuthn]
     C --> F
     F --> G[ASP.NET Core services\nregistered with resolved config]
 ```
@@ -266,24 +266,24 @@ flowchart TD
 
 ```
                           Namesilo DNS (elroitec.com)
-                                    │
+                                    â”‚
                           Cloudflare Nameservers
-                          CDN · WAF · DDoS protection
-                                    │
+                          CDN Â· WAF Â· DDoS protection
+                                    â”‚
                             Ubuntu 22.04 VPS
-                            ┌───────────────┐
-                            │     Nginx     │  ← TLS termination (Let's Encrypt)
-                            └───┬───────┬───┘
-                                │       │
-                    ┌───────────┘       └──────────────┐
-                    │                                  │
+                            â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                            â”‚     Nginx     â”‚  â† TLS termination (Let's Encrypt)
+                            â””â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”˜
+                                â”‚       â”‚
+                    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜       â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                    â”‚                                  â”‚
           batanai.elroitec.com              batanaiapi.elroitec.com
           Angular 21 static build         Kestrel :5000 (.NET 10)
           /var/www/Batanai                 systemd service
-                                               │
+                                               â”‚
                                          PostgreSQL 15
                                          (localhost:5432)
-                                               │
+                                               â”‚
                                       EF Core 10 migrations
 ```
 

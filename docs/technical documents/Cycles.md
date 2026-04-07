@@ -20,7 +20,7 @@ Admins create and manage cycles through the Management console. Members can view
 
 ## Backend
 
-### Controller — `ExpenseCycleController`
+### Controller â€” `ExpenseCycleController`
 
 **File:** `server/src/Batanai.Api/Controllers/ExpenseCycleController.cs`
 
@@ -40,7 +40,7 @@ Base route: `/api/expense-cycle`
 
 ---
 
-### Model — `ExpenseCycle`
+### Model â€” `ExpenseCycle`
 
 **File:** `server/src/Batanai.Api/Models/ExpenseCycle.cs`
 
@@ -53,36 +53,36 @@ Base route: `/api/expense-cycle`
 | `Status` | `CycleStatus` | `Active` or `Closed` |
 | `CreatedAt` | `DateTime` | |
 | `UpdatedAt` | `DateTime` | |
-| `CycleMembers` | `ICollection<CycleMember>` | Navigation — members of this cycle |
-| `Expenses` | `ICollection<Expense>` | Navigation — all expenses in this cycle |
-| `MemberObligations` | `ICollection<MemberObligation>` | Navigation — calculated on close |
+| `CycleMembers` | `ICollection<CycleMember>` | Navigation â€” members of this cycle |
+| `Expenses` | `ICollection<Expense>` | Navigation â€” all expenses in this cycle |
+| `MemberObligations` | `ICollection<MemberObligation>` | Navigation â€” calculated on close |
 
 ---
 
-### Model — `CycleMember`
+### Model â€” `CycleMember`
 
 | Field | Type | Notes |
 |---|---|---|
-| `CycleId` | `int` | PK (composite) — FK ? ExpenseCycle |
-| `UserId` | `int` | PK (composite) — FK ? User |
+| `CycleId` | `int` | PK (composite) â€” FK ? ExpenseCycle |
+| `UserId` | `int` | PK (composite) â€” FK ? User |
 | `JoinedAt` | `DateTime` | |
 
 ---
 
-### Model — `MemberObligation`
+### Model â€” `MemberObligation`
 
 | Field | Type | Notes |
 |---|---|---|
 | `Id` | `int` | PK |
 | `CycleId` | `int` | FK ? ExpenseCycle |
-| `DebtorUserId` | `int` | FK ? User — who owes |
-| `CreditorUserId` | `int` | FK ? User — who is owed |
+| `DebtorUserId` | `int` | FK ? User â€” who owes |
+| `CreditorUserId` | `int` | FK ? User â€” who is owed |
 | `Amount` | `decimal` | Amount owed |
 | `IsPaid` | `bool` | Cleared when payment is confirmed |
 
 ---
 
-### Service — `ExpenseCycleService`
+### Service â€” `ExpenseCycleService`
 
 **File:** `server/src/Batanai.Api/Services/ExpenseCycleService.cs`
 
@@ -140,8 +140,8 @@ Columns: Name | Start Date | End Date | Status Badge | Actions (edit, close, del
 #### Create / Edit Form (Inline)
 
 Fields:
-- `name` — required text input.
-- `startDate` / `endDate` — date pickers.
+- `name` â€” required text input.
+- `startDate` / `endDate` â€” date pickers.
 
 #### Close Cycle
 

@@ -1,4 +1,4 @@
-# Batanai — Technical Documentation
+# Batanai â€” Technical Documentation
 
 This folder contains detailed technical documentation for every feature in the Batanai expense-sharing platform. Each document covers both the backend (.NET 10 API) and frontend (Angular 21 PWA) implementation for its respective feature.
 
@@ -52,7 +52,7 @@ This folder contains detailed technical documentation for every feature in the B
 
 ## Wiki Options
 
-> These documents can be published as a **GitHub Wiki**, **MkDocs site**, or **GitBook** — see notes below.
+> These documents can be published as a **GitHub Wiki**, **MkDocs site**, or **GitBook** â€” see notes below.
 
 ### GitHub Wiki
 
@@ -61,10 +61,10 @@ If this repository is hosted on GitHub, the built-in Wiki can host these files d
 1. Enable the Wiki tab on the repository settings page.
 2. Clone the wiki repo: `git clone https://github.com/CarolineChirenje/Batanai.wiki.git`
 3. Copy all `.md` files from this folder into the wiki repo root.
-4. Rename `README.md` → `Home.md` (GitHub Wiki uses `Home.md` as the landing page).
+4. Rename `README.md` â†’ `Home.md` (GitHub Wiki uses `Home.md` as the landing page).
 5. Push and the wiki is live at `https://github.com/<org>/<repo>/wiki`.
 
-**Limitation:** GitHub Wiki does not support subdirectories — all files must live in the root.
+**Limitation:** GitHub Wiki does not support subdirectories â€” all files must live in the root.
 
 ### MkDocs (Recommended for self-hosted)
 

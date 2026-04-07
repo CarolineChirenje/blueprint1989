@@ -23,7 +23,7 @@ All pages require `Admin` or `SuperAdmin`. Some actions (e.g., managing roles) r
 
 ---
 
-## 1. User Management — `/management/users`
+## 1. User Management â€” `/management/users`
 
 **Frontend File:** `client/src/app/features/management/components/user-management.component.ts`
 
@@ -53,7 +53,7 @@ Bell icon button per row opens a full preferences modal:
 
 ---
 
-## 2. Cycle Management — `/management/cycles`
+## 2. Cycle Management â€” `/management/cycles`
 
 **Frontend File:** `client/src/app/features/management/components/cycle-management.component.ts`
 
@@ -72,7 +72,7 @@ Confirmation dialog. Active cycles cannot be deleted.
 
 ---
 
-## 3. Feature/Bug Report Management — `/management/feature-bug-reports`
+## 3. Feature/Bug Report Management â€” `/management/feature-bug-reports`
 
 **Frontend File:** `client/src/app/features/management/components/feature-bug-reports.component.ts`
 
@@ -88,7 +88,7 @@ Summary:
 
 ---
 
-## 4. App Configuration — `/management/app-config`
+## 4. App Configuration â€” `/management/app-config`
 
 **Frontend File:** `client/src/app/features/management/components/app-config-management.component.ts`
 

@@ -1,4 +1,4 @@
-# Batanai — Technical Documentation
+# Batanai â€” Technical Documentation
 
 Welcome to the Batanai developer wiki. This covers every feature of the Batanai expense-sharing platform in detail, including backend (.NET 10 API) and frontend (Angular 21 PWA) implementation for each feature.
 
@@ -55,7 +55,7 @@ To publish / update the GitHub Wiki:
 git clone https://github.com/CarolineChirenje/Batanai.wiki.git
 cd Batanai.wiki
 
-# Copy all docs — rename files to match wiki page names (no spaces, use hyphens)
+# Copy all docs â€” rename files to match wiki page names (no spaces, use hyphens)
 # Home.md        ? this file (wiki landing page)
 # Authentication.md
 # Biometric-Authentication.md

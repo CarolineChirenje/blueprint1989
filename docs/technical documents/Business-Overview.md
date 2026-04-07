@@ -4,9 +4,9 @@
 
 **Batanai** (Shona for "togetherness") is a cloud-hosted, mobile-first Progressive Web App for community-based financial management. It serves two core use cases:
 
-1. **Majana — Shared Expense Splitting**: Groups split recurring living costs (rent, utilities, groceries) within structured billing cycles. The system tracks every expense, calculates each member's net balance, and generates the minimum set of payment transfers on cycle close.
+1. **Majana â€” Shared Expense Splitting**: Groups split recurring living costs (rent, utilities, groceries) within structured billing cycles. The system tracks every expense, calculates each member's net balance, and generates the minimum set of payment transfers on cycle close.
 
-2. **Mukando — Rotating Savings Groups**: Members contribute a fixed amount each round, and one member receives the full pool on a rotating basis. The platform manages contribution tracking, payout scheduling, proof of payment, and automated reminders.
+2. **Mukando â€” Rotating Savings Groups**: Members contribute a fixed amount each round, and one member receives the full pool on a rotating basis. The platform manages contribution tracking, payout scheduling, proof of payment, and automated reminders.
 
 Batanai replaces informal spreadsheets, WhatsApp threads, and manual IOUs with a single structured platform that works offline and on any device.
 
@@ -14,7 +14,7 @@ Batanai replaces informal spreadsheets, WhatsApp threads, and manual IOUs with a
 
 ## The Problem We Solve
 
-Communities that manage shared money — whether splitting bills or running rotating savings — face persistent challenges:
+Communities that manage shared money â€” whether splitting bills or running rotating savings â€” face persistent challenges:
 
 | Pain Point | Impact |
 |---|---|
@@ -31,7 +31,7 @@ These gaps lead to financial ambiguity, broken trust, and the collapse of commun
 
 ## The Batanai Solution
 
-Batanai organises users into **Groups**, each managed by one or more **Group Admins**. Within a group, admins create **Expense Cycles** of either type — Majana or Mukando. Every financial event is recorded, attributed, and surfaced as a concrete obligation or contribution.
+Batanai organises users into **Groups**, each managed by one or more **Group Admins**. Within a group, admins create **Expense Cycles** of either type â€” Majana or Mukando. Every financial event is recorded, attributed, and surfaced as a concrete obligation or contribution.
 
 ### Core Capabilities
 
@@ -72,16 +72,16 @@ Batanai organises users into **Groups**, each managed by one or more **Group Adm
 
 | Dimension | Batanai | Spreadsheets | Generic expense apps | Stokvel apps |
 |---|---|---|---|---|
-| Structured cycle-based periods | ✓ | ✗ | Rarely | Sometimes |
-| Rotating savings (Mukando) support | ✓ | ✗ | ✗ | ✓ |
-| Role-based access (Group Admin / Member) | ✓ | ✗ | ✗ | Rarely |
-| Join-by-code with QR sharing | ✓ | ✗ | ✗ | Rarely |
-| Offline-first (works without internet) | ✓ | Partially | Rarely | ✗ |
-| Real-time push alerts & reminders | ✓ | ✗ | Sometimes | Sometimes |
-| Automated obligation calculation | ✓ | Manual | Sometimes | ✗ |
-| Biometric login (WebAuthn/FIDO2) | ✓ | ✗ | Rarely | ✗ |
-| PWA — no app store required | ✓ | ✗ | ✗ | ✗ |
-| Contribution proof & payment tracking | ✓ | ✗ | ✗ | Sometimes |
+| Structured cycle-based periods | âœ“ | âœ— | Rarely | Sometimes |
+| Rotating savings (Mukando) support | âœ“ | âœ— | âœ— | âœ“ |
+| Role-based access (Group Admin / Member) | âœ“ | âœ— | âœ— | Rarely |
+| Join-by-code with QR sharing | âœ“ | âœ— | âœ— | Rarely |
+| Offline-first (works without internet) | âœ“ | Partially | Rarely | âœ— |
+| Real-time push alerts & reminders | âœ“ | âœ— | Sometimes | Sometimes |
+| Automated obligation calculation | âœ“ | Manual | Sometimes | âœ— |
+| Biometric login (WebAuthn/FIDO2) | âœ“ | âœ— | Rarely | âœ— |
+| PWA â€” no app store required | âœ“ | âœ— | âœ— | âœ— |
+| Contribution proof & payment tracking | âœ“ | âœ— | âœ— | Sometimes |
 
 ---
 
@@ -90,18 +90,18 @@ Batanai organises users into **Groups**, each managed by one or more **Group Adm
 ### Majana Flow (Expense Sharing)
 
 ```
-Create Group → Invite Members → Create Majana Cycle (start/end dates)
-    → Members Add Expenses → Admin Closes Cycle
-    → System Calculates Obligations → Members Pay → Admin Confirms
+Create Group â†’ Invite Members â†’ Create Majana Cycle (start/end dates)
+    â†’ Members Add Expenses â†’ Admin Closes Cycle
+    â†’ System Calculates Obligations â†’ Members Pay â†’ Admin Confirms
 ```
 
 ### Mukando Flow (Rotating Savings)
 
 ```
-Create Group → Invite Members → Create Mukando Cycle (Draft)
-    → Configure: Amount, Frequency, Payout Order → Activate Cycle
-    → Round 1: All contribute → Recipient receives pool → Admin records payout
-    → Round 2: Next recipient → ... → All rounds complete → Cycle closed
+Create Group â†’ Invite Members â†’ Create Mukando Cycle (Draft)
+    â†’ Configure: Amount, Frequency, Payout Order â†’ Activate Cycle
+    â†’ Round 1: All contribute â†’ Recipient receives pool â†’ Admin records payout
+    â†’ Round 2: Next recipient â†’ ... â†’ All rounds complete â†’ Cycle closed
 ```
 
 ---
@@ -120,7 +120,7 @@ Batanai is built on proven, enterprise-grade open standards:
 | Offline Support | IndexedDB + Service Worker | Full offline queue with automatic sync |
 | Hosting | Ubuntu 22.04 VPS, Nginx, Let's Encrypt TLS | Managed infrastructure at `batanai.elroitec.com` |
 
-Zero dependency on proprietary mobile SDKs — Batanai runs in any modern browser, on any device, without an app store.
+Zero dependency on proprietary mobile SDKs â€” Batanai runs in any modern browser, on any device, without an app store.
 
 ---
 
@@ -130,7 +130,7 @@ Zero dependency on proprietary mobile SDKs — Batanai runs in any modern browse
 
 | Role | Access Level |
 |---|---|
-| **SuperAdmin** | Full system access — users, cycles, configuration, all groups |
+| **SuperAdmin** | Full system access â€” users, cycles, configuration, all groups |
 | **Admin** | Manage users, cycles, app config |
 | **Member** | Participate in groups and cycles |
 
@@ -159,8 +159,8 @@ Batanai is positioned as a **SaaS subscription platform**:
 
 - Fully functional platform deployed to `batanai.elroitec.com`
 - Angular 21 PWA installable to phone home screens; service worker confirmed working
-- Complete Majana workflow: create → add members → add expenses → close → obligations → payments
-- Complete Mukando workflow: create → configure → activate → contributions → payouts → close
+- Complete Majana workflow: create â†’ add members â†’ add expenses â†’ close â†’ obligations â†’ payments
+- Complete Mukando workflow: create â†’ configure â†’ activate â†’ contributions â†’ payouts â†’ close
 - Group management with invite-by-email, join-by-code (QR), and admin approval workflows
 - Push notifications operational across all major browsers
 - Offline queue tested and confirmed with auto-sync on reconnect
@@ -169,4 +169,4 @@ Batanai is positioned as a **SaaS subscription platform**:
 
 ## Summary
 
-> Batanai is the community finance platform that brings structure, transparency, and trust to shared expenses and rotating savings — with structured billing cycles, automated obligation calculation, real-time alerts, offline resilience, and biometric authentication — delivered as a modern PWA that works on any device with no app store required.
+> Batanai is the community finance platform that brings structure, transparency, and trust to shared expenses and rotating savings â€” with structured billing cycles, automated obligation calculation, real-time alerts, offline resilience, and biometric authentication â€” delivered as a modern PWA that works on any device with no app store required.

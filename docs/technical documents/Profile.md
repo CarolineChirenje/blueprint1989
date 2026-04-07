@@ -50,7 +50,7 @@ Logic:
 
 ---
 
-### `ProfileComponent` — `/profile`
+### `ProfileComponent` â€” `/profile`
 
 **File:** `client/src/app/features/profile/components/profile.component.ts`
 
@@ -64,25 +64,25 @@ Logic:
 
 ---
 
-### `MfaSetupComponent` — `/profile/security`
+### `MfaSetupComponent` â€” `/profile/security`
 
 **File:** `client/src/app/features/profile/components/mfa-setup.component.ts`
 
 **Hub screen:** Shows current MFA status (enabled/disabled) with action buttons.
 
 **Setup wizard (6 steps):**
-1. **Hub** — status display with "Set Up MFA" or "Disable MFA" buttons.
-2. **Intro** — explains TOTP and the need for an authenticator app.
-3. **Scan** — calls `POST /auth/mfa/setup`; displays the returned base64 QR code image and the raw Base32 secret for manual entry.
-4. **Verify** — 6-digit TOTP code input; calls `POST /auth/mfa/confirm` to validate and save.
-5. **Backup** — displays the 10 one-time backup codes returned by `/mfa/setup`. Offers download (`.txt` file) and clipboard copy.
-6. **Complete** — success screen; updates `userInfo.isMfaEnabled` in `localStorage`.
+1. **Hub** â€” status display with "Set Up MFA" or "Disable MFA" buttons.
+2. **Intro** â€” explains TOTP and the need for an authenticator app.
+3. **Scan** â€” calls `POST /auth/mfa/setup`; displays the returned base64 QR code image and the raw Base32 secret for manual entry.
+4. **Verify** â€” 6-digit TOTP code input; calls `POST /auth/mfa/confirm` to validate and save.
+5. **Backup** â€” displays the 10 one-time backup codes returned by `/mfa/setup`. Offers download (`.txt` file) and clipboard copy.
+6. **Complete** â€” success screen; updates `userInfo.isMfaEnabled` in `localStorage`.
 
 **Disable MFA:** Shows a confirmation dialog, then requires a valid TOTP code. Calls `POST /auth/mfa/disable`. Updates localStorage.
 
 ---
 
-### `BiometricSetupComponent` — `/profile/biometric`
+### `BiometricSetupComponent` â€” `/profile/biometric`
 
 *(Detailed in [Biometric-Authentication.md](Biometric-Authentication.md))*
 
@@ -90,7 +90,7 @@ Summary: Lists registered WebAuthn credentials, allows registering new ones (nam
 
 ---
 
-### `LinkedDevicesComponent` — `/profile/devices`
+### `LinkedDevicesComponent` â€” `/profile/devices`
 
 **File:** `client/src/app/features/profile/components/linked-devices.component.ts`
 
@@ -105,13 +105,13 @@ Summary: Lists registered WebAuthn credentials, allows registering new ones (nam
 
 **Rename:** Inline edit input per device; saves via `DeviceService.renameDevice(id, name)` (`PATCH /me/devices/{id}/rename`).
 
-**Remove:** `DELETE /me/devices/{id}` (soft-delete — device becomes inactive).
+**Remove:** `DELETE /me/devices/{id}` (soft-delete â€” device becomes inactive).
 
 **Reset install prompt:** For the current device, shows a "Reset Install Banner" option that calls `DeviceService.resetInstallPrompt()`, setting the PWA install status back to `Unknown` so the install banner can appear again.
 
 ---
 
-### `MyReportsComponent` — `/profile/my-reports`
+### `MyReportsComponent` â€” `/profile/my-reports`
 
 **File:** `client/src/app/features/profile/components/my-reports.component.ts`
 
@@ -123,7 +123,7 @@ Summary: Lists registered WebAuthn credentials, allows registering new ones (nam
 
 ---
 
-### `NotificationPreferencesComponent` — `/profile/notifications`
+### `NotificationPreferencesComponent` â€” `/profile/notifications`
 
 **File:** `client/src/app/features/profile/components/notification-preferences.component.ts`
 
