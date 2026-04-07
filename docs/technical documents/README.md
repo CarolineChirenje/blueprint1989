@@ -21,6 +21,7 @@ This folder contains detailed technical documentation for every feature in the B
 | 11 | [Push Notifications](Push-Notifications.md) | VAPID Web Push pipeline and service worker handler |
 | 12 | [Feature & Bug Reports](Feature-Bug-Reports.md) | User-submitted feature requests and bug reports with admin review workflow |
 | 13 | [App Configuration](App-Configuration.md) | Runtime key-value configuration store with secret masking and bulk update |
+| 14 | [Brand Identity](Brand-Identity.md) | Brand mark design, colour palette, typography, icon generation pipeline, and asset inventory |
 
 ---
 

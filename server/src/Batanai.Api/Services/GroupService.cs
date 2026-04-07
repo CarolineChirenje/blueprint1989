@@ -780,6 +780,13 @@ public class GroupService : IGroupService
                             deepLinkUrl: $"/groups/{groupId}",
                             relatedEntityId: groupId,
                             excludeUserIds: new[] { requestingUserId, respondingUserId });
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send join-request response notification for group {GroupId}, user {UserId}", groupId, requestingUserId);
         }
 
         return null;

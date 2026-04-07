@@ -1,68 +1,79 @@
 ﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="icon-title icon-desc">
-  <title id="icon-title">Batanai - 6299 Home Finance</title>
-  <desc id="icon-desc">A green house with the number 6299 inside and a pink piggy bank in front, representing shared home finances.</desc>
+  <title id="icon-title">Batanai</title>
+  <desc id="icon-desc">A circular unity-inspired green emblem containing a pink piggy bank with a gold coin, representing shared group savings.</desc>
 
   <defs>
     <style>
-      .house-fill   { fill: #237a49; }
-      .white-line   { stroke: #ffffff; stroke-width: 10; stroke-linejoin: round; stroke-linecap: round; fill: none; }
-      .num          { fill: #ffffff; font-family: Arial, Helvetica, sans-serif; font-weight: 800; font-size: 88px; }
-      .label        { fill: #237a49; font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 6; }
-      .pig-body     { fill: #ef8fa1; }
-      .pig-shadow   { fill: #e77f92; }
-      .pig-light    { fill: #f5a5b2; }
-      .pig-outline  { stroke: #ffffff; stroke-width: 7; stroke-linejoin: round; stroke-linecap: round; }
-      .pig-green    { stroke: #237a49; stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; fill: none; }
-      .pig-dark     { fill: #2f2f2f; }
-      .pig-nostril  { stroke: #d76e83; stroke-width: 3; stroke-linecap: round; }
+      .ring        { fill: #237A49; }
+      .ring-inner  { fill: #FFFFFF; }
+      .dot         { fill: #237A49; }
+      .pig-body    { fill: #EF8FA1; stroke: #FFFFFF; stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; }
+      .pig-shadow  { fill: #E07A8E; opacity: 0.18; }
+      .pig-light   { fill: #F6ABB9; opacity: 0.38; }
+      .pig-dark    { fill: #2E2E2E; }
+      .pig-nostril { stroke: #D76E83; stroke-width: 3; stroke-linecap: round; }
+      .pig-accent  { stroke: #237A49; stroke-width: 4; stroke-linecap: round; fill: none; }
+      .coin        { fill: #FFD700; }
+      .coin-edge   { fill: none; stroke: #DAA520; stroke-width: 2; }
+      .coin-trail  { stroke: #DAA520; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 4 4; opacity: 0.55; }
     </style>
   </defs>
 
   <!-- Background: white rounded square. id="icon-bg" used by regen script for maskable variant -->
-  <rect id="icon-bg" width="512" height="512" rx="72" fill="#ffffff"/>
+  <rect id="icon-bg" width="512" height="512" rx="72" fill="#FFFFFF"/>
 
-  <!-- House -->
-  <path class="house-fill" d="M91 215 L256 125 L321 159 L321 147 L355 147 L355 178 L421 215 L387 215 L387 364 L125 364 L125 215 Z"/>
-  <path class="white-line" d="M133 214 L256 151 L379 214"/>
-  <path class="white-line" d="M141 225 L141 349 L371 349 L371 225"/>
+  <!-- ── Unity ring ────────────────────────────────────────────────── -->
+  <circle class="ring" cx="256" cy="256" r="200"/>
+  <circle class="ring-inner" cx="256" cy="256" r="170"/>
 
-  <!-- 6299 (white on green house body) -->
-  <text x="256" y="279" text-anchor="middle" class="num">6299</text>
+  <!-- Community dots (4 members on the ring) -->
+  <circle class="dot" cx="256" cy="56"  r="11"/>  <!-- 12 o'clock -->
+  <circle class="dot" cx="456" cy="256" r="11"/>  <!-- 3 o'clock  -->
+  <circle class="dot" cx="256" cy="456" r="11"/>  <!-- 6 o'clock  -->
+  <circle class="dot" cx="56"  cy="256" r="11"/>  <!-- 9 o'clock  -->
 
-  <!-- Falling coin with motion trail -->
-  <line x1="326" y1="270" x2="326" y2="280" stroke="#B8860B" stroke-width="2" stroke-dasharray="3 3" opacity="0.7"/>
-  <circle cx="326" cy="295" r="13" fill="#FFD700"/>
-  <circle cx="326" cy="295" r="8"  fill="none" stroke="#B8860B" stroke-width="2.5"/>
-
-  <!-- Pig (sits over the house base) -->
-  <g transform="translate(0,8)">
+  <!-- ── Piggy bank (centered in ring) ─────────────────────────────── -->
+  <g transform="translate(256,264)">
     <!-- Drop shadow -->
-    <ellipse cx="252" cy="357" rx="94" ry="14" class="pig-shadow" opacity="0.22"/>
-    <!-- Body -->
-    <ellipse cx="255" cy="320" rx="82" ry="58" class="pig-body pig-outline"/>
-    <!-- Top highlight -->
-    <ellipse cx="273" cy="304" rx="48" ry="18" class="pig-light" opacity="0.35"/>
-    <!-- Snout -->
-    <ellipse cx="181" cy="325" rx="25" ry="22" class="pig-body pig-outline"/>
-    <line x1="173" y1="317" x2="173" y2="333" class="pig-nostril"/>
-    <line x1="183" y1="317" x2="183" y2="333" class="pig-nostril"/>
-    <!-- Ear -->
-    <path d="M212 268 L228 246 L244 271 Z" class="pig-body pig-outline"/>
-    <!-- Legs -->
-    <rect x="214" y="367" width="24" height="35" rx="9" class="pig-body pig-outline"/>
-    <rect x="296" y="367" width="24" height="35" rx="9" class="pig-body pig-outline"/>
-    <!-- Eye -->
-    <circle cx="204" cy="309" r="7" class="pig-dark"/>
-    <circle cx="206" cy="307" r="2" fill="white" opacity="0.7"/>
-    <!-- Coin slot -->
-    <rect x="235" y="276" width="50" height="10" rx="5" class="pig-dark"/>
-    <!-- Tail -->
-    <path d="M335 329 C347 320,356 324,356 334 C356 343,348 347,341 342 C335 338,335 329,341 323 C350 314,367 317,369 333"
-          class="pig-outline" fill="none"/>
-    <!-- Green accent arc along base -->
-    <path d="M168 349 C175 381,328 384,339 352" class="pig-green"/>
-  </g>
+    <ellipse class="pig-shadow" cx="0" cy="62" rx="80" ry="12"/>
 
-  <!-- BATANAI wordmark -->
-  <text x="256" y="500" text-anchor="middle" class="label">BATANAI</text>
+    <!-- Body -->
+    <ellipse class="pig-body" cx="4" cy="0" rx="80" ry="58"/>
+
+    <!-- Top highlight -->
+    <ellipse class="pig-light" cx="18" cy="-16" rx="46" ry="16"/>
+
+    <!-- Snout -->
+    <ellipse class="pig-body" cx="-72" cy="6" rx="24" ry="20"/>
+    <line class="pig-nostril" x1="-79" y1="-2" x2="-79" y2="12"/>
+    <line class="pig-nostril" x1="-67" y1="-2" x2="-67" y2="12"/>
+
+    <!-- Ear -->
+    <path class="pig-body" d="M-32,-50 L-16,-76 L2,-46 Z"/>
+
+    <!-- Legs -->
+    <rect class="pig-body" x="-38" y="48" width="22" height="30" rx="8"/>
+    <rect class="pig-body" x="36"  y="48" width="22" height="30" rx="8"/>
+
+    <!-- Eye -->
+    <circle class="pig-dark" cx="-48" cy="-8" r="6"/>
+    <circle cx="-46" cy="-10" r="2" fill="#FFFFFF" opacity="0.7"/>
+
+    <!-- Coin slot -->
+    <rect class="pig-dark" x="-18" y="-42" width="44" height="8" rx="4"/>
+
+    <!-- Tail -->
+    <path d="M82,4 C94,-6,102,-2,102,6 C102,14,94,18,88,14 C82,10,82,4,88,-2 C94,-8,108,-6,110,6"
+          fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Green accent arc along base -->
+    <path class="pig-accent" d="M-70,38 C-56,62,58,64,72,40"/>
+
+    <!-- ── Gold coin dropping into slot ──────────────────────────── -->
+    <!-- Motion trail -->
+    <line class="coin-trail" x1="8" y1="-82" x2="8" y2="-62"/>
+    <!-- Coin -->
+    <circle class="coin" cx="8" cy="-54" r="10"/>
+    <circle class="coin-edge" cx="8" cy="-54" r="6"/>
+  </g>
 </svg>
