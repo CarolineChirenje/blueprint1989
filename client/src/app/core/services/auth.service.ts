@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import { Role } from '../../shared/models/user.model';
+import { PushNotificationService } from './push-notification.service';
 
 export interface SignupPayload {
   email: string;
@@ -21,8 +22,18 @@ export class AuthService {
   private userKey = 'bgl_user';
   private apiUrl = `${environment.apiUrl}/auth`;
 
-  constructor(private http: HttpClient, private router: Router) {
+  private _pushService?: PushNotificationService;
+
+  constructor(private http: HttpClient, private router: Router, private injector: Injector) {
     this.checkTokenExpiration();
+  }
+
+  /** Lazy-resolve PushNotificationService to avoid circular DI. */
+  private get pushService(): PushNotificationService {
+    if (!this._pushService) {
+      this._pushService = this.injector.get(PushNotificationService);
+    }
+    return this._pushService;
   }
 
   login(email: string, password: string): Observable<any> {
@@ -243,6 +254,8 @@ export class AuthService {
   }
 
   logout(explicitSignOut = false): void {
+    // Unsubscribe from push before clearing the token (needs the JWT for auth).
+    this.pushService.unsubscribeFromServer().catch(() => {});
     this.clearToken();
     // Only remove the biometric hint on an explicit user-initiated sign-out.
     // For session expiry the hint is preserved so the biometric button reappears.

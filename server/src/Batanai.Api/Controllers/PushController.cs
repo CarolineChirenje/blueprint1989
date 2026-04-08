@@ -38,7 +38,7 @@ public class PushController : ControllerBase
     /// <summary>
     /// GET /api/push/vapid-public-key
     /// Returns the VAPID public key so the client can subscribe at runtime.
-    /// Anonymous — the key is not sensitive.
+    /// Anonymous ï¿½ the key is not sensitive.
     /// </summary>
     [HttpGet("vapid-public-key")]
     [AllowAnonymous]
@@ -62,6 +62,13 @@ public class PushController : ControllerBase
 
         var userId = GetUserId();
         if (userId == null) return Unauthorized();
+
+        // Reclaim endpoint: remove subscriptions from other users for the same
+        // browser endpoint so that a shared device only delivers notifications
+        // to the user who most recently logged in.
+        await _context.PushSubscriptions
+            .Where(s => s.Endpoint == request.Endpoint && s.UserId != userId)
+            .ExecuteDeleteAsync();
 
         var existing = await _context.PushSubscriptions
             .FirstOrDefaultAsync(s => s.UserId == userId && s.Endpoint == request.Endpoint);

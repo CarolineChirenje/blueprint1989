@@ -907,6 +907,8 @@ export class AppComponent implements OnInit, OnDestroy {
   
   logout(): void {
     this.closeDropdown();
+    // Unsubscribe from push before clearing the token (needs the JWT for auth).
+    this.pushService.unsubscribeFromServer().catch(() => {});
     this.auth.clearToken();
     this.router.navigate(['/login']);
   }
