@@ -491,6 +491,7 @@ export class CycleDetailComponent implements OnInit {
         this.snackBar.open('Contribution recorded.', 'OK', { duration: 3000 });
         this.refreshSelectedRound();
         this.loadRounds();
+        this.loadMukandoSummary();
       },
       error: err => {
         this.contributionUploading = false;
@@ -506,6 +507,7 @@ export class CycleDetailComponent implements OnInit {
         this.snackBar.open('Contribution confirmed.', 'OK', { duration: 3000 });
         this.refreshSelectedRound();
         this.loadRounds();
+        this.loadMukandoSummary();
       },
       error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
     });
