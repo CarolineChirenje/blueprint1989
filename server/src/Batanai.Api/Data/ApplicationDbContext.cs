@@ -48,6 +48,9 @@ public class ApplicationDbContext : DbContext
     // ── File storage ──────────────────────────────────────────────────────
     public DbSet<UploadedFile>             UploadedFiles             { get; set; } = null!;
 
+    // ── Email log ─────────────────────────────────────────────────────────
+    public DbSet<SentEmail>                SentEmails                { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -87,6 +90,9 @@ public class ApplicationDbContext : DbContext
         // Feedback
         ConfigureFeatureBugReportEntity(modelBuilder);
         ConfigureFeatureBugReportCategoryEntity(modelBuilder);
+
+        // Email log
+        ConfigureSentEmailEntity(modelBuilder);
     }
 
     private static void ConfigureUserEntity(ModelBuilder modelBuilder)
@@ -457,6 +463,24 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("FeatureBugReportCategories");
             entity.HasKey(rc => new { rc.FeatureBugReportId, rc.Category });
             entity.HasOne(rc => rc.Report).WithMany(r => r.Categories).HasForeignKey(rc => rc.FeatureBugReportId).OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    private static void ConfigureSentEmailEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<SentEmail>(entity =>
+        {
+            entity.ToTable("sent_emails");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ToAddress).IsRequired().HasMaxLength(255).HasColumnName("to_address");
+            entity.Property(e => e.Subject).IsRequired().HasMaxLength(500).HasColumnName("subject");
+            entity.Property(e => e.HtmlBody).IsRequired().HasColumnType("text").HasColumnName("html_body");
+            entity.Property(e => e.PlainBody).HasColumnType("text").HasColumnName("plain_body");
+            entity.Property(e => e.BccAddress).HasMaxLength(255).HasColumnName("bcc_address");
+            entity.Property(e => e.SentAt).HasColumnName("sent_at");
+            entity.Property(e => e.IsSuccess).HasColumnName("is_success");
+            entity.Property(e => e.ErrorMessage).HasColumnType("text").HasColumnName("error_message");
+            entity.HasIndex(e => e.SentAt).HasDatabaseName("IX_sent_emails_sent_at");
         });
     }
 }

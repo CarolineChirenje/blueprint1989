@@ -34,6 +34,7 @@ public static class AppConfigKeys
     public const string EmailVerificationUrlPath             = "EmailVerificationUrlPath";
     public const string EmailVerificationTokenValidityHours  = "EmailVerificationTokenValidityHours";
     public const string EmailVerificationResendLimitPerHour  = "EmailVerificationResendLimitPerHour";
+    public const string EmailBccAddress                      = "EmailBccAddress";
 
     // -- Documentation ---------------------------------------------------------
     public const string DocsUrl = "DocsUrl";

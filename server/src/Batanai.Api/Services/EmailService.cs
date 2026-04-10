@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Mail;
+using Batanai.Api.Data;
 using Batanai.Api.Models;
 
 namespace Batanai.Api.Services;
@@ -12,11 +13,13 @@ public class EmailService : IEmailService
 {
     private readonly AppConfigService _appConfigService;
     private readonly ILogger<EmailService> _logger;
+    private readonly ApplicationDbContext _db;
 
-    public EmailService(AppConfigService appConfigService, ILogger<EmailService> logger)
+    public EmailService(AppConfigService appConfigService, ILogger<EmailService> logger, ApplicationDbContext db)
     {
         _appConfigService = appConfigService;
         _logger = logger;
+        _db = db;
     }
 
     public async Task<bool> SendEmailAsync(string to, string subject, string htmlBody, string? plainBody = null)
@@ -30,6 +33,7 @@ public class EmailService : IEmailService
             var smtpPassword = await _appConfigService.GetStringAsync(AppConfigKeys.SmtpPassword, "");
             var fromEmail = await _appConfigService.GetStringAsync(AppConfigKeys.SmtpFromEmail, "");
             var fromName = await _appConfigService.GetStringAsync(AppConfigKeys.SmtpFromName, "");
+            var bccAddress = await _appConfigService.GetStringAsync(AppConfigKeys.EmailBccAddress, "");
 
             // Validate required SMTP configuration
             if (string.IsNullOrWhiteSpace(smtpHost) || 
@@ -68,6 +72,14 @@ public class EmailService : IEmailService
                     mailMessage.IsBodyHtml = true;
                     mailMessage.Body = htmlBody;
 
+                    // Add BCC if configured
+                    string? bccApplied = null;
+                    if (!string.IsNullOrWhiteSpace(bccAddress))
+                    {
+                        mailMessage.Bcc.Add(bccAddress);
+                        bccApplied = bccAddress;
+                    }
+
                     // Add plaintext alternative if provided
                     if (!string.IsNullOrWhiteSpace(plainBody))
                     {
@@ -78,6 +90,7 @@ public class EmailService : IEmailService
                     // Send email
                     await smtpClient.SendMailAsync(mailMessage);
                     _logger.LogInformation("Email sent successfully to {Recipient} with subject '{Subject}'", to, subject);
+                    await LogSentEmailAsync(to, subject, htmlBody, plainBody, bccApplied, true, null);
                     return true;
                 }
             }
@@ -85,7 +98,31 @@ public class EmailService : IEmailService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send email to {Recipient} with subject '{Subject}'", to, subject);
+            await LogSentEmailAsync(to, subject, htmlBody, plainBody, null, false, ex.Message);
             return false;
+        }
+    }
+
+    private async Task LogSentEmailAsync(string to, string subject, string htmlBody, string? plainBody, string? bccAddress, bool isSuccess, string? errorMessage)
+    {
+        try
+        {
+            _db.SentEmails.Add(new SentEmail
+            {
+                ToAddress    = to,
+                Subject      = subject,
+                HtmlBody     = htmlBody,
+                PlainBody    = plainBody,
+                BccAddress   = bccAddress,
+                SentAt       = DateTime.UtcNow,
+                IsSuccess    = isSuccess,
+                ErrorMessage = errorMessage
+            });
+            await _db.SaveChangesAsync();
+        }
+        catch (Exception dbEx)
+        {
+            _logger.LogError(dbEx, "Failed to log sent email to the database. Email delivery was not affected.");
         }
     }
 }
