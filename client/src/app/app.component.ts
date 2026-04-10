@@ -79,6 +79,10 @@ export class AppComponent implements OnInit, OnDestroy {
   pendingCount = 0;
   private installPromptEvent: any = null;
 
+  // Samsung Internet warning banner state
+  showSamsungWarnBanner = false;      // in Samsung Internet browser, not yet installed
+  showSamsungReinstallBanner = false; // installed as a PWA via Samsung Internet
+
   // App update prompt state
   showUpdatePrompt = false;
   isBreakingUpdate = false;
@@ -168,6 +172,9 @@ export class AppComponent implements OnInit, OnDestroy {
       this.loadGroupAccess();
     }
 
+    // Samsung Internet detection: show appropriate guidance banner
+    this.initSamsungInternetBanners();
+
     // Initialise push after each successful login navigation
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -207,6 +214,8 @@ export class AppComponent implements OnInit, OnDestroy {
                 url.startsWith('/reset-password') || url.startsWith('/verify-email')) {
               this.showInstallBanner = false;
               this.showUpdatePrompt = false;
+              this.showSamsungWarnBanner = false;
+              this.showSamsungReinstallBanner = false;
             }
           }
         }
@@ -353,6 +362,50 @@ export class AppComponent implements OnInit, OnDestroy {
   neverAskInstall(): void {
     this.showInstallBanner = false;
     this.deviceService.markNeverAskAgain().subscribe();
+  }
+
+  // ── Samsung Internet banners ─────────────────────────────────────────────
+
+  private initSamsungInternetBanners(): void {
+    if (!DeviceService.isSamsungInternet) return;
+
+    if (!DeviceService.isRunningStandalone && !this.deviceService.samsungWarnBannerDismissed) {
+      // User is browsing in Samsung Internet and has not yet installed (or installed badly)
+      this.showSamsungWarnBanner = true;
+    } else if (DeviceService.isRunningStandalone && !this.deviceService.samsungReinstallBannerDismissed) {
+      // App was installed as a PWA through Samsung Internet — reinstall guide
+      this.showSamsungReinstallBanner = true;
+    }
+  }
+
+  openInChrome(): void {
+    const url = window.location.href;
+    // Android intent deep link — opens the current URL directly in Chrome if installed
+    const chromeIntent = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+
+    // Attempt the intent. If Chrome is not installed the intent silently fails,
+    // so we fall back to copying the URL to clipboard after a short delay.
+    window.location.href = chromeIntent;
+
+    setTimeout(() => {
+      // If we're still on the same page after 1.5s, Chrome likely wasn't installed.
+      // Copy the URL to clipboard so the user can paste it in any browser.
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+          this.dialogService.alert('Chrome not found', 'The URL has been copied to your clipboard. Paste it into Chrome or another browser to continue.');
+        }).catch(() => {});
+      }
+    }, 1500);
+  }
+
+  dismissSamsungWarnBanner(): void {
+    this.showSamsungWarnBanner = false;
+    this.deviceService.dismissSamsungWarnBanner();
+  }
+
+  dismissSamsungReinstallBanner(): void {
+    this.showSamsungReinstallBanner = false;
+    this.deviceService.dismissSamsungReinstallBanner();
   }
 
   // ── App update prompt ────────────────────────────────────────────────────

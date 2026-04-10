@@ -344,6 +344,52 @@
   </div>
 }
 
+<!-- Samsung Internet in-browser warning — guides user to install via Chrome instead -->
+@if (showSamsungWarnBanner) {
+  <div class="samsung-warn-banner" role="dialog" aria-label="Browser compatibility notice">
+    <div class="samsung-warn-icon" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:28px;height:28px">
+        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+      </svg>
+    </div>
+    <div class="samsung-warn-body">
+      <strong>Better experience available</strong>
+      <span>Samsung Internet has limited app support. Install Batanai from <strong>Chrome</strong> for the full app experience.</span>
+      <div class="samsung-warn-actions">
+        <button class="samsung-warn-btn-primary" (click)="openInChrome()">Open in Chrome</button>
+        <button class="samsung-warn-btn-dismiss" (click)="dismissSamsungWarnBanner()">Dismiss</button>
+      </div>
+    </div>
+    <button class="samsung-warn-close" (click)="dismissSamsungWarnBanner()" aria-label="Close">✕</button>
+  </div>
+}
+
+<!-- Samsung Internet reinstall guide — shown when already installed via Samsung Internet -->
+@if (showSamsungReinstallBanner) {
+  <div class="samsung-warn-banner samsung-reinstall-banner" role="dialog" aria-label="Reinstall guidance">
+    <div class="samsung-warn-icon" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:28px;height:28px">
+        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+      </svg>
+    </div>
+    <div class="samsung-warn-body">
+      <strong>Fix "Open with" prompt</strong>
+      <span>This app was installed from Samsung Internet which causes the "Open with" issue on your device. Reinstall from Chrome to fix it:</span>
+      <ol class="samsung-reinstall-steps">
+        <li>Long-press this app on your home screen and <strong>uninstall</strong> it</li>
+        <li>Open <strong>Chrome</strong> on your device</li>
+        <li>Go to <strong>batanai.elroitec.com</strong></li>
+        <li>Tap <strong>"Add to Home screen"</strong> in the Chrome menu</li>
+      </ol>
+      <div class="samsung-warn-actions">
+        <button class="samsung-warn-btn-primary" (click)="openInChrome()">Open in Chrome</button>
+        <button class="samsung-warn-btn-dismiss" (click)="dismissSamsungReinstallBanner()">Got it</button>
+      </div>
+    </div>
+    <button class="samsung-warn-close" (click)="dismissSamsungReinstallBanner()" aria-label="Close">✕</button>
+  </div>
+}
+
 <!-- App Update Banner -->
 @if (showUpdatePrompt) {
   <div class="pwa-update-banner" [class.breaking]="isBreakingUpdate" role="alert" aria-live="assertive">

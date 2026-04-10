@@ -4,10 +4,14 @@
   "short_name": "Batanai",
   "description": "Batanai — Group expense tracker",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#237A49",
   "theme_color": "#237A49",
   "orientation": "any",
+  "prefer_related_applications": false,
+  "handle_links": "preferred",
+  "launch_handler": { "client_mode": "focus-existing" },
   "icons": [
     {
       "src": "assets/icons/icon-192x192.png",

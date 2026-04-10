@@ -15,6 +15,8 @@ import {
 const CLIENT_ID_KEY = 'bgl_client_id';
 const INSTALL_STATUS_KEY = 'bgl_install_status';
 const NEXT_PROMPT_KEY = 'bgl_next_prompt_at';
+const SAMSUNG_WARN_DISMISSED_KEY = 'bgl_samsung_warn_dismissed';
+const SAMSUNG_REINSTALL_DISMISSED_KEY = 'bgl_samsung_reinstall_dismissed';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceService {
@@ -24,6 +26,15 @@ export class DeviceService {
   static readonly isMobileOrTablet: boolean =
     /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
     navigator.maxTouchPoints > 0;
+
+  /** True when running inside Samsung Internet browser. */
+  static readonly isSamsungInternet: boolean =
+    /SamsungBrowser/i.test(navigator.userAgent);
+
+  /** True when the app is running as an installed standalone PWA. */
+  static readonly isRunningStandalone: boolean =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true;
 
   private _installStatus$ = new BehaviorSubject<InstallPromptStatus>(
     (localStorage.getItem(INSTALL_STATUS_KEY) as InstallPromptStatus) ?? InstallPromptStatus.Unknown
@@ -123,6 +134,24 @@ export class DeviceService {
   /** Reset install prompt to Unknown — will show the banner again next time. */
   resetInstallPrompt(): Observable<void> {
     return this.updateInstallStatus(0, null);
+  }
+
+  // ── Samsung Internet warning banners ─────────────────────────────────────
+
+  get samsungWarnBannerDismissed(): boolean {
+    return localStorage.getItem(SAMSUNG_WARN_DISMISSED_KEY) !== null;
+  }
+
+  get samsungReinstallBannerDismissed(): boolean {
+    return localStorage.getItem(SAMSUNG_REINSTALL_DISMISSED_KEY) !== null;
+  }
+
+  dismissSamsungWarnBanner(): void {
+    localStorage.setItem(SAMSUNG_WARN_DISMISSED_KEY, '1');
+  }
+
+  dismissSamsungReinstallBanner(): void {
+    localStorage.setItem(SAMSUNG_REINSTALL_DISMISSED_KEY, '1');
   }
 
   private updateInstallStatus(status: number, nextPromptAt: Date | null): Observable<void> {

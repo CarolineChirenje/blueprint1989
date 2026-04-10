@@ -1244,6 +1244,155 @@ footer p {
   }
 }
 
+/* ── Samsung Internet warning banners ────────────────────────────────── */
+.samsung-warn-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff8e1;
+  border-top: 3px solid #f57c00;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  z-index: 9998;
+  flex-wrap: nowrap;
+  color-scheme: light;
+  color: #333;
+}
+
+.samsung-warn-icon {
+  color: #f57c00;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-top: 2px;
+}
+
+.samsung-warn-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 4px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.samsung-warn-body strong {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #e65100;
+}
+
+.samsung-warn-body span {
+  color: #555;
+  font-size: 0.82rem;
+}
+
+.samsung-reinstall-steps {
+  margin: 6px 0 4px 16px;
+  padding: 0;
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.samsung-reinstall-steps li {
+  margin-bottom: 2px;
+}
+
+.samsung-reinstall-steps strong {
+  color: #333;
+  font-weight: 600;
+  font-size: inherit;
+}
+
+.samsung-warn-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.samsung-warn-btn-primary {
+  background: #f57c00;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.samsung-warn-btn-primary:hover {
+  background: #e65100;
+}
+
+.samsung-warn-btn-dismiss {
+  background: none;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.samsung-warn-btn-dismiss:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.samsung-warn-close {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #999;
+  cursor: pointer;
+  padding: 4px 6px;
+  flex-shrink: 0;
+  line-height: 1;
+  align-self: flex-start;
+}
+
+.samsung-warn-close:hover {
+  color: #555;
+}
+
+@media (max-width: 480px) {
+  .samsung-warn-banner {
+    padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .samsung-warn-icon {
+    display: none;
+  }
+
+  .samsung-warn-body {
+    font-size: 0.82rem;
+  }
+
+  .samsung-warn-btn-primary {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .samsung-warn-btn-dismiss {
+    flex: 1;
+    text-align: center;
+  }
+}
+
 /* ── Navigation progress bar ─────────────────────────────────────────── */
 .nav-progress-bar {
   position: fixed;
