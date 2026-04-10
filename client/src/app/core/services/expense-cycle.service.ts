@@ -15,7 +15,8 @@ import {
   OptOutRequestDto,
   MukandoRoundActivityDto,
   MukandoCycleSummaryDto,
-  MukandoDashboardDto
+  MukandoDashboardDto,
+  MukandoVerificationRequestDto
 } from '../../shared/models/expense-cycle.model';
 
 @Injectable({ providedIn: 'root' })
@@ -208,5 +209,23 @@ export class ExpenseCycleService {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<{ url: string }>(`${environment.apiUrl}/files/upload?folder=${encodeURIComponent(folder)}`, formData);
+  }
+
+  // ── Verification ────────────────────────────────────────────────────────────
+
+  getPendingVerifications(cycleId: number): Observable<MukandoVerificationRequestDto[]> {
+    return this.http.get<MukandoVerificationRequestDto[]>(`${this.url}/${cycleId}/pending-verifications`);
+  }
+
+  verifyContribution(cycleId: number, roundId: number, verificationId: number, approve: boolean, rejectionReason?: string): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/verify-contribution/${verificationId}`, { approve, rejectionReason });
+  }
+
+  verifyPayout(cycleId: number, roundId: number, verificationId: number, approve: boolean, rejectionReason?: string): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/verify-payout/${verificationId}`, { approve, rejectionReason });
+  }
+
+  reassignVerifier(cycleId: number, roundId: number, verificationId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/reassign-verifier/${verificationId}`, {});
   }
 }

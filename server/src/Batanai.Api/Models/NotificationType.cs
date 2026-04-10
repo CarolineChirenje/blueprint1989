@@ -114,5 +114,19 @@ public enum NotificationType
 
     /// <summary>A join request was declined by a group admin.</summary>
     JoinRequestDeclined = 35,
+
+    // -- Mukando Verification -------------------------------------------------
+
+    /// <summary>A cycle participant has been randomly selected to verify a contribution or payout.</summary>
+    MukandoVerificationRequested = 36,
+
+    /// <summary>The randomly assigned verifier approved the contribution or payout.</summary>
+    MukandoVerificationApproved = 37,
+
+    /// <summary>The randomly assigned verifier rejected the contribution or payout.</summary>
+    MukandoVerificationRejected = 38,
+
+    /// <summary>The verifier was reassigned (previous assignee did not respond in time).</summary>
+    MukandoVerifierReassigned = 39,
 }
 

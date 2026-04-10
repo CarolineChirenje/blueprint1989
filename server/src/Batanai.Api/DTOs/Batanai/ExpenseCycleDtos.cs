@@ -279,3 +279,24 @@ public record MukandoActiveRoundStatusDto(
     int RoundNumber,
     int ContributionsCollected,
     int TotalExpected);
+
+// ── Mukando Verification ──────────────────────────────────────────────────────
+
+public record RespondToVerificationRequest(
+    bool Approve,
+    string? RejectionReason = null);
+
+public record MukandoVerificationRequestDto(
+    int Id,
+    int MukandoRoundId,
+    string Target,
+    string Status,
+    /// <summary>Only visible after the verifier has responded — blank before then.</summary>
+    int AssignedToUserId,
+    string AssignedToName,
+    DateTime ExpiresAt,
+    DateTime CreatedAt,
+    int? ContributionId,
+    string? ContributorName,
+    decimal? ContributionAmount,
+    string? RejectionReason);

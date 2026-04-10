@@ -195,7 +195,7 @@ export interface MukandoContributionDto {
   firstName: string;
   lastName: string;
   amount: number;
-  status: 'Pending' | 'Paid' | 'Confirmed' | 'Missed';
+  status: 'Pending' | 'Paid' | 'Confirmed' | 'Missed' | 'AwaitingVerification';
   proofUrl: string | null;
   reference: string | null;
   paidAt: string | null;
@@ -297,4 +297,25 @@ export interface MukandoActiveRoundStatusDto {
   roundNumber: number;
   contributionsConfirmed: number;
   contributionsTotal: number;
+}
+
+// ── Mukando Verification ──────────────────────────────────────────────────────
+
+export type VerificationTarget = 'Contribution' | 'Payout';
+export type VerificationStatus = 'Pending' | 'Approved' | 'Rejected' | 'Reassigned';
+
+export interface MukandoVerificationRequestDto {
+  id: number;
+  mukandoRoundId: number;
+  target: VerificationTarget;
+  status: VerificationStatus;
+  /** Zero (and name = 'Pending') until the verifier responds — prevents collusion. */
+  assignedToUserId: number;
+  assignedToName: string;
+  expiresAt: string;
+  createdAt: string;
+  contributionId: number | null;
+  contributorName: string | null;
+  contributionAmount: number | null;
+  rejectionReason: string | null;
 }

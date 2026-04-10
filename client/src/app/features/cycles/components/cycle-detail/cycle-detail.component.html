@@ -424,6 +424,51 @@
     <!-- ═══════ Mukando: Rounds Tab ═══════ -->
     @if (activeTab === 'rounds') {
       <div class="tab-content">
+
+        <!-- Verification assignment banner (shown when current user is assigned as verifier) -->
+        @if (hasPendingVerification && myVerificationAssignment) {
+          <div class="verification-banner" role="region" aria-label="Verification required">
+            <div class="verification-banner-header">
+              <mat-icon>verified_user</mat-icon>
+              <span class="verification-banner-title">Verification Required</span>
+              <span class="verification-expire">Expires {{ myVerificationAssignment.expiresAt | date:'mediumDate' }}</span>
+            </div>
+            <div class="verification-banner-meta">
+              @if (myVerificationAssignment.target === 'Contribution') {
+                You have been randomly selected to verify a contribution.
+                <strong>{{ myVerificationAssignment.contributorName }}</strong> paid
+                <strong>{{ currencySymbol }}{{ myVerificationAssignment.contributionAmount | number:'1.2-2' }}</strong>
+                for Round #{{ myVerificationAssignment.mukandoRoundId }}.
+              } @else {
+                You have been randomly selected to verify a payout for Round #{{ myVerificationAssignment.mukandoRoundId }}.
+              }
+            </div>
+            @if (myVerificationAssignment.target === 'Contribution') {
+              <!-- Proof link for the round contribution — user should have viewed it from the round -->
+              <p class="verification-banner-meta">Review the proof attachment in the round detail below before approving or rejecting.</p>
+            }
+            <mat-form-field class="verification-rejection-field" appearance="outline">
+              <mat-label>Rejection reason (required if rejecting)</mat-label>
+              <textarea matInput rows="2" [(ngModel)]="verificationRejectionReason"></textarea>
+            </mat-form-field>
+            <div class="verification-banner-actions">
+              <button mat-raised-button color="primary"
+                      [disabled]="verificationSubmitting"
+                      (click)="respondToVerification(myVerificationAssignment.id, myVerificationAssignment.mukandoRoundId, myVerificationAssignment.target === 'Payout', true)">
+                <mat-icon>check_circle</mat-icon> Approve
+              </button>
+              <button mat-stroked-button color="warn"
+                      [disabled]="verificationSubmitting || !verificationRejectionReason.trim()"
+                      (click)="respondToVerification(myVerificationAssignment.id, myVerificationAssignment.mukandoRoundId, myVerificationAssignment.target === 'Payout', false)">
+                <mat-icon>cancel</mat-icon> Reject
+              </button>
+              @if (verificationSubmitting) {
+                <span class="verification-expire">Submitting…</span>
+              }
+            </div>
+          </div>
+        }
+
         @if (rounds.length === 0) {
           <div class="empty-state">No rounds yet. Start the cycle to activate the first round.</div>
         } @else {
@@ -467,6 +512,24 @@
                               <mat-icon>check</mat-icon> Confirm
                             </button>
                           }
+                          <!-- AwaitingVerification: show awaiting chip, admin can reassign -->
+                          @if (c.status === 'AwaitingVerification') {
+                            <span class="verification-expire">
+                              <mat-icon style="font-size:14px;vertical-align:middle;">hourglass_top</mat-icon>
+                              Awaiting verifier
+                            </span>
+                            @if (canManageCycle()) {
+                              @for (v of pendingVerifications; track v.id) {
+                                @if (v.contributionId === c.id && v.status === 'Pending') {
+                                  <button mat-stroked-button class="btn-sm" color="accent"
+                                          (click)="reassignVerifier(v.id, selectedRound.id)"
+                                          matTooltip="Reassign to a different verifier">
+                                    <mat-icon>swap_horiz</mat-icon> Reassign
+                                  </button>
+                                }
+                              }
+                            }
+                          }
                         </div>
                       }
                     </div>
@@ -506,49 +569,67 @@
                     @if (canManageCycle() && selectedRound.status === 'Active' && !selectedRound.payoutConfirmed) {
                       <div class="admin-actions-section">
                         <h4>Admin Actions</h4>
-                        <div class="payout-form">
-                          <h5>Record Payout to {{ selectedRound.recipientName }}</h5>
-                          <div class="payout-fields">
-                            <mat-form-field appearance="outline">
-                              <mat-label>Amount</mat-label>
-                              <input matInput type="number" [(ngModel)]="payoutAmount" [readonly]="true">
-                              <mat-hint>Collected: {{ currencySymbol }}{{ selectedRound.actualCollected | number:'1.2-2' }}</mat-hint>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline">
-                              <mat-label>Method</mat-label>
-                              <mat-select [(ngModel)]="payoutMethod">
-                                <mat-option value="Cash">Cash</mat-option>
-                                <mat-option value="BankTransfer">Bank Transfer</mat-option>
-                                <mat-option value="MobileMoney">Mobile Money</mat-option>
-                                <mat-option value="Other">Other</mat-option>
-                              </mat-select>
-                            </mat-form-field>
-                            <div class="proof-upload-area">
-                              <input type="file" #payoutFileInput hidden
-                                     accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                     (change)="onPayoutFileSelected($event)">
-                              <button mat-stroked-button type="button" (click)="payoutFileInput.click()">
-                                <mat-icon>cloud_upload</mat-icon>
-                                Upload Proof
-                              </button>
-                              @if (payoutFileName) {
-                                <span class="proof-file-name"><mat-icon>check_circle</mat-icon> {{ payoutFileName }}</span>
-                              }
-                              @if (payoutUploadError) {
-                                <span class="proof-upload-error">{{ payoutUploadError }}</span>
-                              }
-                            </div>
-                            <mat-form-field appearance="outline">
-                              <mat-label>Reference</mat-label>
-                              <input matInput [(ngModel)]="payoutReference">
-                            </mat-form-field>
+                        <!-- Show notice when a payout verification is already pending for this round -->
+                        @if (hasPayoutVerificationPending(selectedRound.id)) {
+                          <div class="payout-verification-pending">
+                            <mat-icon>hourglass_top</mat-icon>
+                            <p>Payout to <strong>{{ selectedRound.recipientName }}</strong> is awaiting independent verification.
+                              A randomly selected member has been notified to review and approve it.</p>
                           </div>
-                          <button mat-raised-button color="primary"
-                                  [disabled]="!payoutAmount || !payoutMethod || !payoutProofFile || payoutUploading"
-                                  (click)="recordPayout(selectedRound.id)">
-                            <mat-icon>payment</mat-icon> {{ payoutUploading ? 'Submitting…' : 'Record Payout' }}
-                          </button>
-                        </div>
+                          @for (v of pendingVerifications; track v.id) {
+                            @if (v.target === 'Payout' && v.mukandoRoundId === selectedRound.id && v.status === 'Pending') {
+                              <button mat-stroked-button color="accent" class="force-close-btn"
+                                      (click)="reassignVerifier(v.id, selectedRound.id)"
+                                      matTooltip="Assign a different random verifier">
+                                <mat-icon>swap_horiz</mat-icon> Reassign Verifier
+                              </button>
+                            }
+                          }
+                        } @else {
+                          <div class="payout-form">
+                            <h5>Record Payout to {{ selectedRound.recipientName }}</h5>
+                            <div class="payout-fields">
+                              <mat-form-field appearance="outline">
+                                <mat-label>Amount</mat-label>
+                                <input matInput type="number" [(ngModel)]="payoutAmount" [readonly]="true">
+                                <mat-hint>Collected: {{ currencySymbol }}{{ selectedRound.actualCollected | number:'1.2-2' }}</mat-hint>
+                              </mat-form-field>
+                              <mat-form-field appearance="outline">
+                                <mat-label>Method</mat-label>
+                                <mat-select [(ngModel)]="payoutMethod">
+                                  <mat-option value="Cash">Cash</mat-option>
+                                  <mat-option value="BankTransfer">Bank Transfer</mat-option>
+                                  <mat-option value="MobileMoney">Mobile Money</mat-option>
+                                  <mat-option value="Other">Other</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                              <div class="proof-upload-area">
+                                <input type="file" #payoutFileInput hidden
+                                       accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                       (change)="onPayoutFileSelected($event)">
+                                <button mat-stroked-button type="button" (click)="payoutFileInput.click()">
+                                  <mat-icon>cloud_upload</mat-icon>
+                                  Upload Proof
+                                </button>
+                                @if (payoutFileName) {
+                                  <span class="proof-file-name"><mat-icon>check_circle</mat-icon> {{ payoutFileName }}</span>
+                                }
+                                @if (payoutUploadError) {
+                                  <span class="proof-upload-error">{{ payoutUploadError }}</span>
+                                }
+                              </div>
+                              <mat-form-field appearance="outline">
+                                <mat-label>Reference</mat-label>
+                                <input matInput [(ngModel)]="payoutReference">
+                              </mat-form-field>
+                            </div>
+                            <button mat-raised-button color="primary"
+                                    [disabled]="!payoutAmount || !payoutMethod || !payoutProofFile || payoutUploading"
+                                    (click)="recordPayout(selectedRound.id)">
+                              <mat-icon>payment</mat-icon> {{ payoutUploading ? 'Submitting…' : 'Record Payout' }}
+                            </button>
+                          </div>
+                        }
                         <button mat-stroked-button color="warn" class="force-close-btn"
                                 (click)="forceCloseRound(selectedRound.id)">
                           <mat-icon>block</mat-icon> Force Close Round

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Batanai.Api.Data;
 using Batanai.Api.DTOs.Batanai;
 using Batanai.Api.Models;
+using System.Security.Cryptography;
 
 namespace Batanai.Api.Services;
 
@@ -106,13 +107,33 @@ public class MukandoService
         if (contribution == null) return "You are not a contributor for this round.";
         if (contribution.Status != ContributionStatus.Pending) return "Contribution already submitted or confirmed.";
 
-        contribution.Status    = ContributionStatus.Paid;
         contribution.ProofUrl  = request.ProofUrl;
         contribution.Reference = request.Reference;
         contribution.Notes     = request.Notes;
         contribution.PaidAt    = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        // ── Admin-pays guard ──────────────────────────────────────────────────
+        // If the contributor is a GroupAdmin of this cycle's group, they cannot
+        // self-confirm. The system immediately assigns a random independent verifier
+        // so no admin can touch the confirmation step.
+        bool contributorIsAdmin = await IsGroupAdminOfCycleAsync(round.ExpenseCycleId, userId);
+        if (contributorIsAdmin)
+        {
+            contribution.Status = ContributionStatus.AwaitingVerification;
+            await _context.SaveChangesAsync();
+
+            var verifyError = await CreateVerificationAsync(
+                round, contribution,
+                initiatedByUserId: userId,        // contributor triggered it themselves
+                excludeIds: new[] { userId, round.RecipientUserId });
+
+            if (verifyError != null) return verifyError;
+        }
+        else
+        {
+            contribution.Status = ContributionStatus.Paid;
+            await _context.SaveChangesAsync();
+        }
 
         // Log activity
         var user = await _context.Users.FindAsync(userId);
@@ -145,48 +166,39 @@ public class MukandoService
         var contribution = await _context.MukandoContributions
             .FirstOrDefaultAsync(c => c.MukandoRoundId == roundId && c.UserId == userId);
         if (contribution == null) return "Contribution not found.";
-        if (contribution.Status != ContributionStatus.Paid) return "Contribution must be in Paid status to confirm.";
 
-        contribution.Status             = ContributionStatus.Confirmed;
-        contribution.ConfirmedByAdminAt = DateTime.UtcNow;
+        // ── Admin-pays guard ──────────────────────────────────────────────────
+        if (userId == adminUserId)
+            return "You cannot confirm your own contribution. It has been automatically sent for independent verification.";
 
-        round.ActualCollected += contribution.Amount;
-        round.UpdatedAt        = DateTime.UtcNow;
+        if (contribution.Status == ContributionStatus.AwaitingVerification)
+            return "This contribution is already awaiting independent verification by a randomly assigned participant.";
 
+        if (contribution.Status != ContributionStatus.Paid)
+            return "Contribution must be in Paid status to confirm.";
+
+        // Initiate two-step verification: set status to AwaitingVerification,
+        // randomly pick a verifier (exclude both the contributor and the admin).
+        contribution.Status = ContributionStatus.AwaitingVerification;
         await _context.SaveChangesAsync();
 
-        // Log activity
+        var verifyError = await CreateVerificationAsync(
+            round, contribution,
+            initiatedByUserId: adminUserId,
+            excludeIds: new[] { userId, adminUserId, round.RecipientUserId });
+
+        if (verifyError != null)
+        {
+            // Roll back status so admin can retry
+            contribution.Status = ContributionStatus.Paid;
+            await _context.SaveChangesAsync();
+            return verifyError;
+        }
+
         var admin = await _context.Users.FindAsync(adminUserId);
         var member = await _context.Users.FindAsync(userId);
-        await LogActivityAsync(roundId, adminUserId, RoundActivityAction.ContributionConfirmed,
-            $"{admin?.FirstName} confirmed {member?.FirstName}'s contribution of {contribution.Amount:F2}");
-
-        // Notify the contributing member
-        await _push.SendToUserAsync(
-            userId,
-            NotificationType.MukandoContributionConfirmed,
-            $"Contribution confirmed: Round {round.RoundNumber}",
-            $"Your contribution for Round {round.RoundNumber} has been confirmed.",
-            $"/cycles/{round.ExpenseCycleId}",
-            round.ExpenseCycleId);
-
-        // Check if all contributions collected
-        var allConfirmed = !await _context.MukandoContributions
-            .AnyAsync(c => c.MukandoRoundId == roundId && c.Status != ContributionStatus.Confirmed && c.Status != ContributionStatus.Missed);
-        if (allConfirmed)
-        {
-            var adminIds = await GetCycleAdminIdsAsync(round.ExpenseCycleId);
-            var cycle = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
-            var currency = cycle != null ? await _context.Currencies.FindAsync(cycle.CurrencyId) : null;
-            var sym = currency?.Symbol ?? "$";
-            await _push.SendToUsersAsync(
-                adminIds,
-                NotificationType.MukandoAllContributionsCollected,
-                $"All contributions collected: Round {round.RoundNumber}",
-                $"All contributions for Round {round.RoundNumber} have been collected. {sym}{round.ActualCollected:F2} ready for payout.",
-                $"/cycles/{round.ExpenseCycleId}",
-                round.ExpenseCycleId);
-        }
+        await LogActivityAsync(roundId, adminUserId, RoundActivityAction.ContributionVerificationRequested,
+            $"{admin?.FirstName} initiated verification of {member?.FirstName}'s contribution of {contribution.Amount:F2}");
 
         return null;
     }
@@ -207,76 +219,491 @@ public class MukandoService
         if (request.AmountDisbursed <= 0)
             return "Amount must be positive.";
 
+        // ── Admin-self-payout guard ───────────────────────────────────────────
+        if (round.RecipientUserId == adminUserId)
+            return "You cannot record a payout to yourself. A randomly assigned independent verifier will complete this step.";
+
         // Ensure all contributions are confirmed or resolved before payout
         var unresolvedCount = await _context.MukandoContributions
             .CountAsync(c => c.MukandoRoundId == roundId
-                          && (c.Status == ContributionStatus.Pending || c.Status == ContributionStatus.Paid));
+                          && (c.Status == ContributionStatus.Pending || c.Status == ContributionStatus.Paid
+                              || c.Status == ContributionStatus.AwaitingVerification));
         if (unresolvedCount > 0)
-            return $"{unresolvedCount} contribution(s) are still pending or unconfirmed. Confirm them or force-close the round first.";
+            return $"{unresolvedCount} contribution(s) are still pending, unconfirmed, or awaiting verification. Resolve them first.";
 
         // Payout must match what was actually collected
         if (request.AmountDisbursed != round.ActualCollected)
             return $"Payout amount ({request.AmountDisbursed:F2}) does not match the collected amount ({round.ActualCollected:F2}).";
 
-        var payout = new MukandoPayout
+        // ── Check if recipient is a GroupAdmin (auto-route to random verifier) ─
+        bool recipientIsAdmin = await IsGroupAdminOfCycleAsync(round.ExpenseCycleId, round.RecipientUserId);
+
+        // Store payout data in a verification request; don't finalise the round yet.
+        var verificationRequest = new MukandoVerificationRequest
         {
-            MukandoRoundId    = roundId,
-            RecipientUserId   = round.RecipientUserId,
-            AmountDisbursed   = request.AmountDisbursed,
-            PaymentMethod     = method,
-            ProofUrl          = request.ProofUrl,
-            Reference         = request.Reference,
-            ConfirmedByUserId = adminUserId,
-            CreatedAt         = DateTime.UtcNow
+            MukandoRoundId         = roundId,
+            Target                 = VerificationTarget.Payout,
+            PendingPayoutAmount    = request.AmountDisbursed,
+            PendingPayoutMethod    = method,
+            PendingPayoutProofUrl  = request.ProofUrl,
+            PendingPayoutReference = request.Reference,
+            InitiatedByUserId      = adminUserId,
+            Status                 = VerificationStatus.Pending,
+            ExpiresAt              = DateTime.UtcNow.AddHours(48),
+            CreatedAt              = DateTime.UtcNow
         };
 
-        _context.MukandoPayouts.Add(payout);
+        // Exclude: recipient (they benefit), the admin who initiated, and — if recipient
+        // is also a GroupAdmin — exclude other admins too so a random non-admin gets chosen
+        var excludeIds = new List<int> { adminUserId, round.RecipientUserId };
+        if (recipientIsAdmin)
+        {
+            var otherAdmins = await GetCycleAdminIdsAsync(round.ExpenseCycleId);
+            excludeIds.AddRange(otherAdmins);
+        }
 
-        round.PayoutConfirmed   = true;
-        round.PayoutConfirmedAt = DateTime.UtcNow;
-        round.Status            = RoundStatus.Completed;
-        round.UpdatedAt         = DateTime.UtcNow;
+        var (verifierId, selectError) = await SelectRandomVerifierAsync(roundId, excludeIds);
+        if (selectError != null) return selectError;
 
+        verificationRequest.AssignedToUserId = verifierId;
+        _context.MukandoVerificationRequests.Add(verificationRequest);
         await _context.SaveChangesAsync();
 
-        // Log activity
-        var admin = await _context.Users.FindAsync(adminUserId);
-        await LogActivityAsync(roundId, adminUserId, RoundActivityAction.PayoutRecorded,
-            $"{admin?.FirstName} recorded payout of {request.AmountDisbursed:F2} to recipient");
-
-        // Notify recipient
-        var cycle = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
+        var cycle  = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
         var currency = cycle != null ? await _context.Currencies.FindAsync(cycle.CurrencyId) : null;
-        var sym = currency?.Symbol ?? "$";
+        var sym    = currency?.Symbol ?? "$";
+        var recipient = await _context.Users.FindAsync(round.RecipientUserId);
+
+        await LogActivityAsync(roundId, adminUserId, RoundActivityAction.PayoutVerificationRequested,
+            $"Payout of {sym}{request.AmountDisbursed:F2} to {recipient?.FirstName} submitted for independent verification");
+
         await _push.SendToUserAsync(
-            round.RecipientUserId,
-            NotificationType.MukandoPayoutConfirmed,
-            $"Payout confirmed: Round {round.RoundNumber}",
-            $"Your payout of {sym}{request.AmountDisbursed:F2} for Round {round.RoundNumber} has been confirmed!",
+            verifierId,
+            NotificationType.MukandoVerificationRequested,
+            $"Verify payout: Round {round.RoundNumber}",
+            $"You have been randomly selected to verify a payout of {sym}{request.AmountDisbursed:F2} to {recipient?.FirstName} for Round {round.RoundNumber} of \"{cycle?.Name}\". Open the cycle to review and respond.",
             $"/cycles/{round.ExpenseCycleId}",
             round.ExpenseCycleId);
-
-        // Notify all members that round is complete
-        var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == round.ExpenseCycleId)
-            .Select(m => m.UserId).ToListAsync();
-
-        await _push.SendToUsersAsync(
-            memberIds,
-            NotificationType.MukandoRoundCompleted,
-            $"Round {round.RoundNumber} complete",
-            $"Round {round.RoundNumber} of \"{cycle?.Name}\" is complete.",
-            $"/cycles/{round.ExpenseCycleId}",
-            round.ExpenseCycleId);
-
-        // Activate next round or complete cycle
-        await ActivateNextRoundOrCompleteCycleAsync(round.ExpenseCycleId, adminUserId);
 
         return null;
     }
 
-    public async Task<string?> ForceCloseRoundAsync(int roundId, int adminUserId)
+    // ── Verification Flow ─────────────────────────────────────────────────────
+
+    public async Task<List<MukandoVerificationRequestDto>> GetPendingVerificationsAsync(int cycleId, int requestingUserId, bool isAdmin)
     {
+        var roundIds = await _context.MukandoRounds
+            .Where(r => r.ExpenseCycleId == cycleId)
+            .Select(r => r.Id)
+            .ToListAsync();
+
+        var query = _context.MukandoVerificationRequests
+            .Where(v => roundIds.Contains(v.MukandoRoundId) && v.Status == VerificationStatus.Pending);
+
+        // Non-admins only see their own assigned verification
+        if (!isAdmin)
+            query = query.Where(v => v.AssignedToUserId == requestingUserId);
+
+        var items = await query.OrderBy(v => v.CreatedAt).ToListAsync();
+
+        var userIds = items.SelectMany(v => new[] { v.AssignedToUserId, v.InitiatedByUserId })
+            .Concat(items.Where(v => v.MukandoContributionId.HasValue).Select(v => 0))
+            .Distinct().ToList();
+
+        var users = await _context.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id);
+
+        var contributionIds = items.Where(v => v.MukandoContributionId.HasValue)
+            .Select(v => v.MukandoContributionId!.Value).ToList();
+        var contributions = await _context.MukandoContributions
+            .Where(c => contributionIds.Contains(c.Id))
+            .ToDictionaryAsync(c => c.Id);
+
+        var contributionUserIds = contributions.Values.Select(c => c.UserId).Distinct().ToList();
+        var contributionUsers = await _context.Users
+            .Where(u => contributionUserIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id);
+
+        return items.Select(v =>
+        {
+            users.TryGetValue(v.AssignedToUserId, out var assignee);
+            MukandoContribution? contrib = null;
+            User? contributor = null;
+            if (v.MukandoContributionId.HasValue)
+            {
+                contributions.TryGetValue(v.MukandoContributionId.Value, out contrib);
+                if (contrib != null) contributionUsers.TryGetValue(contrib.UserId, out contributor);
+            }
+
+            // Verifier name is hidden until they respond (privacy to prevent collusion)
+            bool revealed = v.Status != VerificationStatus.Pending;
+            return new MukandoVerificationRequestDto(
+                v.Id, v.MukandoRoundId, v.Target.ToString(), v.Status.ToString(),
+                revealed ? v.AssignedToUserId : 0,
+                revealed ? (assignee != null ? $"{assignee.FirstName} {assignee.LastName}" : "Unknown") : "Pending",
+                v.ExpiresAt, v.CreatedAt,
+                v.MukandoContributionId,
+                contributor != null ? $"{contributor.FirstName} {contributor.LastName}" : null,
+                contrib?.Amount,
+                v.RejectionReason);
+        }).ToList();
+    }
+
+    /// <summary>Called by the assigned verifier to approve or reject a contribution verification.</summary>
+    public async Task<string?> VerifyContributionAsync(int verificationId, int verifierUserId, bool approve, string? rejectionReason)
+    {
+        var verification = await _context.MukandoVerificationRequests.FindAsync(verificationId);
+        if (verification == null) return "Verification request not found.";
+        if (verification.Target != VerificationTarget.Contribution) return "This is not a contribution verification.";
+        if (verification.Status != VerificationStatus.Pending) return "This verification has already been responded to.";
+        if (verification.AssignedToUserId != verifierUserId) return "You are not the assigned verifier for this request.";
+        if (verification.ExpiresAt <= DateTime.UtcNow) return "This verification has expired. An admin can reassign it.";
+
+        var round = await _context.MukandoRounds.FindAsync(verification.MukandoRoundId);
+        if (round == null) return "Round not found.";
+
+        var contribution = await _context.MukandoContributions.FindAsync(verification.MukandoContributionId);
+        if (contribution == null) return "Contribution not found.";
+
+        verification.RespondedByUserId = verifierUserId;
+        verification.RespondedAt       = DateTime.UtcNow;
+
+        if (approve)
+        {
+            contribution.Status             = ContributionStatus.Confirmed;
+            contribution.ConfirmedByAdminAt = DateTime.UtcNow;
+            round.ActualCollected          += contribution.Amount;
+            round.UpdatedAt                 = DateTime.UtcNow;
+            verification.Status             = VerificationStatus.Approved;
+
+            await _context.SaveChangesAsync();
+
+            var verifier = await _context.Users.FindAsync(verifierUserId);
+            var member   = await _context.Users.FindAsync(contribution.UserId);
+            await LogActivityAsync(round.Id, verifierUserId, RoundActivityAction.ContributionVerificationApproved,
+                $"{verifier?.FirstName} independently verified and approved {member?.FirstName}'s contribution of {contribution.Amount:F2}");
+
+            var cycle    = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
+            var currency = cycle != null ? await _context.Currencies.FindAsync(cycle.CurrencyId) : null;
+            var sym      = currency?.Symbol ?? "$";
+
+            // Notify contributor
+            await _push.SendToUserAsync(
+                contribution.UserId,
+                NotificationType.MukandoContributionConfirmed,
+                $"Contribution confirmed: Round {round.RoundNumber}",
+                $"Your contribution for Round {round.RoundNumber} has been independently verified and confirmed.",
+                $"/cycles/{round.ExpenseCycleId}",
+                round.ExpenseCycleId);
+
+            // Notify admins + recipient if all contributions now resolved
+            var allResolved = !await _context.MukandoContributions
+                .AnyAsync(c => c.MukandoRoundId == round.Id
+                    && c.Status != ContributionStatus.Confirmed
+                    && c.Status != ContributionStatus.Missed);
+            if (allResolved)
+            {
+                var adminIds = await GetCycleAdminIdsAsync(round.ExpenseCycleId);
+                await _push.SendToUsersAsync(
+                    adminIds,
+                    NotificationType.MukandoAllContributionsCollected,
+                    $"All contributions collected: Round {round.RoundNumber}",
+                    $"All contributions for Round {round.RoundNumber} have been collected. {sym}{round.ActualCollected:F2} ready for payout.",
+                    $"/cycles/{round.ExpenseCycleId}",
+                    round.ExpenseCycleId);
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+                return "A rejection reason is required.";
+
+            contribution.Status    = ContributionStatus.Paid; // revert so admin can re-examine
+            verification.Status    = VerificationStatus.Rejected;
+            verification.RejectionReason = rejectionReason;
+
+            await _context.SaveChangesAsync();
+
+            var verifier = await _context.Users.FindAsync(verifierUserId);
+            var member   = await _context.Users.FindAsync(contribution.UserId);
+            await LogActivityAsync(round.Id, verifierUserId, RoundActivityAction.ContributionVerificationRejected,
+                $"{verifier?.FirstName} rejected {member?.FirstName}'s contribution — reason: {rejectionReason}");
+
+            var adminIds = await GetCycleAdminIdsAsync(round.ExpenseCycleId);
+            await _push.SendToUsersAsync(
+                adminIds,
+                NotificationType.MukandoVerificationRejected,
+                $"Contribution flagged: Round {round.RoundNumber}",
+                $"An independent verifier flagged {member?.FirstName}'s contribution for Round {round.RoundNumber}. Reason: {rejectionReason}",
+                $"/cycles/{round.ExpenseCycleId}",
+                round.ExpenseCycleId);
+        }
+
+        return null;
+    }
+
+    /// <summary>Called by the assigned verifier to approve or reject a payout verification.</summary>
+    public async Task<string?> VerifyPayoutAsync(int verificationId, int verifierUserId, bool approve, string? rejectionReason)
+    {
+        var verification = await _context.MukandoVerificationRequests.FindAsync(verificationId);
+        if (verification == null) return "Verification request not found.";
+        if (verification.Target != VerificationTarget.Payout) return "This is not a payout verification.";
+        if (verification.Status != VerificationStatus.Pending) return "This verification has already been responded to.";
+        if (verification.AssignedToUserId != verifierUserId) return "You are not the assigned verifier for this request.";
+        if (verification.ExpiresAt <= DateTime.UtcNow) return "This verification has expired. An admin can reassign it.";
+
+        var round = await _context.MukandoRounds.FindAsync(verification.MukandoRoundId);
+        if (round == null) return "Round not found.";
+
+        verification.RespondedByUserId = verifierUserId;
+        verification.RespondedAt       = DateTime.UtcNow;
+
+        if (approve)
+        {
+            verification.Status = VerificationStatus.Approved;
+
+            var payout = new MukandoPayout
+            {
+                MukandoRoundId    = round.Id,
+                RecipientUserId   = round.RecipientUserId,
+                AmountDisbursed   = verification.PendingPayoutAmount!.Value,
+                PaymentMethod     = verification.PendingPayoutMethod!.Value,
+                ProofUrl          = verification.PendingPayoutProofUrl!,
+                Reference         = verification.PendingPayoutReference,
+                ConfirmedByUserId = verification.InitiatedByUserId, // original admin gets credit
+                CreatedAt         = DateTime.UtcNow
+            };
+
+            _context.MukandoPayouts.Add(payout);
+
+            round.PayoutConfirmed   = true;
+            round.PayoutConfirmedAt = DateTime.UtcNow;
+            round.Status            = RoundStatus.Completed;
+            round.UpdatedAt         = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var verifier  = await _context.Users.FindAsync(verifierUserId);
+            var cycle     = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
+            var currency  = cycle != null ? await _context.Currencies.FindAsync(cycle.CurrencyId) : null;
+            var sym       = currency?.Symbol ?? "$";
+
+            await LogActivityAsync(round.Id, verifierUserId, RoundActivityAction.PayoutVerificationApproved,
+                $"{verifier?.FirstName} independently verified and approved payout of {sym}{payout.AmountDisbursed:F2}");
+
+            await LogActivityAsync(round.Id, verification.InitiatedByUserId, RoundActivityAction.PayoutRecorded,
+                $"Payout of {sym}{payout.AmountDisbursed:F2} finalised after independent verification");
+
+            await _push.SendToUserAsync(
+                round.RecipientUserId,
+                NotificationType.MukandoPayoutConfirmed,
+                $"Payout confirmed: Round {round.RoundNumber}",
+                $"Your payout of {sym}{payout.AmountDisbursed:F2} for Round {round.RoundNumber} has been independently verified and confirmed!",
+                $"/cycles/{round.ExpenseCycleId}",
+                round.ExpenseCycleId);
+
+            var memberIds = await _context.CycleMembers
+                .Where(m => m.ExpenseCycleId == round.ExpenseCycleId)
+                .Select(m => m.UserId).ToListAsync();
+
+            await _push.SendToUsersAsync(
+                memberIds,
+                NotificationType.MukandoRoundCompleted,
+                $"Round {round.RoundNumber} complete",
+                $"Round {round.RoundNumber} of \"{cycle?.Name}\" is complete.",
+                $"/cycles/{round.ExpenseCycleId}",
+                round.ExpenseCycleId);
+
+            await ActivateNextRoundOrCompleteCycleAsync(round.ExpenseCycleId, verification.InitiatedByUserId);
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+                return "A rejection reason is required.";
+
+            verification.Status          = VerificationStatus.Rejected;
+            verification.RejectionReason = rejectionReason;
+
+            await _context.SaveChangesAsync();
+
+            var verifier  = await _context.Users.FindAsync(verifierUserId);
+            var recipient = await _context.Users.FindAsync(round.RecipientUserId);
+            var cycle     = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
+            var currency  = cycle != null ? await _context.Currencies.FindAsync(cycle.CurrencyId) : null;
+            var sym       = currency?.Symbol ?? "$";
+
+            await LogActivityAsync(round.Id, verifierUserId, RoundActivityAction.PayoutVerificationRejected,
+                $"{verifier?.FirstName} rejected payout of {sym}{verification.PendingPayoutAmount:F2} to {recipient?.FirstName} — reason: {rejectionReason}");
+
+            var adminIds = await GetCycleAdminIdsAsync(round.ExpenseCycleId);
+            await _push.SendToUsersAsync(
+                adminIds,
+                NotificationType.MukandoVerificationRejected,
+                $"Payout flagged: Round {round.RoundNumber}",
+                $"An independent verifier flagged the payout of {sym}{verification.PendingPayoutAmount:F2} to {recipient?.FirstName} for Round {round.RoundNumber}. Reason: {rejectionReason}. Please review and resubmit.",
+                $"/cycles/{round.ExpenseCycleId}",
+                round.ExpenseCycleId);
+        }
+
+        return null;
+    }
+
+    /// <summary>Admin reassigns an expired or stuck verification to a new random participant.</summary>
+    public async Task<string?> ReassignVerifierAsync(int verificationId, int adminUserId)
+    {
+        var old = await _context.MukandoVerificationRequests.FindAsync(verificationId);
+        if (old == null) return "Verification request not found.";
+        if (old.Status != VerificationStatus.Pending) return "Only pending verifications can be reassigned.";
+
+        var round = await _context.MukandoRounds.FindAsync(old.MukandoRoundId);
+        if (round == null) return "Round not found.";
+
+        // Mark old as reassigned
+        old.Status = VerificationStatus.Reassigned;
+        await _context.SaveChangesAsync();
+
+        // Select a new verifier, excluding previous assignee as well
+        var excludeIds = new List<int> { old.InitiatedByUserId, round.RecipientUserId, old.AssignedToUserId };
+        if (old.MukandoContributionId.HasValue)
+        {
+            var contrib = await _context.MukandoContributions.FindAsync(old.MukandoContributionId.Value);
+            if (contrib != null) excludeIds.Add(contrib.UserId);
+        }
+
+        var (newVerifierId, selectError) = await SelectRandomVerifierAsync(old.MukandoRoundId, excludeIds);
+        if (selectError != null) return selectError;
+
+        var newVerification = new MukandoVerificationRequest
+        {
+            MukandoRoundId             = old.MukandoRoundId,
+            Target                     = old.Target,
+            MukandoContributionId      = old.MukandoContributionId,
+            PendingPayoutAmount        = old.PendingPayoutAmount,
+            PendingPayoutMethod        = old.PendingPayoutMethod,
+            PendingPayoutProofUrl      = old.PendingPayoutProofUrl,
+            PendingPayoutReference     = old.PendingPayoutReference,
+            InitiatedByUserId          = old.InitiatedByUserId,
+            AssignedToUserId           = newVerifierId,
+            Status                     = VerificationStatus.Pending,
+            ExpiresAt                  = DateTime.UtcNow.AddHours(48),
+            CreatedAt                  = DateTime.UtcNow
+        };
+
+        _context.MukandoVerificationRequests.Add(newVerification);
+        await _context.SaveChangesAsync();
+
+        await LogActivityAsync(old.MukandoRoundId, adminUserId, RoundActivityAction.VerificationReassigned,
+            $"Verification reassigned to a new independent participant by admin");
+
+        // Notify old assignee
+        await _push.SendToUserAsync(
+            old.AssignedToUserId,
+            NotificationType.MukandoVerifierReassigned,
+            "Verification reassigned",
+            "Your verification assignment has been reassigned to another participant.",
+            $"/cycles/{round.ExpenseCycleId}",
+            round.ExpenseCycleId);
+
+        // Notify new assignee
+        var cycle = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
+        await _push.SendToUserAsync(
+            newVerifierId,
+            NotificationType.MukandoVerificationRequested,
+            $"Verify {old.Target.ToString().ToLower()}: Round {round.RoundNumber}",
+            $"You have been randomly selected to verify a {old.Target.ToString().ToLower()} for Round {round.RoundNumber} of \"{cycle?.Name}\". Open the cycle to review and respond.",
+            $"/cycles/{round.ExpenseCycleId}",
+            round.ExpenseCycleId);
+
+        return null;
+    }
+
+    // ── Verification Helpers ──────────────────────────────────────────────────
+
+    /// <summary>
+    /// Creates a verification request for a contribution and assigns a random verifier.
+    /// </summary>
+    private async Task<string?> CreateVerificationAsync(
+        MukandoRound round,
+        MukandoContribution contribution,
+        int initiatedByUserId,
+        IEnumerable<int> excludeIds)
+    {
+        var (verifierId, selectError) = await SelectRandomVerifierAsync(round.Id, excludeIds);
+        if (selectError != null) return selectError;
+
+        var verification = new MukandoVerificationRequest
+        {
+            MukandoRoundId        = round.Id,
+            Target                = VerificationTarget.Contribution,
+            MukandoContributionId = contribution.Id,
+            InitiatedByUserId     = initiatedByUserId,
+            AssignedToUserId      = verifierId,
+            Status                = VerificationStatus.Pending,
+            ExpiresAt             = DateTime.UtcNow.AddHours(48),
+            CreatedAt             = DateTime.UtcNow
+        };
+
+        _context.MukandoVerificationRequests.Add(verification);
+        await _context.SaveChangesAsync();
+
+        var cycle    = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
+        var currency = cycle != null ? await _context.Currencies.FindAsync(cycle.CurrencyId) : null;
+        var sym      = currency?.Symbol ?? "$";
+        var member   = await _context.Users.FindAsync(contribution.UserId);
+
+        await _push.SendToUserAsync(
+            verifierId,
+            NotificationType.MukandoVerificationRequested,
+            $"Verify contribution: Round {round.RoundNumber}",
+            $"You have been randomly selected to verify {member?.FirstName}'s contribution of {sym}{contribution.Amount:F2} for Round {round.RoundNumber} of \"{cycle?.Name}\". Open the cycle to review and respond.",
+            $"/cycles/{round.ExpenseCycleId}",
+            round.ExpenseCycleId);
+
+        await LogActivityAsync(round.Id, initiatedByUserId, RoundActivityAction.ContributionVerificationRequested,
+            $"Independent verification requested for {member?.FirstName}'s contribution of {sym}{contribution.Amount:F2}");
+
+        return null;
+    }
+
+    /// <summary>
+    /// Picks a cryptographically random cycle participant, excluding specified user IDs.
+    /// </summary>
+    private async Task<(int verifierId, string? error)> SelectRandomVerifierAsync(
+        int roundId, IEnumerable<int> excludeIds)
+    {
+        var round = await _context.MukandoRounds.FindAsync(roundId);
+        if (round == null) return (0, "Round not found.");
+
+        var excludeSet = new HashSet<int>(excludeIds);
+
+        var candidates = await _context.CycleMembers
+            .Where(m => m.ExpenseCycleId == round.ExpenseCycleId && !excludeSet.Contains(m.UserId))
+            .Select(m => m.UserId)
+            .ToListAsync();
+
+        if (candidates.Count == 0)
+            return (0, "No eligible independent verifier found. The cycle may not have enough participants.");
+
+        // Cryptographically secure random selection
+        int index = RandomNumberGenerator.GetInt32(candidates.Count);
+        return (candidates[index], null);
+    }
+
+    /// <summary>Returns true if the given user is a GroupAdmin of the cycle's group.</summary>
+    private async Task<bool> IsGroupAdminOfCycleAsync(int cycleId, int userId)
+    {
+        var groupId = await _context.ExpenseCycles
+            .Where(c => c.Id == cycleId).Select(c => c.GroupId).FirstOrDefaultAsync();
+
+        return await _context.GroupMembers
+            .AnyAsync(gm => gm.GroupId == groupId
+                         && gm.UserId == userId
+                         && gm.GroupRole == GroupRole.GroupAdmin
+                         && gm.Status == GroupInviteStatus.Accepted);
+    }
+
+    public async Task<string?> ForceCloseRoundAsync(int roundId, int adminUserId)    {
         var round = await _context.MukandoRounds.FindAsync(roundId);
         if (round == null) return "Round not found.";
         if (round.Status != RoundStatus.Active) return "Round is not active.";

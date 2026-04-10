@@ -194,3 +194,93 @@ Members settle obligations
   ? Admin or creditor confirms: PATCH /api/payment/{id}/confirm
   ? MemberObligation.IsPaid set to true
 ```
+---
+
+## Mukando Cycles (Rotating Savings)
+
+A **Mukando** cycle is a rotating savings group (stokvel). Members contribute a fixed amount each round, and the full pool is paid out to one recipient on rotation. Batanai fully manages:
+
+- Round generation based on configured frequency and payout order
+- Contribution tracking with proof-of-payment uploads
+- Payout recording and verification
+- Swap and opt-out requests
+- Automated push notification reminders
+
+---
+
+### Mukando Contribution Status Flow
+
+```
+Pending → Paid → AwaitingVerification → Confirmed
+                                      ↓
+                                  (rejected) → Paid (reset)
+       → Missed (force-close)
+```
+
+| Status | Meaning |
+|---|---|
+| `Pending` | Member has not yet submitted a contribution for this round |
+| `Paid` | Member uploaded proof; awaiting admin confirmation |
+| `AwaitingVerification` | Admin initiated confirmation; awaiting independent verifier |
+| `Confirmed` | Contribution verified and accepted; amount added to pool |
+| `Missed` | Round was force-closed without contribution |
+
+---
+
+### Two-Step Verification System
+
+#### Purpose
+
+To prevent single-admin fraud — a group admin cannot unilaterally confirm their own contribution or record a payout to themselves. Every confirmation flows through a cryptographically-random, independent verifier selected from the cycle's active participants.
+
+#### How It Works
+
+1. **Admin confirms a contribution** → system creates a `MukandoVerificationRequest` and randomly assigns a verifier from cycle members (excluding the contributor, admin, and round recipient)
+2. **Verifier receives a push notification** with details of what to verify
+3. **Verifier approves or rejects** via the Rounds tab → verification banner
+4. On approval: contribution status → `Confirmed`, amount added to `ActualCollected`
+5. On rejection: contribution status reverts to `Paid` (re-submittable)
+
+#### Admin-Pays Special Cases
+
+| Scenario | Behaviour |
+|---|---|
+| Contributor is a GroupAdmin | Contribution goes directly to `AwaitingVerification` on upload — no admin confirmation step needed |
+| Admin tries to confirm own contribution | API returns 400: "You cannot confirm your own contribution" |
+| Admin tries to record payout to themselves (they are the round recipient) | API returns 400: "You cannot record a payout to yourself" |
+| Round recipient is a GroupAdmin | Verifier is selected exclusively from non-admin members to prevent collusion |
+
+#### Verifier Identity Protection
+
+While a verification is in `Pending` state, the assigned verifier's identity is hidden from the response (name = "Pending", id = 0). This prevents admins from pressuring the verifier before they respond.
+
+#### Verifier Reassignment
+
+Admins can reassign a verification to a different random member (e.g. if the current verifier is unavailable). The previous request is marked `Reassigned` and a new request is created, excluding the old verifier.
+
+Verifications expire after **48 hours**. Expired verifications can be reassigned by admins.
+
+---
+
+### Mukando Payout Verification
+
+Recording a payout also triggers the two-step verification system:
+
+1. Admin fills in payout amount, method, reference, and proof → submits
+2. System stores the pending payout details in `MukandoVerificationRequest` (no `MukandoPayout` row created yet)
+3. A random verifier is assigned and notified
+4. On approval: `MukandoPayout` is created, round status → `Completed`, next round activates (or cycle completes)
+5. On rejection: admin is notified; no payout is recorded; admin can submit again
+
+While a payout verification is pending, the admin's "Record Payout" form is replaced with an "Awaiting independent verification" notice in the UI.
+
+### UI — Verification Banner (Rounds Tab)
+
+A yellow banner appears at the top of the Rounds tab whenever the current user has a pending verification assignment. The banner shows:
+
+- Who/what they are verifying (contributor name + amount, or payout round)
+- An expiry date
+- A rejection reason textarea (required for rejection)
+- Approve and Reject action buttons
+
+All verification UI is fully responsive across mobile, tablet, and desktop layouts.

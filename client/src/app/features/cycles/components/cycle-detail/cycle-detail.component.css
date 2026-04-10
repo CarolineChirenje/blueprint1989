@@ -330,6 +330,64 @@
 .payout-order-num { font-weight: 700; font-size: 1.1rem; color: var(--primary); min-width: 28px; text-align: center; }
 .payout-order-name { flex: 1; font-weight: 500; }
 
+/* ── Mukando: Verification ── */
+.contrib-status-awaiting { background: #fff3e0; color: #e65100; }
+
+.verification-banner {
+  display: flex; flex-direction: column; gap: .75rem;
+  padding: 1rem 1.25rem; margin-bottom: 1.25rem;
+  background: #fff8e1; border: 1px solid #ffcc02; border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.verification-banner-header {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+}
+.verification-banner-header mat-icon { color: #f57c00; flex-shrink: 0; }
+.verification-banner-title {
+  font-weight: 700; font-size: 1rem; color: #e65100; flex: 1;
+}
+.verification-banner-meta {
+  font-size: .85rem; color: var(--text-secondary);
+}
+.verification-banner-meta strong { color: var(--text-primary); }
+.verification-proof-link {
+  display: inline-flex; align-items: center; gap: .25rem; font-size: .88rem;
+  color: var(--primary); text-decoration: none;
+}
+.verification-proof-link:hover { text-decoration: underline; }
+.verification-rejection-field { width: 100%; max-width: 480px; }
+.verification-rejection-field textarea { min-height: 72px; }
+.verification-banner-actions { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
+.verification-expire { font-size: .8rem; color: var(--text-disabled); }
+
+.verification-awaiting-notice {
+  display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; margin-top: .75rem;
+  background: #fff8e1; border: 1px solid #ffcc02; border-radius: var(--radius-md);
+  font-size: .9rem; color: #e65100;
+}
+.verification-awaiting-notice mat-icon { color: #f57c00; flex-shrink: 0; }
+
+.verification-admin-section { margin-top: 1.25rem; }
+.verification-admin-section h4 { margin: 0 0 .75rem; font-size: .95rem; color: var(--text-primary); }
+.verification-card {
+  background: var(--surface); border-radius: var(--radius-md); padding: .85rem 1rem;
+  box-shadow: var(--shadow-sm); border-left: 4px solid #ffcc02; margin-bottom: .75rem;
+}
+.verification-card-header {
+  display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+}
+.verification-card-target { font-weight: 600; color: var(--text-primary); flex: 1; }
+.verification-card-meta { font-size: .82rem; color: var(--text-secondary); }
+.verification-card-actions { display: flex; gap: .5rem; margin-top: .5rem; flex-wrap: wrap; }
+
+/* Payout awaiting verification notice inside payout form */
+.payout-verification-pending {
+  display: flex; align-items: center; gap: .5rem; padding: 1rem 1.25rem; margin-top: .5rem;
+  background: #fff8e1; border: 1px solid #ffcc02; border-radius: var(--radius-md);
+}
+.payout-verification-pending mat-icon { color: #f57c00; }
+.payout-verification-pending p { margin: 0; font-size: .9rem; color: #e65100; }
+
 /* ── Mobile / tablet responsive ── */
 @media (max-width: 1023px) {
   .detail-page { padding: 1rem; overflow-x: hidden; max-width: 100vw; }
@@ -348,4 +406,8 @@
   .strip-action { margin-left: 0; }
   .table-filter-field { max-width: 100%; }
   .add-member-row { flex-direction: column; }
+  .verification-banner-actions { flex-direction: column; align-items: stretch; }
+  .verification-rejection-field { max-width: 100%; }
+  .verification-card-header { flex-direction: column; align-items: flex-start; }
+  .verification-banner { padding: .75rem 1rem; }
 }

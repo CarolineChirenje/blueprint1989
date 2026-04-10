@@ -499,5 +499,57 @@ public class ExpenseCycleController : ControllerBase
         if (error != null) return BadRequest(new { message = error });
         return NoContent();
     }
+
+    // ── Verification Endpoints ─────────────────────────────────────────────────
+
+    /// <summary>Get all pending verifications for the cycle. Admins see all; members see only their own.</summary>
+    [HttpGet("{id:int}/pending-verifications")]
+    public async Task<IActionResult> GetPendingVerifications(int id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var isAdmin = await CanManageCycleAsync(id);
+        var result = await _mukandoService.GetPendingVerificationsAsync(id, userId.Value, isAdmin);
+        return Ok(result);
+    }
+
+    /// <summary>Assigned verifier responds to a contribution verification.</summary>
+    [HttpPost("{id:int}/rounds/{roundId:int}/verify-contribution/{verificationId:int}")]
+    public async Task<IActionResult> VerifyContribution(int id, int roundId, int verificationId, [FromBody] RespondToVerificationRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _mukandoService.VerifyContributionAsync(verificationId, userId.Value, request.Approve, request.RejectionReason);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Assigned verifier responds to a payout verification.</summary>
+    [HttpPost("{id:int}/rounds/{roundId:int}/verify-payout/{verificationId:int}")]
+    public async Task<IActionResult> VerifyPayout(int id, int roundId, int verificationId, [FromBody] RespondToVerificationRequest request)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var error = await _mukandoService.VerifyPayoutAsync(verificationId, userId.Value, request.Approve, request.RejectionReason);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
+
+    /// <summary>Admin reassigns an expired or unresponsive verification to a new random participant.</summary>
+    [HttpPost("{id:int}/rounds/{roundId:int}/reassign-verifier/{verificationId:int}")]
+    public async Task<IActionResult> ReassignVerifier(int id, int roundId, int verificationId)
+    {
+        if (!await CanManageCycleAsync(id)) return Forbid();
+
+        var adminId = GetCurrentUserId();
+        if (adminId == null) return Unauthorized();
+
+        var error = await _mukandoService.ReassignVerifierAsync(verificationId, adminId.Value);
+        if (error != null) return BadRequest(new { message = error });
+        return NoContent();
+    }
 }
 

@@ -74,10 +74,11 @@ public enum RoundStatus
 
 public enum ContributionStatus
 {
-    Pending   = 0,
-    Paid      = 1,
-    Confirmed = 2,
-    Missed    = 3
+    Pending              = 0,
+    Paid                 = 1,
+    Confirmed            = 2,
+    Missed               = 3,
+    AwaitingVerification = 4
 }
 
 public enum SwapRequestStatus
@@ -105,15 +106,36 @@ public enum PaymentMethod
 
 public enum RoundActivityAction
 {
-    RoundActivated         = 1,
-    ContributionSubmitted  = 2,
-    ContributionConfirmed  = 3,
-    PayoutRecorded         = 4,
-    RoundForceClose        = 5,
-    SwapRequested          = 6,
-    SwapAccepted           = 7,
-    SwapDeclined           = 8,
-    OptOutRequested        = 9,
-    OptOutApproved         = 10,
-    OptOutRejected         = 11
+    RoundActivated                      = 1,
+    ContributionSubmitted               = 2,
+    ContributionConfirmed               = 3,
+    PayoutRecorded                      = 4,
+    RoundForceClose                     = 5,
+    SwapRequested                       = 6,
+    SwapAccepted                        = 7,
+    SwapDeclined                        = 8,
+    OptOutRequested                     = 9,
+    OptOutApproved                      = 10,
+    OptOutRejected                      = 11,
+    ContributionVerificationRequested   = 12,
+    ContributionVerificationApproved    = 13,
+    ContributionVerificationRejected    = 14,
+    PayoutVerificationRequested         = 15,
+    PayoutVerificationApproved          = 16,
+    PayoutVerificationRejected          = 17,
+    VerificationReassigned              = 18
+}
+
+public enum VerificationTarget
+{
+    Contribution = 1,
+    Payout       = 2
+}
+
+public enum VerificationStatus
+{
+    Pending    = 0,
+    Approved   = 1,
+    Rejected   = 2,
+    Reassigned = 3
 }

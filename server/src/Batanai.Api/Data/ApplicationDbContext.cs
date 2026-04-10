@@ -39,6 +39,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<MukandoSwapRequest>     MukandoSwapRequests      { get; set; } = null!;
     public DbSet<CycleOptOutRequest>     CycleOptOutRequests      { get; set; } = null!;
     public DbSet<MukandoRoundActivity>   MukandoRoundActivities   { get; set; } = null!;
+    public DbSet<MukandoVerificationRequest> MukandoVerificationRequests { get; set; } = null!;
 
     // ── Feedback ───────────────────────────────────────────────────────────
     public DbSet<FeatureBugReport>         FeatureBugReports         { get; set; } = null!;
@@ -81,6 +82,7 @@ public class ApplicationDbContext : DbContext
         ConfigureMukandoSwapRequestEntity(modelBuilder);
         ConfigureCycleOptOutRequestEntity(modelBuilder);
         ConfigureMukandoRoundActivityEntity(modelBuilder);
+        ConfigureMukandoVerificationRequestEntity(modelBuilder);
 
         // Feedback
         ConfigureFeatureBugReportEntity(modelBuilder);
@@ -413,6 +415,22 @@ public class ApplicationDbContext : DbContext
             entity.Property(a => a.Details).IsRequired().HasMaxLength(500);
             entity.HasOne<MukandoRound>().WithMany().HasForeignKey(a => a.MukandoRoundId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne<User>().WithMany().HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+
+    private static void ConfigureMukandoVerificationRequestEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<MukandoVerificationRequest>(entity =>
+        {
+            entity.ToTable("MukandoVerificationRequests");
+            entity.HasKey(v => v.Id);
+            entity.Property(v => v.PendingPayoutAmount).HasColumnType("decimal(18,2)");
+            entity.Property(v => v.PendingPayoutProofUrl).HasMaxLength(500);
+            entity.Property(v => v.PendingPayoutReference).HasMaxLength(200);
+            entity.Property(v => v.RejectionReason).HasMaxLength(500);
+            entity.HasOne<MukandoRound>().WithMany().HasForeignKey(v => v.MukandoRoundId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(v => v.InitiatedByUserId).OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne<User>().WithMany().HasForeignKey(v => v.AssignedToUserId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 

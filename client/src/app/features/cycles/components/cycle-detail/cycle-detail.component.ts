@@ -25,6 +25,7 @@ import {
   MukandoRoundActivityDto,
   MukandoSwapRequestDto,
   OptOutRequestDto,
+  MukandoVerificationRequestDto,
 } from '../../../../shared/models/expense-cycle.model';
 import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dialog.component';
 import { AddPaymentDialogComponent } from '../add-payment-dialog/add-payment-dialog.component';
@@ -76,6 +77,10 @@ export class CycleDetailComponent implements OnInit {
   payoutFileName = '';
   swapTargetUserId: number | null = null;
   optOutReason = '';
+  pendingVerifications: MukandoVerificationRequestDto[] = [];
+  myVerificationAssignment: MukandoVerificationRequestDto | null = null;
+  verificationRejectionReason = '';
+  verificationSubmitting = false;
 
   expenseDataSource = new MatTableDataSource<ExpenseDto>([]);
   paymentDataSource = new MatTableDataSource<PaymentDto>([]);
@@ -137,6 +142,7 @@ export class CycleDetailComponent implements OnInit {
           this.loadRounds();
           this.loadMukandoSummary();
           this.loadSwapRequests();
+          if (cycle.status === 'Active') this.loadPendingVerifications();
         } else {
           this.loadExpenses();
           this.loadPayments();
@@ -600,6 +606,82 @@ export class CycleDetailComponent implements OnInit {
     });
   }
 
+  loadPendingVerifications(): void {
+    if (!this.cycle) return;
+    this.cycleService.getPendingVerifications(this.cycle.id).subscribe({
+      next: verifications => {
+        this.pendingVerifications = verifications;
+        this.myVerificationAssignment = verifications.find(
+          v => v.assignedToUserId === this.currentUserId && v.status === 'Pending'
+        ) ?? null;
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  respondToVerification(verificationId: number, roundId: number, isPayoutTarget: boolean, approve: boolean): void {
+    if (!this.cycle || this.verificationSubmitting) return;
+    if (!approve && !this.verificationRejectionReason.trim()) {
+      this.snackBar.open('Please provide a reason for rejection.', 'Dismiss', { duration: 4000 });
+      return;
+    }
+    this.verificationSubmitting = true;
+    const reason = approve ? undefined : this.verificationRejectionReason.trim();
+    const req$ = isPayoutTarget
+      ? this.cycleService.verifyPayout(this.cycle.id, roundId, verificationId, approve, reason)
+      : this.cycleService.verifyContribution(this.cycle.id, roundId, verificationId, approve, reason);
+    req$.subscribe({
+      next: () => {
+        this.verificationSubmitting = false;
+        this.verificationRejectionReason = '';
+        this.snackBar.open(approve ? 'Approved.' : 'Rejected.', 'OK', { duration: 3000 });
+        this.loadPendingVerifications();
+        this.loadRounds();
+        this.loadMukandoSummary();
+        this.refreshSelectedRound();
+      },
+      error: err => {
+        this.verificationSubmitting = false;
+        this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 });
+      }
+    });
+  }
+
+  reassignVerifier(verificationId: number, roundId: number): void {
+    if (!this.cycle) return;
+    this.dialogService.confirm({
+      title: 'Reassign Verifier',
+      message: 'Reassign this verification to a different random member?',
+      confirmText: 'Reassign',
+      confirmColor: 'primary'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.cycleService.reassignVerifier(this.cycle!.id, roundId, verificationId).subscribe({
+        next: () => {
+          this.snackBar.open('Verifier reassigned.', 'OK', { duration: 3000 });
+          this.loadPendingVerifications();
+          this.refreshSelectedRound();
+        },
+        error: err => this.snackBar.open(err?.error?.message ?? 'Failed.', 'Dismiss', { duration: 5000 })
+      });
+    });
+  }
+
+  get hasPendingVerification(): boolean {
+    return this.myVerificationAssignment !== null;
+  }
+
+  pendingVerificationCount(): number {
+    return this.pendingVerifications.filter(v => v.status === 'Pending').length;
+  }
+
+  hasPayoutVerificationPending(roundId: number): boolean {
+    return this.pendingVerifications.some(
+      v => v.target === 'Payout' && v.mukandoRoundId === roundId && v.status === 'Pending'
+    );
+  }
+
   cancelSwap(swapId: number): void {
     if (!this.cycle) return;
     this.cycleService.cancelSwapRequest(this.cycle.id, swapId).subscribe({
@@ -647,6 +729,7 @@ export class CycleDetailComponent implements OnInit {
       case 'Confirmed': return 'contrib-status-confirmed';
       case 'Paid': return 'contrib-status-paid';
       case 'Missed': return 'contrib-status-missed';
+      case 'AwaitingVerification': return 'contrib-status-awaiting';
       default: return 'contrib-status-pending';
     }
   }
