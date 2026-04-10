@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Batanai.Api.Data;
 using Batanai.Api.DTOs.Batanai;
 using Batanai.Api.Models;
+using Batanai.Api.Services.Reminders;
 
 namespace Batanai.Api.Services;
 
@@ -10,12 +11,14 @@ public class PaymentService
     private readonly ApplicationDbContext    _context;
     private readonly NotificationService     _notifications;
     private readonly IPushNotificationSender _push;
+    private readonly ReminderSchedulingService _reminderScheduling;
 
-    public PaymentService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push)
+    public PaymentService(ApplicationDbContext context, NotificationService notifications, IPushNotificationSender push, ReminderSchedulingService reminderScheduling)
     {
-        _context       = context;
-        _notifications = notifications;
-        _push          = push;
+        _context             = context;
+        _notifications       = notifications;
+        _push                = push;
+        _reminderScheduling  = reminderScheduling;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -187,6 +190,25 @@ public class PaymentService
                     $"{payer?.FirstName} {payer?.LastName} paid ${payment.Amount:F2} toward \"{cycle.Name}\".",
                     $"/cycles/{payment.ExpenseCycleId}",
                     payment.Id);
+
+            // Check if payer has fully settled all obligations in this cycle
+            var expenseIds = await _context.Expenses
+                .Where(e => e.ExpenseCycleId == payment.ExpenseCycleId)
+                .Select(e => e.Id)
+                .ToListAsync();
+
+            var totalOwed = await _context.MemberObligations
+                .Where(o => expenseIds.Contains(o.ExpenseId) && o.UserId == payment.PayerId && !o.IsSettled)
+                .SumAsync(o => o.AmountOwed);
+
+            var totalConfirmed = await _context.Payments
+                .Where(p => p.ExpenseCycleId == payment.ExpenseCycleId
+                          && p.PayerId == payment.PayerId
+                          && p.Status == PaymentStatus.Confirmed)
+                .SumAsync(p => p.Amount);
+
+            if (totalConfirmed >= totalOwed)
+                await _reminderScheduling.CancelForUserInCycleAsync(payment.PayerId, payment.ExpenseCycleId);
         }
 
         var dto = (await BuildDtosAsync(new List<Payment> { payment })).First();

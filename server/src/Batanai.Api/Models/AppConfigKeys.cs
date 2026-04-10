@@ -42,4 +42,15 @@ public static class AppConfigKeys
     // -- Ledger ----------------------------------------------------------------
     public const string MembersPerCycle              = "MembersPerCycle";
     public const string PaymentReminderIntervalDays  = "PaymentReminderIntervalDays";
+
+    // -- Reminders -------------------------------------------------------------
+    public const string ReminderMilestoneInitialPct  = "ReminderMilestoneInitialPct";
+    public const string ReminderMilestoneMidPct      = "ReminderMilestoneMidPct";
+    public const string ReminderMilestoneNearDuePct  = "ReminderMilestoneNearDuePct";
+    public const string ReminderOverdueOffsetDays    = "ReminderOverdueOffsetDays";
+    public const string ReminderMinSpacingHours      = "ReminderMinSpacingHours";
+    public const string ReminderMaxPerCycle          = "ReminderMaxPerCycle";
+    public const string KycReminderInitialDelayHours = "KycReminderInitialDelayHours";
+    public const string KycReminderFollowUpDays      = "KycReminderFollowUpDays";
+    public const string KycReminderEscalationDays    = "KycReminderEscalationDays";
 }

@@ -42,7 +42,8 @@ Batanai organises users into **Groups**, each managed by one or more **Group Adm
 | **Mukando Rotating Savings** | Configure contribution amount, frequency (Weekly / Biweekly / Monthly), and payout order; system auto-generates rounds, tracks contributions, records payouts with proof, and sends reminders |
 | **Obligation & Balance Calculation** | On Majana cycle close, the system computes each member's net balance and produces the minimum transfer set. For Mukando, each round's expected pool and contribution status are tracked in real time |
 | **Payment Workflow** | Members submit payments (Majana) or contributions (Mukando) with optional proof; Admins confirm or reject |
-| **Real-Time Push Notifications** | VAPID web push alerts for cycle events, payment due dates, contribution reminders, join requests, and more |
+| **Real-Time Push Notifications** | VAPID web push alerts for cycle events, payment due dates, contribution reminders, join requests, KYC verification, and more |
+| **Duration-Agnostic Reminder Engine** | DB-backed, event-driven reminder scheduling that adapts to any cycle length (1 day to 1 year). Payment reminders are created when a cycle starts; KYC reminders are created when an unverified member is added to a Mukando cycle. All milestones are configurable via the admin AppConfig UI. A lightweight dispatcher sends due reminders with eligibility rechecks, retry logic, and automatic cancellation when obligations are settled or KYC is completed |
 | **Offline-First Architecture** | IndexedDB queue captures expense, payment, and contribution entries when offline; auto-syncs on reconnect with 24-hour TTL |
 | **Biometric / Passwordless Login** | WebAuthn/FIDO2 fingerprint and Face ID login for fast everyday access |
 | **TOTP Multi-Factor Authentication** | Optional TOTP second factor for added account security |
@@ -91,15 +92,19 @@ Batanai organises users into **Groups**, each managed by one or more **Group Adm
 
 ```
 Create Group â†’ Invite Members â†’ Create Majana Cycle (start/end dates)
-    â†’ Members Add Expenses â†’ Admin Closes Cycle
-    â†’ System Calculates Obligations â†’ Members Pay â†’ Admin Confirms
+    â†' Members Add Expenses â†' Admin Starts Cycle
+    â†' System Calculates Obligations & Schedules Payment Reminders
+    â†' Members Pay â†' Admin Confirms â†' Reminders Auto-Cancel on Settlement
+    â†' Admin Closes Cycle â†' All Remaining Reminders Cancelled
 ```
 
 ### Mukando Flow (Rotating Savings)
 
 ```
-Create Group â†’ Invite Members â†’ Create Mukando Cycle (Draft)
-    â†’ Configure: Amount, Frequency, Payout Order â†’ Activate Cycle
+Create Group â†' Invite Members â†' Create Mukando Cycle (Draft)
+    â†' Add Members (KYC reminders auto-scheduled for unverified members)
+    â†' Configure: Amount, Frequency, Payout Order â†' All Members Verify KYC
+    â†' Activate Cycle (KYC reminders cancelled, payment reminders scheduled)
     â†’ Round 1: All contribute â†’ Recipient receives pool â†’ Admin records payout
     â†’ Round 2: Next recipient â†’ ... â†’ All rounds complete â†’ Cycle closed
 ```

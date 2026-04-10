@@ -149,6 +149,15 @@ public enum KycStatus
     AdminBypassed = 4
 }
 
+public enum ReminderJobStatus
+{
+    Pending   = 0,
+    Sent      = 1,
+    Skipped   = 2,
+    Cancelled = 3,
+    Failed    = 4
+}
+
 public enum KycIdType
 {
     NationalId      = 0,

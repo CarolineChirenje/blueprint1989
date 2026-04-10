@@ -55,6 +55,9 @@ public class ApplicationDbContext : DbContext
     // ── Email log ─────────────────────────────────────────────────────────
     public DbSet<SentEmail>                SentEmails                { get; set; } = null!;
 
+    // ── Reminders ────────────────────────────────────────────────────────
+    public DbSet<ReminderJob>              ReminderJobs              { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -101,6 +104,9 @@ public class ApplicationDbContext : DbContext
 
         // Email log
         ConfigureSentEmailEntity(modelBuilder);
+
+        // Reminders
+        ConfigureReminderJobEntity(modelBuilder);
     }
 
     private static void ConfigureUserEntity(ModelBuilder modelBuilder)
@@ -537,6 +543,26 @@ public class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => e.UserId).HasDatabaseName("IX_UserKycDocuments_UserId");
             entity.HasIndex(e => e.Status).HasDatabaseName("IX_UserKycDocuments_Status");
+        });
+    }
+
+    private static void ConfigureReminderJobEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ReminderJob>(entity =>
+        {
+            entity.ToTable("ReminderJobs");
+            entity.HasKey(r => r.Id);
+            entity.HasOne<User>().WithMany().HasForeignKey(r => r.UserId).OnDelete(DeleteBehavior.Cascade);
+            entity.Property(r => r.SubjectType).IsRequired().HasMaxLength(50);
+            entity.Property(r => r.StageKey).IsRequired().HasMaxLength(50);
+            entity.Property(r => r.IdempotencyKey).IsRequired().HasMaxLength(200);
+            entity.HasIndex(r => r.IdempotencyKey).IsUnique();
+            entity.HasIndex(r => new { r.Status, r.ScheduledForUtc }).HasDatabaseName("IX_ReminderJobs_Status_ScheduledForUtc");
+            entity.HasIndex(r => new { r.SubjectType, r.SubjectId, r.Status }).HasDatabaseName("IX_ReminderJobs_Subject_Status");
+            entity.Property(r => r.Title).IsRequired().HasMaxLength(200);
+            entity.Property(r => r.Body).IsRequired().HasMaxLength(1000);
+            entity.Property(r => r.DeepLinkUrl).HasMaxLength(500);
+            entity.Property(r => r.LastError).HasMaxLength(1000);
         });
     }
 }

@@ -1,6 +1,7 @@
 using Batanai.Api.Configuration;
 using Batanai.Api.Data;
 using Batanai.Api.Services;
+using Batanai.Api.Services.Reminders;
 using Fido2NetLib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -233,8 +234,12 @@ builder.Services.AddScoped<WebAuthnService>();
 builder.Services.Configure<VapidSettings>(builder.Configuration.GetSection("Vapid"));
 builder.Services.AddHttpClient<PushNotificationSender>();
 builder.Services.AddScoped<IPushNotificationSender, PushNotificationSender>();
-builder.Services.AddHostedService<BgTimerHostedService>();
 builder.Services.AddHostedService<CycleReminderService>();
+
+// Reminder engine
+builder.Services.AddScoped<IReminderPolicy, DurationBasedReminderPolicy>();
+builder.Services.AddScoped<ReminderSchedulingService>();
+builder.Services.AddHostedService<ReminderDispatcherService>();
 
 // Add Swagger/OpenAPI (only in development)
 if (builder.Environment.IsDevelopment())

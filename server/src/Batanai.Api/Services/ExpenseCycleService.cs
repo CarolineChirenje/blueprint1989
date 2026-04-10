@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Batanai.Api.Data;
 using Batanai.Api.DTOs.Batanai;
 using Batanai.Api.Models;
+using Batanai.Api.Services.Reminders;
 
 namespace Batanai.Api.Services;
 
@@ -11,13 +12,15 @@ public class ExpenseCycleService
     private readonly IPushNotificationSender _push;
     private readonly MukandoService          _mukandoService;
     private readonly ExpenseService           _expenseService;
+    private readonly ReminderSchedulingService _reminderScheduling;
 
-    public ExpenseCycleService(ApplicationDbContext context, IPushNotificationSender push, MukandoService mukandoService, ExpenseService expenseService)
+    public ExpenseCycleService(ApplicationDbContext context, IPushNotificationSender push, MukandoService mukandoService, ExpenseService expenseService, ReminderSchedulingService reminderScheduling)
     {
-        _context        = context;
-        _push           = push;
-        _mukandoService = mukandoService;
-        _expenseService = expenseService;
+        _context             = context;
+        _push                = push;
+        _mukandoService      = mukandoService;
+        _expenseService      = expenseService;
+        _reminderScheduling  = reminderScheduling;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -597,6 +600,13 @@ public class ExpenseCycleService
         cycle.StartNotificationSent = true;
         await _context.SaveChangesAsync();
 
+        // Schedule payment reminders (Majana only — Mukando uses contribution-level reminders)
+        if (cycle.CycleType == CycleType.Majana)
+            await _reminderScheduling.ScheduleForCycleAsync(cycleId);
+
+        // Cancel any KYC reminders — the KYC gate has passed
+        await _reminderScheduling.CancelKycRemindersForCycleAsync(cycleId);
+
         return (await GetByIdAsync(cycle.Id, 0), null);
     }
 
@@ -647,6 +657,8 @@ public class ExpenseCycleService
                 "The cycle has been closed by the admin. Check the summary for final balances.",
                 $"/cycles/{id}",
                 id);
+
+        await _reminderScheduling.CancelForCycleAsync(id);
 
         return null;
     }
@@ -703,6 +715,14 @@ public class ExpenseCycleService
         // Mukando: regenerate rounds to include the new member
         if (cycle.CycleType == CycleType.Mukando)
             await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
+
+        // Schedule KYC reminders for unverified users added to Mukando Draft cycles
+        if (cycle.CycleType == CycleType.Mukando)
+        {
+            var addedUser = await _context.Users.FindAsync(userId);
+            if (addedUser != null && addedUser.KycStatus != KycStatus.Verified && addedUser.KycStatus != KycStatus.AdminBypassed)
+                await _reminderScheduling.ScheduleKycRemindersAsync(userId, cycleId);
+        }
 
         // Member list changed — all members must re-agree
         await ResetAgreementsAsync(cycleId);
@@ -808,6 +828,9 @@ public class ExpenseCycleService
         // Majana: recalculate expense obligations for remaining members
         if (cycle.CycleType == CycleType.Majana)
             await _expenseService.RecalculateAllObligationsAsync(cycleId);
+
+        // Cancel any pending reminder jobs for this user in this cycle
+        await _reminderScheduling.CancelForUserInCycleAsync(userId, cycleId);
 
         // Member list changed — all members must re-agree
         await ResetAgreementsAsync(cycleId);

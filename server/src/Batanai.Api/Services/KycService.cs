@@ -1,6 +1,7 @@
 using Batanai.Api.Data;
 using Batanai.Api.DTOs.Kyc;
 using Batanai.Api.Models;
+using Batanai.Api.Services.Reminders;
 using Microsoft.EntityFrameworkCore;
 
 namespace Batanai.Api.Services;
@@ -9,11 +10,13 @@ public class KycService
 {
     private readonly ApplicationDbContext _context;
     private readonly IPushNotificationSender _push;
+    private readonly ReminderSchedulingService _reminderScheduling;
 
-    public KycService(ApplicationDbContext context, IPushNotificationSender push)
+    public KycService(ApplicationDbContext context, IPushNotificationSender push, ReminderSchedulingService reminderScheduling)
     {
         _context = context;
         _push = push;
+        _reminderScheduling = reminderScheduling;
     }
 
     public async Task<(KycDocumentDto? dto, string? error)> SubmitKycAsync(int userId, SubmitKycRequest request)
@@ -144,6 +147,9 @@ public class KycService
             "/profile",
             doc.Id);
 
+        if (approve)
+            await _reminderScheduling.CancelKycRemindersForUserAsync(doc.UserId);
+
         return null;
     }
 
@@ -179,6 +185,8 @@ public class KycService
             "An administrator has manually approved your identity verification so you can join Mukando cycles.",
             "/profile",
             doc.Id);
+
+        await _reminderScheduling.CancelKycRemindersForUserAsync(targetUserId);
 
         return null;
     }
