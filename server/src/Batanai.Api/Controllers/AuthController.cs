@@ -145,6 +145,7 @@ namespace Batanai.Api.Controllers
                 Email = authenticatedUser?.Email ?? "",
                 FirstName = authenticatedUser?.FirstName ?? "",
                 LastName = authenticatedUser?.LastName ?? "",
+                PhoneNumber = authenticatedUser?.PhoneNumber,
                 Role = authenticatedUser?.Role ?? Models.Role.Member,
                 IsMfaEnabled = authenticatedUser?.IsMfaEnabled ?? false,
                 MfaEnabledAt = _timeZoneService.ConvertFromUtc(authenticatedUser?.MfaEnabledAt),
@@ -514,7 +515,8 @@ namespace Batanai.Api.Controllers
             var (success, error) = await _authService.UpdateProfileAsync(
                 userId, 
                 request.FirstName, 
-                request.LastName, 
+                request.LastName,
+                request.PhoneNumber,
                 request.CurrentPassword, 
                 request.NewPassword
             );

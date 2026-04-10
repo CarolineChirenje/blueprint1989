@@ -1,3 +1,5 @@
+using Batanai.Api.Models;
+
 namespace Batanai.Api.DTOs.Batanai;
 
 // ── Requests ──────────────────────────────────────────────────────────────────
@@ -80,7 +82,8 @@ public record CycleMemberDto(
     string FirstName,
     string LastName,
     string Email,
-    string GroupRole);
+    string GroupRole,
+    KycStatus KycStatus);
 
 public record CycleBalanceDto(
     int CycleId,

@@ -28,6 +28,7 @@ import {
   MukandoVerificationRequestDto,
   CycleAgreementSummaryDto,
 } from '../../../../shared/models/expense-cycle.model';
+import { KycStatus } from '../../../../shared/models/user.model';
 import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dialog.component';
 import { AddPaymentDialogComponent } from '../add-payment-dialog/add-payment-dialog.component';
 import { RespondPaymentDialogComponent } from '../respond-payment-dialog/respond-payment-dialog.component';
@@ -41,6 +42,7 @@ import { DialogService } from '../../../../shared/services/dialog.service';
   standalone: false
 })
 export class CycleDetailComponent implements OnInit {
+  readonly KycStatus = KycStatus;
   cycle: ExpenseCycleDto | null = null;
   expenses: ExpenseDto[] = [];
   payments: PaymentDto[] = [];
@@ -368,6 +370,38 @@ export class CycleDetailComponent implements OnInit {
   get isMukando(): boolean { return this.cycle?.cycleType === 'Mukando'; }
 
   get currencySymbol(): string { return this.cycle?.currencySymbol ?? '$'; }
+
+  kycReadyMembersCount(): number {
+    return (this.cycle?.members ?? []).filter(m => m.kycStatus === KycStatus.Verified || m.kycStatus === KycStatus.AdminBypassed).length;
+  }
+
+  kycUnverifiedMembers() {
+    return (this.cycle?.members ?? []).filter(m => m.kycStatus !== KycStatus.Verified && m.kycStatus !== KycStatus.AdminBypassed);
+  }
+
+  allMukandoMembersKycReady(): boolean {
+    return !this.isMukando || this.kycUnverifiedMembers().length === 0;
+  }
+
+  kycStatusLabel(status: KycStatus): string {
+    switch (status) {
+      case KycStatus.Verified: return 'Verified';
+      case KycStatus.PendingReview: return 'Pending Review';
+      case KycStatus.Rejected: return 'Rejected';
+      case KycStatus.AdminBypassed: return 'Bypassed';
+      default: return 'Not Verified';
+    }
+  }
+
+  kycStatusClass(status: KycStatus): string {
+    switch (status) {
+      case KycStatus.Verified: return 'kyc-chip-verified';
+      case KycStatus.PendingReview: return 'kyc-chip-pending';
+      case KycStatus.Rejected: return 'kyc-chip-rejected';
+      case KycStatus.AdminBypassed: return 'kyc-chip-bypassed';
+      default: return 'kyc-chip-not-started';
+    }
+  }
 
   loadRounds(): void {
     if (!this.cycle) return;

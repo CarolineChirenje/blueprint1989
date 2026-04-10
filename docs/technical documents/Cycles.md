@@ -287,6 +287,94 @@ All verification UI is fully responsive across mobile, tablet, and desktop layou
 
 ---
 
+## KYC Verification (Mukando Only)
+
+To reduce risk in Mukando cycles, **identity verification (KYC)** is required for Mukando participation only. It is **not required for Majana** cycles.
+
+### Why KYC is needed
+
+In a Mukando round, one person receives the full pool. That creates a higher trust and follow-up requirement than normal expense sharing. KYC gives the group a practical way to confirm who a person is before the cycle starts.
+
+### KYC is account-level, not cycle-level
+
+A user completes KYC **once per account**. Once approved, they can join any future Mukando cycle without resubmitting documents.
+
+### KYC Statuses
+
+| Status | Meaning |
+|---|---|
+| `NotStarted` | The user has not submitted any KYC details yet |
+| `PendingReview` | The user submitted KYC details and is waiting for admin review |
+| `Verified` | An admin approved the KYC details |
+| `Rejected` | An admin rejected the submission; the user can fix issues and resubmit |
+| `AdminBypassed` | An admin manually vouched for the user under special circumstances |
+
+### User KYC Flow
+
+1. User opens **Profile** → **KYC Verification**
+2. User selects an ID type: `NationalId`, `Passport`, `DriversLicense`, or `NoDocument`
+3. User enters their full name as it appears on the document
+4. If they have a document, they upload:
+   - a photo/scan of the document
+   - optionally a **selfie holding the ID** next to their face
+5. Submission is stored and platform admins are notified for review
+
+### No Document Path
+
+A user who has no ID is **not blocked from using the whole system**. Instead:
+
+- They can still sign up and join groups
+- They can still participate in Majana cycles
+- For Mukando, they select **`NoDocument`** and ask a trusted admin to manually review and bypass
+
+### Admin Review Flow
+
+Admins can open the KYC review queue and:
+
+- view the submitted document image
+- view the selfie-with-ID image (if provided)
+- approve the user
+- reject the user with a reason
+- manually bypass the requirement with a required note
+
+### Admin Bypass
+
+Admin bypass exists for situations such as:
+
+- the admin personally knows the member
+- the member does not currently have an identity document
+- community or informal groups where trust is based on local knowledge
+
+When using bypass, the admin must record a note so there is an audit trail of who vouched for the person and why.
+
+### Enforcement Gates
+
+KYC is enforced in **three places** for Mukando:
+
+1. **Add member to Mukando cycle** — user must be `Verified` or `AdminBypassed`
+2. **Start Mukando cycle** — the cycle cannot start until **all members** are `Verified` or `AdminBypassed`
+3. **Record payout** — payout recording checks KYC again as a final safeguard
+
+This means a Mukando cycle stays in **Draft** until all members are KYC-ready.
+
+### UI Behaviour
+
+- The cycle detail page shows a **KYC readiness panel** in Draft mode for Mukando cycles
+- Admins can see exactly which members are blocking the cycle start
+- The **Start Cycle** action is disabled until all members are verified or bypassed
+- All KYC UI is responsive across **mobile, tablet, and desktop** layouts
+
+### File Privacy
+
+KYC files are **not treated like normal public proof files**. If an uploaded file is linked to a KYC record, access is restricted to:
+
+- the file owner, or
+- an Admin / SuperAdmin
+
+Anonymous access to KYC identity documents is blocked.
+
+---
+
 ## Member Agreement System
 
 ### Overview

@@ -38,6 +38,7 @@ export class SignupComponent implements OnInit, OnDestroy {
       confirmEmail:    ['', [Validators.required, Validators.email]],
       firstName:       ['', Validators.required],
       lastName:        ['', Validators.required],
+      phoneNumber:     [''],
       password:        ['', [Validators.required, Validators.minLength(8),
                              Validators.pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/)]],
       confirmPassword: ['', Validators.required],
@@ -94,6 +95,7 @@ export class SignupComponent implements OnInit, OnDestroy {
       email:     v.email,
       firstName: v.firstName,
       lastName:  v.lastName,
+      phoneNumber: v.phoneNumber || undefined,
       password:  v.password,
       role:      v.role,
       adminPin:  this.isAdmin ? v.adminPin : undefined

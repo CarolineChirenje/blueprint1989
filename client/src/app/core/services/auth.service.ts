@@ -11,6 +11,7 @@ export interface SignupPayload {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber?: string;
   password: string;
   role: Role;
   adminPin?: string;

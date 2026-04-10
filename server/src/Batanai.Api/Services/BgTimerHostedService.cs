@@ -96,5 +96,61 @@ public class BgTimerHostedService : BackgroundService
                 $"You have ${total:F2} in outstanding payments. Head to your cycles to settle up.",
                 "/cycles");
         }
+
+        await SendKycRemindersAsync(context, push, ct);
+    }
+
+    /// <summary>
+    /// Notifies users who are members of a Mukando Draft cycle but have not yet completed KYC.
+    /// Skips users who already received a KycReminder in the last 24 hours.
+    /// </summary>
+    private async Task SendKycRemindersAsync(ApplicationDbContext context, IPushNotificationSender push, CancellationToken ct)
+    {
+        // Members of any Mukando cycle still in Draft
+        var mukandoDraftCycleIds = await context.ExpenseCycles
+            .Where(c => c.CycleType == CycleType.Mukando && c.Status == CycleStatus.Draft)
+            .Select(c => c.Id)
+            .ToListAsync(ct);
+
+        if (mukandoDraftCycleIds.Count == 0) return;
+
+        var pendingMemberUserIds = await context.CycleMembers
+            .Where(m => mukandoDraftCycleIds.Contains(m.ExpenseCycleId))
+            .Select(m => m.UserId)
+            .Distinct()
+            .ToListAsync(ct);
+
+        if (pendingMemberUserIds.Count == 0) return;
+
+        // Filter to only those without KYC sign-off
+        var unverifiedUserIds = await context.Users
+            .Where(u => pendingMemberUserIds.Contains(u.Id)
+                     && u.KycStatus != KycStatus.Verified
+                     && u.KycStatus != KycStatus.AdminBypassed)
+            .Select(u => u.Id)
+            .ToListAsync(ct);
+
+        if (unverifiedUserIds.Count == 0) return;
+
+        var kycCutoff = DateTime.UtcNow.AddHours(-24);
+
+        foreach (var userId in unverifiedUserIds)
+        {
+            if (ct.IsCancellationRequested) break;
+
+            var alreadyNotified = await context.Notifications
+                .AnyAsync(n => n.UserId == userId
+                            && n.Type == NotificationType.KycReminder
+                            && n.CreatedAt >= kycCutoff, ct);
+
+            if (alreadyNotified) continue;
+
+            await push.SendToUserAsync(
+                userId,
+                NotificationType.KycReminder,
+                "Verify Your Identity",
+                "You are part of a Mukando cycle that requires identity verification. Complete your KYC in your profile to avoid being blocked when the cycle starts.",
+                "/profile");
+        }
     }
 }

@@ -1,9 +1,12 @@
+import { KycStatus } from './user.model';
+
 export interface CycleMemberDto {
   userId: number;
   firstName: string;
   lastName: string;
   email: string;
   groupRole: 'GroupAdmin' | 'GroupMember';
+  kycStatus: KycStatus;
 }
 
 export interface MemberBalanceDto {

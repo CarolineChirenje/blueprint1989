@@ -136,5 +136,22 @@ public enum NotificationType
 
     /// <summary>All members have agreed and the cycle is ready to start.</summary>
     CycleAllMembersAgreed = 41,
+
+    // -- KYC -----------------------------------------------------------------
+
+    /// <summary>A user submitted KYC details and admins need to review them.</summary>
+    KycSubmitted = 42,
+
+    /// <summary>A user's KYC submission was approved.</summary>
+    KycApproved = 43,
+
+    /// <summary>A user's KYC submission was rejected.</summary>
+    KycRejected = 44,
+
+    /// <summary>An admin manually bypassed KYC requirements for a user.</summary>
+    KycBypassed = 45,
+
+    /// <summary>Periodic reminder sent to users in a Mukando Draft cycle who have not completed KYC.</summary>
+    KycReminder = 46,
 }
 

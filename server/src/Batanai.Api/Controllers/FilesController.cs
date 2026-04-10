@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Batanai.Api.Data;
+using Batanai.Api.Models;
 using Batanai.Api.Services;
 
 namespace Batanai.Api.Controllers;
@@ -11,11 +14,13 @@ namespace Batanai.Api.Controllers;
 public class FilesController : ControllerBase
 {
     private readonly IFileStorageService _storage;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<FilesController> _logger;
 
-    public FilesController(IFileStorageService storage, ILogger<FilesController> logger)
+    public FilesController(IFileStorageService storage, ApplicationDbContext context, ILogger<FilesController> logger)
     {
         _storage = storage;
+        _context = context;
         _logger = logger;
     }
 
@@ -46,7 +51,7 @@ public class FilesController : ControllerBase
         }
     }
 
-    /// <summary>Serves an uploaded file by ID.</summary>
+    /// <summary>Serves an uploaded file by ID. KYC files are restricted to their owner or Admin+ users.</summary>
     [HttpGet("{id:int}")]
     [AllowAnonymous]
     public async Task<IActionResult> Download(int id)
@@ -54,6 +59,22 @@ public class FilesController : ControllerBase
         var file = await _storage.GetByIdAsync(id);
         if (file == null)
             return NotFound();
+
+        var isKycFile = await _context.UserKycDocuments.AnyAsync(d => d.DocumentFileId == id || d.SelfieWithIdFileId == id);
+        if (isKycFile)
+        {
+            if (!(User?.Identity?.IsAuthenticated ?? false))
+                return Forbid();
+
+            var currentUserIdClaim = User.FindFirst("id")?.Value ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var roleStr = User.FindFirst("role")?.Value ?? string.Empty;
+            var isAdminOrAbove = roleStr == nameof(Role.SuperAdmin) || roleStr == nameof(Role.Admin);
+            var currentUserId = int.TryParse(currentUserIdClaim, out var parsedId) ? parsedId : 0;
+            var isOwner = file.UploadedByUserId == currentUserId;
+
+            if (!isAdminOrAbove && !isOwner)
+                return Forbid();
+        }
 
         return File(file.Data, file.ContentType, file.FileName);
     }

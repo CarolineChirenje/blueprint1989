@@ -117,6 +117,10 @@
               <div class="error">Last name is required</div>
             }
 
+            <label>Phone Number</label>
+            <input type="tel" formControlName="phoneNumber" placeholder="e.g. +263771234567" autocomplete="tel" />
+            <div class="hint">Optional, but helps your group admins contact you if needed.</div>
+
             <label>Email <span class="required">*</span></label>
             <input type="email" formControlName="email" placeholder="email@example.com" autocomplete="email" />
             @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {

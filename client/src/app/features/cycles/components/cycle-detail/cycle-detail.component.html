@@ -22,7 +22,8 @@
         <span class="badge" [ngClass]="isDraft() ? 'badge-draft' : isActive() ? 'badge-active' : 'badge-closed'">{{ cycle.status }}</span>
         @if (canManageCycle() && isDraft()) {
           <button mat-raised-button color="primary" (click)="startCycle()"
-            [matTooltip]="pendingDisputeCount() > 0 ? 'Resolve all disputes before starting' : pendingOptOutCount() > 0 ? 'Resolve all opt-out requests before starting' : !allMembersAgreed() ? 'All members must agree before starting' : cycle.members.length < 2 ? 'Add at least 1 more member' : 'Start cycle and notify members'">
+            [disabled]="isMukando && !allMukandoMembersKycReady()"
+            [matTooltip]="pendingDisputeCount() > 0 ? 'Resolve all disputes before starting' : pendingOptOutCount() > 0 ? 'Resolve all opt-out requests before starting' : !allMembersAgreed() ? 'All members must agree before starting' : cycle.members.length < 2 ? 'Add at least 1 more member' : isMukando && !allMukandoMembersKycReady() ? 'All Mukando members must complete KYC verification before starting' : 'Start cycle and notify members'">
             <mat-icon>play_arrow</mat-icon> Start Cycle
           </button>
         }
@@ -73,6 +74,40 @@
               <button mat-stroked-button color="primary" (click)="goToTab('order')">Set Order</button>
             }
           </div>
+
+          <div class="check-item" [class.done]="allMukandoMembersKycReady()">
+            <mat-icon>{{ allMukandoMembersKycReady() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>
+              All Mukando members KYC verified
+              <span class="checklist-count">({{ kycReadyMembersCount() }}/{{ cycle.members.length }})</span>
+            </span>
+            @if (!allMukandoMembersKycReady()) {
+              <button mat-stroked-button color="primary" (click)="goToTab('members')">View</button>
+            }
+          </div>
+
+          @if (!allMukandoMembersKycReady()) {
+            <div class="kyc-readiness-panel">
+              <div class="kyc-panel-header">
+                <mat-icon>verified_user</mat-icon>
+                <div>
+                  <strong>Cannot start until all members are verified</strong>
+                  <div class="kyc-panel-subtext">The following members still need KYC review or admin bypass.</div>
+                </div>
+              </div>
+              <div class="kyc-member-list">
+                @for (m of kycUnverifiedMembers(); track m.userId) {
+                  <div class="kyc-member-row">
+                    <div>
+                      <div class="member-name">{{ m.firstName }} {{ m.lastName }}</div>
+                      <div class="member-email">{{ m.email }}</div>
+                    </div>
+                    <span class="kyc-chip" [ngClass]="kycStatusClass(m.kycStatus)">{{ kycStatusLabel(m.kycStatus) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
         }
         <div class="check-item" [class.done]="pendingSwapCount() === 0 && isMukando">
           <mat-icon>{{ (!isMukando || pendingSwapCount() === 0) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>

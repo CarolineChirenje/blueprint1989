@@ -72,6 +72,47 @@
 .member-email { font-size: .85rem; color: var(--text-secondary); }
 /* Draft badge */
 .badge-draft { background: #fff3cd; color: #856404; }
+
+/* KYC readiness */
+.kyc-readiness-panel {
+  margin: .75rem 0 1rem 2rem;
+  padding: .85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #f9a825;
+  background: #fff8e1;
+}
+.kyc-panel-header {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  margin-bottom: .75rem;
+  color: #7a5a00;
+}
+.kyc-panel-subtext { font-size: .85rem; color: #8d6e00; }
+.kyc-member-list { display: flex; flex-direction: column; gap: .5rem; }
+.kyc-member-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .75rem;
+  padding: .5rem .75rem;
+  background: rgba(255,255,255,.65);
+  border-radius: 8px;
+}
+.kyc-chip {
+  display: inline-flex;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.kyc-chip-verified { background: #e8f5e9; color: #2e7d32; }
+.kyc-chip-pending { background: #fff3cd; color: #856404; }
+.kyc-chip-rejected { background: #ffebee; color: #c62828; }
+.kyc-chip-bypassed { background: #e3f2fd; color: #1565c0; }
+.kyc-chip-not-started { background: #eceff1; color: #546e7a; }
+
 /* Summary strip */
 .summary-strip { display: flex; gap: 2rem; padding: 1rem 1.25rem; background: var(--surface); border-radius: var(--radius-md); margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
 .strip-item { display: flex; flex-direction: column; }

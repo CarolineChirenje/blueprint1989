@@ -223,6 +223,11 @@ public class MukandoService
         if (round.RecipientUserId == adminUserId)
             return "You cannot record a payout to yourself. A randomly assigned independent verifier will complete this step.";
 
+        var recipient = await _context.Users.FindAsync(round.RecipientUserId);
+        if (recipient == null) return "Recipient not found.";
+        if (recipient.KycStatus != KycStatus.Verified && recipient.KycStatus != KycStatus.AdminBypassed)
+            return "Recipient must complete identity verification before payout can be recorded.";
+
         // Ensure all contributions are confirmed or resolved before payout
         var unresolvedCount = await _context.MukandoContributions
             .CountAsync(c => c.MukandoRoundId == roundId
@@ -272,7 +277,6 @@ public class MukandoService
         var cycle  = await _context.ExpenseCycles.FindAsync(round.ExpenseCycleId);
         var currency = cycle != null ? await _context.Currencies.FindAsync(cycle.CurrencyId) : null;
         var sym    = currency?.Symbol ?? "$";
-        var recipient = await _context.Users.FindAsync(round.RecipientUserId);
 
         await LogActivityAsync(roundId, adminUserId, RoundActivityAction.PayoutVerificationRequested,
             $"Payout of {sym}{request.AmountDisbursed:F2} to {recipient?.FirstName} submitted for independent verification");

@@ -64,6 +64,13 @@ public class User
     /// <summary>When the user completed (or dismissed) the onboarding tour. Null = not yet completed.</summary>
     public DateTime? TourCompletedAt { get; set; }
 
+    /// <summary>Optional phone number for out-of-band contact (WhatsApp, call). Not verified via OTP.</summary>
+    [StringLength(30)]
+    public string? PhoneNumber { get; set; }
+
+    /// <summary>KYC verification status. Required to join or start a Mukando cycle.</summary>
+    public KycStatus KycStatus { get; set; } = KycStatus.NotStarted;
+
     [NotMapped]
     public List<string> BackupCodes
     { 

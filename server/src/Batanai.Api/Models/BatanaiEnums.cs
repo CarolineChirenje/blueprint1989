@@ -139,3 +139,20 @@ public enum VerificationStatus
     Rejected   = 2,
     Reassigned = 3
 }
+
+public enum KycStatus
+{
+    NotStarted    = 0,
+    PendingReview = 1,
+    Verified      = 2,
+    Rejected      = 3,
+    AdminBypassed = 4
+}
+
+public enum KycIdType
+{
+    NationalId      = 0,
+    Passport        = 1,
+    DriversLicense  = 2,
+    NoDocument      = 3
+}

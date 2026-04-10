@@ -476,6 +476,20 @@ public class ExpenseCycleService
         if (pendingOptOuts)
             return (null, "All pending opt-out requests must be resolved before the cycle can be started.");
 
+        // Mukando KYC gate: every member must be verified or admin-bypassed before Draft → Active.
+        if (cycle.CycleType == CycleType.Mukando)
+        {
+            var unverifiedMembers = await _context.CycleMembers
+                .Where(m => m.ExpenseCycleId == cycleId)
+                .Join(_context.Users, m => m.UserId, u => u.Id, (m, u) => u)
+                .Where(u => u.KycStatus != KycStatus.Verified && u.KycStatus != KycStatus.AdminBypassed)
+                .Select(u => $"{u.FirstName} {u.LastName}")
+                .ToListAsync();
+
+            if (unverifiedMembers.Count > 0)
+                return (null, $"Cannot start: the following members have not completed identity verification: {string.Join(", ", unverifiedMembers)}.");
+        }
+
         // Block if any unresolved disputes exist
         {
             var hasOpenDisputes = await _context.ExpenseDisputes
@@ -658,6 +672,15 @@ public class ExpenseCycleService
             .AnyAsync(m => m.ExpenseCycleId == cycleId && m.UserId == userId);
         if (exists) return "User is already a member of this cycle.";
 
+        if (cycle.CycleType == CycleType.Mukando)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return "User not found.";
+
+            if (user.KycStatus != KycStatus.Verified && user.KycStatus != KycStatus.AdminBypassed)
+                return "Identity verification required to join a Mukando cycle.";
+        }
+
         _context.CycleMembers.Add(new CycleMember
         {
             ExpenseCycleId = cycleId,
@@ -705,6 +728,19 @@ public class ExpenseCycleService
         var newUserIds = userIds.Where(uid => !existingSet.Contains(uid)).Distinct().ToList();
         if (newUserIds.Count == 0)
             return (new List<int>(), null);
+
+        if (cycle.CycleType == CycleType.Mukando)
+        {
+            var blockedUsers = await _context.Users
+                .Where(u => newUserIds.Contains(u.Id)
+                    && u.KycStatus != KycStatus.Verified
+                    && u.KycStatus != KycStatus.AdminBypassed)
+                .Select(u => $"{u.FirstName} {u.LastName}")
+                .ToListAsync();
+
+            if (blockedUsers.Count > 0)
+                return (null, $"The following users must complete identity verification before they can join this Mukando cycle: {string.Join(", ", blockedUsers)}.");
+        }
 
         foreach (var uid in newUserIds)
         {
@@ -1133,7 +1169,11 @@ public class ExpenseCycleService
             .ToDictionaryAsync(gm => gm.UserId, gm => gm.GroupRole.ToString());
 
         return users.Select(u => new CycleMemberDto(
-            u.Id, u.FirstName, u.LastName, u.Email,
-            groupRoles.TryGetValue(u.Id, out var gr) ? gr : "GroupMember")).ToList();
+            u.Id,
+            u.FirstName,
+            u.LastName,
+            u.Email,
+            groupRoles.TryGetValue(u.Id, out var gr) ? gr : "GroupMember",
+            u.KycStatus)).ToList();
     }
 }

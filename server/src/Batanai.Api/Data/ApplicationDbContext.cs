@@ -46,6 +46,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<FeatureBugReport>         FeatureBugReports         { get; set; } = null!;
     public DbSet<FeatureBugReportCategory> FeatureBugReportCategories { get; set; } = null!;
 
+    // ── KYC ───────────────────────────────────────────────────────────────
+    public DbSet<UserKycDocument>          UserKycDocuments          { get; set; } = null!;
+
     // ── File storage ──────────────────────────────────────────────────────
     public DbSet<UploadedFile>             UploadedFiles             { get; set; } = null!;
 
@@ -92,6 +95,9 @@ public class ApplicationDbContext : DbContext
         // Feedback
         ConfigureFeatureBugReportEntity(modelBuilder);
         ConfigureFeatureBugReportCategoryEntity(modelBuilder);
+
+        // KYC
+        ConfigureUserKycDocumentEntity(modelBuilder);
 
         // Email log
         ConfigureSentEmailEntity(modelBuilder);
@@ -495,6 +501,42 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsSuccess).HasColumnName("is_success");
             entity.Property(e => e.ErrorMessage).HasColumnType("text").HasColumnName("error_message");
             entity.HasIndex(e => e.SentAt).HasDatabaseName("IX_sent_emails_sent_at");
+        });
+    }
+
+    private static void ConfigureUserKycDocumentEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserKycDocument>(entity =>
+        {
+            entity.ToTable("UserKycDocuments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FullNameOnId).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.IdNumber).HasMaxLength(100);
+            entity.Property(e => e.RejectionReason).HasMaxLength(500);
+            entity.Property(e => e.AdminBypassNote).HasMaxLength(500);
+
+            entity.HasOne(e => e.User)
+                  .WithMany()
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.DocumentFile)
+                  .WithMany()
+                  .HasForeignKey(e => e.DocumentFileId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.SelfieWithIdFile)
+                  .WithMany()
+                  .HasForeignKey(e => e.SelfieWithIdFileId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.ReviewedBy)
+                  .WithMany()
+                  .HasForeignKey(e => e.ReviewedByUserId)
+                  .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_UserKycDocuments_UserId");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_UserKycDocuments_Status");
         });
     }
 }

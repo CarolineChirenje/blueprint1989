@@ -207,6 +207,7 @@ builder.Services.AddScoped<ExpenseService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<ExpenseDisputeService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<KycService>();
 builder.Services.AddScoped<FeatureBugReportService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 

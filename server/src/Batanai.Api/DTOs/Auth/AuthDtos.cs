@@ -26,6 +26,10 @@ public class SignupRequest
     public Role Role { get; set; }
 
     public string? AdminPin { get; set; }
+
+    /// <summary>Optional phone number for contact purposes. Not verified via OTP.</summary>
+    [StringLength(30)]
+    public string? PhoneNumber { get; set; }
 }
 
 public class LoginRequest
@@ -59,6 +63,7 @@ public class AuthResponse
     public string Email { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
     public Role Role { get; set; } = Role.Member;
     public string Token { get; set; } = string.Empty;
     public DateTime? TokenExpiresAt { get; set; }

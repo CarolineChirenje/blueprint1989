@@ -367,6 +367,8 @@ namespace Batanai.Api.Services
                 IsActive = true,
                 IsMfaEnabled = false,
                 CreatedAt = DateTime.UtcNow,
+                PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim(),
+                KycStatus = KycStatus.NotStarted,
             };
 
             _context.Users.Add(user);
@@ -406,7 +408,7 @@ namespace Batanai.Api.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<(bool success, string? error)> UpdateProfileAsync(int userId, string firstName, string lastName, string? currentPassword, string? newPassword)
+        public async Task<(bool success, string? error)> UpdateProfileAsync(int userId, string firstName, string lastName, string? phoneNumber, string? currentPassword, string? newPassword)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
@@ -414,9 +416,10 @@ namespace Batanai.Api.Services
                 return (false, "User not found");
             }
 
-            // Update name fields
+            // Update profile fields
             user.FirstName = firstName.Trim();
             user.LastName = lastName.Trim();
+            user.PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? null : phoneNumber.Trim();
 
             // If changing password, verify current password
             if (!string.IsNullOrEmpty(newPassword))

@@ -4,15 +4,25 @@ export enum Role {
     Member = 3
 }
 
+export enum KycStatus {
+    NotStarted = 0,
+    PendingReview = 1,
+    Verified = 2,
+    Rejected = 3,
+    AdminBypassed = 4
+}
+
 export interface User {
     id?: number;
     email?: string;
     firstName?: string;
     lastName?: string;
+    phoneNumber?: string;
     role?: Role;
     roleName?: string;
     isActive?: boolean;
     tourCompleted?: boolean;
+    kycStatus?: KycStatus;
 }
 
 export interface UserManagementDto {
