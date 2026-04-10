@@ -51,8 +51,32 @@ public class BgTimerHostedService : BackgroundService
         var context     = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var push        = scope.ServiceProvider.GetRequiredService<IPushNotificationSender>();
 
-        // Find members with unsettled obligations in active cycles,
-        // who have not received a PaymentDue notification in the last 24 hours.
+        // Run each job independently so a failure in one doesn't skip the others.
+        await RunJobAsync("PaymentReminders", () => SendPaymentRemindersAsync(context, push, ct));
+        await RunJobAsync("KycReminders",     () => SendKycRemindersAsync(context, push, ct));
+    }
+
+    /// <summary>Runs a named job, logging start/finish and isolating exceptions from sibling jobs.</summary>
+    private async Task RunJobAsync(string jobName, Func<Task> job)
+    {
+        try
+        {
+            _logger.LogDebug("BgTimer: starting job {Job}.", jobName);
+            await job();
+            _logger.LogDebug("BgTimer: finished job {Job}.", jobName);
+        }
+        catch (OperationCanceledException)
+        {
+            throw; // propagate so the outer loop can exit cleanly
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BgTimer: job {Job} failed.", jobName);
+        }
+    }
+
+    private async Task SendPaymentRemindersAsync(ApplicationDbContext context, IPushNotificationSender push, CancellationToken ct)
+    {
         var activeCycleIds = await context.ExpenseCycles
             .Where(c => c.Status == CycleStatus.Active)
             .Select(c => c.Id)
@@ -71,33 +95,49 @@ public class BgTimerHostedService : BackgroundService
             .Distinct()
             .ToListAsync(ct);
 
+        if (debtorIds.Count == 0) return;
+
         var cutoff = DateTime.UtcNow.AddHours(-24);
 
-        foreach (var userId in debtorIds)
+        // Batch deduplication: fetch all already-notified user IDs in one query.
+        var alreadyNotifiedIds = await context.Notifications
+            .Where(n => debtorIds.Contains(n.UserId)
+                     && n.Type == NotificationType.PaymentDue
+                     && n.CreatedAt >= cutoff)
+            .Select(n => n.UserId)
+            .Distinct()
+            .ToListAsync(ct);
+
+        var toNotify = debtorIds.Except(alreadyNotifiedIds).ToList();
+        int sent = 0;
+
+        foreach (var userId in toNotify)
         {
             if (ct.IsCancellationRequested) break;
 
-            // Skip if a PaymentDue notification was sent in the last 24 hours
-            var alreadyNotified = await context.Notifications
-                .AnyAsync(n => n.UserId == userId
-                            && n.Type == NotificationType.PaymentDue
-                            && n.CreatedAt >= cutoff, ct);
+            try
+            {
+                var total = await context.MemberObligations
+                    .Where(o => expenseIds.Contains(o.ExpenseId) && o.UserId == userId && !o.IsSettled)
+                    .SumAsync(o => o.AmountOwed, ct);
 
-            if (alreadyNotified) continue;
+                await push.SendToUserAsync(
+                    userId,
+                    NotificationType.PaymentDue,
+                    "Payment Reminder",
+                    $"You have ${total:F2} in outstanding payments. Head to your cycles to settle up.",
+                    "/cycles");
 
-            var total = await context.MemberObligations
-                .Where(o => expenseIds.Contains(o.ExpenseId) && o.UserId == userId && !o.IsSettled)
-                .SumAsync(o => o.AmountOwed, ct);
-
-            await push.SendToUserAsync(
-                userId,
-                NotificationType.PaymentDue,
-                "Payment Reminder",
-                $"You have ${total:F2} in outstanding payments. Head to your cycles to settle up.",
-                "/cycles");
+                sent++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "BgTimer: PaymentReminder failed for user {UserId}.", userId);
+            }
         }
 
-        await SendKycRemindersAsync(context, push, ct);
+        if (sent > 0)
+            _logger.LogInformation("BgTimer: sent {Count} PaymentDue notification(s).", sent);
     }
 
     /// <summary>
@@ -106,7 +146,6 @@ public class BgTimerHostedService : BackgroundService
     /// </summary>
     private async Task SendKycRemindersAsync(ApplicationDbContext context, IPushNotificationSender push, CancellationToken ct)
     {
-        // Members of any Mukando cycle still in Draft
         var mukandoDraftCycleIds = await context.ExpenseCycles
             .Where(c => c.CycleType == CycleType.Mukando && c.Status == CycleStatus.Draft)
             .Select(c => c.Id)
@@ -134,23 +173,40 @@ public class BgTimerHostedService : BackgroundService
 
         var kycCutoff = DateTime.UtcNow.AddHours(-24);
 
-        foreach (var userId in unverifiedUserIds)
+        // Batch deduplication: one query instead of one per user.
+        var alreadyNotifiedIds = await context.Notifications
+            .Where(n => unverifiedUserIds.Contains(n.UserId)
+                     && n.Type == NotificationType.KycReminder
+                     && n.CreatedAt >= kycCutoff)
+            .Select(n => n.UserId)
+            .Distinct()
+            .ToListAsync(ct);
+
+        var toNotify = unverifiedUserIds.Except(alreadyNotifiedIds).ToList();
+        int sent = 0;
+
+        foreach (var userId in toNotify)
         {
             if (ct.IsCancellationRequested) break;
 
-            var alreadyNotified = await context.Notifications
-                .AnyAsync(n => n.UserId == userId
-                            && n.Type == NotificationType.KycReminder
-                            && n.CreatedAt >= kycCutoff, ct);
+            try
+            {
+                await push.SendToUserAsync(
+                    userId,
+                    NotificationType.KycReminder,
+                    "Verify Your Identity",
+                    "You are part of a Mukando cycle that requires identity verification. Complete your KYC in your profile to avoid being blocked when the cycle starts.",
+                    "/profile");
 
-            if (alreadyNotified) continue;
-
-            await push.SendToUserAsync(
-                userId,
-                NotificationType.KycReminder,
-                "Verify Your Identity",
-                "You are part of a Mukando cycle that requires identity verification. Complete your KYC in your profile to avoid being blocked when the cycle starts.",
-                "/profile");
+                sent++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "BgTimer: KycReminder failed for user {UserId}.", userId);
+            }
         }
+
+        if (sent > 0)
+            _logger.LogInformation("BgTimer: sent {Count} KycReminder notification(s).", sent);
     }
 }
