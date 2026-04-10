@@ -319,3 +319,17 @@ export interface MukandoVerificationRequestDto {
   contributionAmount: number | null;
   rejectionReason: string | null;
 }
+
+export interface CycleMemberAgreementStatusDto {
+  userId: number;
+  userName: string;
+  hasAgreed: boolean;
+  agreedAt: string | null;
+}
+
+export interface CycleAgreementSummaryDto {
+  allAgreed: boolean;
+  agreedCount: number;
+  totalCount: number;
+  members: CycleMemberAgreementStatusDto[];
+}

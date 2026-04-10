@@ -16,7 +16,8 @@ import {
   MukandoRoundActivityDto,
   MukandoCycleSummaryDto,
   MukandoDashboardDto,
-  MukandoVerificationRequestDto
+  MukandoVerificationRequestDto,
+  CycleAgreementSummaryDto
 } from '../../shared/models/expense-cycle.model';
 
 @Injectable({ providedIn: 'root' })
@@ -227,5 +228,13 @@ export class ExpenseCycleService {
 
   reassignVerifier(cycleId: number, roundId: number, verificationId: number): Observable<void> {
     return this.http.post<void>(`${this.url}/${cycleId}/rounds/${roundId}/reassign-verifier/${verificationId}`, {});
+  }
+
+  getAgreementStatus(cycleId: number): Observable<CycleAgreementSummaryDto> {
+    return this.http.get<CycleAgreementSummaryDto>(`${this.url}/${cycleId}/agreements`);
+  }
+
+  submitAgreement(cycleId: number): Observable<CycleAgreementSummaryDto> {
+    return this.http.post<CycleAgreementSummaryDto>(`${this.url}/${cycleId}/agree`, {});
   }
 }

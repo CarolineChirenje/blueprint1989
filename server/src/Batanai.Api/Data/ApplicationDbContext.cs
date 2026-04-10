@@ -25,8 +25,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Group>            Groups            { get; set; } = null!;
     public DbSet<GroupMember>      GroupMembers      { get; set; } = null!;
     public DbSet<ExpenseCycle>     ExpenseCycles     { get; set; } = null!;
-    public DbSet<CycleMember>      CycleMembers      { get; set; } = null!;
-    public DbSet<Expense>          Expenses          { get; set; } = null!;
+    public DbSet<CycleMember>            CycleMembers            { get; set; } = null!;
+    public DbSet<CycleMemberAgreement>  CycleMemberAgreements   { get; set; } = null!;
+    public DbSet<Expense>               Expenses                { get; set; } = null!;
     public DbSet<MemberObligation> MemberObligations { get; set; } = null!;
     public DbSet<Payment>          Payments          { get; set; } = null!;
     public DbSet<ExpenseDispute>   ExpenseDisputes   { get; set; } = null!;
@@ -72,6 +73,7 @@ public class ApplicationDbContext : DbContext
         ConfigureGroupMemberEntity(modelBuilder);
         ConfigureExpenseCycleEntity(modelBuilder);
         ConfigureCycleMemberEntity(modelBuilder);
+        ConfigureCycleMemberAgreementEntity(modelBuilder);
         ConfigureExpenseEntity(modelBuilder);
         ConfigureMemberObligationEntity(modelBuilder);
         ConfigurePaymentEntity(modelBuilder);
@@ -270,6 +272,18 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(m => new { m.ExpenseCycleId, m.UserId });
             entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(m => m.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);
             entity.HasOne<User>().WithMany().HasForeignKey(m => m.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
+    private static void ConfigureCycleMemberAgreementEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CycleMemberAgreement>(entity =>
+        {
+            entity.ToTable("CycleMemberAgreements");
+            entity.HasKey(a => a.Id);
+            entity.HasIndex(a => new { a.ExpenseCycleId, a.UserId }).IsUnique();
+            entity.HasOne<ExpenseCycle>().WithMany().HasForeignKey(a => a.ExpenseCycleId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne<User>().WithMany().HasForeignKey(a => a.UserId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 

@@ -128,5 +128,13 @@ public enum NotificationType
 
     /// <summary>The verifier was reassigned (previous assignee did not respond in time).</summary>
     MukandoVerifierReassigned = 39,
+
+    // -- Cycle Agreement ------------------------------------------------------
+
+    /// <summary>Agreements were reset because cycle settings, members, or opt-outs changed.</summary>
+    CycleAgreementsReset = 40,
+
+    /// <summary>All members have agreed and the cycle is ready to start.</summary>
+    CycleAllMembersAgreed = 41,
 }
 

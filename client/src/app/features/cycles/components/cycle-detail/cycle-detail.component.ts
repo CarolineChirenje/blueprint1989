@@ -26,6 +26,7 @@ import {
   MukandoSwapRequestDto,
   OptOutRequestDto,
   MukandoVerificationRequestDto,
+  CycleAgreementSummaryDto,
 } from '../../../../shared/models/expense-cycle.model';
 import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dialog.component';
 import { AddPaymentDialogComponent } from '../add-payment-dialog/add-payment-dialog.component';
@@ -49,7 +50,7 @@ export class CycleDetailComponent implements OnInit {
   loading = true;
   error = '';
   reminderSending = false;
-  activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' | 'rounds' | 'stats' | 'activity' | 'swaps' | 'optouts' | 'order' = 'expenses';
+  activeTab: 'expenses' | 'payments' | 'summary' | 'disputes' | 'members' | 'rounds' | 'stats' | 'activity' | 'swaps' | 'optouts' | 'order' | 'agreements' = 'expenses';
   isAdmin = false;
   currentUserId: number | null = null;
   addableMembers: GroupMemberDto[] = [];
@@ -63,6 +64,8 @@ export class CycleDetailComponent implements OnInit {
   roundActivities: MukandoRoundActivityDto[] = [];
   swapRequests: MukandoSwapRequestDto[] = [];
   optOutRequests: OptOutRequestDto[] = [];
+  agreementSummary: CycleAgreementSummaryDto | null = null;
+  agreementSubmitting = false;
   contributionProofFile: File | null = null;
   contributionReference = '';
   contributionUploading = false;
@@ -124,7 +127,7 @@ export class CycleDetailComponent implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     const tab = this.route.snapshot.queryParamMap.get('tab');
     if (tab) {
-      const validTabs = ['expenses', 'payments', 'summary', 'disputes', 'members', 'rounds', 'stats', 'activity', 'swaps', 'optouts', 'order'];
+      const validTabs = ['expenses', 'payments', 'summary', 'disputes', 'members', 'rounds', 'stats', 'activity', 'swaps', 'optouts', 'order', 'agreements'];
       if (validTabs.includes(tab)) {
         this.activeTab = tab as typeof this.activeTab;
       }
@@ -150,6 +153,7 @@ export class CycleDetailComponent implements OnInit {
         }
         this.loadOptOutRequests();
         this.loadDisputes();
+        this.loadAgreements();
         if (this.canManageCycle() && cycle.status === 'Draft') {
           this.loadAddableMembers(cycle);
         }
@@ -432,6 +436,44 @@ export class CycleDetailComponent implements OnInit {
       next: r => { this.optOutRequests = r; this.cdr.detectChanges(); },
       error: () => {}
     });
+  }
+
+  loadAgreements(): void {
+    if (!this.cycle) return;
+    this.cycleService.getAgreementStatus(this.cycle.id).subscribe({
+      next: s => { this.agreementSummary = s; this.cdr.detectChanges(); },
+      error: () => {}
+    });
+  }
+
+  submitAgreement(): void {
+    if (!this.cycle || this.agreementSubmitting) return;
+    this.agreementSubmitting = true;
+    this.cycleService.submitAgreement(this.cycle.id).subscribe({
+      next: s => {
+        this.agreementSummary = s;
+        this.agreementSubmitting = false;
+        this.snackBar.open('Your agreement has been recorded.', 'OK', { duration: 3000 });
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        this.agreementSubmitting = false;
+        this.snackBar.open(err?.error?.message ?? 'Failed to record agreement.', 'Dismiss', { duration: 5000 });
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  currentUserHasAgreed(): boolean {
+    return this.agreementSummary?.members.some(m => m.userId === this.currentUserId && m.hasAgreed) ?? false;
+  }
+
+  currentUserAgreedAt(): string | null {
+    return this.agreementSummary?.members.find(m => m.userId === this.currentUserId)?.agreedAt ?? null;
+  }
+
+  allMembersAgreed(): boolean {
+    return this.agreementSummary?.allAgreed ?? false;
   }
 
   private readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB

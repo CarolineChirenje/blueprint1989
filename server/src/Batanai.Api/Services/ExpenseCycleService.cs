@@ -461,20 +461,22 @@ public class ExpenseCycleService
         var memberCount = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycleId);
         if (memberCount < 2) return (null, "A cycle requires at least 2 members before it can be started.");
 
-        // Mukando: cancel all pending swap requests
+        // Block if any pending swap requests exist
         if (cycle.CycleType == CycleType.Mukando)
         {
             var pendingSwaps = await _context.MukandoSwapRequests
-                .Where(s => s.ExpenseCycleId == cycleId && s.Status == SwapRequestStatus.Pending)
-                .ToListAsync();
-            foreach (var swap in pendingSwaps)
-            {
-                swap.Status = SwapRequestStatus.Cancelled;
-                swap.RespondedAt = DateTime.UtcNow;
-            }
+                .AnyAsync(s => s.ExpenseCycleId == cycleId && s.Status == SwapRequestStatus.Pending);
+            if (pendingSwaps)
+                return (null, "All pending swap requests must be resolved before the cycle can be started.");
         }
 
-        if (cycle.CycleType == CycleType.Majana)
+        // Block if any pending opt-out requests exist
+        var pendingOptOuts = await _context.CycleOptOutRequests
+            .AnyAsync(o => o.ExpenseCycleId == cycleId && o.Status == OptOutRequestStatus.Pending);
+        if (pendingOptOuts)
+            return (null, "All pending opt-out requests must be resolved before the cycle can be started.");
+
+        // Block if any unresolved disputes exist
         {
             var hasOpenDisputes = await _context.ExpenseDisputes
                 .Join(_context.Expenses.Where(e => e.ExpenseCycleId == cycleId),
@@ -482,6 +484,11 @@ public class ExpenseCycleService
                 .AnyAsync(d => d.Status == DisputeStatus.Pending || d.Status == DisputeStatus.Reviewed);
             if (hasOpenDisputes) return (null, "All expense disputes must be resolved or rejected before starting the cycle.");
         }
+
+        // Block if not all members have agreed
+        var agreementSummary = await GetAgreementStatusAsync(cycleId);
+        if (!agreementSummary.AllAgreed)
+            return (null, $"All members must agree before the cycle can be started. ({agreementSummary.AgreedCount}/{agreementSummary.TotalCount} agreed)");
 
         cycle.Status    = CycleStatus.Active;
         cycle.UpdatedAt = DateTime.UtcNow;
@@ -597,6 +604,10 @@ public class ExpenseCycleService
 
         await _context.SaveChangesAsync();
 
+        // Settings changed — all members must re-agree
+        if (cycle.Status == CycleStatus.Draft)
+            await ResetAgreementsAsync(id);
+
         return (await GetByIdAsync(cycle.Id, 0), null);
     }
 
@@ -670,6 +681,9 @@ public class ExpenseCycleService
         if (cycle.CycleType == CycleType.Mukando)
             await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
 
+        // Member list changed — all members must re-agree
+        await ResetAgreementsAsync(cycleId);
+
         return null;
     }
 
@@ -722,6 +736,9 @@ public class ExpenseCycleService
         if (cycle.CycleType == CycleType.Mukando)
             await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
 
+        // Member list changed — all members must re-agree
+        await ResetAgreementsAsync(cycleId);
+
         return (newUserIds, null);
     }
 
@@ -755,6 +772,9 @@ public class ExpenseCycleService
         // Majana: recalculate expense obligations for remaining members
         if (cycle.CycleType == CycleType.Majana)
             await _expenseService.RecalculateAllObligationsAsync(cycleId);
+
+        // Member list changed — all members must re-agree
+        await ResetAgreementsAsync(cycleId);
 
         return null;
     }
@@ -847,6 +867,9 @@ public class ExpenseCycleService
                 await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(req.ExpenseCycleId);
             else if (cycle.CycleType == CycleType.Majana)
                 await _expenseService.RecalculateAllObligationsAsync(req.ExpenseCycleId);
+
+            // Member left — all remaining members must re-agree
+            await ResetAgreementsAsync(req.ExpenseCycleId);
         }
 
         await _context.SaveChangesAsync();
@@ -861,6 +884,103 @@ public class ExpenseCycleService
             message, $"/cycles/{req.ExpenseCycleId}", req.ExpenseCycleId);
 
         return null;
+    }
+
+    // ── Member Agreement ──────────────────────────────────────────────────────
+
+    public async Task<CycleAgreementSummaryDto> GetAgreementStatusAsync(int cycleId)
+    {
+        var members = await _context.CycleMembers
+            .Where(m => m.ExpenseCycleId == cycleId)
+            .Join(_context.Users, m => m.UserId, u => u.Id, (m, u) => new { m.UserId, FirstName = u.FirstName, LastName = u.LastName })
+            .ToListAsync();
+
+        var agreedUserIds = await _context.CycleMemberAgreements
+            .Where(a => a.ExpenseCycleId == cycleId)
+            .ToDictionaryAsync(a => a.UserId, a => a.AgreedAt);
+
+        var statuses = members.Select(m => new CycleMemberAgreementStatusDto(
+            m.UserId,
+            $"{m.FirstName} {m.LastName}",
+            agreedUserIds.ContainsKey(m.UserId),
+            agreedUserIds.TryGetValue(m.UserId, out var at) ? at : null
+        )).ToList();
+
+        int agreedCount = statuses.Count(s => s.HasAgreed);
+
+        return new CycleAgreementSummaryDto(
+            AllAgreed: agreedCount == members.Count && members.Count > 0,
+            AgreedCount: agreedCount,
+            TotalCount: members.Count,
+            Members: statuses);
+    }
+
+    public async Task<(CycleAgreementSummaryDto? dto, string? error)> SubmitAgreementAsync(int cycleId, int userId)
+    {
+        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
+        if (cycle == null) return (null, "Cycle not found.");
+        if (cycle.Status != CycleStatus.Draft) return (null, "Agreements can only be submitted while the cycle is in Draft status.");
+
+        var isMember = await _context.CycleMembers.AnyAsync(m => m.ExpenseCycleId == cycleId && m.UserId == userId);
+        if (!isMember) return (null, "You are not a member of this cycle.");
+
+        var existing = await _context.CycleMemberAgreements
+            .FirstOrDefaultAsync(a => a.ExpenseCycleId == cycleId && a.UserId == userId);
+
+        if (existing == null)
+        {
+            _context.CycleMemberAgreements.Add(new CycleMemberAgreement
+            {
+                ExpenseCycleId = cycleId,
+                UserId         = userId,
+                AgreedAt       = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        var summary = await GetAgreementStatusAsync(cycleId);
+
+        if (summary.AllAgreed)
+        {
+            var adminIds = await GetCycleAdminIdsAsync(cycleId);
+            if (adminIds.Count > 0)
+                await _push.SendToUsersAsync(
+                    adminIds,
+                    NotificationType.CycleAllMembersAgreed,
+                    $"All members agreed: {cycle.Name}",
+                    "All cycle members have agreed. You can now start the cycle.",
+                    $"/cycles/{cycleId}",
+                    cycleId);
+        }
+
+        return (summary, null);
+    }
+
+    public async Task ResetAgreementsAsync(int cycleId)
+    {
+        var agreements = await _context.CycleMemberAgreements
+            .Where(a => a.ExpenseCycleId == cycleId).ToListAsync();
+
+        if (agreements.Count == 0) return;
+
+        _context.CycleMemberAgreements.RemoveRange(agreements);
+        await _context.SaveChangesAsync();
+
+        var memberIds = await _context.CycleMembers
+            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
+
+        if (memberIds.Count == 0) return;
+
+        var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
+        if (cycle == null) return;
+
+        await _push.SendToUsersAsync(
+            memberIds,
+            NotificationType.CycleAgreementsReset,
+            $"Re-agreement required: {cycle.Name}",
+            "Cycle details have changed. All members must re-agree before the cycle can start.",
+            $"/cycles/{cycleId}",
+            cycleId);
     }
 
     private async Task<List<int>> GetCycleAdminIdsAsync(int cycleId)

@@ -500,9 +500,32 @@ public class ExpenseCycleController : ControllerBase
         return NoContent();
     }
 
-    // ── Verification Endpoints ─────────────────────────────────────────────────
+    // ── Member Agreement ───────────────────────────────────────────────────────
 
-    /// <summary>Get all pending verifications for the cycle. Admins see all; members see only their own.</summary>
+    /// <summary>Get agreement status for all members of a cycle.</summary>
+    [HttpGet("{id:int}/agreements")]
+    public async Task<IActionResult> GetAgreementStatus(int id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var summary = await _cycleService.GetAgreementStatusAsync(id);
+        return Ok(summary);
+    }
+
+    /// <summary>Current user records their agreement for a Draft cycle.</summary>
+    [HttpPost("{id:int}/agree")]
+    public async Task<IActionResult> SubmitAgreement(int id)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null) return Unauthorized();
+
+        var (dto, error) = await _cycleService.SubmitAgreementAsync(id, userId.Value);
+        if (error != null) return BadRequest(new { message = error });
+        return Ok(dto);
+    }
+
+    // ── Verification Endpoints ─────────────────────────────────────────────────
     [HttpGet("{id:int}/pending-verifications")]
     public async Task<IActionResult> GetPendingVerifications(int id)
     {

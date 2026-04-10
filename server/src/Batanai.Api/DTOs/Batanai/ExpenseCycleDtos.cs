@@ -300,3 +300,17 @@ public record MukandoVerificationRequestDto(
     string? ContributorName,
     decimal? ContributionAmount,
     string? RejectionReason);
+
+// ── Member Agreement ──────────────────────────────────────────────────────────
+
+public record CycleMemberAgreementStatusDto(
+    int UserId,
+    string UserName,
+    bool HasAgreed,
+    DateTime? AgreedAt);
+
+public record CycleAgreementSummaryDto(
+    bool AllAgreed,
+    int AgreedCount,
+    int TotalCount,
+    List<CycleMemberAgreementStatusDto> Members);

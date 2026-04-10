@@ -868,6 +868,26 @@ public class MukandoService
         cycle.EndDate = ExpenseCycleService.CalculateRoundDueDate(cycle.StartDate, freq, request.PayoutOrder.Count - 1);
         await _context.SaveChangesAsync();
 
+        // Settings changed — clear all agreements so members must re-agree
+        var agreements = await _context.CycleMemberAgreements
+            .Where(a => a.ExpenseCycleId == cycleId).ToListAsync();
+        if (agreements.Count > 0)
+        {
+            _context.CycleMemberAgreements.RemoveRange(agreements);
+            await _context.SaveChangesAsync();
+
+            var agreementMemberIds = await _context.CycleMembers
+                .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
+            if (agreementMemberIds.Count > 0)
+                await _push.SendToUsersAsync(
+                    agreementMemberIds,
+                    NotificationType.CycleAgreementsReset,
+                    $"Re-agreement required: {cycle.Name}",
+                    "Cycle settings have changed. All members must re-agree before the cycle can start.",
+                    $"/cycles/{cycleId}",
+                    cycleId);
+        }
+
         return null;
     }
 

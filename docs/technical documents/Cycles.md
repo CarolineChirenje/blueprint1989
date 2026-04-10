@@ -284,3 +284,131 @@ A yellow banner appears at the top of the Rounds tab whenever the current user h
 - Approve and Reject action buttons
 
 All verification UI is fully responsive across mobile, tablet, and desktop layouts.
+
+---
+
+## Member Agreement System
+
+### Overview
+
+Before a cycle can be started, **every participating member must explicitly record their agreement**. This creates a timestamped, auditable trail of consent — ignorance cannot be used as a defence during disputes. The feature applies to both **Majana** and **Mukando** cycle types.
+
+### Data Model
+
+**`CycleMemberAgreements` table**
+
+| Column | Type | Description |
+|---|---|---|
+| `Id` | int (PK) | Auto-increment |
+| `ExpenseCycleId` | int (FK → ExpenseCycles) | Which cycle |
+| `UserId` | int (FK → Users) | Which member agreed |
+| `AgreedAt` | DateTime UTC | Timestamp of agreement |
+
+A unique constraint on `(ExpenseCycleId, UserId)` ensures each member can agree only once per cycle instance (before any reset).
+
+### API Endpoints
+
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/cycles/{id}/agreements` | Any member or admin | Returns agreement status for all members |
+| `POST` | `/api/cycles/{id}/agree` | Any cycle member | Records the calling user's agreement |
+
+**`GET /agreements` response shape:**
+```json
+{
+  "allAgreed": false,
+  "agreedCount": 2,
+  "totalCount": 3,
+  "members": [
+    { "userId": 1, "userName": "Alice Smith", "hasAgreed": true, "agreedAt": "2026-04-20T10:30:00Z" },
+    { "userId": 2, "userName": "Bob Jones",  "hasAgreed": true, "agreedAt": "2026-04-20T11:00:00Z" },
+    { "userId": 3, "userName": "Carol Dube", "hasAgreed": false, "agreedAt": null }
+  ]
+}
+```
+
+### Agreement Reset Rules
+
+All existing agreements are **automatically deleted** (and all members notified via push) whenever any of the following changes occur to a Draft cycle:
+
+1. **Cycle settings updated** — name, start/end date (`UpdateAsync`)
+2. **Member added** — single or batch add (`AddMemberAsync`, `AddMembersBatchAsync`)
+3. **Member removed** (`RemoveMemberAsync`)
+4. **Opt-out request approved** — member leaves the cycle (`RespondOptOutRequestAsync`)
+5. **Mukando settings updated** — contribution amount, frequency, payout order (`MukandoService.UpdateSettingsAsync`)
+
+Agreements are **not** reset when:
+- A dispute is raised or resolved
+- A swap request is created, responded to, or cancelled (swaps don't change cycle terms)
+
+### Start Cycle Validation Order
+
+`StartAsync` checks the following conditions in order and blocks the start with a descriptive error if any fail:
+
+1. Cycle must be in `Draft` status
+2. At least 2 members required
+3. **No pending swap requests** (Mukando only — previously auto-cancelled, now blocks)
+4. **No pending opt-out requests**
+5. **No open disputes** (Pending or Reviewed status — applies to both Majana and Mukando)
+6. **All members must have agreed**
+7. Mukando: rounds must exist (payout order must be set)
+
+### Notifications
+
+| Notification Type | Sent to | Trigger |
+|---|---|---|
+| `CycleAgreementsReset` (40) | All current members | Any reset event above |
+| `CycleAllMembersAgreed` (41) | Cycle admins (Group Admins) | Last member submits their agreement |
+
+### UI — Admin (Setup Checklist)
+
+The **Setup Checklist** card (visible to Group Admins on Draft cycles) gained three new check items:
+
+- **No pending swap requests** (Mukando only) — shows pending count with "Resolve" button linking to Swaps tab
+- **No pending opt-out requests** — shows pending count with "Resolve" button linking to Opt-outs tab
+- **No open disputes** — shows open count with "Resolve" button linking to Disputes tab
+- **All members agreed** — shows `{agreed}/{total}` count with "View" button linking to Agreements tab
+
+### UI — Members (Readiness Card)
+
+A **Readiness Card** is displayed to non-admin cycle members on Draft cycles. It shows:
+
+- Whether all opt-out requests are resolved
+- Whether all disputes are resolved
+- How many members have agreed (`{n}/{total}`)
+- If the current user has not yet agreed: an **"I Agree — Record my Agreement"** button
+- If the current user has already agreed: a confirmation chip with the exact timestamp
+
+### UI — Agreements Tab
+
+A new **Agreements** tab is available on all Draft cycles (admin and members alike). It displays:
+
+- A summary strip showing total agreed count and the user's own agreement status
+- A card for each member, colour-coded green when agreed, with the exact timestamp
+- The "I Agree" button if the current user has not yet agreed
+
+The badge on the Agreements tab button shows `{agreed}/{total}` and turns green when all members have agreed.
+
+### UI — Start Cycle Tooltip
+
+The **Start Cycle** button tooltip now cycles through blocking conditions in priority order:
+1. Unresolved disputes
+2. Pending opt-out requests
+3. Members who haven't agreed
+4. Fewer than 2 members
+
+### Scenarios
+
+| Scenario | Outcome |
+|---|---|
+| Admin adds a member → existing agreements wiped | All members (including previous agreers) are notified to re-agree |
+| Admin updates cycle dates → agreements wiped | Push notification sent; everyone must re-agree |
+| Member opts out and admin approves → member removed, agreements wiped | Remaining members re-agree |
+| Admin tries to start before all agree | `400 Bad Request`: "X/Y agreed" — blocked |
+| Admin tries to start with a pending swap request | `400 Bad Request`: blocked |
+| Admin tries to start with a pending opt-out request | `400 Bad Request`: blocked |
+| Last member clicks "I Agree" | Admins receive a `CycleAllMembersAgreed` push notification |
+
+### Responsiveness
+
+All agreement and readiness UI components use `flex-wrap: wrap` and collapse to a single column at `max-width: 600px`, ensuring correct display on mobile, tablet, and desktop.
