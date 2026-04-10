@@ -18,16 +18,19 @@ public class PushController : ControllerBase
     private readonly VapidSettings _vapid;
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<PushController> _logger;
+    private readonly IEmailService _emailService;
 
     public PushController(
         ApplicationDbContext context,
         IPushNotificationSender pushSender,
         IOptions<VapidSettings> vapidOptions,
         IWebHostEnvironment env,
-        ILogger<PushController> logger)
+        ILogger<PushController> logger,
+        IEmailService emailService)
     {
         _context = context;
         _pushSender = pushSender;
+        _emailService = emailService;
         _vapid = vapidOptions.Value;
         _env = env;
         _logger = logger;
@@ -151,6 +154,41 @@ public class PushController : ControllerBase
         return Ok(new { message = "Test push dispatched." });
     }
 
+    // -- Dev / Admin test email endpoint -------------------------------------
+
+    /// <summary>
+    /// POST /api/push/test-email
+    /// Sends a test email to the specified address.
+    /// In Development: accessible to all authenticated users.
+    /// In Production: restricted to Admin and above.
+    /// </summary>
+    [HttpPost("test-email")]
+    [Authorize]
+    public async Task<IActionResult> SendTestEmail([FromBody] TestEmailRequest request)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        // Enforce role restriction in production
+        if (!_env.IsDevelopment())
+        {
+            var role = User.FindFirst("role")?.Value;
+            if (role is not ("SuperAdmin" or "Administrator"))
+                return Forbid();
+        }
+
+        var sent = await _emailService.SendEmailAsync(
+            to: request.To,
+            subject: request.Subject,
+            htmlBody: $"<p>{System.Web.HttpUtility.HtmlEncode(request.Body)}</p>",
+            plainBody: request.Body);
+
+        if (!sent)
+            return BadRequest(new { message = "Email failed to send — check SMTP configuration." });
+
+        _logger.LogInformation("Test email sent to {Recipient}", request.To);
+        return Ok(new { message = $"Test email dispatched to {request.To}." });
+    }
+
     // -- BG Timer scheduling -------------------------------------------------
 
     /// <summary>
@@ -167,3 +205,13 @@ public class PushController : ControllerBase
         return claim != null && int.TryParse(claim.Value, out var id) ? id : null;
     }
 }
+
+public record TestEmailRequest(
+    [property: System.ComponentModel.DataAnnotations.Required]
+    [property: System.ComponentModel.DataAnnotations.EmailAddress]
+    string To,
+    [property: System.ComponentModel.DataAnnotations.Required]
+    string Subject,
+    [property: System.ComponentModel.DataAnnotations.Required]
+    string Body
+);

@@ -2,7 +2,8 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import {
   PushNotificationService,
   NotificationType,
-  TestPushRequest
+  TestPushRequest,
+  TestEmailRequest
 } from '../../core/services/push-notification.service';
 
 interface NotificationTypeOption {
@@ -27,6 +28,12 @@ export class PushTestComponent implements OnInit {
   testTitle = 'Batanai Test';
   testBody = 'This is a test push notification.';
   testDeepLink = '/dashboard';
+
+  // Email test form
+  testEmailTo = 'elroitec@gmail.com';
+  testEmailSubject = 'Batanai Test Email';
+  testEmailBody = 'This is a test email from Batanai.';
+  emailLoading = false;
 
   // UI state
   status = '';
@@ -91,6 +98,33 @@ export class PushTestComponent implements OnInit {
       },
       error: err => {
         this.loading = false;
+        const msg = err?.error?.message ?? err?.message ?? 'Unknown error';
+        this.setStatus(msg, 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  sendTestEmail(): void {
+    if (!this.testEmailTo || !this.testEmailSubject || !this.testEmailBody) {
+      this.setStatus('Please fill in all email fields.', 'error');
+      return;
+    }
+    const req: TestEmailRequest = {
+      to: this.testEmailTo,
+      subject: this.testEmailSubject,
+      body: this.testEmailBody
+    };
+    this.emailLoading = true;
+    this.setStatus('Sending email…', 'info');
+    this.pushService.sendTestEmail(req).subscribe({
+      next: res => {
+        this.emailLoading = false;
+        this.setStatus(res.message, 'success');
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        this.emailLoading = false;
         const msg = err?.error?.message ?? err?.message ?? 'Unknown error';
         this.setStatus(msg, 'error');
         this.cdr.detectChanges();

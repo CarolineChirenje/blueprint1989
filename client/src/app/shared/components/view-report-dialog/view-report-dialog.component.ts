@@ -20,6 +20,7 @@ export class ViewReportDialogComponent {
   isAdmin: boolean;
   isUpdating = false;
   errorMessage = '';
+  descriptionCopied = false;
 
   readonly ReportStatus = ReportStatus;
 
@@ -40,6 +41,13 @@ export class ViewReportDialogComponent {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  copyDescription(): void {
+    navigator.clipboard.writeText(this.report.description ?? '').then(() => {
+      this.descriptionCopied = true;
+      setTimeout(() => { this.descriptionCopied = false; }, 2000);
+    });
   }
 
   markInReview(): void {

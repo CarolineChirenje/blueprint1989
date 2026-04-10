@@ -19,6 +19,12 @@ export interface TestPushRequest {
   deepLinkUrl?: string;
 }
 
+export interface TestEmailRequest {
+  to: string;
+  subject: string;
+  body: string;
+}
+
 /** Enum mirroring server-side NotificationType — kept in sync with the server enum values. */
 export enum NotificationType {
   General              = 1,
@@ -177,6 +183,10 @@ export class PushNotificationService implements OnDestroy {
    */
   sendTestPush(req: TestPushRequest) {
     return this.http.post<{ message: string }>(`${this.apiUrl}/test`, req);
+  }
+
+  sendTestEmail(req: TestEmailRequest) {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/test-email`, req);
   }
 
   /**

@@ -37,7 +37,15 @@
     </div>
 
     <div class="report-title">{{ report.title }}</div>
-    <div class="report-description">{{ report.description }}</div>
+    <div>
+      <div class="description-header">
+        <span class="meta-label">Description</span>
+        <button class="copy-btn" [class.copied]="descriptionCopied" (click)="copyDescription()" type="button">
+          {{ descriptionCopied ? '✓ Copied' : 'Copy' }}
+        </button>
+      </div>
+      <div class="report-description">{{ report.description }}</div>
+    </div>
 
     @if (fullImageUrl) {
       <div class="report-image-wrap">
