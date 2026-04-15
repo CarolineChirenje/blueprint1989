@@ -17,6 +17,7 @@ public class UserManagementDto
     public bool IsMfaEnabled { get; set; }
     public bool IsEmailVerified { get; set; }
     public DateTime CreatedAt { get; set; }
+    public KycStatus KycStatus { get; set; }
 }
 
 public class UpdateUserStatusRequest

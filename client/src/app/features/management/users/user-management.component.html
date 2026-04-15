@@ -55,6 +55,15 @@
           </button>
           <button *ngIf="isAdminOrAbove"
                   mat-icon-button
+                  [matTooltip]="kycTooltip(u)"
+                  [class.kyc-pending]="u.kycStatus === KycStatus.PendingReview"
+                  [class.kyc-verified]="u.kycStatus === KycStatus.Verified || u.kycStatus === KycStatus.AdminBypassed"
+                  [class.kyc-rejected]="u.kycStatus === KycStatus.Rejected"
+                  (click)="openKycDialog(u)">
+            <mat-icon>verified_user</mat-icon>
+          </button>
+          <button *ngIf="isAdminOrAbove"
+                  mat-icon-button
                   matTooltip="Reset password"
                   (click)="openResetPasswordDialog(u)">
             <mat-icon>lock_reset</mat-icon>

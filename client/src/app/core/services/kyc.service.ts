@@ -62,6 +62,10 @@ export class KycService {
     return this.http.get<KycDocumentDto[]>(`${this.apiUrl}/pending`);
   }
 
+  getByUserId(userId: number): Observable<KycDocumentDto> {
+    return this.http.get<KycDocumentDto>(`${this.apiUrl}/user/${userId}`);
+  }
+
   review(id: number, approve: boolean, rejectionReason?: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/${id}/review`, { approve, rejectionReason });
   }

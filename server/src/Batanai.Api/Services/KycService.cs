@@ -96,6 +96,17 @@ public class KycService
         return docs.Select(d => Map(d, d.User)).ToList();
     }
 
+    public async Task<KycDocumentDto?> GetKycDocumentByUserIdAsync(int userId)
+    {
+        var doc = await _context.UserKycDocuments
+            .Include(d => d.User)
+            .Where(d => d.UserId == userId)
+            .OrderByDescending(d => d.SubmittedAt)
+            .FirstOrDefaultAsync();
+
+        return doc == null ? null : Map(doc, doc.User);
+    }
+
     public async Task<KycStatusDto?> GetKycStatusAsync(int userId)
     {
         var user = await _context.Users.FindAsync(userId);

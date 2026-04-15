@@ -86,6 +86,10 @@
   color: var(--text-secondary, #757575);
 }
 
+.kyc-pending  ::ng-deep mat-icon { color: #f5a623; }
+.kyc-verified ::ng-deep mat-icon { color: #27ae60; }
+.kyc-rejected ::ng-deep mat-icon { color: #e53935; }
+
 @media (max-width: 1023px) {
   .content-card {
     background: transparent;

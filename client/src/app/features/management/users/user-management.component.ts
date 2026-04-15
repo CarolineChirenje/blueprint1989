@@ -2,12 +2,14 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { UserManagementDto } from '../../../shared/models/user.model';
+import { UserManagementDto, KycStatus } from '../../../shared/models/user.model';
 import { UserGroupRolesDialogComponent } from './user-group-roles-dialog/user-group-roles-dialog.component';
 import { EditUserDialogComponent } from './edit-user-dialog/edit-user-dialog.component';
 import { AdminResetPasswordDialogComponent } from './admin-reset-password-dialog/admin-reset-password-dialog.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { DialogService } from '../../../shared/services/dialog.service';
+import { KycService } from '../../../core/services/kyc.service';
+import { KycReviewDialogComponent } from './kyc-review-dialog/kyc-review-dialog.component';
 
 @Component({
   selector: 'app-user-management',
@@ -20,6 +22,7 @@ export class UserManagementComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   displayedColumns = ['fullName', 'email', 'role', 'status', 'actions'];
+  readonly KycStatus = KycStatus;
 
   get isSuperAdmin(): boolean { return this.authService.isSuperAdmin(); }
   get isAdminOrAbove(): boolean { return this.authService.isAdminOrAbove(); }
@@ -29,7 +32,8 @@ export class UserManagementComponent implements OnInit {
     private dialog: MatDialog,
     private dialogService: DialogService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private kycService: KycService
   ) {}
 
   ngOnInit(): void {
@@ -151,6 +155,56 @@ export class UserManagementComponent implements OnInit {
       if (result) {
         this.errorMessage = '';
       }
+    });
+  }
+
+  kycTooltip(user: UserManagementDto): string {
+    switch (user.kycStatus) {
+      case KycStatus.PendingReview:  return 'KYC: Pending review click to open review queue';
+      case KycStatus.Verified:       return 'KYC: Verified';
+      case KycStatus.Rejected:       return 'KYC: Rejected click to bypass';
+      case KycStatus.AdminBypassed:  return 'KYC: Admin bypassed';
+      default:                       return 'KYC: Not started click to bypass';
+    }
+  }
+
+  openKycDialog(user: UserManagementDto): void {
+    if (user.kycStatus === KycStatus.PendingReview || user.kycStatus === KycStatus.Verified ||
+        user.kycStatus === KycStatus.Rejected || user.kycStatus === KycStatus.AdminBypassed) {
+      const ref = this.dialog.open(KycReviewDialogComponent, {
+        width: '660px',
+        maxWidth: '95vw',
+        data: { userId: user.id, userName: user.fullName }
+      });
+      ref.afterClosed().subscribe(result => {
+        if (result === 'approved') {
+          user.kycStatus = KycStatus.Verified;
+          this.cdr.detectChanges();
+        } else if (result === 'rejected') {
+          user.kycStatus = KycStatus.Rejected;
+          this.cdr.detectChanges();
+        }
+      });
+      return;
+    }
+    // NotStarted — bypass inline
+    this.dialogService.confirm({
+      title:        'Bypass KYC Verification',
+      message:      `Administratively approve KYC for <strong>${user.fullName}</strong>?<br><br>This skips document verification and marks the account as verified.`,
+      confirmText:  'Bypass',
+      confirmColor: 'warn'
+    }).subscribe(confirmed => {
+      if (!confirmed) return;
+      this.kycService.bypass(user.id, 'Admin bypass from user management').subscribe({
+        next: () => {
+          user.kycStatus = KycStatus.AdminBypassed;
+          this.cdr.detectChanges();
+        },
+        error: err => {
+          this.errorMessage = err.error?.message || 'Failed to bypass KYC.';
+          this.cdr.detectChanges();
+        }
+      });
     });
   }
 }

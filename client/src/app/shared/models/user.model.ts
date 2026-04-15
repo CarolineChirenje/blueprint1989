@@ -38,6 +38,7 @@ export interface UserManagementDto {
     isMfaEnabled: boolean;
     isEmailVerified: boolean;
     createdAt: string;
+    kycStatus: KycStatus;
 }
 
 export interface UserGroupMembershipDto {

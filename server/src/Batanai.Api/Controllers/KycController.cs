@@ -64,6 +64,15 @@ public class KycController : ControllerBase
         return Ok(items);
     }
 
+    [HttpGet("user/{userId:int}")]
+    public async Task<IActionResult> GetKycByUserId(int userId)
+    {
+        if (!IsAdminOrAbove()) return Forbid();
+        var doc = await _kycService.GetKycDocumentByUserIdAsync(userId);
+        if (doc == null) return NotFound(new { message = "No KYC document found for this user." });
+        return Ok(doc);
+    }
+
     [HttpPost("{id:int}/review")]
     public async Task<IActionResult> Review(int id, [FromBody] ReviewKycRequest request)
     {

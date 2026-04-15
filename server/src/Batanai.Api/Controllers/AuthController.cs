@@ -353,7 +353,8 @@ namespace Batanai.Api.Controllers
                 ActiveStatus = u.IsActive ? "Yes" : "No",
                 IsMfaEnabled = u.IsMfaEnabled,
                 IsEmailVerified = u.IsEmailVerified,
-                CreatedAt = _timeZoneService.ConvertFromUtc(u.CreatedAt)
+                CreatedAt = _timeZoneService.ConvertFromUtc(u.CreatedAt),
+                KycStatus = u.KycStatus
             }).ToList();
 
             return Ok(userDtos);

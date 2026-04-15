@@ -1,0 +1,94 @@
+<h2 mat-dialog-title>KYC Review — {{ data.userName }}</h2>
+
+<mat-dialog-content>
+
+  @if (isLoading) {
+    <div class="state"><mat-spinner diameter="32"></mat-spinner></div>
+  } @else if (errorMessage) {
+    <div class="error">{{ errorMessage }}</div>
+  } @else if (doc) {
+
+    <dl class="fields">
+      <dt>Full name on ID</dt>
+      <dd>{{ doc.fullNameOnId }}</dd>
+
+      <dt>ID type</dt>
+      <dd>{{ idTypeLabel(doc.idType) }}</dd>
+
+      @if (doc.idNumber) {
+        <dt>ID number</dt>
+        <dd>{{ doc.idNumber }}</dd>
+      }
+
+      <dt>Submitted</dt>
+      <dd>{{ doc.submittedAt | date: 'dd MMM yyyy, HH:mm' }}</dd>
+    </dl>
+
+    <div class="images-row">
+      @if (imagesLoading) {
+        <p class="loading-text">Loading documents…</p>
+      }
+
+      <div class="image-card">
+        <p class="image-label">Identity Document</p>
+        @if (docObjectUrl) {
+          <a [href]="docObjectUrl" download="identity-document" target="_blank" rel="noopener">
+            <img [src]="docObjectUrl" alt="Identity document" class="kyc-img" />
+          </a>
+        } @else if (!imagesLoading) {
+          <p class="image-missing">{{ doc.documentFileUrl ? 'Could not load image.' : 'Not uploaded.' }}</p>
+        }
+      </div>
+
+      <div class="image-card">
+        <p class="image-label">Selfie with Document</p>
+        @if (selfieObjectUrl) {
+          <a [href]="selfieObjectUrl" download="selfie-with-document" target="_blank" rel="noopener">
+            <img [src]="selfieObjectUrl" alt="Selfie with document" class="kyc-img" />
+          </a>
+        } @else if (!imagesLoading) {
+          <p class="image-missing">{{ doc.selfieWithIdFileUrl ? 'Could not load image.' : 'Not uploaded.' }}</p>
+        }
+      </div>
+    </div>
+
+    @if (doc.status !== KycStatus.PendingReview) {
+      <div class="already-reviewed">
+        This submission has already been reviewed (status: <strong>{{ doc.status }}</strong>).
+      </div>
+    }
+
+    @if (actionPanel === 'reject') {
+      <div class="reject-panel">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rejection reason</mat-label>
+          <textarea matInput [formControl]="rejectForm.controls['rejectionReason']"
+                    rows="3" maxlength="500"
+                    placeholder="Explain why the submission is being rejected…"></textarea>
+          <mat-error>Reason is required.</mat-error>
+        </mat-form-field>
+      </div>
+    }
+
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (doc && doc.status === KycStatus.PendingReview && !processing) {
+    @if (actionPanel === null) {
+      <button mat-stroked-button color="warn" (click)="actionPanel = 'reject'">Reject</button>
+      <button mat-flat-button color="primary" (click)="approve()">Approve</button>
+    }
+    @if (actionPanel === 'reject') {
+      <button mat-button (click)="actionPanel = null">Cancel</button>
+      <button mat-flat-button color="warn"
+              [disabled]="rejectForm.invalid"
+              (click)="reject()">Confirm Rejection</button>
+    }
+  } @else if (processing) {
+    <mat-spinner diameter="24"></mat-spinner>
+  } @else {
+    <button mat-button mat-dialog-close>Close</button>
+  }
+</mat-dialog-actions>
