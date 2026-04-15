@@ -14,6 +14,8 @@ const NOTIFICATION_CHECK_INTERVAL = 60000; // Check every minute
 
 // Default app icon
 const ICON = '/assets/icons/icon-192x192.png';
+// Monochrome badge for the Android notification status bar
+const BADGE = '/assets/icons/badge-96x96.png';
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -168,7 +170,6 @@ self.addEventListener('push', (event) => {
     title: 'Batanai Notification',
     body: 'You have a new notification.',
     icon: ICON,
-    badge: ICON,
     url: '/',
     type: 0
   };
@@ -184,8 +185,8 @@ self.addEventListener('push', (event) => {
   const notificationOptions = {
     body: payload.body,
     icon: payload.icon || ICON,
-    badge: payload.badge || ICON,
-    tag: `push-${payload.type}-${Date.now()}`,
+    badge: BADGE,
+    tag: `push-${payload.type}-${Date.now()}`,`
     requireInteraction: isPriorityType(payload.type),
     data: { url: payload.url, source: 'push', type: payload.type },
     actions: [
@@ -276,8 +277,8 @@ async function checkScheduledNotifications() {
         // Send the notification
         await self.registration.showNotification(notification.title, {
           body: notification.body,
-          icon: '/assets/icons/icon-192x192.png',
-          badge: '/assets/icons/icon-192x192.png',
+          icon: ICON,
+          badge: BADGE,
           tag: notification.id,
           requireInteraction: true,
           data: notification.data,
@@ -328,22 +329,17 @@ self.addEventListener('notificationclick', (event) => {
   // - Server push notifications carry a deep-link URL in notification.data.url
   // - Local timer notifications fall back to the BGL reading page
   const notifData = event.notification.data || {};
-  const deepLink  = notifData.source === 'push' && notifData.url
-    ? notifData.url
-    : '/admin/bgl-reading';
+  const deepLink  = notifData.url || '/notifications';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Try to focus an existing window on the target path
+      // Focus any existing app window and navigate it to the target path
       for (const client of clientList) {
-        if (client.url.includes(deepLink) && 'focus' in client) {
-          return client.focus();
+        if ('focus' in client) {
+          return client.focus().then(c => c.navigate(deepLink));
         }
       }
-      // Focus any open window and navigate it, or open a new one
-      if (clientList.length > 0 && 'navigate' in clientList[0]) {
-        return clientList[0].focus().then(c => c.navigate(deepLink));
-      }
+      // No window open — open a new one
       if (self.clients.openWindow) {
         return self.clients.openWindow(deepLink);
       }

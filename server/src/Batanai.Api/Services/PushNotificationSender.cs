@@ -170,7 +170,7 @@ public class PushNotificationSender : IPushNotificationSender
             title,
             body,
             icon = "/assets/icons/icon-192x192.png",
-            badge = "/assets/icons/icon-192x192.png",
+            badge = "/assets/icons/badge-96x96.png",
             url = url ?? "/",
             type = (int)type,
             relatedEntityId = relatedEntityId,

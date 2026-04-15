@@ -21,6 +21,18 @@ const maskableSvgBuf = Buffer.from(
   regularSvgBuf.toString().replace('id="icon-bg" width="512" height="512" rx="72"', 'id="icon-bg" width="512" height="512" rx="0"')
 );
 
+// Build badge SVG: white monochrome on transparent background.
+// Android renders the `badge` field in the notification status bar as a small
+// mono silhouette — sending a full-colour icon produces a "white blob".
+// We strip the background rect and force every fill/stroke to white.
+const badgeSvgBuf = Buffer.from(
+  regularSvgBuf.toString()
+    .replace(/<rect id="icon-bg"[^>]*\/>/g, '')
+    .replace(/(fill|stroke):\s*#[0-9A-Fa-f]{3,8}/g, '$1: #ffffff')
+    .replace(/fill="#[0-9A-Fa-f]{3,8}"/g, 'fill="#ffffff"')
+    .replace(/stroke="#[0-9A-Fa-f]{3,8}"/g, 'stroke="#ffffff"')
+);
+
 async function rasterize(svgBuf, outPath, size) {
   await sharp(svgBuf, { density: Math.round(size * 72 / 512) })
     .resize(size, size)
@@ -39,6 +51,9 @@ async function run() {
   // Maskable icons (full-bleed, OS applies its own mask)
   await rasterize(maskableSvgBuf, join(iconsDir, 'icon-maskable-512x512.png'), 512);
   await rasterize(maskableSvgBuf, join(iconsDir, 'icon-maskable-192x192.png'), 192);
+
+  // Badge icon (96×96 white monochrome — used for the Android notification status bar badge)
+  await rasterize(badgeSvgBuf, join(iconsDir, 'badge-96x96.png'), 96);
 
   // Intermediate PNGs for favicon.ico (multi-size)
   const fav48 = join(iconsDir, '_fav48.png');
