@@ -5,10 +5,10 @@ import { environment } from '../../../environments/environment';
 import { KycStatus } from '../../shared/models/user.model';
 
 export enum KycIdType {
-  NationalId = 0,
-  Passport = 1,
-  DriversLicense = 2,
-  NoDocument = 3
+  NationalId = 'NationalId',
+  Passport = 'Passport',
+  DriversLicense = 'DriversLicense',
+  NoDocument = 'NoDocument'
 }
 
 export interface KycStatusDto {

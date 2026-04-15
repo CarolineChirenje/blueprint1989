@@ -5,11 +5,11 @@ export enum Role {
 }
 
 export enum KycStatus {
-    NotStarted = 0,
-    PendingReview = 1,
-    Verified = 2,
-    Rejected = 3,
-    AdminBypassed = 4
+    NotStarted = 'NotStarted',
+    PendingReview = 'PendingReview',
+    Verified = 'Verified',
+    Rejected = 'Rejected',
+    AdminBypassed = 'AdminBypassed'
 }
 
 export interface User {

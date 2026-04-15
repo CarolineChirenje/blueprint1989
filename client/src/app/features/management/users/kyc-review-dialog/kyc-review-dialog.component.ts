@@ -20,15 +20,17 @@ export class KycReviewDialogComponent implements OnInit, OnDestroy {
   doc: KycDocumentDto | null = null;
   isLoading = false;
   errorMessage = '';
+  noSubmission = false;
 
   docObjectUrl:    string | null = null;
   selfieObjectUrl: string | null = null;
   imagesLoading = false;
 
-  actionPanel: 'approve' | 'reject' | null = null;
+  actionPanel: 'approve' | 'reject' | 'bypass' | null = null;
   processing = false;
 
   rejectForm: FormGroup;
+  bypassForm: FormGroup;
 
   readonly KycIdType = KycIdType;
   readonly KycStatus = KycStatus;
@@ -42,6 +44,9 @@ export class KycReviewDialogComponent implements OnInit, OnDestroy {
   ) {
     this.rejectForm = this.fb.group({
       rejectionReason: ['', [Validators.required, Validators.maxLength(500)]]
+    });
+    this.bypassForm = this.fb.group({
+      note: ['Admin bypass — no document available', [Validators.required, Validators.maxLength(500)]]
     });
   }
 
@@ -69,7 +74,12 @@ export class KycReviewDialogComponent implements OnInit, OnDestroy {
         this.loadImages(doc);
       },
       error: err => {
-        this.errorMessage = err?.error?.message ?? 'Failed to load KYC document.';
+        if (err?.status === 404) {
+          this.noSubmission = true;
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = err?.error?.message ?? 'Failed to load KYC document.';
+        }
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -127,6 +137,20 @@ export class KycReviewDialogComponent implements OnInit, OnDestroy {
       next: () => this.dialogRef.close('rejected'),
       error: err => {
         this.errorMessage = err?.error?.message ?? 'Rejection failed.';
+        this.processing = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  bypass(): void {
+    if (this.bypassForm.invalid) return;
+    this.processing = true;
+    const note = this.bypassForm.value.note;
+    this.kycService.bypass(this.data.userId, note).subscribe({
+      next: () => this.dialogRef.close('bypassed'),
+      error: err => {
+        this.errorMessage = err?.error?.message ?? 'Bypass failed.';
         this.processing = false;
         this.cdr.detectChanges();
       }

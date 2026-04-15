@@ -6,6 +6,10 @@
     <div class="state"><mat-spinner diameter="32"></mat-spinner></div>
   } @else if (errorMessage) {
     <div class="error">{{ errorMessage }}</div>
+  } @else if (noSubmission) {
+    <div class="already-reviewed">
+      This user has not submitted any KYC documents yet.
+    </div>
   } @else if (doc) {
 
     <dl class="fields">
@@ -54,7 +58,8 @@
 
     @if (doc.status !== KycStatus.PendingReview) {
       <div class="already-reviewed">
-        This submission has already been reviewed (status: <strong>{{ doc.status }}</strong>).
+        Status: <strong>{{ doc.status === KycStatus.Verified ? 'Verified' : doc.status === KycStatus.Rejected ? 'Rejected' : doc.status === KycStatus.AdminBypassed ? 'Admin Bypassed' : 'Unknown' }}</strong>
+        @if (doc.rejectionReason) { — {{ doc.rejectionReason }} }
       </div>
     }
 
@@ -72,22 +77,36 @@
 
   }
 
+  @if ((noSubmission || (doc && doc.status !== KycStatus.Verified && doc.status !== KycStatus.AdminBypassed)) && actionPanel === 'bypass') {
+    <div class="reject-panel">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Bypass note</mat-label>
+        <textarea matInput [formControl]="bypassForm.controls['note']"
+                  rows="2" maxlength="500"
+                  placeholder="Reason for manual approval…"></textarea>
+        <mat-error>Note is required.</mat-error>
+      </mat-form-field>
+    </div>
+  }
+
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  @if (doc && doc.status === KycStatus.PendingReview && !processing) {
-    @if (actionPanel === null) {
-      <button mat-stroked-button color="warn" (click)="actionPanel = 'reject'">Reject</button>
-      <button mat-flat-button color="primary" (click)="approve()">Approve</button>
-    }
-    @if (actionPanel === 'reject') {
-      <button mat-button (click)="actionPanel = null">Cancel</button>
-      <button mat-flat-button color="warn"
-              [disabled]="rejectForm.invalid"
-              (click)="reject()">Confirm Rejection</button>
-    }
-  } @else if (processing) {
+  @if (processing) {
     <mat-spinner diameter="24"></mat-spinner>
+  } @else if (actionPanel === 'reject') {
+    <button mat-button (click)="actionPanel = null">Cancel</button>
+    <button mat-flat-button color="warn" [disabled]="rejectForm.invalid" (click)="reject()">Confirm Rejection</button>
+  } @else if (actionPanel === 'bypass') {
+    <button mat-button (click)="actionPanel = null">Cancel</button>
+    <button mat-flat-button color="accent" [disabled]="bypassForm.invalid" (click)="bypass()">Confirm Bypass</button>
+  } @else if (doc && doc.status === KycStatus.PendingReview) {
+    <button mat-stroked-button (click)="actionPanel = 'bypass'">Bypass</button>
+    <button mat-stroked-button color="warn" (click)="actionPanel = 'reject'">Reject</button>
+    <button mat-flat-button color="primary" (click)="approve()">Approve</button>
+  } @else if (noSubmission || (doc && doc.status === KycStatus.Rejected)) {
+    <button mat-stroked-button color="accent" (click)="actionPanel = 'bypass'">Bypass KYC</button>
+    <button mat-button mat-dialog-close>Close</button>
   } @else {
     <button mat-button mat-dialog-close>Close</button>
   }
