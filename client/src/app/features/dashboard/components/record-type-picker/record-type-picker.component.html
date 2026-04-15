@@ -1,0 +1,21 @@
+@if (visible) {
+  <div class="type-picker-overlay" role="dialog" aria-modal="true" aria-label="Select recording type" (click)="cancel()">
+    <div class="type-picker-card" (click)="$event.stopPropagation()">
+      <h2>What would you like to record?</h2>
+      <p>Choose a type to get started with your new recording</p>
+      <div class="type-options">
+        <button class="type-btn diabetes-btn" (click)="select('diabetes')">
+          <span class="type-icon">🩸</span>
+          <span class="type-label">BGL Assessment</span>
+          <span class="type-desc">Record a supervised blood glucose assessment</span>
+        </button>
+        <button class="type-btn bp-btn" (click)="select('bp')">
+          <span class="type-icon">❤️</span>
+          <span class="type-label">Blood Pressure Session</span>
+          <span class="type-desc">Record a blood pressure reading session</span>
+        </button>
+      </div>
+      <button class="cancel-picker-btn" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+}

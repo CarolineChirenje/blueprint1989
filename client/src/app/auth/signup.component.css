@@ -1,0 +1,733 @@
+/* Styles for signup component */
+
+/* Full-page centering — same pattern as login */
+.signup-page {
+  margin: -2rem;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 2rem 1rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px) + 80px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 2rem 2.5rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  color-scheme: light;
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 520px) {
+  .signup-page {
+    margin: -1rem;
+    padding: 1.25rem 0.85rem;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px) + 80px);
+    justify-content: flex-start;
+  }
+  .signup-card { padding: 1.5rem; border-radius: var(--radius-md); }
+}
+
+.signup-card h1 {
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.signup-card label { 
+  display: block; 
+  margin-top: 1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+/* All form controls share the same font and size */
+.signup-card input,
+.signup-card select,
+.signup-card button {
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+.signup-card input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.375rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--primary-subtle);
+  color: var(--text-primary);
+  box-sizing: border-box;
+  color-scheme: light;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.signup-card input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12);
+}
+
+.signup-card button { 
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.signup-card a {
+  display: block;
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.signup-card a:hover {
+  text-decoration: underline;
+}
+
+.error {
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--error);
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Success message styles */
+.success-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--success-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 48px;
+  color: var(--success);
+  font-weight: bold;
+}
+
+.success-message h2 {
+  color: var(--success);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.success-message > p {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 16px;
+}
+
+.mfa-prompt {
+  margin-top: 2rem;
+}
+
+.mfa-info {
+  background: var(--primary-subtle);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.shield-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.mfa-info h3 {
+  color: var(--primary);
+  margin: 0 0 0.5rem 0;
+  font-size: 18px;
+}
+
+.mfa-info p {
+  color: #555;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  width: 100%;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:disabled {
+  background: var(--border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--primary-subtle);
+  transform: translateY(-1px);
+}
+
+.login-link-btn {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: var(--primary);
+  color: white !important;
+  text-decoration: none !important;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.login-link-btn:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+/* Error message styles */
+.error-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--error-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 48px;
+  color: var(--error);
+  font-weight: bold;
+}
+
+.error-message h2 {
+  color: var(--error);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.error-message p {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.retry-btn {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: var(--error);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.retry-btn:hover {
+  background: #A71E1E;
+}
+
+/* ── Role picker ── */
+.form-section {
+  margin-top: 1.5rem;
+}
+
+.section-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+.required {
+  color: var(--error);
+}
+
+.role-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  user-select: none;
+}
+
+.role-card:hover {
+  border-color: var(--primary);
+  background: var(--primary-subtle);
+}
+
+.role-card.selected {
+  border-color: var(--primary-dark);
+  background: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.15);
+}
+
+.role-card-icon {
+  font-size: 1.35rem;
+  margin-bottom: 0.35rem;
+  line-height: 1;
+  transition: filter 0.2s;
+}
+
+.role-card.selected .role-card-icon {
+  filter: brightness(0.8);
+}
+
+.role-card-title {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.9375rem;
+  font-family: inherit;
+}
+
+.role-card-desc {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* ── Conditional sections ── */
+.conditional-section {
+  background: var(--primary-subtle);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.conditional-heading {
+  color: var(--primary);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.conditional-hint {
+  font-size: 0.8125rem;
+  color: #555;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Select inside form */
+.signup-card select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.375rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.signup-card select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.1);
+}
+
+.submit-btn {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  padding: 0.85rem;
+  min-height: 48px;
+  /* font-family and font-size inherited from the shared rule above */
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+.submit-btn-blue {
+  background: #1565C0;
+  color: white;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.1s;
+}
+
+.submit-btn-blue:hover:not(:disabled):not(.form-ready) {
+  background: #0D47A1;
+  transform: translateY(-1px);
+}
+
+.submit-btn-blue:disabled {
+  background: #90CAF9;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.submit-btn-blue.form-ready {
+  background: #1a5c36;
+  box-shadow: 0 0 0 3px rgba(26, 92, 54, 0.25);
+}
+
+.submit-btn-blue.form-ready:hover:not(:disabled) {
+  background: #145229;
+  transform: translateY(-1px);
+}
+
+.submit-btn-blue:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 0.05s;
+}
+
+/* ─── Conditions / Medication signup styles ─────────────────────────────── */
+.section-sublabel {
+  display: block;
+  margin-top: 1.25rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--primary);
+}
+
+.condition-row-signup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.condition-row-signup:last-child {
+  border-bottom: none;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.year-input {
+  flex: 1;
+  min-width: 160px;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.medication-section {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  background: var(--primary-subtle);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.medication-heading {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+
+.med-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.med-col {
+  flex: 1;
+}
+
+
+/* Radio option groups in signup (diabetes medication delivery route) */
+.radio-options {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 0.8rem;
+}
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.radio-label input[type="radio"] {
+  width: auto;
+  margin: 0;
+}
+
+/* ─── Email verification flow (success screen) ─────────────────────────── */
+
+.verify-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--info-bg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.verify-icon .material-icons {
+  font-size: 40px;
+  color: var(--info);
+}
+
+.success-icon .material-icons {
+  font-size: 40px;
+}
+
+.email-display {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--primary-subtle);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+.resend-row {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 1rem 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.resend-row button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+  margin: 0;
+  width: auto;
+}
+
+.resend-row button:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+  text-decoration: none;
+}
+
+.go-back-link {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 0.75rem;
+  min-height: 44px;
+  line-height: 1.5;
+}
+
+.go-back-link a {
+  color: var(--primary);
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.go-back-link a:hover {
+  color: var(--primary-hover);
+}
+
+/* Spinner animation for send button */
+.spinner {
+  font-size: 1.125rem;
+  vertical-align: middle;
+  margin-right: 0.35rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Responsive: mobile ─── */
+@media (max-width: 520px) {
+  .success-message {
+    padding: 1.25rem 0;
+  }
+
+  .verify-icon,
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+  }
+
+  .verify-icon .material-icons,
+  .success-icon .material-icons {
+    font-size: 32px;
+  }
+
+  .email-display {
+    font-size: 0.9375rem;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .success-message h2 {
+    font-size: 1.25rem;
+  }
+}
+
+/* ─── Responsive: tablet+ ─── */
+@media (min-width: 768px) {
+  .email-display {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  /* Reduce the tall top margin so the card sits near the top on mobile */
+  .signup-card {
+    margin: 1rem auto;
+    border-radius: 12px;
+  }
+
+  /* Role picker: single column on narrow screens */
+  .role-picker {
+    grid-template-columns: 1fr;
+  }
+
+  /* Medication row fields: stack vertically */
+  .med-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Condition row: stack checkbox label above year input */
+  .condition-row-signup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .checkbox-label {
+    min-width: unset;
+  }
+
+  .year-input {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* Ensure submit button has adequate tap target */
+  .submit-btn {
+    min-height: 44px;
+  }
+}

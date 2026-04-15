@@ -1,0 +1,94 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="assets/icons/logo-full.svg" alt="Batanai" class="login-logo" />
+    </div>
+
+    @if (loginState !== 'idle') {
+      <div class="login-lock-overlay" [class.unlocked]="loginState === 'unlocked'" aria-live="assertive">
+        <span class="material-icons lock-icon"
+              [class.lock-spin]="loginState === 'processing'"
+              [class.lock-open]="loginState === 'unlocked'">
+          {{ loginState === 'unlocked' ? 'lock_open' : 'lock' }}
+        </span>
+        <p class="lock-label">
+          {{ loginState === 'unlocked' ? '👏🏾 Titambire!' : 'Verifying…' }}
+        </p>
+      </div>
+    } @else if (emailUnverified) {
+      <div class="email-unverified-panel" aria-live="polite">
+        <span class="material-icons unverified-icon">mark_email_unread</span>
+        <h3>Verify your email</h3>
+        <p>Your email address has not been verified yet. Please check your inbox for the verification link we sent when you signed up.</p>
+
+        <div class="email-tip">
+          <span class="material-icons">info</span>
+          <div>
+            Check your <strong>Spam</strong> or <strong>Junk</strong> folder especially if you use
+            Yahoo, Hotmail or Outlook. Still can't find it? Contact an Admin with proof this email belongs to you.
+          </div>
+        </div>
+
+        @if (resendState === 'sent') {
+          <p class="resend-success">Verification email sent! Check your inbox and spam folder.</p>
+        } @else {
+          <button class="submit-btn submit-btn-blue" (click)="resendVerification()" [disabled]="resendState === 'sending'">
+            {{ resendState === 'sending' ? 'Sending…' : 'Resend Verification Email' }}
+          </button>
+          @if (resendMessage) {
+            <p class="resend-error">{{ resendMessage }}</p>
+          }
+        }
+
+        <button class="submit-btn submit-btn-outline" (click)="dismissEmailUnverified()">Back to Login</button>
+      </div>
+    } @else if (mfaFormVisible) {
+      <div class="mfa-form">
+        <p class="mfa-instruction">Enter the 6-digit code from your authenticator app or use a backup code.</p>
+        <form [formGroup]="mfaForm" (ngSubmit)="verifyMfa()">
+          <label>Authenticator Code</label>
+          <input
+            type="text"
+            formControlName="code"
+            placeholder="Enter 6-digit code"
+            maxlength="6"
+            autocomplete="one-time-code" />
+          <button type="submit" class="submit-btn submit-btn-blue" [disabled]="mfaForm.invalid">Verify Code</button>
+          <button type="button" class="submit-btn submit-btn-outline" (click)="cancelMfa()">Back to Login</button>
+        </form>
+      </div>
+    } @else {
+      <form [formGroup]="loginForm" (ngSubmit)="submit()">
+        <label>Email</label>
+        <input type="email" formControlName="email" />
+
+        @if (!isBiometricLogin) {
+          <label>Password</label>
+          <app-password-field formControlName="password" [autocomplete]="'current-password'"></app-password-field>
+          <div class="remember-me-row">
+            <label class="remember-me-label">
+              <input type="checkbox" formControlName="rememberMe" />
+              Remember me
+            </label>
+            <a class="forgot-password-link" [routerLink]="['/forgot-password']">
+              Forgot Password?
+            </a>
+          </div>
+        }
+
+        <div class="login-actions">
+          <button type="submit" class="submit-btn submit-btn-blue" [disabled]="loginForm.invalid">
+            Login
+          </button>
+          <button type="button" class="submit-btn submit-btn-green" [routerLink]="['/signup']">Create Account</button>
+        </div>
+      </form>
+    }
+
+    @if (errorMessage) {
+      <div class="error-message">
+        {{ errorMessage }}
+      </div>
+    }
+  </div>
+</div>

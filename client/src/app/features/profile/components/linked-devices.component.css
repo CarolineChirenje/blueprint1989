@@ -1,0 +1,289 @@
+.linked-devices-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color-scheme: light;
+  color: var(--text-primary);
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1.5px solid var(--success-border);
+}
+
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1.5px solid var(--error-border);
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.devices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.device-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.device-card.current-device {
+  border-color: var(--primary);
+  background: var(--primary-subtle);
+}
+
+.device-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.device-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.device-card.current-device .device-icon {
+  background: var(--primary-dark);
+  color: #fff;
+}
+
+.device-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.device-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.device-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.15rem;
+}
+
+.current-badge {
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.device-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.device-status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.install-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+}
+
+.install-status-installed {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.install-status-neveraskagain {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.install-status-remindlater {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.last-seen {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.reset-prompt-row {
+  margin-top: 0.4rem;
+}
+
+.reset-prompt-btn {
+  background: none;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.reset-prompt-btn:hover {
+  background: var(--primary-subtle);
+}
+
+.remove-btn {
+  background: none;
+  border: 1.5px solid var(--error-border);
+  color: var(--error);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.remove-btn:hover {
+  background: var(--error-bg);
+}
+
+.back-link {
+  margin-top: 2rem;
+}
+
+.back-link a {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+/* ── Device rename ────────────────────────────────── */
+.rename-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  line-height: 1;
+}
+
+.rename-btn:hover { color: var(--primary); }
+
+.rename-btn .material-icons { font-size: 1rem; }
+
+.rename-input {
+  flex: 1;
+  min-width: 140px;
+  padding: 4px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.rename-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12); }
+
+.rename-save-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rename-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.rename-save-btn:not(:disabled):hover { background: var(--primary-hover); }
+
+.rename-cancel-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.rename-cancel-btn:hover { background: var(--surface-raised); }
+
+/* ── Platform badge ───────────────────────────────── */
+.platform-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-right: 4px;
+}
+
+.platform-badge-android  { background: var(--success-bg); color: var(--success); }
+.platform-badge-ios      { background: var(--info-bg); color: var(--info); }
+.platform-badge-desktop  { background: #ede7f6; color: #4527a0; }
+.platform-badge-unknown  { background: var(--surface-raised); color: var(--text-secondary); }

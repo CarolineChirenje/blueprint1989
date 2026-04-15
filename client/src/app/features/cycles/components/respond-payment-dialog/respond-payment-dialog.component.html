@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Respond to Payment</h2>
+
+<mat-dialog-content>
+  <div class="payment-summary">
+    <p><strong>From:</strong> {{ data.payment.payerFirstName }} {{ data.payment.payerLastName }}</p>
+    <p><strong>Amount:</strong> ${{ data.payment.amount | number:'1.2-2' }}</p>
+    @if (data.payment.notes) {
+      <p><strong>Note:</strong> {{ data.payment.notes }}</p>
+    }
+  </div>
+
+  <mat-form-field appearance="outline" class="full-width" style="margin-top:12px">
+    <mat-label>Your notes (optional)</mat-label>
+    <textarea matInput [formControl]="notes" rows="3" placeholder="Add a note…"></textarea>
+  </mat-form-field>
+
+  @if (error) {
+    <p class="error-msg">{{ error }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()" [disabled]="saving">Cancel</button>
+  <button mat-raised-button color="warn" (click)="respond(false)" [disabled]="saving">Reject</button>
+  <button mat-raised-button color="primary" (click)="respond(true)" [disabled]="saving">
+    {{ saving ? 'Saving…' : 'Confirm Receipt' }}
+  </button>
+</mat-dialog-actions>

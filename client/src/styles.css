@@ -1,0 +1,1839 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import 'shepherd.js/dist/css/shepherd.css';
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-700.css';
+
+/*
+ * Safety: hide fixed PWA banners when auth pages are displayed.
+ * These banners (z-index:9999, position:fixed, bottom:0) can cover form buttons.
+ * The JS also hides them, but this catches race conditions on first paint.
+ */
+body:has(app-signup) .pwa-install-banner,
+body:has(app-signup) .pwa-update-banner,
+body:has(app-login) .pwa-install-banner,
+body:has(app-login) .pwa-update-banner,
+body:has(app-forgot-password) .pwa-install-banner,
+body:has(app-forgot-password) .pwa-update-banner,
+body:has(app-reset-password) .pwa-install-banner,
+body:has(app-reset-password) .pwa-update-banner {
+  display: none !important;
+}
+
+/* Ensure all form controls/buttons on auth pages receive touch events */
+app-signup, app-login, app-signup *, app-login * {
+  touch-action: manipulation;
+}
+
+/* ── Shepherd.js Tour Theme (batanaiBlue) ───────────────────────────────── */
+.shepherd-has-cancel-icon .shepherd-cancel-icon {
+  color: #666;
+}
+.shepherd-has-cancel-icon .shepherd-cancel-icon:hover {
+  color: #333;
+}
+
+.shepherd-element {
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1px solid var(--border) !important;
+  max-width: 340px !important;
+  font-family: inherit !important;
+  background: #ffffff !important;
+}
+
+.shepherd-element.shepherd-mobile {
+  max-width: min(92vw, 360px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  position: fixed !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.shepherd-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%) !important;
+  border-radius: 7px 7px 0 0 !important;
+  padding: 14px 16px 12px !important;
+}
+
+.shepherd-title {
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+.shepherd-text {
+  padding: 14px 16px !important;
+  color: #253128 !important;
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+}
+
+.shepherd-footer {
+  padding: 0 16px 14px !important;
+  gap: 8px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  background: #ffffff !important;
+}
+
+/* Primary (Next / Start / Done) */
+.shepherd-btn-primary {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 7px 18px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+}
+.shepherd-btn-primary:hover {
+  background: var(--primary-hover) !important;
+}
+
+/* Secondary (Back) */
+.shepherd-btn-secondary {
+  background: transparent !important;
+  color: var(--primary) !important;
+  border: 1px solid var(--primary) !important;
+  border-radius: 4px !important;
+  padding: 6px 16px !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
+}
+.shepherd-btn-secondary:hover {
+  background: rgba(62, 180, 137, 0.1) !important;
+}
+
+/* Skip */
+.shepherd-btn-skip {
+  background: transparent !important;
+  color: #5F6B62 !important;
+  border: none !important;
+  padding: 6px 10px !important;
+  font-size: 0.8rem !important;
+  cursor: pointer !important;
+  margin-right: auto !important;
+}
+.shepherd-btn-skip:hover {
+  color: #253128 !important;
+  text-decoration: underline !important;
+}
+
+/* Welcome / finish steps — slightly wider */
+.shepherd-welcome.shepherd-element {
+  max-width: 380px !important;
+}
+
+/* Inspired by Arya step */
+.shepherd-inspired.shepherd-element {
+  max-width: 320px !important;
+  text-align: center !important;
+}
+.shepherd-inspired .shepherd-title {
+  font-size: 1.2rem !important;
+  letter-spacing: 0.01em !important;
+  justify-content: center !important;
+}
+.shepherd-inspired .shepherd-text {
+  text-align: center !important;
+  padding: 8px 16px 12px !important;
+}
+.shepherd-inspired .shepherd-footer {
+  justify-content: center !important;
+}
+.inspired-heart {
+  font-size: 4rem;
+  display: block;
+  margin: 0 auto 10px;
+  animation: inspired-heartbeat 1.4s ease-in-out infinite;
+  transform-origin: center;
+  line-height: 1;
+}
+.inspired-tagline {
+  font-size: 0.88rem;
+  color: #555;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+@keyframes inspired-heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.2); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.12); }
+  70%       { transform: scale(1); }
+}
+
+/* Modal overlay */
+.shepherd-modal-overlay-container .shepherd-modal-overlay {
+  fill: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Arrow */
+.shepherd-arrow::before {
+  background: var(--primary) !important;
+}
+
+/* Responsive: ensure nav steps don't go off-screen on small viewports */
+@media (max-width: 767px) {
+  .shepherd-element:not(.shepherd-mobile) {
+    max-width: 92vw !important;
+  }
+  /* Touch-friendly buttons on mobile */
+  .shepherd-footer .shepherd-button,
+  .shepherd-btn-primary,
+  .shepherd-btn-secondary,
+  .shepherd-btn-skip {
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .shepherd-footer {
+    padding-bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Tablet: slightly wider tooltip, comfortable spacing */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .shepherd-element {
+    max-width: 380px !important;
+  }
+  .shepherd-text {
+    padding: 16px 18px !important;
+  }
+  .shepherd-footer .shepherd-button,
+  .shepherd-btn-primary,
+  .shepherd-btn-secondary {
+    min-height: 44px !important;
+    padding: 8px 20px !important;
+  }
+}
+
+/* Landscape phone: reduce padding so steps fit without scroll */
+@media (max-height: 500px) and (orientation: landscape) {
+  .shepherd-header {
+    padding: 10px 14px 8px !important;
+  }
+  .shepherd-title {
+    font-size: 0.9rem !important;
+  }
+  .shepherd-text {
+    padding: 8px 14px !important;
+    font-size: 0.82rem !important;
+  }
+  .shepherd-footer {
+    padding: 0 14px 8px !important;
+  }
+}
+
+/* Ensure tour sits above Angular Material overlays + mobile nav */
+.shepherd-element {
+  z-index: 10010 !important;
+}
+.shepherd-modal-overlay-container {
+  z-index: 10000 !important;
+}
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+.submit-btn-blue {
+  background: #1565C0;
+  color: white;
+}
+
+.submit-btn-blue:hover:not(:disabled):not(.form-ready) {
+  background: #0D47A1;
+}
+
+.submit-btn-blue.form-ready {
+  background: #1a5c36;
+  box-shadow: 0 0 0 3px rgba(26, 92, 54, 0.25);
+}
+
+.submit-btn-blue.form-ready:hover:not(:disabled) {
+  background: #145229;
+}
+
+.submit-btn-green {
+  background: var(--primary) !important;
+  color: white;
+}
+
+.submit-btn-green:hover:not(:disabled) {
+  background: var(--primary-hover) !important;
+}
+/* Shared button and alert styles */
+.submit-btn {
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-btn:disabled {
+  background: var(--border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.text-danger {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  align-self: safe;
+}
+
+/* ─── Shared email tip callout (signup + login) ─────────────────────────── */
+.email-tip {
+  display: flex;
+  gap: 0.75rem;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin: 1.25rem 0;
+  text-align: left;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.email-tip .material-icons {
+  color: var(--warning);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 520px) {
+  .email-tip {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.875rem;
+  }
+
+  .email-tip .material-icons {
+    align-self: flex-start;
+  }
+}
+
+@media (min-width: 768px) {
+  .email-tip {
+    font-size: 0.875rem;
+    padding: 1.25rem;
+  }
+}
+/* Design Tokens — Batanai Green Theme */
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --primary:           #237A49;
+  --primary-hover:     #1D643C;
+  --primary-dark:      #1A5735;
+  --primary-light:     #E9F3EC;
+  --primary-subtle:    #F0F7F2;
+
+  /* Surface */
+  --bg:                #F7F5F0;
+  --surface:           #FFFFFF;
+  --surface-raised:    #FAFAF8;
+  --border:            #D9E2DA;
+  --border-focus:      #237A49;
+  --divider:           #E8EDE9;
+
+  /* Text */
+  --text-primary:      #253128;
+  --text-secondary:    #5F6B62;
+  --text-disabled:     #9EA8A0;
+  --text-on-primary:   #FFFFFF;
+
+  /* Semantic */
+  --success:           #2E7D32;
+  --success-bg:        #EBF5EC;
+  --success-border:    #A5D6A7;
+  --warning:           #D98E04;
+  --warning-bg:        #FEF7EC;
+  --warning-border:    #F5C14E;
+  --warning-text:      #7A4600;
+  --error:             #C62828;
+  --error-bg:          #FFEBEE;
+  --error-border:      #EF9A9A;
+  --info:              #1565C0;
+  --info-bg:           #E3F2FD;
+  --info-border:       #90CAF9;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 4px rgba(37, 49, 40, 0.08);
+  --shadow-md: 0 4px 16px rgba(37, 49, 40, 0.12);
+  --shadow-lg: 0 8px 32px rgba(37, 49, 40, 0.15);
+
+  /* Radius */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+
+  /* Angular Material MDC overrides */
+  --mdc-theme-primary:                                  #237A49;
+  --mdc-theme-on-primary:                               #FFFFFF;
+  --mdc-theme-secondary:                                #237A49;
+  --mdc-theme-surface:                                  #FFFFFF;
+  --mdc-theme-background:                               #F7F5F0;
+  --mdc-theme-error:                                    #C62828;
+  --mdc-filled-text-field-active-indicator-color:       #237A49;
+  --mdc-filled-text-field-focus-active-indicator-color: #237A49;
+  --mdc-filled-text-field-focus-label-text-color:       #237A49;
+  --mdc-filled-text-field-container-color:              #F0F7F2;
+  --mdc-outlined-text-field-focus-outline-color:        #237A49;
+  --mdc-outlined-text-field-focus-label-text-color:     #237A49;
+  --mdc-checkbox-selected-icon-color:                   #237A49;
+  --mdc-checkbox-selected-hover-icon-color:             #1D643C;
+  --mdc-radio-selected-icon-color:                      #237A49;
+  --mdc-filled-button-container-color:                  #237A49;
+  --mdc-filled-button-label-text-color:                 #FFFFFF;
+  --mdc-linear-progress-active-indicator-color:         #237A49;
+  --mat-tab-header-active-label-text-color:             #237A49;
+  --mat-tab-header-active-indicator-color:              #237A49;
+  --mdc-switch-selected-track-color:                    #237A49;
+  --mdc-switch-selected-hover-track-color:              #1D643C;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ── Global Force-Dark prevention ──────────────────────────────────────────
+   Chrome Android "Force Dark" auto-inverts colours on native form controls
+   and Angular Material elements. In LIGHT mode only, color-scheme: light
+   opts them out entirely. In dark mode we let our own dark CSS take control.
+────────────────────────────────────────────────────────────────────────── */
+input:not(.mat-mdc-input-element),
+input[type="text"]:not(.mat-mdc-input-element),
+input[type="email"]:not(.mat-mdc-input-element),
+input[type="password"]:not(.mat-mdc-input-element),
+input[type="search"]:not(.mat-mdc-input-element),
+input[type="number"]:not(.mat-mdc-input-element),
+input[type="tel"]:not(.mat-mdc-input-element),
+input[type="url"]:not(.mat-mdc-input-element),
+input[type="date"]:not(.mat-mdc-input-element),
+input[type="time"]:not(.mat-mdc-input-element),
+textarea:not(.mat-mdc-input-element),
+select:not([class*="mat-"]) {
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+@media (prefers-color-scheme: light) {
+  input:not(.mat-mdc-input-element),
+  input[type="text"]:not(.mat-mdc-input-element),
+  input[type="email"]:not(.mat-mdc-input-element),
+  input[type="password"]:not(.mat-mdc-input-element),
+  input[type="search"]:not(.mat-mdc-input-element),
+  input[type="number"]:not(.mat-mdc-input-element),
+  input[type="tel"]:not(.mat-mdc-input-element),
+  input[type="url"]:not(.mat-mdc-input-element),
+  input[type="date"]:not(.mat-mdc-input-element),
+  input[type="time"]:not(.mat-mdc-input-element),
+  textarea:not(.mat-mdc-input-element),
+  select:not([class*="mat-"]) {
+    color-scheme: light;
+  }
+}
+
+/* Angular Material MDC form fields, selects, options, autocomplete */
+.mat-mdc-form-field,
+.mat-mdc-text-field-wrapper,
+.mat-mdc-input-element,
+.mat-mdc-select,
+.mat-mdc-select-trigger,
+.mat-mdc-select-value,
+.mat-mdc-option,
+.mat-mdc-autocomplete-panel,
+.mdc-text-field,
+.mdc-text-field--filled,
+.mdc-text-field--outlined {
+  color: var(--text-primary) !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .mat-mdc-form-field,
+  .mat-mdc-text-field-wrapper,
+  .mat-mdc-input-element,
+  .mat-mdc-select,
+  .mat-mdc-select-trigger,
+  .mat-mdc-select-value,
+  .mat-mdc-option,
+  .mat-mdc-autocomplete-panel,
+  .mdc-text-field,
+  .mdc-text-field--filled,
+  .mdc-text-field--outlined {
+    color-scheme: light !important;
+  }
+}
+
+.mat-mdc-select-panel {
+  background-color: var(--surface) !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .mat-mdc-select-panel {
+    color-scheme: light !important;
+  }
+}
+
+.mat-mdc-option .mdc-list-item__primary-text {
+  color: var(--text-primary) !important;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  color-scheme: light dark;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: var(--bg);
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover,
+a:focus {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+/* Container */
+.container {
+  width: min(90%, 1200px);
+  margin: auto;
+}
+
+/* Header */
+.header {
+  background: var(--primary);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+/* Footer */
+.footer {
+  background: var(--primary);
+  color: white;
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: auto;
+  box-shadow: 0 -2px 8px rgba(37, 49, 40, 0.12);
+}
+
+/* Buttons */
+.button {
+  display: inline-block;
+  font-size: 0.9375rem;
+  color: white;
+  background: var(--primary);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+.button:hover {
+  background: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.button:disabled {
+  background: var(--border);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button.secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+
+.button.secondary:hover {
+  background: var(--primary-light);
+}
+
+.button.danger {
+  background: var(--error);
+}
+
+.button.danger:hover {
+  background: #A71E1E;
+}
+
+/* Form Elements — excludes Angular Material's own inputs which are styled via MDC */
+.input-field,
+input[type="text"]:not(.mat-mdc-input-element),
+input[type="email"]:not(.mat-mdc-input-element),
+input[type="password"]:not(.mat-mdc-input-element),
+input[type="number"]:not(.mat-mdc-input-element),
+select:not([class*="mat-"]):not([class*="mdc-"]),
+textarea:not(.mat-mdc-input-element) {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 1rem;
+  background-color: var(--surface);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:not(.mat-mdc-input-element):focus,
+input[type="email"]:not(.mat-mdc-input-element):focus,
+input[type="password"]:not(.mat-mdc-input-element):focus,
+input[type="number"]:not(.mat-mdc-input-element):focus,
+select:not([class*="mat-"]):not([class*="mdc-"]):focus,
+textarea:not(.mat-mdc-input-element):focus {
+  outline: none;
+  border-color: var(--border-focus);
+  background-color: var(--surface);
+}
+
+textarea:not(.mat-mdc-input-element) {
+  resize: vertical;
+  min-height: 120px;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Section/Cards */
+.section,
+.card {
+  background: var(--surface);
+  padding: 2rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Comments Section */
+.comment-section {
+  margin-top: 2rem;
+  background: var(--surface);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.comment {
+  padding: 1rem;
+  margin: 0.5rem 0;
+  background-color: var(--primary-subtle);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--primary);
+}
+
+.comment-author {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.comment-date {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+thead {
+  background: var(--primary);
+}
+
+th {
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+tbody tr:hover {
+  background-color: var(--primary-subtle);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Messages */
+.success {
+  background-color: var(--success-bg);
+  color: var(--success);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  border-left: 5px solid var(--success-border);
+}
+
+.error,
+.danger {
+  background-color: var(--error-bg);
+  color: var(--error);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  border-left: 5px solid var(--error-border);
+}
+
+.warning {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  border-left: 5px solid var(--warning-border);
+}
+
+.info {
+  background-color: var(--info-bg);
+  color: var(--info);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  border-left: 5px solid var(--info-border);
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:              #0F1E14;
+    --surface:         #162719;
+    --surface-raised:  #1C3020;
+    --border:          #2E4A35;
+    --divider:         #243C2A;
+    --text-primary:    #D4E8D7;
+    --text-secondary:  #8FB89A;
+    --text-disabled:   #526358;
+    --primary-light:   #1C3A25;
+    --primary-subtle:  #162719;
+    --shadow-sm:       0 1px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md:       0 4px 16px rgba(0, 0, 0, 0.5);
+    --shadow-lg:       0 8px 32px rgba(0, 0, 0, 0.6);
+
+    /* Semantic colors — dark mode */
+    --success:           #4CAF50;
+    --success-bg:        #1B3A1E;
+    --success-border:    #2E5931;
+    --warning:           #FFB74D;
+    --warning-bg:        #3A2E10;
+    --warning-border:    #5C4A1A;
+    --warning-text:      #FFD180;
+    --error:             #EF5350;
+    --error-bg:          #3D1212;
+    --error-border:      #5D1A1A;
+    --info:              #42A5F5;
+    --info-bg:           #0D2740;
+    --info-border:       #1A3D5C;
+
+    /* Angular Material MDC dark overrides */
+    --mdc-theme-primary:                                  #3EB489;
+    --mdc-theme-on-primary:                               #FFFFFF;
+    --mdc-theme-secondary:                                #3EB489;
+    --mdc-theme-surface:                                  #162719;
+    --mdc-theme-background:                               #0F1E14;
+    --mdc-theme-error:                                    #EF5350;
+    --mdc-filled-text-field-active-indicator-color:       #3EB489;
+    --mdc-filled-text-field-focus-active-indicator-color: #3EB489;
+    --mdc-filled-text-field-focus-label-text-color:       #3EB489;
+    --mdc-filled-text-field-container-color:              #1C3020;
+    --mdc-outlined-text-field-focus-outline-color:        #3EB489;
+    --mdc-outlined-text-field-focus-label-text-color:     #3EB489;
+    --mdc-checkbox-selected-icon-color:                   #3EB489;
+    --mdc-checkbox-selected-hover-icon-color:             #35A07A;
+    --mdc-radio-selected-icon-color:                      #3EB489;
+    --mdc-filled-button-container-color:                  #237A49;
+    --mdc-filled-button-label-text-color:                 #FFFFFF;
+    --mdc-linear-progress-active-indicator-color:         #3EB489;
+    --mat-tab-header-active-label-text-color:             #3EB489;
+    --mat-tab-header-active-indicator-color:              #3EB489;
+    --mdc-switch-selected-track-color:                    #3EB489;
+    --mdc-switch-selected-hover-track-color:              #35A07A;
+
+    /* MDC card dark overrides */
+    --mdc-elevated-card-container-color:                  #162719;
+    --mdc-outlined-card-container-color:                  #162719;
+    --mat-card-elevated-container-color:                  #162719;
+    --mat-card-outlined-container-color:                  #162719;
+
+    /* MDC table dark overrides */
+    --mat-table-background-color:                         #162719;
+    --mat-sys-surface:                                    #162719;
+    --mat-table-row-item-outline-color:                   #2E4A35;
+    --mat-table-header-headline-color:                    #D4E8D7;
+    --mat-table-row-item-label-text-color:                #D4E8D7;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #A0D8C0;
+  }
+
+  .section,
+  .card,
+  .comment-section {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select,
+  textarea {
+    background-color: var(--surface-raised);
+    border-color: var(--border);
+    color: var(--text-primary);
+  }
+
+  .comment {
+    background-color: var(--surface-raised);
+    color: var(--text-primary);
+  }
+
+  table {
+    background: var(--surface);
+  }
+
+  .mat-mdc-table {
+    background: var(--surface) !important;
+  }
+
+  .mat-mdc-row,
+  .mat-mdc-header-row {
+    background: transparent !important;
+  }
+
+  .mat-mdc-cell {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--divider) !important;
+  }
+
+  .mat-mdc-row:hover {
+    background-color: var(--surface-raised) !important;
+  }
+
+  tbody tr:hover {
+    background-color: var(--surface-raised);
+  }
+
+  td {
+    border-bottom-color: var(--divider);
+  }
+
+  /* ── Material Dialog surfaces ─────────────────────────────────────── */
+  .mat-mdc-dialog-surface,
+  .mdc-dialog__surface,
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-dialog-title {
+    color: #A0D8C0 !important;
+  }
+
+  .mat-mdc-dialog-content {
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Material Card ────────────────────────────────────────────────── */
+  .mat-mdc-card,
+  .mdc-card,
+  mat-card {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+  }
+
+  /* ── Material Form Fields ─────────────────────────────────────────── */
+  .mdc-text-field--outlined,
+  .mdc-text-field--filled {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .mat-mdc-form-field .mat-mdc-input-element {
+    color: var(--text-primary) !important;
+    caret-color: #3EB489 !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-text-field--outlined {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading,
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch,
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+    border-color: var(--border) !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline .mat-mdc-floating-label {
+    color: var(--text-secondary) !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mat-mdc-floating-label {
+    color: #3EB489 !important;
+  }
+
+  .mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__leading,
+  .mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__notch,
+  .mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__trailing,
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__leading,
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch,
+  .mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
+    border-color: #3EB489 !important;
+  }
+
+  /* ── Material Select panels & options ─────────────────────────────── */
+  .mat-mdc-select-panel {
+    background-color: var(--surface) !important;
+  }
+
+  .mat-mdc-option {
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-option:hover,
+  .mat-mdc-option.mdc-list-item--selected {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .mat-mdc-option .mdc-list-item__primary-text {
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-autocomplete-panel {
+    background-color: var(--surface) !important;
+  }
+
+  /* ── Material Select value & arrow ────────────────────────────────── */
+  .mat-mdc-select-value-text {
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-select-arrow {
+    color: var(--text-secondary) !important;
+  }
+
+  /* ── Material Buttons ─────────────────────────────────────────────── */
+  .mat-mdc-raised-button:not([color]) {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-raised-button.mat-mdc-button-disabled,
+  .mat-mdc-raised-button:disabled {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-disabled) !important;
+  }
+
+  .mat-mdc-outlined-button:not([color]) {
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .mat-mdc-icon-button {
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Material Slide Toggle ────────────────────────────────────────── */
+  .mat-mdc-slide-toggle .mdc-switch__track {
+    background-color: var(--border) !important;
+  }
+
+  /* ── Material Tabs ────────────────────────────────────────────────── */
+  .mat-mdc-tab-header {
+    background-color: var(--surface) !important;
+    border-bottom-color: var(--divider) !important;
+  }
+
+  .mat-mdc-tab .mdc-tab__text-label {
+    color: var(--text-secondary) !important;
+  }
+
+  .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    color: #3EB489 !important;
+  }
+
+  /* ── Material Paginator ───────────────────────────────────────────── */
+  .mat-mdc-paginator {
+    background-color: var(--surface) !important;
+    color: var(--text-primary) !important;
+    border-top-color: var(--divider) !important;
+  }
+
+  /* ── Material Snackbar ────────────────────────────────────────────── */
+  .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Material Tooltip ─────────────────────────────────────────────── */
+  .mat-mdc-tooltip .mdc-tooltip__surface {
+    background-color: var(--surface-raised) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Form system (auth pages, profile) ────────────────────────────── */
+  .form-control {
+    background-color: var(--surface-raised) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .form-control:focus {
+    border-color: #3EB489 !important;
+  }
+
+  .auth-card {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── Status/Alert banners ─────────────────────────────────────────── */
+  .error-banner {
+    background-color: #3D1212 !important;
+    color: #EF9A9A !important;
+    border-color: #5D1A1A !important;
+  }
+}
+
+/* Material Dialog Customization */
+.custom-dialog-container .mat-mdc-dialog-container {
+  padding: 24px;
+  overflow: visible;
+}
+
+.custom-dialog-container .mat-mdc-dialog-surface {
+  overflow: visible;
+}
+
+/* Mobile dialog — anchored near bottom with rounded top corners */
+.mobile-dialog .mat-mdc-dialog-container {
+  padding: 16px;
+  border-radius: 12px !important;
+}
+
+.mobile-dialog .mat-mdc-dialog-surface {
+  border-radius: 12px !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  overflow-y: visible !important;
+}
+
+.mat-mdc-dialog-content {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* Ensure dialog title styling */
+.mat-mdc-dialog-title {
+  padding: 20px 24px 4px !important;
+  margin-bottom: 0 !important;
+}
+
+.mat-mdc-dialog-content {
+  padding: 12px 24px !important;
+}
+
+.dialog-title-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  display: block;
+}
+
+/* Ensure dialog content doesn't scroll */
+.mat-mdc-dialog-content:not(.mat-mdc-dialog-content-scroll) {
+  overflow-y: visible !important;
+}
+
+/* ── Mobile dialog scroll fix ──────────────────────────────────────── */
+/* On small screens dialogs must be height-bounded and scrollable so
+   the title stays visible and content doesn't overflow the viewport. */
+@media (max-width: 767px) {
+  .cdk-overlay-pane {
+    max-height: 92dvh !important;
+    display: flex !important;
+    align-items: flex-start !important;
+  }
+
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    max-height: 92dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  /* Title: never scrolls away */
+  .mat-mdc-dialog-title {
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    background: #fff !important;
+    z-index: 2 !important;
+    padding-bottom: 8px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Content fills remaining space and scrolls */
+  .mat-mdc-dialog-content {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    max-height: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Actions: never scrolls away */
+  .mat-mdc-dialog-actions {
+    flex-shrink: 0 !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE + TABLET RESPONSIVE — all rules here are additive only.
+   Desktop experience is unchanged (≥1024px).
+   Covers: phones (≤767px), tablets portrait+landscape (768–1023px).
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  /* Prevent iOS Safari zoom-on-focus (input font-size must be ≥16px) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Scale down oversized page headings */
+  h1 { font-size: 1.5rem !important; }
+  h2 { font-size: 1.2rem !important; }
+
+  /* Reduce the 2rem main padding so content fills the screen */
+  main { padding: 0.75rem !important; }
+
+  /* Material dialogs: constrain to mobile viewport width */
+  .mat-mdc-dialog-container,
+  .mat-dialog-container {
+    max-width: 95vw !important;
+    width: 95vw !important;
+  }
+
+  /* Full-screen dialog (used for supply form on mobile) */
+  .full-screen-dialog .mat-mdc-dialog-container,
+  .full-screen-dialog .mat-dialog-container {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Utility class: sticky submit bar (opt-in per form component) */
+  .mobile-sticky-actions {
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+    padding: 0.875rem 1rem;
+    margin: 1rem -1rem -1rem;
+    box-shadow: 0 -2px 8px rgba(37, 49, 40, 0.14);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .mobile-sticky-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* ── Global mobile table → card layout ───────────────────────────── */
+  /* These rules are GLOBAL (not component-scoped) to bypass Angular    */
+  /* Material's view encapsulation on mat-table internal elements.      */
+  .shared-table.mat-mdc-table,
+  table.shared-table {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+  }
+
+  .shared-table thead,
+  .shared-table .mat-mdc-header-row {
+    display: none !important;
+  }
+
+  .shared-table tbody,
+  .shared-table .mdc-data-table__content {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .shared-table .mat-mdc-row,
+  .shared-table tr {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin: 0 0 1rem 0 !important;
+    border: 1px solid var(--border) !important;
+    border-left: 4px solid var(--primary) !important;
+    padding: 0 !important;
+    background: var(--surface) !important;
+    overflow: hidden !important;
+  }
+
+  .shared-table .mat-mdc-cell,
+  .shared-table td {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    height: auto !important;
+    min-height: unset !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    padding: 0.5rem 0.85rem !important;
+    border-bottom: 1px solid var(--divider) !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-radius: 0 !important;
+    font-size: 0.9rem !important;
+    gap: 0.75rem;
+    white-space: normal !important;
+    word-break: break-word;
+    line-height: 1.45;
+    text-align: right;
+    overflow: visible !important;
+    text-overflow: unset !important;
+  }
+
+  .shared-table .mat-mdc-cell:nth-child(even),
+  .shared-table td:nth-child(even) {
+    background-color: var(--surface-raised) !important;
+  }
+
+  .shared-table .mat-mdc-cell:last-child,
+  .shared-table td:last-child {
+    border-bottom: none !important;
+  }
+
+  .shared-table .mat-mdc-cell::before,
+  .shared-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    width: 40%;
+    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left !important;
+    padding-top: 0.1rem;
+  }
+
+  .shared-table .mat-mdc-cell > *,
+  .shared-table td > * {
+    flex: 1;
+    text-align: right;
+    min-width: 0;
+  }
+
+  .shared-table td[data-label='']::before,
+  .shared-table .mat-mdc-cell[data-label='']::before {
+    display: none !important;
+  }
+
+  .shared-table .actions-cell,
+  .shared-table .mat-column-actions {
+    justify-content: flex-end !important;
+    border-bottom: none !important;
+    gap: 0.25rem;
+    min-height: 52px !important;
+    align-items: center !important;
+    background-color: var(--primary-light) !important;
+  }
+
+  .shared-table .actions-cell::before,
+  .shared-table .mat-column-actions::before {
+    display: none !important;
+  }
+
+  /* Content-card container: transparent on mobile */
+  .content-card {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   REPORT DIALOG — panel class applied to all report dialogs.
+   The MDC dialog surface has no default padding, so the component
+   manages its own header/body/actions padding.
+   ═══════════════════════════════════════════════════════ */
+.report-dialog .mat-mdc-dialog-surface {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   GLOBAL FORM SYSTEM — single source of truth for all forms.
+   Auth, profile, and page forms use the raw-input classes below.
+   Dialogs use mat-form-field which is restyled via the MDC overrides further down.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Labels ─────────────────────────────────────────────────────────── */
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.375rem;
+}
+
+.required-star {
+  color: var(--error);
+  margin-left: 0.1rem;
+}
+
+/* ── Inputs, textareas, selects (brand-styled) ───────────────────────
+   Note: Global .input-field already applies most of this for type=* inputs.
+   .form-control is the explicit opt-in class for any element needing the
+   brand treatment: correct background, border weight, radius and focus ring.
+   ─────────────────────────────────────────────────────────────────── */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--primary-subtle);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color-scheme: light;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(35, 122, 73, 0.10);
+}
+
+.form-control.ng-invalid.ng-touched,
+.form-control.is-invalid {
+  border-color: var(--error);
+}
+
+.form-control[readonly],
+.form-control:read-only {
+  background-color: var(--surface-raised);
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.form-control:disabled {
+  background-color: var(--surface-raised);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ── Form group & row ────────────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 520px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Inline field-level feedback messages ──────────────────────────── */
+.field-error {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--error);
+  margin-top: 0.25rem;
+}
+
+.field-hint,
+.help-text {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* ── Alert / status banners ──────────────────────────────────────────
+   Replaces the Bootstrap .alert-danger / .alert-success scattered throughout.
+   Usage: <div class="alert alert--error">…</div>
+   ─────────────────────────────────────────────────────────────────── */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+
+.alert strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.alert--success {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: var(--success);
+}
+
+.alert--error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: var(--error);
+}
+
+.alert--warning {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+  color: var(--warning-text);
+}
+
+.alert--info {
+  background: var(--info-bg);
+  border-color: var(--info-border);
+  color: var(--info);
+}
+
+/* ── Auth / centered-page wrappers ───────────────────────────────────
+   Replaces the 5+ per-component copies of the full-page centering pattern.
+   ─────────────────────────────────────────────────────────────────── */
+.auth-page {
+  margin: -2rem;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+@media (max-width: 599px) {
+  .auth-page {
+    margin: -1rem;
+    padding: 1.5rem 1rem;
+  }
+}
+
+.auth-card {
+  color-scheme: light;
+  width: 100%;
+  max-width: 460px;
+  padding: 2rem 2.5rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 499px) {
+  .auth-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.auth-card__header {
+  text-align: center;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.auth-card__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.75rem;
+  color: var(--text-primary);
+}
+
+.auth-card__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 520px) {
+  .auth-page {
+    margin: -0.75rem;
+    padding: 1.25rem 0.85rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    max-width: 100%;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ANGULAR MATERIAL mat-form-field BRAND OVERRIDES
+   Keeps mat-form-field appearance="outline" in dialogs but aligns it
+   with the app's green design system: border color/weight/radius,
+   brand-tinted background, matching label typography.
+   Uses :host-context-free global CSS so it works in ng-deep-free components.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Outline border — idle */
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__leading {
+  border-width: 1.5px !important;
+  border-right-width: 0 !important;
+  border-radius: var(--radius-md) 0 0 var(--radius-md) !important;
+  min-width: var(--radius-md) !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__notch {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+}
+
+/* Outline border — hover */
+.mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline:not(.mat-form-field-disabled):hover .mdc-notched-outline__trailing {
+  border-color: var(--border-focus) !important;
+}
+
+/* Outline border — focused */
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--border-focus) !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__leading {
+  border-width: 1.5px !important;
+  border-right-width: 0 !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
+  border-right-width: 0 !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
+  border-width: 1.5px !important;
+  border-left-width: 0 !important;
+}
+
+/* Background fill inside mat-form-field — consistent white at rest and on focus */
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-text-field--outlined {
+  background-color: var(--surface) !important;
+  border-radius: var(--radius-md) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* Label color */
+.mat-mdc-form-field.mat-form-field-appearance-outline .mat-mdc-floating-label {
+  color: var(--text-secondary) !important;
+  font-size: 0.9375rem !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-focused .mat-mdc-floating-label {
+  color: var(--border-focus) !important;
+}
+
+/* Input / textarea text */
+.mat-mdc-form-field .mat-mdc-input-element {
+  color: var(--text-primary) !important;
+  font-family: inherit !important;
+  font-size: 0.9375rem !important;
+  caret-color: var(--border-focus) !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* mat-select value text */
+.mat-mdc-select-value-text {
+  color: var(--text-primary) !important;
+  font-family: inherit !important;
+  font-size: 0.9375rem !important;
+}
+
+/* mat-select arrow */
+.mat-mdc-select-arrow {
+  color: var(--text-secondary) !important;
+}
+
+/* Hide number input spinner arrows so number inputs match select/text field heights */
+.mat-mdc-form-field input[type=number]::-webkit-inner-spin-button,
+.mat-mdc-form-field input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.mat-mdc-form-field input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Error state outline */
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-form-field-invalid .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-form-field-invalid .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-form-field-appearance-outline.mat-form-field-invalid .mdc-notched-outline__trailing {
+  border-color: var(--error) !important;
+}
+
+/* Hint / error helper text */
+.mat-mdc-form-field .mat-mdc-form-field-hint,
+.mat-mdc-form-field .mat-mdc-form-field-error {
+  font-size: 0.8rem !important;
+  font-family: inherit !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-error {
+  color: var(--error) !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-hint {
+  color: var(--text-secondary) !important;
+}
+
+/* Consistent bottom padding so form rows don't collapse */
+.mat-mdc-form-field {
+  font-family: inherit !important;
+}
+
+/* Dialog sizing — responsive */
+.mat-mdc-dialog-container {
+  border-radius: var(--radius-lg) !important;
+}
+
+@media (max-width: 599px) {
+  .cdk-overlay-pane:not(.full-screen-dialog) {
+    max-width: 96vw !important;
+  }
+}
+
+/* ── Dialog form layout — responsive ────────────────────────────────── */
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+
+.dialog-form .full-width,
+.dialog-form mat-form-field.full-width {
+  width: 100%;
+}
+
+/* Side-by-side field row used in dialogs (e.g. amount + category, start + end date) */
+.amount-row,
+.field-row,
+.date-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.amount-row .mat-mdc-form-field,
+.field-row .mat-mdc-form-field,
+.date-row .mat-mdc-form-field {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .amount-row,
+  .field-row,
+  .date-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .amount-row .mat-mdc-form-field,
+  .field-row .mat-mdc-form-field,
+  .date-row .mat-mdc-form-field {
+    width: 100%;
+  }
+}

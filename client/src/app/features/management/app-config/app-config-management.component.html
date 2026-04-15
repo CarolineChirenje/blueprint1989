@@ -1,0 +1,106 @@
+<section class="page">
+  <div id="config-header" class="page__header">
+    <div>
+      <p class="page__eyebrow">Management</p>
+      <h1>App Configuration</h1>
+      <p class="page__subtitle">View and edit runtime configuration settings. Changes take effect immediately unless a restart is required.</p>
+    </div>
+    <div class="page__actions">
+      @if (canRestart) {
+        <button class="btn btn--ghost" (click)="restartService()" [disabled]="isRestarting">
+          {{ isRestarting ? 'Restarting…' : 'Restart Service' }}
+        </button>
+      }
+      <button class="btn btn--ghost" (click)="resetAll()" [disabled]="!hasPendingChanges || isSaving">Discard Changes</button>
+      <button class="btn btn--primary" (click)="saveAll()" [disabled]="!hasPendingChanges || isSaving">
+        {{ isSaving ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert--success">{{ successMessage }}</div>
+  }
+  @if (errorMessage) {
+    <div class="alert alert--error">{{ errorMessage }}</div>
+  }
+  @if (restartWarning) {
+    <div class="alert alert--warning">One or more changed settings require a service restart to take effect.</div>
+  }
+
+  @if (isLoading) {
+    <div class="state-message">Loading configuration…</div>
+  } @else if (entries.length === 0) {
+    <div class="state-message">No configuration entries found.</div>
+  } @else {
+    @for (category of categories; track category) {
+      <div class="config-category">
+        <h2 class="config-category__title">{{ category }}</h2>
+        <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>Value</th>
+              <th>Type</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of entriesForCategory(category); track entry.key) {
+              <tr [class.row--dirty]="dirtyKeys.has(entry.key)">
+                <td data-label="Setting">
+                  <div class="entry-name">{{ entry.displayName }}</div>
+                  <div class="entry-key">{{ entry.key }}</div>
+                  @if (entry.description) {
+                    <div class="entry-desc">{{ entry.description }}</div>
+                  }
+                  @if (entry.requiresRestart) {
+                    <span class="badge badge--warning">Requires restart</span>
+                  }
+                  @if (entry.isReadOnly) {
+                    <span class="badge badge--muted">Read-only</span>
+                  }
+                </td>
+                <td data-label="Value">
+                  @if (entry.isReadOnly) {
+                    <span class="value-readonly">
+                      {{ entry.isSecret && !revealedKeys.has(entry.key) ? '••••••••' : entry.value }}
+                    </span>
+                  } @else if (entry.dataType === 'bool') {
+                    <div class="toggle-wrap">
+                      <label class="toggle">
+                        <input type="checkbox"
+                               [checked]="editedValues[entry.key] === 'true'"
+                               (change)="onValueChange(entry.key, $any($event.target).checked ? 'true' : 'false', entry.value)">
+                        <span class="toggle__slider"></span>
+                      </label>
+                    </div>
+                  } @else {
+                    <div class="input-wrap">
+                      <input class="value-input"
+                             [type]="entry.isSecret && !revealedKeys.has(entry.key) ? 'password' : 'text'"
+                             [value]="editedValues[entry.key]"
+                             (input)="onValueChange(entry.key, $any($event.target).value, entry.value)">
+                    </div>
+                  }
+                </td>
+                <td data-label="Type">
+                  <span class="badge badge--type">{{ entry.dataType }}</span>
+                </td>
+                <td data-label="">
+                  @if (entry.isSecret) {
+                    <button class="btn-icon" type="button" (click)="toggleReveal(entry.key)" [title]="revealedKeys.has(entry.key) ? 'Hide' : 'Reveal'">
+                      <span class="material-icons">{{ revealedKeys.has(entry.key) ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        </div>
+      </div>
+    }
+  }
+</section>

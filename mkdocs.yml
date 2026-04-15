@@ -1,0 +1,56 @@
+site_name: Batanai Technical Docs
+site_description: Technical documentation for the Batanai expense-sharing platform
+site_author: Batanai Team
+docs_dir: "docs/technical documents"
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: light blue
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: Home.md
+  - Authentication:
+    - Authentication: Authentication.md
+    - Biometric Authentication: Biometric-Authentication.md
+  - Core Features:
+    - Dashboard: Dashboard.md
+    - Cycles: Cycles.md
+    - Profile: Profile.md
+    - Notifications: Notifications.md
+    - Offline Queue: Offline-Queue.md
+  - Admin:
+    - Management: Management.md
+    - Feature & Bug Reports: Feature-Bug-Reports.md
+    - App Configuration: App-Configuration.md
+  - Infrastructure:
+    - Push Notifications: Push-Notifications.md
+    - Cloudflare Wiki: Cloudflare-Wiki.md
+  - Business:
+    - Business Overview: Business-Overview.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - codehilite
+  - toc:
+      permalink: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true

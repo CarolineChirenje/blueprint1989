@@ -1,0 +1,89 @@
+.type-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.type-picker-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  max-width: 560px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.type-picker-card h2 {
+  color: var(--primary);
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+  border: none;
+}
+
+.type-picker-card p {
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.type-options {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  min-width: 170px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  background: var(--primary-subtle);
+}
+
+.type-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.diabetes-btn:hover { border-color: var(--primary); }
+.bp-btn:hover       { border-color: #c0392b; }
+
+.type-icon  { font-size: 2.2rem; }
+
+.type-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.type-desc {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.cancel-picker-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  padding: 0.5rem 1.4rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.15s;
+}
+
+.cancel-picker-btn:hover {
+  background: var(--primary-subtle);
+}

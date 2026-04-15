@@ -1,0 +1,111 @@
+<div class="oq-container">
+  <div class="oq-card">
+
+    <div class="oq-header">
+      <div>
+        <h1>Offline Queue</h1>
+        <p class="oq-subtitle">Entries captured while offline, held for up to 24 hours before upload.</p>
+      </div>
+      <span class="status-pill" [class.online]="isOnline" [class.offline]="!isOnline">
+        <span class="status-dot"></span>
+        {{ isOnline ? 'Online' : 'Offline' }}
+      </span>
+    </div>
+
+    @if (syncResult && !syncError) {
+      <div class="success-message">
+        {{ syncResult.synced }} entr{{ syncResult.synced === 1 ? 'y' : 'ies' }} uploaded successfully.
+        @if (syncResult.expired > 0) {
+          {{ syncResult.expired }} expired entr{{ syncResult.expired === 1 ? 'y' : 'ies' }} discarded.
+        }
+      </div>
+    }
+
+    @if (syncError) {
+      <div class="error-message">{{ syncError }}</div>
+    }
+
+    <!-- Action bar -->
+    <div class="oq-actions">
+      <button class="btn btn-primary" (click)="syncNow()"
+              [disabled]="isSyncing || pendingCount === 0 || !isOnline">
+        @if (isSyncing) { Syncing... }
+        @else { Sync Now ({{ pendingCount }}) }
+      </button>
+      @if (expiredItems.length > 0) {
+        <button class="btn btn-secondary" (click)="clearExpired()" [disabled]="isSyncing">
+          Clear Expired ({{ expiredItems.length }})
+        </button>
+      }
+    </div>
+
+    @if (!isOnline) {
+      <p class="oq-offline-notice">You are currently offline. Connect to a network, then tap "Sync Now".</p>
+    }
+
+    <!-- Loading state -->
+    @if (isLoading) {
+      <p class="oq-empty-text">Loading...</p>
+    }
+
+    <!-- Empty state -->
+    @else if (items.length === 0) {
+      <div class="oq-empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="oq-empty-icon">
+          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3zm-5.45-5h-2.59l.88-.88c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-2.59 2.59c-.39.39-.39 1.02 0 1.41l2.59 2.59c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-.88-.88h2.59c.55 0 1-.45 1-1s-.45-1-1-1z"/>
+        </svg>
+        <p>Nothing pending, all entries are up to date.</p>
+      </div>
+    }
+
+    <!-- Pending items -->
+    @else {
+      @if (pendingItems.length > 0) {
+        <div class="oq-section">
+          <h2>Pending Upload ({{ pendingItems.length }})</h2>
+          <div class="oq-list">
+            @for (item of pendingItems; track item.id) {
+              <div class="oq-item" [class.expiring-soon]="isExpiringSoon(item)">
+                <div class="oq-item-main">
+                  <span class="oq-badge" [class]="typeBadgeClass(item.type)">{{ typeLabel(item.type) }}</span>
+                  <span class="oq-item-label">{{ item.label }}</span>
+                </div>
+                <div class="oq-item-meta">
+                  <span class="oq-captured">Captured: {{ formatDate(item.capturedAt) }}</span>
+                  <span class="oq-expiry" [class.warning]="isExpiringSoon(item)">
+                    {{ expiryLabel(item) }}
+                  </span>
+                </div>
+                <button class="btn-discard" (click)="discardItem(item.id)" [disabled]="isSyncing"
+                        title="Discard this entry">Discard</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (expiredItems.length > 0) {
+        <div class="oq-section oq-section-expired">
+          <h2>Expired ({{ expiredItems.length }})</h2>
+          <p class="section-description">These entries exceeded the 24-hour window and can no longer be uploaded.</p>
+          <div class="oq-list">
+            @for (item of expiredItems; track item.id) {
+              <div class="oq-item oq-item-expired">
+                <div class="oq-item-main">
+                  <span class="oq-badge badge-expired">{{ typeLabel(item.type) }}</span>
+                  <span class="oq-item-label">{{ item.label }}</span>
+                </div>
+                <div class="oq-item-meta">
+                  <span class="oq-captured">Captured: {{ formatDate(item.capturedAt) }}</span>
+                  <span class="oq-expiry expired">Expired</span>
+                </div>
+                <button class="btn-discard" (click)="discardItem(item.id)" title="Remove this entry">Remove</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    }
+
+  </div>
+</div>

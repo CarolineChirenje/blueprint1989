@@ -1,0 +1,181 @@
+<div class="signup-page">
+<div class="signup-card">
+  <h1>Create Account</h1>
+
+  @if (signupSuccess) {
+    @if (!emailSent) {
+      <!-- State 1: Confirm email before sending -->
+      <div class="success-message">
+        <div class="verify-icon">
+          <span class="material-icons">mark_email_read</span>
+        </div>
+        <h2>Verify Your Email</h2>
+        <p>We'll send a verification link to:</p>
+        <p class="email-display">{{ confirmedEmail }}</p>
+
+        @if (sendError) {
+          <div class="error">{{ sendError }}</div>
+        }
+
+        <button
+          type="button"
+          class="submit-btn submit-btn-blue form-ready"
+          [disabled]="isSendingEmail"
+          (click)="sendVerificationEmail()"
+        >
+          @if (isSendingEmail) {
+            <span class="material-icons spinner">autorenew</span> Sending…
+          } @else {
+            Send Verification Email
+          }
+        </button>
+        <p class="go-back-link">Not your email? <a (click)="goBackToForm()">Go back</a></p>
+      </div>
+    } @else {
+      <!-- State 2: Email sent — check inbox -->
+      <div class="success-message">
+        <div class="success-icon">
+          <span class="material-icons">mark_email_unread</span>
+        </div>
+        <h2>Check Your Inbox</h2>
+        <p>A verification link has been sent to <strong>{{ confirmedEmail }}</strong>.</p>
+
+        <div class="email-tip">
+          <span class="material-icons">info</span>
+          <div>
+            <strong>Can't find it?</strong> Check your <strong>Spam</strong> or <strong>Junk</strong>
+            folder especially if you use Yahoo, Hotmail, or Outlook.
+            If it's still not there, contact an Admin with proof that this email belongs to you.
+          </div>
+        </div>
+
+        <div class="resend-row">
+          Didn't receive it?
+          <button type="button" [disabled]="resendCooldown > 0" (click)="resendEmail()">
+            Resend{{ resendCooldown > 0 ? ' (' + resendCooldown + 's)' : '' }}
+          </button>
+        </div>
+
+        @if (sendError) {
+          <div class="error">{{ sendError }}</div>
+        }
+
+        <button type="button" class="submit-btn submit-btn-blue form-ready" (click)="goToLogin()">
+          Go to Login
+        </button>
+      </div>
+    }
+  } @else {
+    @if (errorMsg) {
+      <div class="error-message">
+        <div class="error-icon">✕</div>
+        <h2>Sign Up Failed</h2>
+        <p>{{ errorMsg }}</p>
+        <button type="button" class="retry-btn" (click)="errorMsg = ''">Try Again</button>
+      </div>
+    } @else {
+      <form [formGroup]="signupForm" (ngSubmit)="submit()" autocomplete="off">
+
+        <!-- Step 1: Role Selection -->
+        <div class="form-section">
+          <label class="section-label">I am a... <span class="required">*</span></label>
+          <div class="role-picker">
+            @for (opt of roleOptions; track opt.value) {
+              <label
+                class="role-card"
+                [class.selected]="selectedRole === opt.value"
+              >
+                <input
+                  type="radio"
+                  formControlName="role"
+                  [value]="opt.value"
+                  class="sr-only"
+                />
+                <span class="role-card-icon material-icons" [style.color]="opt.color" aria-hidden="true">{{ opt.icon }}</span>
+                <span class="role-card-title">{{ opt.label }}</span>
+                <span class="role-card-desc">{{ opt.description }}</span>
+              </label>
+            }
+          </div>
+          @if (signupForm.get('role')?.invalid && signupForm.get('role')?.touched) {
+            <div class="error">Please select a role</div>
+          }
+        </div>
+
+        @if (selectedRole !== null) {
+          <!-- Common fields -->
+          <div class="form-section">
+            <label>First Name <span class="required">*</span></label>
+            <input type="text" formControlName="firstName" placeholder="First name" autocomplete="given-name" />
+            @if (signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched) {
+              <div class="error">First name is required</div>
+            }
+
+            <label>Last Name <span class="required">*</span></label>
+            <input type="text" formControlName="lastName" placeholder="Last name" autocomplete="family-name" />
+            @if (signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched) {
+              <div class="error">Last name is required</div>
+            }
+
+            <label>Phone Number</label>
+            <input type="tel" formControlName="phoneNumber" placeholder="e.g. +263771234567" autocomplete="tel" />
+            <div class="hint">Optional, but helps your group admins contact you if needed.</div>
+
+            <label>Email <span class="required">*</span></label>
+            <input type="email" formControlName="email" placeholder="email@example.com" autocomplete="email" />
+            @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
+              <div class="error">Valid email is required</div>
+            }
+
+            <label>Confirm Email <span class="required">*</span></label>
+            <input type="email" formControlName="confirmEmail" placeholder="Re-enter your email" autocomplete="email" />
+            @if (signupForm.errors?.['emailMismatch'] && signupForm.get('confirmEmail')?.touched) {
+              <div class="error">Email addresses do not match</div>
+            }
+
+            <label>Password <span class="required">*</span></label>
+            <app-password-field formControlName="password" placeholder="At least 8 characters" [autocomplete]="'new-password'"></app-password-field>
+            @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
+              <div class="error">Password must be at least 8 characters with uppercase, lowercase and a number</div>
+            }
+
+            <label>Confirm Password <span class="required">*</span></label>
+            <app-password-field formControlName="confirmPassword" placeholder="Repeat password" [autocomplete]="'new-password'"></app-password-field>
+            @if (signupForm.errors?.['mismatch'] && signupForm.get('confirmPassword')?.touched) {
+              <div class="error">Passwords do not match</div>
+            }
+          </div>
+
+          
+          <!-- Administrator: PIN -->
+          @if (isAdmin) {
+            <div class="form-section conditional-section">
+              <h3 class="conditional-heading">Administrator Verification</h3>
+              <p class="conditional-hint">
+                You must provide the administration PIN to create an Admin account.
+              </p>
+              <label>Admin PIN <span class="required">*</span></label>
+              <input type="password" formControlName="adminPin" placeholder="Enter administration PIN" autocomplete="off" />
+              @if (signupForm.get('adminPin')?.invalid && signupForm.get('adminPin')?.touched) {
+                <div class="error">Admin PIN is required</div>
+              }
+            </div>
+          }
+
+          <button
+            type="button"
+            class="submit-btn submit-btn-blue"
+            [class.form-ready]="signupForm.valid"
+            [disabled]="isSubmitting"
+            (click)="submit()"
+          >
+            {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
+          </button>
+        }
+
+      </form>
+      <a routerLink="/login">Already have an account? Login</a>
+    }
+  }
+</div>
+</div>

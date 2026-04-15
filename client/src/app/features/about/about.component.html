@@ -1,0 +1,125 @@
+<div class="about-page">
+  <div class="about-content">
+
+    <!-- App Info -->
+    <mat-card class="about-card" appearance="outlined">
+      <mat-card-content>
+        <div class="about-card-header">
+          <div class="about-card-logo-wrap app-icon-wrap">
+            <img src="assets/icons/icon.svg" class="about-card-logo" alt="Batanai">
+          </div>
+          <h2 class="about-card-title">Application</h2>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="about-info-grid">
+          <div class="about-info-row">
+            <span class="about-info-label">Name</span>
+            <span class="about-info-value">{{ appName }}</span>
+          </div>
+          <div class="about-info-row">
+            <span class="about-info-label">Version</span>
+            <span class="about-info-value">
+              <span class="about-version-pill" *ngIf="frontendVersion; else loadingVersion">v{{ frontendVersion }}</span>
+              <ng-template #loadingVersion><span class="about-version-pill">loading&hellip;</span></ng-template>
+            </span>
+          </div>
+          <div class="about-info-row" *ngIf="backendVersion">
+            <span class="about-info-label">API Version</span>
+            <span class="about-info-value">
+              <span class="about-version-pill secondary">v{{ backendVersion }}</span>
+            </span>
+          </div>
+          <div class="about-description-block">
+            <p class="about-desc-intro">Batanai is an expense-sharing platform designed to help groups track shared costs, split bills, and manage financial obligations with complete transparency.</p>
+            <p>Whether managing group bills, shared subscriptions, or other group expenses, Batanai gives every member a clear view of who owes what and when.</p>
+            <p>Expenses are organised into <strong>cycles</strong>, creating structured billing periods that make it easy to review, settle, and close out group finances at a glance.</p>
+            <p>Batanai supports real-time push notifications, offline entry, biometric login, and a full payment confirmation workflow so groups can stay on top of their finances from any device.</p>
+          </div>
+          <div class="about-info-row">
+            <span class="about-info-label">Platform</span>
+            <span class="about-info-value">Web &amp; Progressive Web App (PWA)</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Developer -->
+    <mat-card class="about-card" appearance="outlined">
+      <mat-card-content>
+        <div class="about-card-header">
+          <mat-icon class="about-card-icon dev-icon">business</mat-icon>
+          <h2 class="about-card-title">Developer</h2>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="about-info-grid">
+          <div class="about-info-row">
+            <span class="about-info-label">Company</span>
+            <span class="about-info-value about-company-name">{{ companyName }}</span>
+          </div>
+          <div class="about-info-row">
+            <span class="about-info-label">Founder</span>
+            <span class="about-info-value">{{ founderName }}</span>
+          </div>
+          <div class="about-info-row">
+            <span class="about-info-label">Copyright</span>
+            <span class="about-info-value">&copy; {{ currentYear }} {{ companyName }}. All rights reserved.</span>
+          </div>
+          <div class="about-info-row">
+            <span class="about-info-label">Tagline</span>
+            <span class="about-info-value">Asibambaneni!</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tech Stack -->
+    <mat-card class="about-card" appearance="outlined">
+      <mat-card-content>
+        <div class="about-card-header">
+          <mat-icon class="about-card-icon tech-icon">code</mat-icon>
+          <h2 class="about-card-title">Technology Stack</h2>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="about-tech-grid">
+          <div class="about-tech-item" *ngFor="let tech of techStack">
+            <div class="about-tech-icon-wrap">
+              <mat-icon class="about-tech-icon">{{ tech.icon }}</mat-icon>
+            </div>
+            <div class="about-tech-info">
+              <span class="about-tech-name">{{ tech.name }}</span>
+              <span class="about-tech-desc">{{ tech.description }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Contact / Support -->
+    <mat-card class="about-card" appearance="outlined">
+      <mat-card-content>
+        <div class="about-card-header">
+          <mat-icon class="about-card-icon contact-icon">support_agent</mat-icon>
+          <h2 class="about-card-title">Contact &amp; Support</h2>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="about-info-grid">
+          <div class="about-info-row">
+            <span class="about-info-label">Support Email</span>
+            <span class="about-info-value">
+              <a class="about-link" href="mailto:{{ contactEmail }}">{{ contactEmail }}</a>
+            </span>
+          </div>
+          <div class="about-info-row">
+            <span class="about-info-label">Issues</span>
+            <span class="about-info-value">For bug reports or feature requests, please contact your system administrator.</span>
+          </div>
+          <div class="about-info-row">
+            <span class="about-info-label">Documentation</span>
+            <span class="about-info-value">Refer to the in-app Release Notes for the latest changes and technical details.</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Group Roles — {{ data.userName }}</h2>
+
+<mat-dialog-content>
+  <div *ngIf="isLoading" class="loading-wrap">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+
+  <div *ngIf="error" class="error-banner">{{ error }}</div>
+
+  <ng-container *ngIf="!isLoading">
+    <p *ngIf="memberships.length === 0" class="empty-msg">
+      This user is not a member of any group.
+    </p>
+
+    <div class="table-scroll">
+    <table mat-table [dataSource]="memberships" class="roles-table shared-table" *ngIf="memberships.length > 0">
+
+      <ng-container matColumnDef="groupName">
+        <th mat-header-cell *matHeaderCellDef>Group</th>
+        <td mat-cell *matCellDef="let m" data-label="Group">{{ m.groupName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="groupRole">
+        <th mat-header-cell *matHeaderCellDef>Current Role</th>
+        <td mat-cell *matCellDef="let m" data-label="Role">
+          <span class="role-chip" [class.admin]="m.groupRole === 'GroupAdmin'">
+            {{ m.groupRole === 'GroupAdmin' ? 'Group Admin' : 'Member' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let m" class="action-cell" data-label="">
+          <button mat-stroked-button
+                  [color]="m.groupRole === 'GroupAdmin' ? 'warn' : 'primary'"
+                  [disabled]="savingGroupId === m.groupId"
+                  (click)="toggleGroupAdmin(m)">
+            <mat-spinner *ngIf="savingGroupId === m.groupId" diameter="16"></mat-spinner>
+            <span *ngIf="savingGroupId !== m.groupId">
+              {{ m.groupRole === 'GroupAdmin' ? 'Remove Admin' : 'Make Admin' }}
+            </span>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['groupName','groupRole','action']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['groupName','groupRole','action'];"></tr>
+    </table>
+    </div>
+  </ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

@@ -1,0 +1,194 @@
+<section class="notifications-page">
+  <div class="notifications-page__header">
+    <div>
+      <p class="notifications-page__eyebrow">Notification center</p>
+      <h1>Notifications</h1>
+      <p class="notifications-page__subtitle">
+        Review recent alerts, reminders, and system updates in one place.
+      </p>
+    </div>
+
+    <div class="notifications-page__actions">
+      <div class="notifications-page__filters">
+        <button
+          type="button"
+          class="notifications-page__filter"
+          [class.is-active]="selectedFilter === 'all'"
+          (click)="setFilter('all')">
+          All
+        </button>
+        <button
+          type="button"
+          class="notifications-page__filter"
+          [class.is-active]="selectedFilter === 'unread'"
+          (click)="setFilter('unread')">
+          Unread
+        </button>
+        <button
+          type="button"
+          class="notifications-page__filter"
+          [class.is-active]="selectedFilter === 'archived'"
+          (click)="setFilter('archived')">
+          Archived
+        </button>
+      </div>
+
+      @if (unreadCount > 0 && selectedFilter !== 'archived') {
+        <button type="button" class="notifications-page__mark-all" (click)="markAllRead()">
+          Mark all read
+        </button>
+      }
+
+      @if (selectedFilter === 'all' && hasReadNotifications) {
+        <button type="button" class="notifications-page__clear-read" (click)="archiveRead()">
+          Archive read
+        </button>
+      }
+      @if (selectedFilter === 'archived' && notifications.length > 0) {
+        <button type="button" class="notifications-page__purge-archived" (click)="deleteAllArchived()">
+          <span class="material-icons" aria-hidden="true">delete_sweep</span>
+          <span class="btn-label">Purge all</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (pendingInvites.length > 0) {
+    <div class="notifications-page__invites">
+      <div class="notifications-page__invites-heading">
+        <span class="material-icons" aria-hidden="true">group_add</span>
+        <strong>Pending group invitations ({{ pendingInvites.length }})</strong>
+      </div>
+      @if (inviteError) {
+        <div class="notifications-page__state notifications-page__state--error">{{ inviteError }}</div>
+      }
+      @for (invite of pendingInvites; track invite.groupId) {
+        <div class="notifications-page__invite-item">
+          <div class="notifications-page__invite-info">
+            <span class="notifications-page__invite-group">{{ invite.groupName }}</span>
+            <span class="notifications-page__invite-meta">
+              Invited by {{ invite.invitedByName }} &middot; {{ invite.invitedAt | date:'dd MMM yyyy' }} &middot; Role: {{ invite.groupRole === 1 ? 'Group Admin' : 'Member' }}
+            </span>
+          </div>
+          <div class="notifications-page__invite-actions">
+            <button type="button" class="notifications-page__invite-btn notifications-page__invite-btn--accept"
+              [disabled]="inviteResponding" (click)="respondToInvite(invite, true)">
+              Accept
+            </button>
+            <button type="button" class="notifications-page__invite-btn notifications-page__invite-btn--decline"
+              [disabled]="inviteResponding" (click)="respondToInvite(invite, false)">
+              Decline
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (pendingJoinRequests.length > 0) {
+    <div class="notifications-page__invites">
+      <div class="notifications-page__invites-heading">
+        <span class="material-icons" aria-hidden="true">how_to_reg</span>
+        <strong>Pending join requests ({{ pendingJoinRequests.length }})</strong>
+      </div>
+      @if (joinRequestError) {
+        <div class="notifications-page__state notifications-page__state--error">{{ joinRequestError }}</div>
+      }
+      @for (request of pendingJoinRequests; track request.groupId + '-' + request.userId) {
+        <div class="notifications-page__invite-item">
+          <div class="notifications-page__invite-info">
+            <span class="notifications-page__invite-group">{{ request.groupName }}</span>
+            <span class="notifications-page__invite-meta">
+              {{ request.firstName }} {{ request.lastName }} ({{ request.email }}) &middot; {{ request.requestedAt | date:'dd MMM yyyy' }}
+            </span>
+          </div>
+          <div class="notifications-page__invite-actions">
+            <button type="button" class="notifications-page__invite-btn notifications-page__invite-btn--accept"
+              [disabled]="joinRequestResponding" (click)="respondToJoinRequest(request, true)">
+              Accept
+            </button>
+            <button type="button" class="notifications-page__invite-btn notifications-page__invite-btn--decline"
+              [disabled]="joinRequestResponding" (click)="respondToJoinRequest(request, false)">
+              Decline
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="notifications-page__summary">
+    <span>{{ unreadCount }} unread</span>
+    <span>Showing {{ notifications.length }} notification{{ notifications.length === 1 ? '' : 's' }}</span>
+  </div>
+
+  @if (error) {
+    <div class="notifications-page__state notifications-page__state--error">{{ error }}</div>
+  } @else if (isLoading) {
+    <div class="notifications-page__state">Loading notifications…</div>
+  } @else if (notifications.length === 0) {
+    <div class="notifications-page__state">
+      <strong>{{ selectedFilter === 'archived' ? 'No archived notifications yet' : "Youare all caught up" }}</strong>
+      <span>There are no notifications in this view right now.</span>
+    </div>
+  } @else {
+    <div class="notifications-page__list">
+      @for (group of notificationGroups; track group.label) {
+        <div class="notifications-page__group">
+          <div class="notifications-page__group-label">{{ group.label }}</div>
+
+          @for (notification of group.items; track notification.id) {
+            <article class="notifications-page__item" [class.is-read]="notification.isRead" [attr.data-tone]="getNotificationTone(notification.type)">
+              <button type="button" class="notifications-page__item-main" (click)="openNotification(notification)">
+                <span class="notifications-page__icon" aria-hidden="true">{{ getNotificationIcon(notification.type) }}</span>
+                <span class="notifications-page__item-body">
+                  <span class="notifications-page__message">{{ notification.message }}</span>
+                  <span class="notifications-page__meta">{{ notification.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
+                </span>
+              </button>
+
+              <div class="notifications-page__item-actions">
+                @if (!notification.isRead && !notification.isArchived) {
+                  <button type="button" class="notifications-page__action-btn" aria-label="Mark as read" title="Mark read" (click)="markRead(notification)">
+                    <span class="material-icons" aria-hidden="true">done</span>
+                    <span class="btn-label">Mark read</span>
+                  </button>
+                }
+                @if (notification.isRead && !notification.isArchived) {
+                  <button type="button" class="notifications-page__action-btn" aria-label="Mark as unread" title="Mark unread" (click)="markUnread(notification)">
+                    <span class="material-icons" aria-hidden="true">mark_email_unread</span>
+                    <span class="btn-label">Mark unread</span>
+                  </button>
+                }
+                @if (!notification.isArchived) {
+                  <button type="button" class="notifications-page__action-btn" aria-label="Archive notification" title="Archive" (click)="archiveSingle(notification)">
+                    <span class="material-icons" aria-hidden="true">archive</span>
+                    <span class="btn-label">Archive</span>
+                  </button>
+                }
+                @if (notification.isArchived) {
+                  <button type="button" class="notifications-page__action-btn" aria-label="Restore notification" title="Restore" (click)="restore(notification)">
+                    <span class="material-icons" aria-hidden="true">unarchive</span>
+                    <span class="btn-label">Restore</span>
+                  </button>
+                }
+                <button type="button" class="notifications-page__action-btn notifications-page__action-btn--danger" aria-label="Delete notification" title="Delete" (click)="deleteNotification(notification)">
+                  <span class="material-icons" aria-hidden="true">delete</span>
+                  <span class="btn-label">Delete</span>
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </div>
+
+    @if (hasMore) {
+      <div class="notifications-page__load-more">
+        <button type="button" class="notifications-page__load-more-btn" [disabled]="isLoadingMore" (click)="loadNotifications(false)">
+          {{ isLoadingMore ? 'Loading…' : 'Load more' }}
+        </button>
+      </div>
+    }
+  }
+</section>

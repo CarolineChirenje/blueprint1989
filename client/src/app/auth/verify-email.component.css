@@ -1,0 +1,176 @@
+/* overflow-x guard — scoped to login page wrapper instead of body */
+
+/* Full-page layout copied locally so this component is self-contained. */
+.login-page {
+  margin: -2rem;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  color-scheme: light;
+  width: 100%;
+  max-width: 520px;
+  padding: 2rem;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+
+.login-brand {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.login-logo {
+  width: 132px;
+  height: 132px;
+  display: block;
+  margin: 0 auto;
+}
+
+.verify-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0.5rem;
+  gap: 0.9rem;
+}
+
+.verify-icon {
+  font-size: 44px;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.verify-icon.spin {
+  animation: spin 1.2s linear infinite;
+}
+
+.success-icon { color: var(--success); }
+.error-icon   { color: var(--error); }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.verify-panel h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.verify-panel p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.verify-panel button {
+  width: 100%;
+}
+
+.resend-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.resend-form label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.resend-form input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--primary-subtle);
+  color: var(--text-primary);
+  color-scheme: light;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resend-form input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(35, 122, 73, 0.12);
+}
+
+.resend-success { color: var(--success); font-weight: 500; }
+.resend-error   { color: var(--error); font-weight: 500; font-size: 0.875rem; }
+
+.submit-btn-outline {
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  border: 2px solid var(--primary) !important;
+}
+
+.submit-btn-outline:hover {
+  background: var(--primary-subtle) !important;
+  color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+@media (max-width: 640px) {
+  .login-page {
+    margin: -1rem;
+    padding: 1.25rem 0.85rem;
+  }
+
+  .login-card {
+    padding: 1.15rem;
+    border-radius: 10px;
+    max-height: calc(100vh - 2.5rem);
+  }
+
+  .login-logo {
+    width: 96px;
+    height: 96px;
+  }
+
+  .verify-icon {
+    font-size: 38px;
+  }
+
+  .verify-panel h3 {
+    font-size: 1.02rem;
+  }
+
+  .verify-panel p,
+  .resend-form label,
+  .resend-error {
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .login-card {
+    max-width: 560px;
+    padding: 1.75rem 2rem;
+  }
+
+  .login-logo {
+    width: 116px;
+    height: 116px;
+  }
+
+  .verify-icon {
+    font-size: 40px;
+  }
+}

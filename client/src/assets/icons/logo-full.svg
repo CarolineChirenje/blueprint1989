@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 640" role="img" aria-labelledby="logo-title logo-desc">
+  <title id="logo-title">Batanai</title>
+  <desc id="logo-desc">Batanai logo — a circular unity-inspired green emblem containing a pink piggy bank with a gold coin, with the word BATANAI below.</desc>
+
+  <defs>
+    <style>
+      .ring        { fill: #237A49; }
+      .ring-inner  { fill: #FFFFFF; }
+      .dot         { fill: #237A49; }
+      .pig-body    { fill: #EF8FA1; stroke: #FFFFFF; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+      .pig-snout   { fill: #E8899D; stroke: #FFFFFF; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+      .pig-shadow  { fill: #D6748A; opacity: 0.15; }
+      .pig-light   { fill: #F7B8C5; opacity: 0.45; }
+      .pig-dark    { fill: #2E2E2E; }
+      .pig-nostril { stroke: #C96A7F; stroke-width: 3; stroke-linecap: round; }
+      .pig-accent  { stroke: #237A49; stroke-width: 3.5; stroke-linecap: round; fill: none; opacity: 0.5; }
+      .coin        { fill: #FFD700; }
+      .coin-edge   { fill: none; stroke: #C8960C; stroke-width: 1.8; }
+      .coin-trail  { stroke: #C8960C; stroke-width: 2; stroke-linecap: round; opacity: 0.45; }
+      .brand       { font-family: Inter, Poppins, Arial, Helvetica, sans-serif; font-size: 60px; font-weight: 800; letter-spacing: 5px; fill: #237A49; }
+    </style>
+  </defs>
+
+  <!-- ── Emblem (same as icon.svg, shifted up) ─────────────────────── -->
+  <g transform="translate(0,-30)">
+    <!-- Unity ring (32 px thick) -->
+    <circle class="ring" cx="256" cy="256" r="200"/>
+    <circle class="ring-inner" cx="256" cy="256" r="168"/>
+
+    <!-- Piggy bank -->
+    <g transform="translate(248,260)">
+      <line x1="-38" y1="66" x2="96" y2="66" stroke="#CCCCCC" stroke-width="2" stroke-linecap="round"/>
+      <ellipse class="pig-body" cx="0" cy="0" rx="58" ry="56"/>
+      <ellipse class="pig-snout" cx="-52" cy="8" rx="16" ry="13"/>
+      <line class="pig-nostril" x1="-57" y1="3" x2="-57" y2="12"/>
+      <line class="pig-nostril" x1="-48" y1="3" x2="-48" y2="12"/>
+      <path d="M-14,-49 L-4,-74 L10,-45 Z" fill="#E8899D"/>
+      <rect class="pig-body" x="-28" y="44" width="16" height="22" rx="6"/>
+      <rect class="pig-body" x="14"  y="44" width="16" height="22" rx="6"/>
+      <circle class="pig-dark" cx="-28" cy="-6" r="4.5"/>
+      <circle cx="-26.5" cy="-7.5" r="1.6" fill="#FFFFFF" opacity="0.8"/>
+      <rect class="pig-dark" x="-10" y="-40" width="24" height="6" rx="3"/>
+      <g transform="translate(78,20)">
+        <ellipse cx="0" cy="10" rx="17" ry="6" fill="#B8860B"/>
+        <ellipse cx="0" cy="6" rx="17" ry="6" fill="#FFD700"/>
+        <ellipse cx="0" cy="6" rx="11" ry="3.5" fill="none" stroke="#B8860B" stroke-width="1.2"/>
+        <ellipse cx="0" cy="0" rx="17" ry="6" fill="#B8860B"/>
+        <ellipse cx="0" cy="-4" rx="17" ry="6" fill="#FFD700"/>
+        <ellipse cx="0" cy="-4" rx="11" ry="3.5" fill="none" stroke="#B8860B" stroke-width="1.2"/>
+        <ellipse cx="0" cy="-10" rx="17" ry="6" fill="#B8860B"/>
+        <ellipse cx="0" cy="-14" rx="17" ry="6" fill="#FFD700"/>
+        <ellipse cx="0" cy="-14" rx="11" ry="3.5" fill="none" stroke="#B8860B" stroke-width="1.2"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ── Wordmark ──────────────────────────────────────────────────── -->
+  <text x="256" y="578" text-anchor="middle" class="brand">BATANAI</text>
+</svg>

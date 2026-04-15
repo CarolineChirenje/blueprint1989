@@ -1,0 +1,170 @@
+<h2 mat-dialog-title class="dialog-title-truncate">{{ data.groupName }} — Members</h2>
+
+<mat-dialog-content>
+  <div *ngIf="error" class="error-msg">{{ error }}</div>
+
+  <!-- Invite section — hidden in read-only mode -->
+  <ng-container *ngIf="!isReadOnly">
+    <div class="invite-section">
+      <h4>Invite a user</h4>
+      <div class="invite-row">
+        <mat-form-field appearance="outline" class="user-select">
+          <mat-label>Select user</mat-label>
+          <mat-select [(ngModel)]="selectedUserId" (closed)="clearUserSearch()">
+            <div class="select-search-wrap" (click)="$event.stopPropagation()">
+              <input
+                class="select-search-input"
+                placeholder="Search by name or email…"
+                [(ngModel)]="userSearchTerm"
+                (keydown)="$event.stopPropagation()"
+                autocomplete="off" />
+            </div>
+            <mat-option *ngIf="filteredUsers.length === 0" disabled>No users found</mat-option>
+            <mat-option *ngFor="let u of filteredUsers" [value]="u.id">
+              {{ u.firstName }} {{ u.lastName }} — {{ u.email }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="role-select">
+          <mat-label>Role</mat-label>
+          <mat-select [(ngModel)]="selectedRole">
+            <mat-option value="GroupMember">Member</mat-option>
+            <mat-option value="GroupAdmin">Admin</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary"
+                [disabled]="!selectedUserId || isSendingInvite"
+                (click)="sendInvite()">
+          <mat-spinner *ngIf="isSendingInvite" diameter="16" style="display:inline-block;margin-right:4px;"></mat-spinner>
+          Send Invite
+        </button>
+      </div>
+      <div *ngIf="inviteError" class="error-msg">{{ inviteError }}</div>
+      <div *ngIf="inviteSuccess" class="success-msg">{{ inviteSuccess }}</div>
+    </div>
+    <mat-divider></mat-divider>
+  </ng-container>
+
+  <!-- Accepted Members -->
+  <div>
+    <h4>Accepted Members ({{ acceptedMembers.length }})</h4>
+    <div class="table-scroll">
+    <table mat-table [dataSource]="acceptedMembers" class="members-table shared-table" *ngIf="acceptedMembers.length; else noAccepted">
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let m" data-label="Name">{{ m.firstName }} {{ m.lastName }}</td>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let m" data-label="Email">{{ m.email }}</td>
+      </ng-container>
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Role</th>
+        <td mat-cell *matCellDef="let m" data-label="Role">
+          <ng-container *ngIf="!isReadOnly; else roleText">
+            <mat-select [value]="m.groupRole" (selectionChange)="changeRole(m, $event.value)" class="role-inline-select">
+              <mat-option value="GroupMember">Member</mat-option>
+              <mat-option value="GroupAdmin">Admin</mat-option>
+            </mat-select>
+          </ng-container>
+          <ng-template #roleText>{{ m.groupRole === 'GroupAdmin' ? 'Admin' : 'Member' }}</ng-template>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let m" data-label="Status"><span class="chip accepted">Accepted</span></td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let m" data-label="">
+          <button mat-icon-button color="warn" matTooltip="Remove member" (click)="removeMember(m)">
+            <mat-icon>person_remove</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="isReadOnly ? readOnlyColumns : displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: isReadOnly ? readOnlyColumns : displayedColumns;"></tr>
+    </table>
+    </div>
+    <ng-template #noAccepted><p class="empty-msg">No accepted members yet.</p></ng-template>
+
+    <!-- Pending invites — hidden in read-only mode -->
+    <ng-container *ngIf="!isReadOnly">
+      <h4 style="margin-top:16px">Pending Invites ({{ pendingMembers.length }})</h4>
+      <div class="table-scroll">
+      <table mat-table [dataSource]="pendingMembers" class="members-table shared-table" *ngIf="pendingMembers.length; else noPending">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let m" data-label="Name">{{ m.firstName }} {{ m.lastName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Email</th>
+          <td mat-cell *matCellDef="let m" data-label="Email">{{ m.email }}</td>
+        </ng-container>
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef>Role</th>
+          <td mat-cell *matCellDef="let m" data-label="Role">{{ m.groupRole === 'GroupAdmin' ? 'Admin' : 'Member' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let m" data-label="Status"><span class="chip pending">Pending</span></td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let m" data-label="">
+            <button mat-icon-button color="warn" matTooltip="Cancel invite" (click)="removeMember(m)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      </div>
+      <ng-template #noPending><p class="empty-msg">No pending invites.</p></ng-template>
+    </ng-container>
+
+    <!-- Join Requests — hidden in read-only mode -->
+    <ng-container *ngIf="!isReadOnly && joinRequests.length > 0">
+      <h4 style="margin-top:16px">Join Requests ({{ joinRequests.length }})</h4>
+      <div class="table-scroll">
+      <table mat-table [dataSource]="joinRequests" class="members-table shared-table">
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let r" data-label="Name">{{ r.firstName }} {{ r.lastName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Email</th>
+          <td mat-cell *matCellDef="let r" data-label="Email">{{ r.email }}</td>
+        </ng-container>
+        <ng-container matColumnDef="requestedAt">
+          <th mat-header-cell *matHeaderCellDef>Requested</th>
+          <td mat-cell *matCellDef="let r" data-label="Requested">{{ r.requestedAt | date:'mediumDate' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let r" data-label="">
+            <button mat-icon-button color="primary" matTooltip="Approve" (click)="respondToJoinRequest(r, true)">
+              <mat-icon>check_circle</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Decline" (click)="respondToJoinRequest(r, false)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="joinRequestColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: joinRequestColumns;"></tr>
+      </table>
+      </div>
+    </ng-container>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

@@ -1,0 +1,77 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>Report an Issue</h2>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="dialog-body">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" placeholder="Brief summary of the issue" maxlength="200">
+      @if (form.get('title')?.hasError('required') && form.get('title')?.touched) {
+        <mat-error>Title is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="4" placeholder="Describe the issue in detail" maxlength="2000"></textarea>
+      @if (form.get('description')?.hasError('required') && form.get('description')?.touched) {
+        <mat-error>Description is required</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          @for (opt of typeOptions; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Priority</mat-label>
+        <mat-select formControlName="priority">
+          @for (opt of priorityOptions; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Categories</mat-label>
+      <mat-select formControlName="categories" multiple>
+        @for (opt of categoryOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('categories')?.hasError('required') && form.get('categories')?.touched) {
+        <mat-error>Select at least one category</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="image-upload">
+      <label class="upload-label">Screenshot (optional)</label>
+      <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" #fileInput hidden>
+      @if (!imagePreview) {
+        <button type="button" mat-stroked-button (click)="fileInput.click()">Attach Image</button>
+      } @else {
+        <div class="image-preview-wrap">
+          <img [src]="imagePreview" alt="Preview" class="image-preview">
+          <button type="button" mat-icon-button class="remove-image-btn" (click)="removeImage()" title="Remove image">
+            <span class="remove-icon">&times;</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="dialog-actions">
+      <button mat-button type="button" (click)="cancel()">Cancel</button>
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isSubmitting">
+        {{ isSubmitting ? 'Submitting...' : 'Submit Report' }}
+      </button>
+    </div>
+  </form>
+</div>

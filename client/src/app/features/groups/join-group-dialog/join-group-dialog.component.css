@@ -1,0 +1,5 @@
+.full-width { width: 100%; }
+.hint { color: var(--text-secondary); font-size: .9rem; margin-bottom: .5rem; }
+.success-msg { display: flex; align-items: center; gap: .5rem; color: var(--success, #2e7d32); padding: 1rem 0; }
+.success-msg mat-icon { font-size: 1.5rem; }
+.error-msg { color: var(--error, #d32f2f); font-size: .85rem; margin-top: .25rem; }

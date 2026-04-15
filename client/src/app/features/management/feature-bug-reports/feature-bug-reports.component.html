@@ -1,0 +1,88 @@
+<section class="page">
+  <div class="page__header">
+    <div>
+      <p class="page__eyebrow">Management</p>
+      <h1>Feature &amp; Bug Reports</h1>
+      <p class="page__subtitle">Review and manage user-submitted feature requests and bug reports.</p>
+    </div>
+  </div>
+
+  <div class="filters">
+    <select class="filter-select" [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+      @for (opt of statusOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+    <select class="filter-select" [(ngModel)]="typeFilter" (change)="onTypeFilterChange()">
+      @for (opt of typeOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+    <select class="filter-select" [(ngModel)]="priorityFilter" (change)="onPriorityFilterChange()">
+      @for (opt of priorityOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert--error">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="alert alert--success">{{ successMessage }}</div>
+  }
+
+  @if (isLoading) {
+    <div class="state-message">Loading reports…</div>
+  } @else if (filteredReports.length === 0) {
+    <div class="state-message">No reports found for the selected filters.</div>
+  } @else {
+    <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Priority</th>
+          <th>Categories</th>
+          <th>Status</th>
+          <th>Submitted by</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (report of filteredReports; track report.id) {
+          <tr>
+            <td data-label="Title">
+              <button class="link-btn" (click)="openViewDialog(report)">{{ report.title }}</button>
+            </td>
+            <td data-label="Type">{{ report.typeName }}</td>
+            <td data-label="Priority">{{ report.priorityName }}</td>
+            <td data-label="Categories">
+              @for (cat of report.categoryNames; track cat) {
+                <span class="category-chip">{{ cat }}</span>
+              }
+            </td>
+            <td data-label="Status"><span class="badge" [ngClass]="getStatusBadgeClass(report.status)">{{ report.statusName }}</span></td>
+            <td data-label="Submitted by">{{ report.submittedByName }}</td>
+            <td data-label="Date">{{ report.submittedAt | date:'d MMM y' }}</td>
+            <td data-label="">
+              <div class="action-btns">
+                <button class="btn btn--sm btn--ghost" (click)="openViewDialog(report)">View</button>
+                @if (canMarkInReview(report.status, report.id)) {
+                  <button class="btn btn--sm btn--ghost" (click)="markInReview(report.id)" [disabled]="processingIds.has(report.id)">In Review</button>
+                }
+                @if (canClose(report.status, report.id)) {
+                  <button class="btn btn--sm btn--ghost" (click)="openCloseDialog(report.id)" [disabled]="processingIds.has(report.id)">Close</button>
+                }
+                <button class="btn btn--sm btn--danger-ghost" (click)="deleteReport(report.id)" [disabled]="processingIds.has(report.id)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    </div>
+  }
+</section>

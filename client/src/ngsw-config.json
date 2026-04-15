@@ -1,0 +1,38 @@
+{
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installPath": "/",
+      "resources": {
+        "files": [
+          "/index.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      },
+      "cacheConfig": {
+        "maxSize": 10000000,
+        "maxAge": "1d",
+        "timeout": "5s",
+        "strategy": "performance"
+      }
+    },
+    {
+      "name": "assets",
+      "installPath": "/assets/",
+      "resources": {
+        "files": [
+          "/assets/**"
+        ]
+      },
+      "cacheConfig": {
+        "maxSize": 10000000,
+        "maxAge": "1d",
+        "timeout": "5s",
+        "strategy": "performance"
+      }
+    }
+  ]
+}

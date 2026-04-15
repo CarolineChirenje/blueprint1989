@@ -1,0 +1,73 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="icon-title icon-desc">
+  <title id="icon-title">Batanai</title>
+  <desc id="icon-desc">A circular unity-inspired green emblem containing a pink piggy bank with a gold coin, representing shared group savings.</desc>
+
+  <defs>
+    <style>
+      .ring        { fill: #237A49; }
+      .ring-inner  { fill: #FFFFFF; }
+      .dot         { fill: #237A49; }
+      .pig-body    { fill: #EF8FA1; stroke: #FFFFFF; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+      .pig-snout   { fill: #E8899D; stroke: #FFFFFF; stroke-width: 4; stroke-linejoin: round; stroke-linecap: round; }
+      .pig-shadow  { fill: #D6748A; opacity: 0.15; }
+      .pig-light   { fill: #F7B8C5; opacity: 0.45; }
+      .pig-dark    { fill: #2E2E2E; }
+      .pig-nostril { stroke: #C96A7F; stroke-width: 3; stroke-linecap: round; }
+      .pig-accent  { stroke: #237A49; stroke-width: 3.5; stroke-linecap: round; fill: none; opacity: 0.5; }
+      .coin        { fill: #FFD700; }
+      .coin-edge   { fill: none; stroke: #C8960C; stroke-width: 1.8; }
+      .coin-trail  { stroke: #C8960C; stroke-width: 2; stroke-linecap: round; opacity: 0.45; }
+    </style>
+  </defs>
+
+  <!-- Background: white rounded square. id="icon-bg" used by regen script for maskable variant -->
+  <rect id="icon-bg" width="512" height="512" rx="72" fill="#FFFFFF"/>
+
+  <!-- ── Unity ring (32 px thick) ──────────────────────────────────── -->
+  <circle class="ring" cx="256" cy="256" r="200"/>
+  <circle class="ring-inner" cx="256" cy="256" r="168"/>
+
+  <!-- ── Piggy bank (optically centered in ring) ───────────────────── -->
+  <g transform="translate(248,260)">
+    <!-- Ground line (anchors pig + coins) -->
+    <line x1="-38" y1="66" x2="96" y2="66" stroke="#CCCCCC" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- Body — plump, nearly circular piggy bank (1.04:1) -->
+    <ellipse class="pig-body" cx="0" cy="0" rx="58" ry="56"/>
+
+    <!-- Snout — slightly darker pink for depth -->
+    <ellipse class="pig-snout" cx="-52" cy="8" rx="16" ry="13"/>
+    <line class="pig-nostril" x1="-57" y1="3" x2="-57" y2="12"/>
+    <line class="pig-nostril" x1="-48" y1="3" x2="-48" y2="12"/>
+
+    <!-- Ear — single flat triangle (darker pink, no stroke) -->
+    <path d="M-14,-49 L-4,-74 L10,-45 Z" fill="#E8899D"/>
+
+    <!-- Legs — stubby, balanced under body -->
+    <rect class="pig-body" x="-28" y="44" width="16" height="22" rx="6"/>
+    <rect class="pig-body" x="14"  y="44" width="16" height="22" rx="6"/>
+
+    <!-- Eye -->
+    <circle class="pig-dark" cx="-28" cy="-6" r="4.5"/>
+    <circle cx="-26.5" cy="-7.5" r="1.6" fill="#FFFFFF" opacity="0.8"/>
+
+    <!-- Coin slot -->
+    <rect class="pig-dark" x="-10" y="-40" width="24" height="6" rx="3"/>
+
+    <!-- ── Gold coin stack (beside pig, right side) ──────────────── -->
+    <g transform="translate(78,20)">
+      <!-- Bottom coin (3rd) -->
+      <ellipse cx="0" cy="10" rx="17" ry="6" fill="#B8860B"/>
+      <ellipse cx="0" cy="6" rx="17" ry="6" fill="#FFD700"/>
+      <ellipse cx="0" cy="6" rx="11" ry="3.5" fill="none" stroke="#B8860B" stroke-width="1.2"/>
+      <!-- Middle coin (2nd) -->
+      <ellipse cx="0" cy="0" rx="17" ry="6" fill="#B8860B"/>
+      <ellipse cx="0" cy="-4" rx="17" ry="6" fill="#FFD700"/>
+      <ellipse cx="0" cy="-4" rx="11" ry="3.5" fill="none" stroke="#B8860B" stroke-width="1.2"/>
+      <!-- Top coin (1st) -->
+      <ellipse cx="0" cy="-10" rx="17" ry="6" fill="#B8860B"/>
+      <ellipse cx="0" cy="-14" rx="17" ry="6" fill="#FFD700"/>
+      <ellipse cx="0" cy="-14" rx="11" ry="3.5" fill="none" stroke="#B8860B" stroke-width="1.2"/>
+    </g>
+  </g>
+</svg>

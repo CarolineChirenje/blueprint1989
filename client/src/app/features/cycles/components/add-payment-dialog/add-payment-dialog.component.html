@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>Send Payment</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Amount</mat-label>
+      <input matInput type="number" formControlName="amount" min="0.01" step="0.01" placeholder="0.00" required />
+      <span matTextPrefix>$&nbsp;</span>
+      <mat-error>Enter a valid amount (min $0.01).</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes (optional)</mat-label>
+      <textarea matInput formControlName="notes" rows="3" placeholder="Any notes for this payment…"></textarea>
+    </mat-form-field>
+
+    @if (error) {
+      <p class="error-msg">{{ error }}</p>
+    }
+    @if (isSelfPayment) {
+      <p class="self-payment-hint">
+        <mat-icon class="hint-icon">info</mat-icon>
+        Your payment will be auto-confirmed.
+      </p>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()" [disabled]="saving">Cancel</button>
+  <button mat-raised-button color="primary" (click)="submit()" [disabled]="form.invalid || saving">
+    {{ saving ? 'Sending…' : 'Send Payment' }}
+  </button>
+</mat-dialog-actions>

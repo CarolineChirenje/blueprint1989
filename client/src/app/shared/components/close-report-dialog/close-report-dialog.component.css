@@ -1,0 +1,89 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-header {
+  background: var(--primary);
+  color: white;
+  padding: 18px 24px 16px;
+  flex-shrink: 0;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: white;
+}
+
+.dialog-body {
+  padding: 20px 24px 0;
+}
+
+.instructions {
+  background-color: var(--primary-subtle);
+  border-left: 3px solid var(--primary);
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.instructions p {
+  margin: 0;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 24px 16px;
+  margin-top: 16px;
+  border-top: 1px solid var(--divider);
+}
+
+button {
+  min-width: 100px;
+}
+
+@media (max-width: 600px) {
+  .dialog-header {
+    padding: 14px 16px;
+  }
+
+  .dialog-body {
+    padding: 16px 16px 0;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: 8px 16px 16px;
+  }
+
+  button {
+    width: 100%;
+  }
+}

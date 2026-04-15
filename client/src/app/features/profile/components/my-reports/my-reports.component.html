@@ -1,0 +1,66 @@
+<section class="page">
+  <div class="page__header">
+    <div>
+      <p class="page__eyebrow">Profile</p>
+      <h1>My Feedback</h1>
+      <p class="page__subtitle">View and manage your submitted feature requests and bug reports.</p>
+    </div>
+    <button class="btn btn--primary" (click)="openNewReport()">Report an Issue</button>
+  </div>
+
+  @if (isLoading) {
+    <div class="state-message">Loading your reports…</div>
+  } @else if (reports.length === 0) {
+    <div class="state-message">
+      <p>You haven't submitted any reports yet.</p>
+      <button class="btn btn--primary" (click)="openNewReport()">Submit your first report</button>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Priority</th>
+            <th>Categories</th>
+            <th>Status</th>
+            <th>Version</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (report of reports; track report.id) {
+            <tr>
+              <td data-label="Title">
+                <button class="link-btn" (click)="openViewDialog(report)">{{ report.title }}</button>
+              </td>
+              <td data-label="Type">{{ report.typeName }}</td>
+              <td data-label="Priority">{{ report.priorityName }}</td>
+              <td data-label="Categories">
+                @for (cat of report.categoryNames; track cat) {
+                  <span class="category-chip">{{ cat }}</span>
+                }
+              </td>
+              <td data-label="Status">
+                <span class="badge" [ngClass]="getStatusBadgeClass(report.status)">{{ report.statusName }}</span>
+              </td>
+              <td data-label="Version">{{ report.versionNumber || '—' }}</td>
+              <td data-label="Date">{{ report.submittedAt | date:'d MMM y' }}</td>
+              <td data-label="">
+                <div class="action-btns">
+                  <button class="btn btn--sm btn--ghost" (click)="openViewDialog(report)">View</button>
+                  @if (canDelete(report.status)) {
+                    <button class="btn btn--sm btn--danger-ghost" (click)="deleteReport(report.id)"
+                            [disabled]="processingIds.has(report.id)">Delete</button>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

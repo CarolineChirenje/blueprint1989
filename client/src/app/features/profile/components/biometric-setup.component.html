@@ -1,0 +1,130 @@
+<div class="biometric-container">
+  <div class="biometric-card">
+
+    <!-- ── Credential list ──────────────────────────────────────────────── -->
+    @if (step === 'list') {
+      <div class="step-content">
+        <button type="button" class="btn btn-back" (click)="goBack()">← Back to Profile</button>
+
+        <div class="icon-biometric">🔏</div>
+        <h1>Biometric Login</h1>
+        <p class="description">
+          Log in using your device's fingerprint sensor, Face ID, or Touch ID.
+          Each biometric credential is tied to one device — you can register on multiple devices.
+        </p>
+
+        @if (!isSupported) {
+          <div class="info-box info-box--warning">
+            ⚠️ Your browser does not support WebAuthn biometric login. Try using Chrome or Safari on a device with a biometric sensor.
+          </div>
+        }
+
+        @if (errorMessage) {
+          <div class="error-message">{{ errorMessage }}</div>
+        }
+
+        @if (loadingCredentials) {
+          <p class="loading-text">Loading registered credentials…</p>
+        } @else if (credentials.length === 0) {
+          <div class="empty-state">
+            <p>No biometric credentials registered yet.</p>
+          </div>
+        } @else {
+          <div class="credential-list">
+            <h3>Registered on this account</h3>
+            @for (cred of credentials; track cred.id) {
+              <div class="credential-item">
+                <div class="credential-info">
+                  <span class="credential-name">{{ cred.deviceFriendlyName || 'Biometric Authenticator' }}</span>
+                  <span class="credential-meta">Added {{ formatDate(cred.createdAt) }}</span>
+                  @if (cred.lastUsedAt) {
+                    <span class="credential-meta">Last used {{ formatDate(cred.lastUsedAt) }}</span>
+                  }
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-remove"
+                  (click)="deleteCredential(cred.id)"
+                  [disabled]="deletingId === cred.id">
+                  {{ deletingId === cred.id ? 'Removing…' : 'Remove' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        @if (isSupported) {
+          <div class="button-group">
+            <button type="button" class="btn btn-primary" (click)="startAdd()">
+              + Add biometric for this device
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ── Confirm / name step ──────────────────────────────────────────── -->
+    @if (step === 'confirm') {
+      <div class="step-content">
+        <div class="icon-biometric">🔏</div>
+        <h1>Add Biometric Login</h1>
+        <p class="description">
+          This will register your device's fingerprint sensor, Face ID, or Touch ID for this account.
+          The biometric data <strong>never leaves your device</strong> — only a public key is saved on the server.
+        </p>
+
+        <div class="form-group">
+          <label for="friendlyName">Device name <span class="optional">(optional)</span></label>
+          <input
+            type="text"
+            id="friendlyName"
+            class="form-control"
+            [(ngModel)]="friendlyName"
+            placeholder="e.g. My iPhone, Work Laptop"
+            maxlength="100" />
+          <small class="help-text">Helps identify this credential in your list.</small>
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="register()">Scan biometric</button>
+          <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    }
+
+    <!-- ── Waiting (browser prompt is active) ───────────────────────────── -->
+    @if (step === 'waiting') {
+      <div class="step-content waiting-step">
+        <div class="spinner"></div>
+        <h1>Waiting…</h1>
+        <p class="description">Follow your device prompt to scan your fingerprint, face, or PIN.</p>
+      </div>
+    }
+
+    <!-- ── Success ───────────────────────────────────────────────────────── -->
+    @if (step === 'success') {
+      <div class="step-content">
+        <div class="icon-success">✅</div>
+        <h1>Biometric Login Added</h1>
+        <p class="description">{{ successMessage }}</p>
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="done()">Done</button>
+        </div>
+      </div>
+    }
+
+    <!-- ── Error ─────────────────────────────────────────────────────────── -->
+    @if (step === 'error') {
+      <div class="step-content">
+        <div class="icon-error">❌</div>
+        <h1>Registration Failed</h1>
+        <div class="error-message">{{ errorMessage }}</div>
+        <div class="button-group">
+          <button type="button" class="btn btn-primary" (click)="cancel()">Try Again</button>
+          <button type="button" class="btn btn-secondary" (click)="goBack()">Back to Profile</button>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

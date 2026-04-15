@@ -1,0 +1,72 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>{{ report.typeName }} Report</h2>
+    <span class="badge" [ngClass]="getStatusClass()">{{ report.statusName }}</span>
+  </div>
+
+  <div class="dialog-body">
+    <div class="report-meta">
+      <div class="meta-row">
+        <span class="meta-label">Submitted by</span>
+        <span class="meta-value">{{ report.submittedByName }}</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Priority</span>
+        <span class="meta-value">{{ report.priorityName }}</span>
+      </div>
+      @if (report.categoryNames && report.categoryNames.length > 0) {
+        <div class="meta-row">
+          <span class="meta-label">Categories</span>
+          <span class="meta-value">
+            @for (cat of report.categoryNames; track cat) {
+              <span class="category-chip">{{ cat }}</span>
+            }
+          </span>
+        </div>
+      }
+      <div class="meta-row">
+        <span class="meta-label">Date</span>
+        <span class="meta-value">{{ report.submittedAt | date:'d MMM y, h:mm a' }}</span>
+      </div>
+      @if (report.versionNumber) {
+        <div class="meta-row">
+          <span class="meta-label">Closed in version</span>
+          <span class="meta-value">{{ report.versionNumber }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="report-title">{{ report.title }}</div>
+    <div>
+      <div class="description-header">
+        <span class="meta-label">Description</span>
+        <button class="copy-btn" [class.copied]="descriptionCopied" (click)="copyDescription()" type="button">
+          {{ descriptionCopied ? '✓ Copied' : 'Copy' }}
+        </button>
+      </div>
+      <div class="report-description">{{ report.description }}</div>
+    </div>
+
+    @if (fullImageUrl) {
+      <div class="report-image-wrap">
+        <span class="meta-label">Screenshot</span>
+        <a [href]="fullImageUrl" target="_blank" rel="noopener">
+          <img [src]="fullImageUrl" alt="Report screenshot" class="report-image">
+        </a>
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+  </div>
+
+  <div class="dialog-actions">
+    @if (isAdmin && report.status === ReportStatus.New) {
+      <button mat-raised-button color="accent" (click)="markInReview()" [disabled]="isUpdating">
+        Mark In Review
+      </button>
+    }
+    <button mat-button (click)="close()">Close</button>
+  </div>
+</div>

@@ -1,0 +1,220 @@
+<section class="page">
+
+  <div class="page__header">
+    <div>
+      <p class="page__eyebrow">Management</p>
+      <h1>KYC Review Queue</h1>
+      <p class="page__subtitle">Review pending identity verification submissions before members can join Mukando cycles.</p>
+    </div>
+    <button class="btn btn--secondary" (click)="load()" [disabled]="isLoading">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="btn-icon">
+        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert--error" role="alert">
+      {{ errorMessage }}
+      <button class="alert__dismiss" (click)="dismiss()" aria-label="Dismiss">✕</button>
+    </div>
+  }
+  @if (successMessage) {
+    <div class="alert alert--success" role="status">
+      {{ successMessage }}
+      <button class="alert__dismiss" (click)="dismiss()" aria-label="Dismiss">✕</button>
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="state-message">Loading submissions…</div>
+  } @else if (items.length === 0) {
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="empty-state__icon">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+      </svg>
+      <p>No pending KYC submissions.</p>
+    </div>
+  } @else {
+
+    <div class="queue-layout">
+
+      <!-- LEFT: submission list -->
+      <div class="queue-list">
+        @for (item of items; track item.id) {
+          <button
+            class="queue-item"
+            [class.queue-item--active]="selected?.id === item.id"
+            (click)="select(item)">
+            <div class="queue-item__name">{{ item.userName }}</div>
+            <div class="queue-item__email">{{ item.userEmail }}</div>
+            <div class="queue-item__meta">
+              <span class="id-type-chip">{{ idTypeLabel(item.idType) }}</span>
+              <span class="queue-item__date">{{ item.submittedAt | date: 'dd MMM yyyy, HH:mm' }}</span>
+            </div>
+          </button>
+        }
+      </div>
+
+      <!-- RIGHT: detail panel -->
+      <div class="detail-panel">
+        @if (!selected) {
+          <div class="detail-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            <p>Select a submission to review</p>
+          </div>
+        } @else {
+
+          <div class="detail-scroll">
+            <h2 class="detail-title">{{ selected.userName }}</h2>
+            <p class="detail-email">{{ selected.userEmail }}</p>
+
+            <dl class="detail-fields">
+              <dt>Full name on ID</dt>
+              <dd>{{ selected.fullNameOnId }}</dd>
+
+              <dt>ID type</dt>
+              <dd>{{ idTypeLabel(selected.idType) }}</dd>
+
+              @if (selected.idNumber) {
+                <dt>ID number</dt>
+                <dd>{{ selected.idNumber }}</dd>
+              }
+
+              <dt>Submitted</dt>
+              <dd>{{ selected.submittedAt | date: 'dd MMM yyyy, HH:mm' }}</dd>
+            </dl>
+
+            <!-- Document images -->
+            <div class="images-row">
+              @if (imagesLoading) {
+                <div class="images-loading">Loading documents…</div>
+              }
+              @if (selected.documentFileUrl) {
+                <div class="image-card">
+                  <p class="image-card__label">Identity Document</p>
+                  @if (docObjectUrl) {
+                    <a [href]="docObjectUrl" download="identity-document" target="_blank" rel="noopener">
+                      <img [src]="docObjectUrl" alt="Identity document" class="kyc-image" />
+                    </a>
+                  } @else if (!imagesLoading) {
+                    <p class="image-card__none">Could not load image.</p>
+                  }
+                </div>
+              } @else {
+                <div class="image-card image-card--missing">
+                  <p class="image-card__label">Identity Document</p>
+                  <p class="image-card__none">No document uploaded</p>
+                </div>
+              }
+
+              @if (selected.selfieWithIdFileUrl) {
+                <div class="image-card">
+                  <p class="image-card__label">Selfie with Document</p>
+                  @if (selfieObjectUrl) {
+                    <a [href]="selfieObjectUrl" download="selfie-with-document" target="_blank" rel="noopener">
+                      <img [src]="selfieObjectUrl" alt="Selfie with document" class="kyc-image" />
+                    </a>
+                  } @else if (!imagesLoading) {
+                    <p class="image-card__none">Could not load image.</p>
+                  }
+                </div>
+              } @else {
+                <div class="image-card image-card--missing">
+                  <p class="image-card__label">Selfie with Document</p>
+                  <p class="image-card__none">No selfie uploaded</p>
+                </div>
+              }
+            </div>
+
+            <!-- Action buttons -->
+            @if (!actionPanel) {
+              <div class="action-row">
+                <button class="btn btn--approve" (click)="openAction('approve')" [disabled]="processingId === selected.id">
+                  Approve
+                </button>
+                <button class="btn btn--reject" (click)="openAction('reject')" [disabled]="processingId === selected.id">
+                  Reject
+                </button>
+                <button class="btn btn--bypass" (click)="openAction('bypass')" [disabled]="processingId === selected.id">
+                  Bypass
+                </button>
+              </div>
+            }
+
+            <!-- Approve confirmation -->
+            @if (actionPanel === 'approve') {
+              <div class="action-panel action-panel--approve">
+                <p>Approve this submission? The user will be notified and can now join Mukando cycles.</p>
+                <div class="action-panel__btns">
+                  <button class="btn btn--approve" (click)="approve()" [disabled]="processingId === selected.id">
+                    {{ processingId === selected.id ? 'Approving…' : 'Confirm Approval' }}
+                  </button>
+                  <button class="btn btn--secondary" (click)="cancelAction()">Cancel</button>
+                </div>
+              </div>
+            }
+
+            <!-- Reject form -->
+            @if (actionPanel === 'reject') {
+              <div class="action-panel action-panel--reject" [formGroup]="reviewForm">
+                <label class="field-label" for="rejectionReason">Rejection reason <span class="required">*</span></label>
+                <textarea
+                  id="rejectionReason"
+                  formControlName="rejectionReason"
+                  class="field-textarea"
+                  rows="3"
+                  maxlength="500"
+                  placeholder="Explain clearly so the user can resubmit correctly…"></textarea>
+                @if (reviewForm.get('rejectionReason')?.invalid && reviewForm.get('rejectionReason')?.touched) {
+                  <p class="field-error">A rejection reason is required.</p>
+                }
+                <div class="action-panel__btns">
+                  <button class="btn btn--reject" (click)="reject()"
+                          [disabled]="reviewForm.invalid || processingId === selected.id">
+                    {{ processingId === selected.id ? 'Rejecting…' : 'Confirm Rejection' }}
+                  </button>
+                  <button class="btn btn--secondary" (click)="cancelAction()">Cancel</button>
+                </div>
+              </div>
+            }
+
+            <!-- Bypass form -->
+            @if (actionPanel === 'bypass') {
+              <div class="action-panel action-panel--bypass" [formGroup]="bypassForm">
+                <p class="bypass-warning">
+                  <strong>Admin bypass</strong> — grants Mukando access without document review.
+                  Document an auditable reason below.
+                </p>
+                <label class="field-label" for="bypassNote">Bypass note <span class="required">*</span></label>
+                <textarea
+                  id="bypassNote"
+                  formControlName="note"
+                  class="field-textarea"
+                  rows="3"
+                  maxlength="500"
+                  placeholder="e.g. Verified in-person at community meeting…"></textarea>
+                @if (bypassForm.get('note')?.invalid && bypassForm.get('note')?.touched) {
+                  <p class="field-error">A bypass note is required.</p>
+                }
+                <div class="action-panel__btns">
+                  <button class="btn btn--bypass" (click)="bypass()"
+                          [disabled]="bypassForm.invalid || processingId === selected.id">
+                    {{ processingId === selected.id ? 'Bypassing…' : 'Confirm Bypass' }}
+                  </button>
+                  <button class="btn btn--secondary" (click)="cancelAction()">Cancel</button>
+                </div>
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</section>

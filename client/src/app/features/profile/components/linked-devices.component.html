@@ -1,0 +1,103 @@
+<div class="linked-devices-container">
+  <div class="page-header">
+    <h2>My Devices</h2>
+    <p class="subtitle">Devices that have accessed your Batanai account</p>
+  </div>
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-state">
+      <p>Loading devices...</p>
+    </div>
+  } @else if (devices.length === 0) {
+    <div class="empty-state">
+      <p>No devices registered yet. Devices appear here after you log in.</p>
+    </div>
+  } @else {
+    <div class="devices-list">
+      @for (device of devices; track device.id) {
+        <div class="device-card" [class.current-device]="isCurrentDevice(device)">
+          <div class="device-icon">
+            @if (isDesktop(device)) {
+              <!-- Desktop monitor icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z"/>
+              </svg>
+            } @else {
+              <!-- Smartphone icon for Android / iOS / Unknown -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+              </svg>
+            }
+          </div>
+          <div class="device-details">
+            <div class="device-name-row">
+              @if (renamingDeviceId === device.id) {
+                <input
+                  type="text"
+                  class="rename-input"
+                  [(ngModel)]="renameValue"
+                  (keyup.enter)="saveRename(device)"
+                  (keyup.escape)="cancelRename()"
+                  placeholder="Enter a friendly name..."
+                  maxlength="100"
+                  autofocus
+                />
+                <button class="rename-save-btn" (click)="saveRename(device)" [disabled]="!renameValue.trim()">Save</button>
+                <button class="rename-cancel-btn" (click)="cancelRename()">Cancel</button>
+              } @else {
+                <span class="device-name">
+                  {{ getDeviceLabel(device) }}
+                </span>
+                @if (isCurrentDevice(device)) {
+                  <span class="current-badge">This device</span>
+                }
+                <button class="rename-btn" (click)="startRename(device)" title="Rename this device">
+                  <span class="material-icons">edit</span>
+                </button>
+              }
+            </div>
+            <div class="device-meta">
+              <span class="platform-badge platform-badge-{{ device.deviceType | lowercase }}">{{ device.deviceType }}</span>
+              @if (device.osVersion) {
+                <span>· OS: {{ device.osVersion }}</span>
+              }
+              @if (device.appVersion) {
+                <span>· App v{{ device.appVersion }}</span>
+              }
+            </div>
+            <div class="device-status">
+              <span class="install-status install-status-{{ device.installStatus | lowercase }}">
+                {{ device.installStatus }}
+              </span>
+              <span class="last-seen">Last seen: {{ formatDate(device.lastSeenAt) }}</span>
+            </div>
+            @if (canResetPrompt(device)) {
+              <div class="reset-prompt-row">
+                <button class="reset-prompt-btn" (click)="resetInstallPrompt()" title="Clear remind later so the install prompt shows again">
+                  ↺ Prompt again
+                </button>
+              </div>
+            }
+          </div>
+          @if (!isCurrentDevice(device)) {
+            <button class="remove-btn" (click)="removeDevice(device)" title="Remove device">
+              Remove
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <div class="back-link">
+    <a routerLink="/profile">← Back to Profile</a>
+  </div>
+</div>

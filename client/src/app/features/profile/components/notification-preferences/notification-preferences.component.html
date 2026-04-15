@@ -1,0 +1,103 @@
+<div class="notif-prefs-container">
+  <div class="page-header">
+    <h2>Notification Preferences</h2>
+    <p class="subtitle">Choose which push notifications you want to receive. In-app notifications are always shown regardless of these settings.</p>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error" role="alert">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success" role="alert">{{ successMessage }}</div>
+  }
+
+  @if (loading) {
+    <div class="loading-state">
+      <span class="material-icons spin">sync</span>
+      <p>Loading preferences…</p>
+    </div>
+  } @else {
+
+    @if (adminPrefs.length > 0) {
+      <!-- Admin-controlled notifications -->
+      <section class="pref-section">
+        <div class="section-header">
+          <span class="material-icons section-icon">admin_panel_settings</span>
+          <div>
+            <h3>Administrator-Controlled</h3>
+            <p class="section-note">
+              <span class="material-icons lock-icon">lock</span>
+              These notifications are managed by your administrator and cannot be changed here.
+            </p>
+          </div>
+        </div>
+
+        <ul class="pref-list">
+          @for (pref of adminPrefs; track pref.typeId) {
+            <li class="pref-item pref-item--locked">
+              <div class="pref-info">
+                <span class="pref-name">{{ formatName(pref.typeName) }}</span>
+                @if (pref.description) {
+                  <span class="pref-desc">{{ pref.description }}</span>
+                }
+              </div>
+              <div class="toggle-wrap">
+                <span class="lock-badge" title="Managed by your administrator">
+                  <span class="material-icons">lock</span>
+                </span>
+                <label class="toggle toggle--disabled">
+                  <input type="checkbox" [checked]="pref.isEnabled" disabled />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <!-- User-controlled notifications -->
+    <section class="pref-section">
+      <div class="section-header">
+        <span class="material-icons section-icon">notifications</span>
+        <div>
+          <h3>Push Notifications</h3>
+          <p class="section-note">Toggle which push notifications you receive.</p>
+        </div>
+      </div>
+
+      <ul class="pref-list">
+        @for (pref of otherPrefs; track pref.typeId) {
+          <li class="pref-item" [class.pref-item--disabled]="!pref.isEnabled">
+            <div class="pref-info">
+              <span class="pref-name">{{ formatName(pref.typeName) }}</span>
+              @if (pref.description) {
+                <span class="pref-desc">{{ pref.description }}</span>
+              }
+            </div>
+            <label class="toggle">
+              <input type="checkbox" [checked]="pref.isEnabled" (change)="toggle(pref)" />
+              <span class="slider"></span>
+            </label>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <div class="form-actions">
+      <button class="save-btn" (click)="save()" [disabled]="saving">
+        @if (saving) {
+          <span class="material-icons spin">sync</span> Saving…
+        } @else {
+          Save Preferences
+        }
+      </button>
+    </div>
+
+  }
+
+  <div class="back-link">
+    <a routerLink="/profile">← Back to Profile</a>
+  </div>
+</div>

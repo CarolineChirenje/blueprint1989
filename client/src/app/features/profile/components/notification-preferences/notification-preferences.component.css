@@ -1,0 +1,278 @@
+.notif-prefs-container {
+  max-width: 760px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: var(--text-primary);
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 0.25rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Alerts */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.alert-success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error);
+  border: 1px solid var(--error-border);
+}
+
+/* Loading */
+.loading-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #888;
+}
+
+/* Sections */
+.pref-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.section-icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.health-icon {
+  color: #c62828;
+}
+
+.section-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.2rem;
+  color: var(--primary);
+}
+
+.section-note {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.lock-icon {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* Preference list */
+.pref-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pref-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  transition: opacity 0.2s;
+}
+
+.pref-item:last-child {
+  border-bottom: none;
+}
+
+.pref-item--disabled .pref-info {
+  opacity: 0.5;
+}
+
+.pref-item--locked {
+  opacity: 0.85;
+}
+
+.pref-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pref-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.pref-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Toggle wrap (locked items show lock badge + disabled toggle) */
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lock-badge {
+  color: #aaa;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.lock-badge .material-icons {
+  font-size: 1rem;
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 24px;
+  transition: background 0.25s;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+
+.toggle input:checked + .slider {
+  background: var(--primary);
+}
+
+.toggle input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* Save button */
+.form-actions {
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.save-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Back link */
+.back-link {
+  font-size: 0.9rem;
+}
+
+.back-link a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+/* Spinning icon */
+.spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .pref-item {
+    flex-wrap: nowrap;
+  }
+
+  .pref-name {
+    font-size: 0.9rem;
+  }
+}

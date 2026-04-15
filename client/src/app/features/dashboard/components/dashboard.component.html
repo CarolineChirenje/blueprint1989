@@ -1,0 +1,81 @@
+<div class="dashboard-container">
+
+  <!-- Record Type Picker Overlay -->
+  <app-record-type-picker
+    [visible]="showRecordPicker"
+    (typeSelected)="onRecordTypeSelected($event)"
+    (pickCancelled)="onRecordPickerCancelled()">
+  </app-record-type-picker>
+
+  <div id="dashboard-greeting" class="welcome-section">
+    <h1>{{ getGreeting() }}, {{ userName }}!</h1>
+    <p class="current-time">{{ currentTime | date: 'fullDate' }} - {{ currentTime | date: 'shortTime' }}</p>
+  </div>
+
+  <div id="outstanding-balance-section" class="obligations-section">
+    <h2>My Outstanding Balance</h2>
+
+    <!-- Loading skeleton -->
+    <div *ngIf="summaryLoading" class="hero-skeleton">
+      <div class="skeleton skeleton-icon"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton skeleton-line-lg"></div>
+        <div class="skeleton skeleton-line-md"></div>
+        <div class="skeleton skeleton-line-sm"></div>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="!summaryLoading && summaryError" class="hero-empty">
+      <span class="hero-empty__icon">⚠</span>
+      <span>Could not load outstanding balance.</span>
+      <a class="hero-empty__link" (click)="navigateTo('/cycles')" tabindex="0">Go to Cycles</a>
+    </div>
+
+    <!-- All settled -->
+    <div *ngIf="!summaryLoading && !summaryError && outstandingSummary?.totalOutstanding === 0"
+         class="hero-settled"
+         role="status">
+      <div class="hero-settled__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="hero-settled__title">You are all settled up!</p>
+        <p class="hero-settled__sub">No outstanding balance across your active cycles.</p>
+      </div>
+    </div>
+
+    <!-- Hero card — has outstanding balance -->
+    <div *ngIf="!summaryLoading && !summaryError && outstandingSummary && outstandingSummary.totalOutstanding > 0"
+         class="hero-card"
+         role="button"
+         tabindex="0"
+         (click)="navigateTo('/cycles')"
+         (keyup.enter)="navigateTo('/cycles')">
+
+      <div class="hero-card__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+        </svg>
+      </div>
+
+      <div class="hero-card__content">
+        <span class="hero-card__label">You Owe</span>
+        <span class="hero-card__amount">{{ outstandingSummary.totalOutstanding | currency:'USD':'symbol':'1.2-2' }}</span>
+        <span class="hero-card__meta">
+          {{ outstandingSummary.cycleCount }} active cycle{{ outstandingSummary.cycleCount !== 1 ? 's' : '' }}
+        </span>
+      </div>
+
+      <div class="hero-card__cta">
+        <span>View Cycles</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+</div>
