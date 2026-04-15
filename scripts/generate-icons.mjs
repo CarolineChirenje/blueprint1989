@@ -21,16 +21,23 @@ const maskableSvgBuf = Buffer.from(
   regularSvgBuf.toString().replace('id="icon-bg" width="512" height="512" rx="72"', 'id="icon-bg" width="512" height="512" rx="0"')
 );
 
-// Build badge SVG: white monochrome on transparent background.
-// Android renders the `badge` field in the notification status bar as a small
-// mono silhouette — sending a full-colour icon produces a "white blob".
-// We strip the background rect and force every fill/stroke to white.
+// Badge SVG: white piggy-bank silhouette on transparent background.
+// Android renders `badge` as a tiny monochrome shape in the notification
+// status bar. We draw only the essential pig outline — body, snout, ear,
+// legs — so it stays recognisable at ~24 dp without any detail.
+// Coordinates are the original SVG pig geometry (from icon.svg, centred at
+// translate(248,260)) scaled ×2.8 and re-centred at (265,268) in a 512×512
+// canvas so the silhouette fills the viewBox comfortably.
 const badgeSvgBuf = Buffer.from(
-  regularSvgBuf.toString()
-    .replace(/<rect id="icon-bg"[^>]*\/>/g, '')
-    .replace(/(fill|stroke):\s*#[0-9A-Fa-f]{3,8}/g, '$1: #ffffff')
-    .replace(/fill="#[0-9A-Fa-f]{3,8}"/g, 'fill="#ffffff"')
-    .replace(/stroke="#[0-9A-Fa-f]{3,8}"/g, 'stroke="#ffffff"')
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <g transform="translate(265,268)" fill="#EF8FA1">
+      <path d="M-40,-140 L-10,-210 L28,-130 Z"/>
+      <ellipse cx="0" cy="0" rx="155" ry="150"/>
+      <ellipse cx="-148" cy="22" rx="44" ry="36"/>
+      <rect x="-82" y="120" width="44" height="60" rx="16"/>
+      <rect x="38" y="120" width="44" height="60" rx="16"/>
+    </g>
+  </svg>`
 );
 
 async function rasterize(svgBuf, outPath, size) {
