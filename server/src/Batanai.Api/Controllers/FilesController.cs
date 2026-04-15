@@ -34,7 +34,10 @@ public class FilesController : ControllerBase
             if (file == null || file.Length == 0)
                 return BadRequest(new { message = "No file provided." });
 
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var userIdClaim = User.FindFirst("id")?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+
             var (fileId, _) = await _storage.UploadAsync(file, folder, userId);
 
             var url = $"/api/files/{fileId}";

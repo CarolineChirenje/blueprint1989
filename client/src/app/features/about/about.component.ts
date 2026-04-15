@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
@@ -38,17 +38,19 @@ export class AboutComponent implements OnInit {
     { name: 'JWT Auth', icon: 'lock', description: 'Secure authentication' },
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.http.get<AppVersionDto>(`${environment.apiUrl}/app-config/version`).subscribe({
       next: v => {
         this.frontendVersion = v.frontendVersion;
         this.backendVersion = v.backendVersion;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.frontendVersion = '—';
         this.backendVersion = '—';
+        this.cdr.detectChanges();
       }
     });
   }

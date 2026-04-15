@@ -82,4 +82,15 @@ export class KycService {
       })
     );
   }
+
+  /**
+   * Downloads a KYC file via authenticated HttpClient and returns a blob object URL.
+   * The caller is responsible for calling URL.revokeObjectURL() when done.
+   */
+  downloadAsObjectUrl(apiRelativeUrl: string): Observable<string> {
+    const fullUrl = `${environment.apiUrl.replace(/\/api$/, '')}${apiRelativeUrl}`;
+    return this.http.get(fullUrl, { responseType: 'blob' }).pipe(
+      map(blob => URL.createObjectURL(blob))
+    );
+  }
 }

@@ -948,6 +948,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.router.navigate(['/management/feature-bug-reports']);
   }
 
+  navigateToKycReview(): void {
+    this.closeManagementDropdown();
+    this.router.navigate(['/management/kyc-review']);
+  }
+
   navigateToProfile(): void {
     this.closeDropdown();
     this.router.navigate(['/profile']);
