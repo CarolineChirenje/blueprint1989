@@ -164,7 +164,7 @@
               <span *ngIf="c.outstanding > 0" class="cycle-row__amount cycle-row__amount--owe">
                 {{ c.currencySymbol }}{{ c.outstanding | number:'1.2-2' }}
               </span>
-              <span *ngIf="c.outstanding === 0" class="cycle-row__amount cycle-row__amount--settled">Settled ✓</span>
+              <span *ngIf="c.outstanding === 0" class="cycle-row__amount cycle-row__amount--settled">Settled</span>
             </ng-container>
 
             <!-- Outstanding amount for Mukando contributor -->
@@ -175,12 +175,8 @@
               <span *ngIf="c.outstanding === 0" class="cycle-row__amount cycle-row__amount--settled">—</span>
             </ng-container>
 
-            <!-- Mukando recipient: show $0 + badge -->
-            <ng-container *ngIf="c.cycleType === 'Mukando' && c.contributionStatus === 'Recipient'">
-              <span class="cycle-row__amount cycle-row__amount--recipient">
-                {{ c.currencySymbol }}0.00
-              </span>
-            </ng-container>
+            <!-- Mukando recipient: no amount shown — badge on the left is the indicator -->
+            <!-- (recipients owe $0 and the "You receive!" badge makes that clear) -->
 
             <!-- Arrow -->
             <svg class="cycle-row__arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
