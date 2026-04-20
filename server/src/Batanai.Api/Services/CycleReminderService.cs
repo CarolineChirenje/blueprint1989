@@ -126,7 +126,7 @@ public class CycleReminderService : BackgroundService
 
             var currency = await context.Currencies.FindAsync(cycle.CurrencyId);
             var sym = currency?.Symbol ?? "$";
-            var deepLink = $"/cycles/{cycle.Id}";
+            var deepLink = $"/cycles/{cycle.Id}?tab=rounds";
 
             var pendingContributions = await context.MukandoContributions
                 .Where(c => c.MukandoRoundId == round.Id && c.Status == ContributionStatus.Pending)

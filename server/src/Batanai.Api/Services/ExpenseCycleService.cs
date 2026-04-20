@@ -931,7 +931,7 @@ public class ExpenseCycleService
             NotificationType.CycleOptOutRequested,
             $"Opt-out request: {cycle.Name}",
             $"{user?.FirstName} has requested to leave the cycle \"{cycle.Name}\".",
-            $"/cycles/{cycleId}",
+            $"/cycles/{cycleId}?tab=optouts",
             cycleId);
 
         var requests = await GetOptOutRequestsAsync(cycleId);
@@ -983,7 +983,7 @@ public class ExpenseCycleService
 
         await _push.SendToUserAsync(req.UserId, NotificationType.CycleOptOutResponded,
             $"Opt-out {(approve ? "approved" : "declined")}",
-            message, $"/cycles/{req.ExpenseCycleId}", req.ExpenseCycleId);
+            message, $"/cycles/{req.ExpenseCycleId}?tab=optouts", req.ExpenseCycleId);
 
         return null;
     }
@@ -1172,41 +1172,204 @@ public class ExpenseCycleService
 
     public async Task<OutstandingSummaryDto> GetOutstandingSummaryAsync(int userId)
     {
-        var cycleIds = await _context.CycleMembers
-            .Where(m => m.UserId == userId)
-            .Select(m => m.ExpenseCycleId)
-            .ToListAsync();
+        // Q1: All Active + Draft cycles the user is in, joined with group name and currency in one query.
+        var userCycles = await (
+            from cm in _context.CycleMembers
+            where cm.UserId == userId
+            join c  in _context.ExpenseCycles on cm.ExpenseCycleId equals c.Id
+            where c.Status == CycleStatus.Active || c.Status == CycleStatus.Draft
+            join g  in _context.Groups     on c.GroupId    equals g.Id
+            join cu in _context.Currencies on c.CurrencyId equals cu.Id
+            select new
+            {
+                cm.CycleRole,
+                Cycle          = c,
+                GroupId        = g.Id,
+                GroupName      = g.Name,
+                CurrencySymbol = cu.Symbol
+            }
+        ).ToListAsync();
 
-        var activeCycles = await _context.ExpenseCycles
-            .Where(c => cycleIds.Contains(c.Id) && c.Status == CycleStatus.Active)
-            .ToListAsync();
+        if (userCycles.Count == 0)
+            return new OutstandingSummaryDto(0, 0, new List<CycleOutstandingItemDto>());
+
+        var majanaCycleIds  = userCycles.Where(x => x.Cycle.CycleType == CycleType.Majana  && x.Cycle.Status == CycleStatus.Active).Select(x => x.Cycle.Id).ToList();
+        var mukandoCycleIds = userCycles.Where(x => x.Cycle.CycleType == CycleType.Mukando && x.Cycle.Status == CycleStatus.Active).Select(x => x.Cycle.Id).ToList();
+        var draftCycleIds   = userCycles.Where(x => x.Cycle.Status == CycleStatus.Draft).Select(x => x.Cycle.Id).ToList();
+
+        // Q2: Participant member counts per active Majana cycle (Observers excluded — fixes previous count bug).
+        var participantCounts = majanaCycleIds.Count > 0
+            ? await _context.CycleMembers
+                .Where(m => majanaCycleIds.Contains(m.ExpenseCycleId) && m.CycleRole == CycleRole.Participant)
+                .GroupBy(m => m.ExpenseCycleId)
+                .Select(g => new { CycleId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.CycleId, x => x.Count)
+            : new Dictionary<int, int>();
+
+        // Q3: Total expenses per active Majana cycle.
+        var totalExpenses = majanaCycleIds.Count > 0
+            ? await _context.Expenses
+                .Where(e => majanaCycleIds.Contains(e.ExpenseCycleId))
+                .GroupBy(e => e.ExpenseCycleId)
+                .Select(g => new { CycleId = g.Key, Total = g.Sum(e => e.Amount) })
+                .ToDictionaryAsync(x => x.CycleId, x => x.Total)
+            : new Dictionary<int, decimal>();
+
+        // Q4: User's confirmed payments per active Majana cycle.
+        var userPayments = majanaCycleIds.Count > 0
+            ? await _context.Payments
+                .Where(p => majanaCycleIds.Contains(p.ExpenseCycleId)
+                         && p.PayerId == userId
+                         && p.Status == PaymentStatus.Confirmed)
+                .GroupBy(p => p.ExpenseCycleId)
+                .Select(g => new { CycleId = g.Key, Total = g.Sum(p => p.Amount) })
+                .ToDictionaryAsync(x => x.CycleId, x => x.Total)
+            : new Dictionary<int, decimal>();
+
+        // Q5: Active rounds per active Mukando cycle.
+        var activeRounds = mukandoCycleIds.Count > 0
+            ? await _context.MukandoRounds
+                .Where(r => mukandoCycleIds.Contains(r.ExpenseCycleId) && r.Status == RoundStatus.Active)
+                .ToDictionaryAsync(r => r.ExpenseCycleId)
+            : new Dictionary<int, MukandoRound>();
+
+        // Q6: User's contributions in those active rounds.
+        var activeRoundIds = activeRounds.Values.Select(r => r.Id).ToList();
+        var userContributions = activeRoundIds.Count > 0
+            ? await _context.MukandoContributions
+                .Where(c => activeRoundIds.Contains(c.MukandoRoundId) && c.UserId == userId)
+                .ToDictionaryAsync(c => c.MukandoRoundId)
+            : new Dictionary<int, MukandoContribution>();
+
+        // Q7: Cycle IDs the user has already agreed to (Draft cycles only).
+        var agreedCycleIds = draftCycleIds.Count > 0
+            ? (await _context.CycleMemberAgreements
+                .Where(a => a.UserId == userId && draftCycleIds.Contains(a.ExpenseCycleId))
+                .Select(a => a.ExpenseCycleId)
+                .ToListAsync())
+                .ToHashSet()
+            : new HashSet<int>();
 
         var items = new List<CycleOutstandingItemDto>();
 
-        foreach (var cycle in activeCycles)
+        foreach (var x in userCycles)
         {
-            var memberCount   = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycle.Id);
-            var totalExpenses = await _context.Expenses
-                .Where(e => e.ExpenseCycleId == cycle.Id)
-                .SumAsync(e => e.Amount);
+            var cycle = x.Cycle;
 
-            decimal sharePerMember = memberCount > 0 ? Math.Round(totalExpenses / memberCount, 2) : 0;
+            // ── Draft cycles ─────────────────────────────────────────────────
+            if (cycle.Status == CycleStatus.Draft)
+            {
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           cycle.CycleType.ToString(),
+                    CycleStatus:         "Draft",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         0,
+                    SharePerMember:      null,
+                    TotalPaid:           null,
+                    ActiveRoundNumber:   null,
+                    ContributionDueDate: null,
+                    ContributionStatus:  null,
+                    PendingAgreement:    !agreedCycleIds.Contains(cycle.Id)));
+                continue;
+            }
 
-            var totalPaid = await _context.Payments
-                .Where(p => p.ExpenseCycleId == cycle.Id
-                         && p.PayerId == userId
-                         && p.Status == PaymentStatus.Confirmed)
-                .SumAsync(p => p.Amount);
+            // ── Active Majana ─────────────────────────────────────────────────
+            if (cycle.CycleType == CycleType.Majana)
+            {
+                participantCounts.TryGetValue(cycle.Id, out var count);
+                totalExpenses.TryGetValue(cycle.Id, out var expenses);
+                userPayments.TryGetValue(cycle.Id, out var paid);
 
-            var outstanding = Math.Max(0, Math.Round(sharePerMember - totalPaid, 2));
+                var share       = count > 0 ? Math.Round(expenses / count, 2) : 0m;
+                var outstanding = Math.Max(0, Math.Round(share - paid, 2));
 
-            items.Add(new CycleOutstandingItemDto(cycle.Id, cycle.Name, outstanding, sharePerMember, totalPaid));
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           "Majana",
+                    CycleStatus:         "Active",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         outstanding,
+                    SharePerMember:      share,
+                    TotalPaid:           paid,
+                    ActiveRoundNumber:   null,
+                    ContributionDueDate: null,
+                    ContributionStatus:  null,
+                    PendingAgreement:    false));
+                continue;
+            }
+
+            // ── Active Mukando ────────────────────────────────────────────────
+            if (activeRounds.TryGetValue(cycle.Id, out var round))
+            {
+                string contributionStatus;
+                decimal outstanding;
+
+                if (round.RecipientUserId == userId)
+                {
+                    // User receives this round — fully visible, $0 owed.
+                    contributionStatus = "Recipient";
+                    outstanding        = 0;
+                }
+                else if (userContributions.TryGetValue(round.Id, out var contrib))
+                {
+                    contributionStatus = contrib.Status.ToString();
+                    outstanding        = contrib.Status == ContributionStatus.Pending ? contrib.Amount : 0;
+                }
+                else
+                {
+                    // Contribution record exists but wasn't fetched — treat as Pending.
+                    contributionStatus = "Pending";
+                    outstanding        = cycle.ContributionAmount ?? 0;
+                }
+
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           "Mukando",
+                    CycleStatus:         "Active",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         outstanding,
+                    SharePerMember:      null,
+                    TotalPaid:           null,
+                    ActiveRoundNumber:   round.RoundNumber,
+                    ContributionDueDate: round.DueDate,
+                    ContributionStatus:  contributionStatus,
+                    PendingAgreement:    false));
+            }
+            else
+            {
+                // Active Mukando with no current active round (between rounds or all completed).
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           "Mukando",
+                    CycleStatus:         "Active",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         0,
+                    SharePerMember:      null,
+                    TotalPaid:           null,
+                    ActiveRoundNumber:   null,
+                    ContributionDueDate: null,
+                    ContributionStatus:  null,
+                    PendingAgreement:    false));
+            }
         }
 
-        return new OutstandingSummaryDto(
-            Math.Round(items.Sum(c => c.Outstanding), 2),
-            items.Count,
-            items);
+        var activeTotalOutstanding = Math.Round(items.Where(i => i.CycleStatus == "Active").Sum(i => i.Outstanding), 2);
+        var activeCycleCount       = items.Count(i => i.CycleStatus == "Active");
+
+        return new OutstandingSummaryDto(activeTotalOutstanding, activeCycleCount, items);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

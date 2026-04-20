@@ -130,9 +130,18 @@ public record OutstandingSummaryDto(
 public record CycleOutstandingItemDto(
     int CycleId,
     string CycleName,
+    int GroupId,
+    string GroupName,
+    string CycleType,
+    string CycleStatus,
+    string CurrencySymbol,
     decimal Outstanding,
-    decimal SharePerMember,
-    decimal TotalPaid);
+    decimal? SharePerMember,
+    decimal? TotalPaid,
+    int? ActiveRoundNumber,
+    DateTime? ContributionDueDate,
+    string? ContributionStatus,
+    bool PendingAgreement);
 
 // ── Currency ─────────────────────────────────────────────────────────────────
 

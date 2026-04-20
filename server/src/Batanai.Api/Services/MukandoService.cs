@@ -151,7 +151,7 @@ public class MukandoService
             NotificationType.MukandoContributionReceived,
             $"Contribution received: Round {round.RoundNumber}",
             $"{user?.FirstName} has submitted their {sym}{contribution.Amount:F2} contribution for Round {round.RoundNumber}.",
-            $"/cycles/{round.ExpenseCycleId}",
+            $"/cycles/{round.ExpenseCycleId}?tab=rounds",
             round.ExpenseCycleId);
 
         return null;
@@ -286,7 +286,7 @@ public class MukandoService
             NotificationType.MukandoVerificationRequested,
             $"Verify payout: Round {round.RoundNumber}",
             $"You have been randomly selected to verify a payout of {sym}{request.AmountDisbursed:F2} to {recipient?.FirstName} for Round {round.RoundNumber} of \"{cycle?.Name}\". Open the cycle to review and respond.",
-            $"/cycles/{round.ExpenseCycleId}",
+            $"/cycles/{round.ExpenseCycleId}?tab=rounds",
             round.ExpenseCycleId);
 
         return null;
@@ -398,10 +398,9 @@ public class MukandoService
                 NotificationType.MukandoContributionConfirmed,
                 $"Contribution confirmed: Round {round.RoundNumber}",
                 $"Your contribution for Round {round.RoundNumber} has been independently verified and confirmed.",
-                $"/cycles/{round.ExpenseCycleId}",
+                $"/cycles/{round.ExpenseCycleId}?tab=rounds",
                 round.ExpenseCycleId);
 
-            // Notify admins + recipient if all contributions now resolved
             var allResolved = !await _context.MukandoContributions
                 .AnyAsync(c => c.MukandoRoundId == round.Id
                     && c.Status != ContributionStatus.Confirmed
@@ -414,7 +413,7 @@ public class MukandoService
                     NotificationType.MukandoAllContributionsCollected,
                     $"All contributions collected: Round {round.RoundNumber}",
                     $"All contributions for Round {round.RoundNumber} have been collected. {sym}{round.ActualCollected:F2} ready for payout.",
-                    $"/cycles/{round.ExpenseCycleId}",
+                    $"/cycles/{round.ExpenseCycleId}?tab=rounds",
                     round.ExpenseCycleId);
             }
         }
@@ -440,7 +439,7 @@ public class MukandoService
                 NotificationType.MukandoVerificationRejected,
                 $"Contribution flagged: Round {round.RoundNumber}",
                 $"An independent verifier flagged {member?.FirstName}'s contribution for Round {round.RoundNumber}. Reason: {rejectionReason}",
-                $"/cycles/{round.ExpenseCycleId}",
+                $"/cycles/{round.ExpenseCycleId}?tab=rounds",
                 round.ExpenseCycleId);
         }
 
@@ -504,7 +503,7 @@ public class MukandoService
                 NotificationType.MukandoPayoutConfirmed,
                 $"Payout confirmed: Round {round.RoundNumber}",
                 $"Your payout of {sym}{payout.AmountDisbursed:F2} for Round {round.RoundNumber} has been independently verified and confirmed!",
-                $"/cycles/{round.ExpenseCycleId}",
+                $"/cycles/{round.ExpenseCycleId}?tab=rounds",
                 round.ExpenseCycleId);
 
             var memberIds = await _context.CycleMembers
@@ -516,7 +515,7 @@ public class MukandoService
                 NotificationType.MukandoRoundCompleted,
                 $"Round {round.RoundNumber} complete",
                 $"Round {round.RoundNumber} of \"{cycle?.Name}\" is complete.",
-                $"/cycles/{round.ExpenseCycleId}",
+                $"/cycles/{round.ExpenseCycleId}?tab=rounds",
                 round.ExpenseCycleId);
 
             await ActivateNextRoundOrCompleteCycleAsync(round.ExpenseCycleId, verification.InitiatedByUserId);
@@ -546,7 +545,7 @@ public class MukandoService
                 NotificationType.MukandoVerificationRejected,
                 $"Payout flagged: Round {round.RoundNumber}",
                 $"An independent verifier flagged the payout of {sym}{verification.PendingPayoutAmount:F2} to {recipient?.FirstName} for Round {round.RoundNumber}. Reason: {rejectionReason}. Please review and resubmit.",
-                $"/cycles/{round.ExpenseCycleId}",
+                $"/cycles/{round.ExpenseCycleId}?tab=rounds",
                 round.ExpenseCycleId);
         }
 
@@ -606,7 +605,7 @@ public class MukandoService
             NotificationType.MukandoVerifierReassigned,
             "Verification reassigned",
             "Your verification assignment has been reassigned to another participant.",
-            $"/cycles/{round.ExpenseCycleId}",
+            $"/cycles/{round.ExpenseCycleId}?tab=rounds",
             round.ExpenseCycleId);
 
         // Notify new assignee
@@ -616,7 +615,7 @@ public class MukandoService
             NotificationType.MukandoVerificationRequested,
             $"Verify {old.Target.ToString().ToLower()}: Round {round.RoundNumber}",
             $"You have been randomly selected to verify a {old.Target.ToString().ToLower()} for Round {round.RoundNumber} of \"{cycle?.Name}\". Open the cycle to review and respond.",
-            $"/cycles/{round.ExpenseCycleId}",
+            $"/cycles/{round.ExpenseCycleId}?tab=rounds",
             round.ExpenseCycleId);
 
         return null;
@@ -661,7 +660,7 @@ public class MukandoService
             NotificationType.MukandoVerificationRequested,
             $"Verify contribution: Round {round.RoundNumber}",
             $"You have been randomly selected to verify {member?.FirstName}'s contribution of {sym}{contribution.Amount:F2} for Round {round.RoundNumber} of \"{cycle?.Name}\". Open the cycle to review and respond.",
-            $"/cycles/{round.ExpenseCycleId}",
+            $"/cycles/{round.ExpenseCycleId}?tab=rounds",
             round.ExpenseCycleId);
 
         await LogActivityAsync(round.Id, initiatedByUserId, RoundActivityAction.ContributionVerificationRequested,
@@ -768,7 +767,7 @@ public class MukandoService
                 NotificationType.MukandoRoundStarted,
                 $"Round {nextRound.RoundNumber} started",
                 $"Round {nextRound.RoundNumber} has started. {recipientName} receives this round. Contribute {sym}{cycle?.ContributionAmount:F2} by {nextRound.DueDate:MMM d, yyyy}.",
-                $"/cycles/{cycleId}",
+                $"/cycles/{cycleId}?tab=rounds",
                 cycleId);
         }
         else
@@ -897,7 +896,7 @@ public class MukandoService
                     NotificationType.CycleAgreementsReset,
                     $"Re-agreement required: {cycle.Name}",
                     "Cycle settings have changed. All members must re-agree before the cycle can start.",
-                    $"/cycles/{cycleId}",
+                    $"/cycles/{cycleId}?tab=agreements",
                     cycleId);
         }
 
@@ -1071,7 +1070,7 @@ public class MukandoService
             NotificationType.MukandoSwapRequested,
             $"Swap request: {cycle.Name}",
             $"{requester?.FirstName} wants to swap Round {requesterRound.RoundNumber} with your Round {targetRound.RoundNumber}.",
-            $"/cycles/{cycleId}",
+            $"/cycles/{cycleId}?tab=swaps",
             cycleId);
 
         var swaps = await GetSwapRequestsAsync(cycleId);
@@ -1123,7 +1122,7 @@ public class MukandoService
                 NotificationType.MukandoSwapAccepted,
                 $"Swap accepted: {cycle.Name}",
                 $"Turn swap accepted! Rounds have been updated.",
-                $"/cycles/{swap.ExpenseCycleId}",
+                $"/cycles/{swap.ExpenseCycleId}?tab=swaps",
                 swap.ExpenseCycleId);
         }
         else
@@ -1139,7 +1138,7 @@ public class MukandoService
                 NotificationType.MukandoSwapDeclined,
                 $"Swap declined: {cycle.Name}",
                 "Your swap request has been declined.",
-                $"/cycles/{swap.ExpenseCycleId}",
+                $"/cycles/{swap.ExpenseCycleId}?tab=swaps",
                 swap.ExpenseCycleId);
         }
 

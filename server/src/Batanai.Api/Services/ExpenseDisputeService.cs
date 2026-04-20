@@ -72,7 +72,7 @@ public class ExpenseDisputeService
             NotificationType.DisputeRaised,
             $"Expense disputed in {cycle.Name}",
             $"{raiserName} raised a dispute on \"{expense.Title}\": {dispute.Reason}",
-            $"/cycles/{cycle.Id}",
+            $"/cycles/{cycle.Id}?tab=disputes",
             dispute.Id);
 
         return (await BuildDtoAsync(dispute), null);
@@ -99,7 +99,7 @@ public class ExpenseDisputeService
         // Notify the person who raised the dispute
         var expense = await _context.Expenses.FindAsync(dispute.ExpenseId);
         var cycle   = expense != null ? await _context.ExpenseCycles.FindAsync(expense.ExpenseCycleId) : null;
-        var deepLink = cycle != null ? $"/cycles/{cycle.Id}" : null;
+        var deepLink = cycle != null ? $"/cycles/{cycle.Id}?tab=disputes" : null;
 
         await _push.SendToUserAsync(
             dispute.RaisedByUserId,

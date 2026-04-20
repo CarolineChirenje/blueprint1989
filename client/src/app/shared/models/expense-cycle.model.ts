@@ -159,9 +159,18 @@ export interface OutstandingSummaryDto {
 export interface CycleOutstandingItemDto {
   cycleId: number;
   cycleName: string;
+  groupId: number;
+  groupName: string;
+  cycleType: 'Majana' | 'Mukando';
+  cycleStatus: 'Active' | 'Draft';
+  currencySymbol: string;
   outstanding: number;
-  sharePerMember: number;
-  totalPaid: number;
+  sharePerMember: number | null;
+  totalPaid: number | null;
+  activeRoundNumber: number | null;
+  contributionDueDate: string | null;
+  contributionStatus: 'Pending' | 'Paid' | 'Confirmed' | 'Missed' | 'AwaitingVerification' | 'Recipient' | null;
+  pendingAgreement: boolean;
 }
 
 // ── Disputes ──────────────────────────────────────────────────────────────────
