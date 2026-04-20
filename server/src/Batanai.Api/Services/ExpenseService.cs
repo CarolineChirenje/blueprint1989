@@ -8,10 +8,12 @@ namespace Batanai.Api.Services;
 public class ExpenseService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IPushNotificationSender _push;
 
-    public ExpenseService(ApplicationDbContext context)
+    public ExpenseService(ApplicationDbContext context, IPushNotificationSender push)
     {
         _context = context;
+        _push    = push;
     }
 
     // ── Queries ───────────────────────────────────────────────────────────────
@@ -110,6 +112,9 @@ public class ExpenseService
         if (!Enum.TryParse<ExpenseCategory>(request.Category, ignoreCase: true, out var category))
             return (null, $"Invalid category '{request.Category}'.");
 
+        var amountChanged = Math.Round(request.Amount, 2) != expense.Amount;
+        var expenseTitle  = expense.Title.Trim();
+
         expense.Title     = request.Title.Trim();
         expense.Amount    = Math.Round(request.Amount, 2);
         expense.Category  = category;
@@ -124,6 +129,34 @@ public class ExpenseService
         await _context.SaveChangesAsync();
 
         await RecalculateObligationsAsync(expense);
+
+        // When the amount changes in a Draft cycle, reset all agreements and notify
+        // only those who had already agreed — they need to review and re-agree.
+        if (amountChanged && cycle?.Status == CycleStatus.Draft)
+        {
+            var agreedUserIds = await _context.CycleMemberAgreements
+                .Where(a => a.ExpenseCycleId == expense.ExpenseCycleId)
+                .Select(a => a.UserId)
+                .ToListAsync();
+
+            if (agreedUserIds.Count > 0)
+            {
+                var agreements = await _context.CycleMemberAgreements
+                    .Where(a => a.ExpenseCycleId == expense.ExpenseCycleId)
+                    .ToListAsync();
+
+                _context.CycleMemberAgreements.RemoveRange(agreements);
+                await _context.SaveChangesAsync();
+
+                await _push.SendToUsersAsync(
+                    agreedUserIds,
+                    NotificationType.CycleAgreementsReset,
+                    $"Re-agreement required: {cycle.Name}",
+                    $"The amount for '{expenseTitle}' has been updated. Your agreement has been reset — all members must re-agree before the cycle can start.",
+                    $"/cycles/{expense.ExpenseCycleId}",
+                    expense.ExpenseCycleId);
+            }
+        }
 
         return (await BuildDtoAsync(expense), null);
     }

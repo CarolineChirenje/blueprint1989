@@ -246,7 +246,11 @@ export class CycleDetailComponent implements OnInit {
       }
     });
     ref.afterClosed().subscribe(result => {
-      if (result) { this.loadExpenses(); this.loadContributionSummary(); }
+      if (result) {
+        this.loadExpenses();
+        this.loadContributionSummary();
+        if (this.isDraft()) this.loadAgreements();
+      }
     });
   }
 

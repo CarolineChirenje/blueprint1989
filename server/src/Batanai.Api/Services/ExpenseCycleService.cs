@@ -1065,19 +1065,18 @@ public class ExpenseCycleService
 
         if (agreements.Count == 0) return;
 
+        // Capture who had agreed BEFORE wiping records — only they need to be notified,
+        // since members who hadn't agreed yet have nothing to re-do.
+        var agreedUserIds = agreements.Select(a => a.UserId).ToList();
+
         _context.CycleMemberAgreements.RemoveRange(agreements);
         await _context.SaveChangesAsync();
-
-        var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
-
-        if (memberIds.Count == 0) return;
 
         var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
         if (cycle == null) return;
 
         await _push.SendToUsersAsync(
-            memberIds,
+            agreedUserIds,
             NotificationType.CycleAgreementsReset,
             $"Re-agreement required: {cycle.Name}",
             "Cycle details have changed. All members must re-agree before the cycle can start.",
