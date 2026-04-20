@@ -461,8 +461,10 @@ public class ExpenseCycleService
         if (cycle == null) return (null, "Cycle not found.");
         if (cycle.Status != CycleStatus.Draft) return (null, "Only a Draft cycle can be started.");
 
-        var memberCount = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycleId);
-        if (memberCount < 2) return (null, "A cycle requires at least 2 members before it can be started.");
+        // Observers have no financial role — a cycle needs at least 2 Participants to be meaningful
+        var participantCount = await _context.CycleMembers
+            .CountAsync(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant);
+        if (participantCount < 2) return (null, "A cycle requires at least 2 participants before it can be started.");
 
         // Block if any pending swap requests exist
         if (cycle.CycleType == CycleType.Mukando)
@@ -479,18 +481,19 @@ public class ExpenseCycleService
         if (pendingOptOuts)
             return (null, "All pending opt-out requests must be resolved before the cycle can be started.");
 
-        // Mukando KYC gate: every member must be verified or admin-bypassed before Draft → Active.
+        // Mukando KYC gate: every Participant must be verified or admin-bypassed before Draft → Active.
+        // Observers have no financial obligations so KYC is not required for them.
         if (cycle.CycleType == CycleType.Mukando)
         {
             var unverifiedMembers = await _context.CycleMembers
-                .Where(m => m.ExpenseCycleId == cycleId)
+                .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
                 .Join(_context.Users, m => m.UserId, u => u.Id, (m, u) => u)
                 .Where(u => u.KycStatus != KycStatus.Verified && u.KycStatus != KycStatus.AdminBypassed)
                 .Select(u => $"{u.FirstName} {u.LastName}")
                 .ToListAsync();
 
             if (unverifiedMembers.Count > 0)
-                return (null, $"Cannot start: the following members have not completed identity verification: {string.Join(", ", unverifiedMembers)}.");
+                return (null, $"Cannot start: the following participants have not completed identity verification: {string.Join(", ", unverifiedMembers)}.");
         }
 
         // Block if any unresolved disputes exist
@@ -558,6 +561,12 @@ public class ExpenseCycleService
         else
         {
             // Majana: re-calculate obligations for any expenses added during Draft
+            // Only Participants owe shares; Observers have no financial obligations
+            var participantIds = await _context.CycleMembers
+                .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
+                .Select(m => m.UserId)
+                .ToListAsync();
+
             var expenses = await _context.Expenses.Where(e => e.ExpenseCycleId == cycleId).ToListAsync();
             foreach (var expense in expenses)
             {
@@ -568,9 +577,9 @@ public class ExpenseCycleService
 
             foreach (var expense in expenses)
             {
-                if (memberIds.Count == 0) continue;
-                decimal share = Math.Round(expense.Amount / memberIds.Count, 2);
-                foreach (var uid in memberIds)
+                if (participantIds.Count == 0) continue;
+                decimal share = Math.Round(expense.Amount / participantIds.Count, 2);
+                foreach (var uid in participantIds)
                     _context.MemberObligations.Add(new MemberObligation
                     {
                         ExpenseId  = expense.Id,
@@ -584,7 +593,7 @@ public class ExpenseCycleService
 
             // Notify all members that the cycle has started
             var totalExpenses = expenses.Sum(e => e.Amount);
-            decimal sharePerMember = memberCount > 0 ? Math.Round(totalExpenses / memberCount, 2) : 0;
+            decimal sharePerMember = participantIds.Count > 0 ? Math.Round(totalExpenses / participantIds.Count, 2) : 0;
             var currency = await _context.Currencies.FindAsync(cycle.CurrencyId);
             var sym = currency?.Symbol ?? "$";
             await _push.SendToUsersAsync(
@@ -674,7 +683,7 @@ public class ExpenseCycleService
         return null;
     }
 
-    public async Task<string?> AddMemberAsync(int cycleId, int userId)
+    public async Task<string?> AddMemberAsync(int cycleId, int userId, CycleRole cycleRole = CycleRole.Participant)
     {
         var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
         if (cycle == null) return "Cycle not found.";
@@ -684,7 +693,7 @@ public class ExpenseCycleService
             .AnyAsync(m => m.ExpenseCycleId == cycleId && m.UserId == userId);
         if (exists) return "User is already a member of this cycle.";
 
-        if (cycle.CycleType == CycleType.Mukando)
+        if (cycle.CycleType == CycleType.Mukando && cycleRole == CycleRole.Participant)
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return "User not found.";
@@ -697,6 +706,7 @@ public class ExpenseCycleService
         {
             ExpenseCycleId = cycleId,
             UserId         = userId,
+            CycleRole      = cycleRole,
             AddedAt        = DateTime.UtcNow
         });
 
@@ -704,20 +714,34 @@ public class ExpenseCycleService
 
         var group = await _context.Groups.FindAsync(cycle.GroupId);
         var groupName = group?.Name ?? "your group";
-        await _push.SendToUserAsync(
-            userId,
-            NotificationType.CycleMemberAdded,
-            $"Added to {cycle.Name}",
-            $"You have been added to the {cycle.Name} cycle in {groupName}.",
-            $"/cycles/{cycleId}",
-            cycleId);
 
-        // Mukando: regenerate rounds to include the new member
+        if (cycleRole == CycleRole.Observer)
+        {
+            await _push.SendToUserAsync(
+                userId,
+                NotificationType.CycleMemberObserverAdded,
+                $"Added as Observer to {cycle.Name}",
+                $"You have been added as an Observer to the {cycle.Name} cycle in {groupName}. You will receive notifications but have no financial obligations.",
+                $"/cycles/{cycleId}",
+                cycleId);
+        }
+        else
+        {
+            await _push.SendToUserAsync(
+                userId,
+                NotificationType.CycleMemberAdded,
+                $"Added to {cycle.Name}",
+                $"You have been added to the {cycle.Name} cycle in {groupName}.",
+                $"/cycles/{cycleId}",
+                cycleId);
+        }
+
+        // Mukando: regenerate rounds to include the new member (Participants only affect rounds)
         if (cycle.CycleType == CycleType.Mukando)
             await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(cycleId);
 
-        // Schedule KYC reminders for unverified users added to Mukando Draft cycles
-        if (cycle.CycleType == CycleType.Mukando)
+        // Schedule KYC reminders for unverified Participants added to Mukando Draft cycles
+        if (cycle.CycleType == CycleType.Mukando && cycleRole == CycleRole.Participant)
         {
             var addedUser = await _context.Users.FindAsync(userId);
             if (addedUser != null && addedUser.KycStatus != KycStatus.Verified && addedUser.KycStatus != KycStatus.AdminBypassed)
@@ -730,7 +754,7 @@ public class ExpenseCycleService
         return null;
     }
 
-    public async Task<(List<int>? addedUserIds, string? error)> AddMembersBatchAsync(int cycleId, List<int> userIds, int requestedByUserId)
+    public async Task<(List<int>? addedUserIds, string? error)> AddMembersBatchAsync(int cycleId, List<int> userIds, int requestedByUserId, CycleRole cycleRole = CycleRole.Participant)
     {
         var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
         if (cycle == null) return (null, "Cycle not found.");
@@ -749,7 +773,7 @@ public class ExpenseCycleService
         if (newUserIds.Count == 0)
             return (new List<int>(), null);
 
-        if (cycle.CycleType == CycleType.Mukando)
+        if (cycle.CycleType == CycleType.Mukando && cycleRole == CycleRole.Participant)
         {
             var blockedUsers = await _context.Users
                 .Where(u => newUserIds.Contains(u.Id)
@@ -768,6 +792,7 @@ public class ExpenseCycleService
             {
                 ExpenseCycleId = cycleId,
                 UserId         = uid,
+                CycleRole      = cycleRole,
                 AddedAt        = DateTime.UtcNow
             });
         }
@@ -779,13 +804,27 @@ public class ExpenseCycleService
         {
             var group = await _context.Groups.FindAsync(cycle.GroupId);
             var groupName = group?.Name ?? "your group";
-            await _push.SendToUsersAsync(
-                notifyIds,
-                NotificationType.CycleMemberAdded,
-                $"Added to {cycle.Name}",
-                $"You have been added to the {cycle.Name} cycle in {groupName}.",
-                $"/cycles/{cycleId}",
-                cycleId);
+
+            if (cycleRole == CycleRole.Observer)
+            {
+                await _push.SendToUsersAsync(
+                    notifyIds,
+                    NotificationType.CycleMemberObserverAdded,
+                    $"Added as Observer to {cycle.Name}",
+                    $"You have been added as an Observer to the {cycle.Name} cycle in {groupName}. You will receive notifications but have no financial obligations.",
+                    $"/cycles/{cycleId}",
+                    cycleId);
+            }
+            else
+            {
+                await _push.SendToUsersAsync(
+                    notifyIds,
+                    NotificationType.CycleMemberAdded,
+                    $"Added to {cycle.Name}",
+                    $"You have been added to the {cycle.Name} cycle in {groupName}.",
+                    $"/cycles/{cycleId}",
+                    cycleId);
+            }
         }
 
         // Mukando: regenerate rounds once after all members added
@@ -892,7 +931,7 @@ public class ExpenseCycleService
             NotificationType.CycleOptOutRequested,
             $"Opt-out request: {cycle.Name}",
             $"{user?.FirstName} has requested to leave the cycle \"{cycle.Name}\".",
-            $"/cycles/{cycleId}",
+            $"/cycles/{cycleId}?tab=optouts",
             cycleId);
 
         var requests = await GetOptOutRequestsAsync(cycleId);
@@ -921,11 +960,15 @@ public class ExpenseCycleService
 
             await _context.SaveChangesAsync();
 
-            // Type-specific recalculation
-            if (cycle.CycleType == CycleType.Mukando)
-                await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(req.ExpenseCycleId);
-            else if (cycle.CycleType == CycleType.Majana)
-                await _expenseService.RecalculateAllObligationsAsync(req.ExpenseCycleId);
+            // Observers have no financial records — skip type-specific recalculation
+            var isObserver = member?.CycleRole == CycleRole.Observer;
+            if (!isObserver)
+            {
+                if (cycle.CycleType == CycleType.Mukando)
+                    await _mukandoService.RegenerateRoundsAfterMemberChangeAsync(req.ExpenseCycleId);
+                else if (cycle.CycleType == CycleType.Majana)
+                    await _expenseService.RecalculateAllObligationsAsync(req.ExpenseCycleId);
+            }
 
             // Member left — all remaining members must re-agree
             await ResetAgreementsAsync(req.ExpenseCycleId);
@@ -940,7 +983,7 @@ public class ExpenseCycleService
 
         await _push.SendToUserAsync(req.UserId, NotificationType.CycleOptOutResponded,
             $"Opt-out {(approve ? "approved" : "declined")}",
-            message, $"/cycles/{req.ExpenseCycleId}", req.ExpenseCycleId);
+            message, $"/cycles/{req.ExpenseCycleId}?tab=optouts", req.ExpenseCycleId);
 
         return null;
     }
@@ -1022,19 +1065,18 @@ public class ExpenseCycleService
 
         if (agreements.Count == 0) return;
 
+        // Capture who had agreed BEFORE wiping records — only they need to be notified,
+        // since members who hadn't agreed yet have nothing to re-do.
+        var agreedUserIds = agreements.Select(a => a.UserId).ToList();
+
         _context.CycleMemberAgreements.RemoveRange(agreements);
         await _context.SaveChangesAsync();
-
-        var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
-
-        if (memberIds.Count == 0) return;
 
         var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
         if (cycle == null) return;
 
         await _push.SendToUsersAsync(
-            memberIds,
+            agreedUserIds,
             NotificationType.CycleAgreementsReset,
             $"Re-agreement required: {cycle.Name}",
             "Cycle details have changed. All members must re-agree before the cycle can start.",
@@ -1060,8 +1102,10 @@ public class ExpenseCycleService
         var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
         if (cycle == null) return null;
 
+        // Only Participants are included in expense splits; Observers have no financial obligations
         var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
+            .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
+            .Select(m => m.UserId).ToListAsync();
 
         var users = await _context.Users.Where(u => memberIds.Contains(u.Id)).ToListAsync();
 
@@ -1128,44 +1172,219 @@ public class ExpenseCycleService
 
     public async Task<OutstandingSummaryDto> GetOutstandingSummaryAsync(int userId)
     {
-        var cycleIds = await _context.CycleMembers
-            .Where(m => m.UserId == userId)
-            .Select(m => m.ExpenseCycleId)
-            .ToListAsync();
+        // Q1: All Active + Draft cycles the user is in, joined with group name and currency in one query.
+        var userCycles = await (
+            from cm in _context.CycleMembers
+            where cm.UserId == userId
+            join c  in _context.ExpenseCycles on cm.ExpenseCycleId equals c.Id
+            where c.Status == CycleStatus.Active || c.Status == CycleStatus.Draft
+            join g  in _context.Groups     on c.GroupId    equals g.Id
+            join cu in _context.Currencies on c.CurrencyId equals cu.Id
+            select new
+            {
+                cm.CycleRole,
+                Cycle          = c,
+                GroupId        = g.Id,
+                GroupName      = g.Name,
+                CurrencySymbol = cu.Symbol
+            }
+        ).ToListAsync();
 
-        var activeCycles = await _context.ExpenseCycles
-            .Where(c => cycleIds.Contains(c.Id) && c.Status == CycleStatus.Active)
-            .ToListAsync();
+        if (userCycles.Count == 0)
+            return new OutstandingSummaryDto(0, 0, 0, new List<CycleOutstandingItemDto>());
+
+        var majanaCycleIds  = userCycles.Where(x => x.Cycle.CycleType == CycleType.Majana  && x.Cycle.Status == CycleStatus.Active).Select(x => x.Cycle.Id).ToList();
+        var mukandoCycleIds = userCycles.Where(x => x.Cycle.CycleType == CycleType.Mukando && x.Cycle.Status == CycleStatus.Active).Select(x => x.Cycle.Id).ToList();
+        var draftCycleIds   = userCycles.Where(x => x.Cycle.Status == CycleStatus.Draft).Select(x => x.Cycle.Id).ToList();
+
+        // Q2: Participant member counts per active Majana cycle (Observers excluded — fixes previous count bug).
+        var participantCounts = majanaCycleIds.Count > 0
+            ? await _context.CycleMembers
+                .Where(m => majanaCycleIds.Contains(m.ExpenseCycleId) && m.CycleRole == CycleRole.Participant)
+                .GroupBy(m => m.ExpenseCycleId)
+                .Select(g => new { CycleId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.CycleId, x => x.Count)
+            : new Dictionary<int, int>();
+
+        // Q3: Total expenses per active Majana cycle.
+        var totalExpenses = majanaCycleIds.Count > 0
+            ? await _context.Expenses
+                .Where(e => majanaCycleIds.Contains(e.ExpenseCycleId))
+                .GroupBy(e => e.ExpenseCycleId)
+                .Select(g => new { CycleId = g.Key, Total = g.Sum(e => e.Amount) })
+                .ToDictionaryAsync(x => x.CycleId, x => x.Total)
+            : new Dictionary<int, decimal>();
+
+        // Q4: User's confirmed payments per active Majana cycle.
+        var userPayments = majanaCycleIds.Count > 0
+            ? await _context.Payments
+                .Where(p => majanaCycleIds.Contains(p.ExpenseCycleId)
+                         && p.PayerId == userId
+                         && p.Status == PaymentStatus.Confirmed)
+                .GroupBy(p => p.ExpenseCycleId)
+                .Select(g => new { CycleId = g.Key, Total = g.Sum(p => p.Amount) })
+                .ToDictionaryAsync(x => x.CycleId, x => x.Total)
+            : new Dictionary<int, decimal>();
+
+        // Q5: Active rounds per active Mukando cycle.
+        var activeRounds = mukandoCycleIds.Count > 0
+            ? await _context.MukandoRounds
+                .Where(r => mukandoCycleIds.Contains(r.ExpenseCycleId) && r.Status == RoundStatus.Active)
+                .ToDictionaryAsync(r => r.ExpenseCycleId)
+            : new Dictionary<int, MukandoRound>();
+
+        // Q6: User's contributions in those active rounds.
+        var activeRoundIds = activeRounds.Values.Select(r => r.Id).ToList();
+        var userContributions = activeRoundIds.Count > 0
+            ? await _context.MukandoContributions
+                .Where(c => activeRoundIds.Contains(c.MukandoRoundId) && c.UserId == userId)
+                .ToDictionaryAsync(c => c.MukandoRoundId)
+            : new Dictionary<int, MukandoContribution>();
+
+        // Q7: Cycle IDs the user has already agreed to (Draft cycles only).
+        var agreedCycleIds = draftCycleIds.Count > 0
+            ? (await _context.CycleMemberAgreements
+                .Where(a => a.UserId == userId && draftCycleIds.Contains(a.ExpenseCycleId))
+                .Select(a => a.ExpenseCycleId)
+                .ToListAsync())
+                .ToHashSet()
+            : new HashSet<int>();
 
         var items = new List<CycleOutstandingItemDto>();
 
-        foreach (var cycle in activeCycles)
+        foreach (var x in userCycles)
         {
-            var memberCount   = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycle.Id);
-            var totalExpenses = await _context.Expenses
-                .Where(e => e.ExpenseCycleId == cycle.Id)
-                .SumAsync(e => e.Amount);
+            var cycle = x.Cycle;
 
-            decimal sharePerMember = memberCount > 0 ? Math.Round(totalExpenses / memberCount, 2) : 0;
+            // ── Draft cycles ─────────────────────────────────────────────────
+            if (cycle.Status == CycleStatus.Draft)
+            {
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           cycle.CycleType.ToString(),
+                    CycleStatus:         "Draft",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         0,
+                    SharePerMember:      null,
+                    TotalPaid:           null,
+                    ActiveRoundNumber:   null,
+                    ContributionDueDate: null,
+                    ContributionStatus:  null,
+                    PendingAgreement:    !agreedCycleIds.Contains(cycle.Id),
+                    ExpectedPayout:      null));
+                continue;
+            }
 
-            var totalPaid = await _context.Payments
-                .Where(p => p.ExpenseCycleId == cycle.Id
-                         && p.PayerId == userId
-                         && p.Status == PaymentStatus.Confirmed)
-                .SumAsync(p => p.Amount);
+            // ── Active Majana ─────────────────────────────────────────────────
+            if (cycle.CycleType == CycleType.Majana)
+            {
+                participantCounts.TryGetValue(cycle.Id, out var count);
+                totalExpenses.TryGetValue(cycle.Id, out var expenses);
+                userPayments.TryGetValue(cycle.Id, out var paid);
 
-            var outstanding = Math.Max(0, Math.Round(sharePerMember - totalPaid, 2));
+                var share       = count > 0 ? Math.Round(expenses / count, 2) : 0m;
+                var outstanding = Math.Max(0, Math.Round(share - paid, 2));
 
-            items.Add(new CycleOutstandingItemDto(cycle.Id, cycle.Name, outstanding, sharePerMember, totalPaid));
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           "Majana",
+                    CycleStatus:         "Active",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         outstanding,
+                    SharePerMember:      share,
+                    TotalPaid:           paid,
+                    ActiveRoundNumber:   null,
+                    ContributionDueDate: null,
+                    ContributionStatus:  null,
+                    PendingAgreement:    false,
+                    ExpectedPayout:      null));
+                continue;
+            }
+
+            // ── Active Mukando ────────────────────────────────────────────────
+            if (activeRounds.TryGetValue(cycle.Id, out var round))
+            {
+                string contributionStatus;
+                decimal outstanding;
+
+                if (round.RecipientUserId == userId)
+                {
+                    // User receives this round — fully visible, $0 owed.
+                    contributionStatus = "Recipient";
+                    outstanding        = 0;
+                }
+                else if (userContributions.TryGetValue(round.Id, out var contrib))
+                {
+                    contributionStatus = contrib.Status.ToString();
+                    outstanding        = contrib.Status == ContributionStatus.Pending ? contrib.Amount : 0;
+                }
+                else
+                {
+                    // Contribution record exists but wasn't fetched — treat as Pending.
+                    contributionStatus = "Pending";
+                    outstanding        = cycle.ContributionAmount ?? 0;
+                }
+
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           "Mukando",
+                    CycleStatus:         "Active",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         outstanding,
+                    SharePerMember:      null,
+                    TotalPaid:           null,
+                    ActiveRoundNumber:   round.RoundNumber,
+                    ContributionDueDate: round.DueDate,
+                    ContributionStatus:  contributionStatus,
+                    PendingAgreement:    false,
+                    ExpectedPayout:      contributionStatus == "Recipient" ? round.ExpectedPool : null));
+            }
+            else
+            {
+                // Active Mukando with no current active round (between rounds or all completed).
+                items.Add(new CycleOutstandingItemDto(
+                    CycleId:             cycle.Id,
+                    CycleName:           cycle.Name,
+                    GroupId:             x.GroupId,
+                    GroupName:           x.GroupName,
+                    CycleType:           "Mukando",
+                    CycleStatus:         "Active",
+                    CurrencySymbol:      x.CurrencySymbol,
+                    Outstanding:         0,
+                    SharePerMember:      null,
+                    TotalPaid:           null,
+                    ActiveRoundNumber:   null,
+                    ContributionDueDate: null,
+                    ContributionStatus:  null,
+                    PendingAgreement:    false,
+                    ExpectedPayout:      null));
+            }
         }
 
-        return new OutstandingSummaryDto(
-            Math.Round(items.Sum(c => c.Outstanding), 2),
-            items.Count,
-            items);
+        var activeTotalOutstanding = Math.Round(items.Where(i => i.CycleStatus == "Active").Sum(i => i.Outstanding), 2);
+        var activeTotalIncoming     = Math.Round(items.Where(i => i.ExpectedPayout.HasValue).Sum(i => i.ExpectedPayout!.Value), 2);
+        var activeCycleCount       = items.Count(i => i.CycleStatus == "Active");
+
+        return new OutstandingSummaryDto(activeTotalOutstanding, activeTotalIncoming, activeCycleCount, items);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /// <summary>Returns UserIds of Participants only (excludes Observers). Used for all financial calculations.</summary>
+    public async Task<List<int>> GetParticipantMemberIdsAsync(int cycleId)
+        => await _context.CycleMembers
+            .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
+            .Select(m => m.UserId)
+            .ToListAsync();
 
     private async Task<string> GetUserGroupRoleAsync(int groupId, int userId)
     {
@@ -1178,10 +1397,12 @@ public class ExpenseCycleService
 
     private async Task<List<CycleMemberDto>> GetMemberDtosAsync(int cycleId, int groupId)
     {
-        var memberIds = await _context.CycleMembers
+        var cycleMembers = await _context.CycleMembers
             .Where(m => m.ExpenseCycleId == cycleId)
-            .Select(m => m.UserId)
             .ToListAsync();
+
+        var memberIds = cycleMembers.Select(m => m.UserId).ToList();
+        var cycleRoles = cycleMembers.ToDictionary(m => m.UserId, m => m.CycleRole);
 
         var users = await _context.Users
             .Where(u => memberIds.Contains(u.Id))
@@ -1197,6 +1418,7 @@ public class ExpenseCycleService
             u.LastName,
             u.Email,
             groupRoles.TryGetValue(u.Id, out var gr) ? gr : "GroupMember",
-            u.KycStatus)).ToList();
+            u.KycStatus,
+            cycleRoles.TryGetValue(u.Id, out var cr) ? cr.ToString() : "Participant")).ToList();
     }
 }

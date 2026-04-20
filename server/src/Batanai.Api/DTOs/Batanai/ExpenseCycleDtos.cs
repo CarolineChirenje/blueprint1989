@@ -33,7 +33,7 @@ public record UpdateMukandoSettingsRequest(
 
 public record DuplicateCycleRequest(DateTime NewStartDate);
 
-public record AddMembersBatchRequest(List<int> UserIds);
+public record AddMembersBatchRequest(List<int> UserIds, string? CycleRole = null);
 
 // ── Responses ─────────────────────────────────────────────────────────────────
 
@@ -83,7 +83,8 @@ public record CycleMemberDto(
     string LastName,
     string Email,
     string GroupRole,
-    KycStatus KycStatus);
+    KycStatus KycStatus,
+    string CycleRole);
 
 public record CycleBalanceDto(
     int CycleId,
@@ -123,15 +124,27 @@ public record CycleContributionSummaryDto(
 
 public record OutstandingSummaryDto(
     decimal TotalOutstanding,
+    decimal TotalIncoming,
     int CycleCount,
     List<CycleOutstandingItemDto> Cycles);
 
 public record CycleOutstandingItemDto(
     int CycleId,
     string CycleName,
+    int GroupId,
+    string GroupName,
+    string CycleType,
+    string CycleStatus,
+    string CurrencySymbol,
     decimal Outstanding,
-    decimal SharePerMember,
-    decimal TotalPaid);
+    decimal? SharePerMember,
+    decimal? TotalPaid,
+    int? ActiveRoundNumber,
+    DateTime? ContributionDueDate,
+    string? ContributionStatus,
+    bool PendingAgreement,
+    /// <summary>Mukando recipient only: the expected pool payout for this round.</summary>
+    decimal? ExpectedPayout);
 
 // ── Currency ─────────────────────────────────────────────────────────────────
 

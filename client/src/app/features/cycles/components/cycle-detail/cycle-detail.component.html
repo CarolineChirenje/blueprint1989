@@ -10,20 +10,62 @@
         <button mat-icon-button (click)="back()" aria-label="Back">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <div>
-          <h1>{{ cycle.name }}</h1>
-          <span class="date-range">{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
-          @if (isMukando) {
-            <span class="cycle-type-badge mukando">Mukando</span>
-          }
-        </div>
+
+        <!-- Read mode -->
+        @if (!editingHeader) {
+          <div class="header-title-group">
+            <div class="header-title-row">
+              <h1>{{ cycle.name }}</h1>
+              @if (canManageCycle() && isDraft()) {
+                <button mat-icon-button class="edit-header-btn" matTooltip="Edit name & dates" (click)="openEditHeader()">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              }
+            </div>
+            <span class="date-range">{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
+            @if (isMukando) {
+              <span class="cycle-type-badge mukando">Mukando</span>
+            }
+          </div>
+        }
+
+        <!-- Edit mode -->
+        @if (editingHeader) {
+          <div class="header-edit-form">
+            <mat-form-field appearance="outline" class="edit-name-field">
+              <mat-label>Cycle name</mat-label>
+              <input matInput [(ngModel)]="editName" maxlength="100" required>
+            </mat-form-field>
+            <div class="edit-dates-row">
+              <mat-form-field appearance="outline" class="edit-date-field">
+                <mat-label>Start date</mat-label>
+                <input matInput type="date" [(ngModel)]="editStartDate" required>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="edit-date-field">
+                <mat-label>End date</mat-label>
+                <input matInput type="date" [(ngModel)]="editEndDate" required>
+              </mat-form-field>
+            </div>
+            <div class="edit-actions">
+              <button mat-raised-button color="primary"
+                      [disabled]="editSaving || !editName.trim()"
+                      (click)="saveEditHeader()">
+                <mat-icon>check</mat-icon> {{ editSaving ? 'Saving…' : 'Save' }}
+              </button>
+              <button mat-stroked-button [disabled]="editSaving" (click)="cancelEditHeader()">
+                <mat-icon>close</mat-icon> Cancel
+              </button>
+            </div>
+          </div>
+        }
       </div>
+
       <div class="header-right">
         <span class="badge" [ngClass]="isDraft() ? 'badge-draft' : isActive() ? 'badge-active' : 'badge-closed'">{{ cycle.status }}</span>
         @if (canManageCycle() && isDraft()) {
           <button mat-raised-button color="primary" (click)="startCycle()"
             [disabled]="isMukando && !allMukandoMembersKycReady()"
-            [matTooltip]="pendingDisputeCount() > 0 ? 'Resolve all disputes before starting' : pendingOptOutCount() > 0 ? 'Resolve all opt-out requests before starting' : !allMembersAgreed() ? 'All members must agree before starting' : cycle.members.length < 2 ? 'Add at least 1 more member' : isMukando && !allMukandoMembersKycReady() ? 'All Mukando members must complete KYC verification before starting' : 'Start cycle and notify members'">
+            [matTooltip]="pendingDisputeCount() > 0 ? 'Resolve all disputes before starting' : pendingOptOutCount() > 0 ? 'Resolve all opt-out requests before starting' : !allMembersAgreed() ? 'All members must agree before starting' : participantCount < 2 ? 'Add at least 2 participants before starting' : isMukando && !allMukandoMembersKycReady() ? 'All Mukando participants must complete KYC verification before starting' : 'Start cycle and notify members'">
             <mat-icon>play_arrow</mat-icon> Start Cycle
           </button>
         }
@@ -50,10 +92,10 @@
     @if (isDraft() && canManageCycle()) {
       <div class="draft-checklist">
         <h3><mat-icon>checklist</mat-icon> Setup Checklist</h3>
-        <div class="check-item" [class.done]="cycle.members.length >= 2">
-          <mat-icon>{{ cycle.members.length >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-          <span>Add members ({{ cycle.members.length }}/2 minimum)</span>
-          @if (cycle.members.length < 2) {
+        <div class="check-item" [class.done]="participantCount >= 2">
+          <mat-icon>{{ participantCount >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          <span>Add participants ({{ participantCount }}/2 minimum)</span>
+          @if (participantCount < 2) {
             <button mat-stroked-button color="primary" (click)="goToTab('members')">Add</button>
           }
         </div>
@@ -79,7 +121,7 @@
             <mat-icon>{{ allMukandoMembersKycReady() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
             <span>
               All Mukando members KYC verified
-              <span class="checklist-count">({{ kycReadyMembersCount() }}/{{ cycle.members.length }})</span>
+              <span class="checklist-count">({{ kycReadyMembersCount() }}/{{ participantCount }})</span>
             </span>
             @if (!allMukandoMembersKycReady()) {
               <button mat-stroked-button color="primary" (click)="goToTab('members')">View</button>
@@ -785,6 +827,23 @@
               </div>
             }
           </div>
+          @if (observerCount > 0) {
+            <div class="observer-payout-section">
+              <div class="observer-payout-header">
+                <mat-icon>visibility</mat-icon>
+                <span>Observers ({{ observerCount }}) — not included in payout order</span>
+              </div>
+              @for (m of cycle.members; track m.userId) {
+                @if (m.cycleRole === 'Observer') {
+                  <div class="payout-order-row observer-row">
+                    <mat-icon class="observer-icon">visibility</mat-icon>
+                    <span class="payout-order-name">{{ m.firstName }} {{ m.lastName }}</span>
+                    <span class="observer-note">Observer</span>
+                  </div>
+                }
+              }
+            </div>
+          }
         }
       </div>
     }
@@ -1030,12 +1089,15 @@
                 }
               </mat-select>
             </mat-form-field>
+            <mat-checkbox [(ngModel)]="addAsObserver" class="observer-toggle" matTooltip="Observer: receives all notifications and can raise disputes, but has no financial obligations">
+              Add as Observer
+            </mat-checkbox>
             <button mat-raised-button color="primary"
                     [disabled]="!selectedAddUserId || addingMember"
                     (click)="addCycleMember()">
               <mat-icon>person_add</mat-icon> Add
             </button>
-            @if (addableMembers.length > 1) {
+            @if (addableMembers.length > 1 && !addAsObserver) {
               <button mat-stroked-button color="primary"
                       [disabled]="addingMember"
                       (click)="addAllMembers()">
@@ -1047,7 +1109,19 @@
         @if (isMukando && isDraft() && cycle.members.length >= 2) {
           <div class="mukando-draft-preview">
             <mat-icon>info_outline</mat-icon>
-            <span>{{ cycle.members.length }} rounds · Pool per round: {{ currencySymbol }}{{ poolPerRound | number:'1.2-2' }}</span>
+            <span>
+              {{ participantCount }} participant{{ participantCount !== 1 ? 's' : '' }}
+              @if (observerCount > 0) {
+                · {{ observerCount }} observer{{ observerCount !== 1 ? 's' : '' }}
+              }
+              · {{ participantCount }} rounds · Pool per round: {{ currencySymbol }}{{ poolPerRound | number:'1.2-2' }}
+            </span>
+          </div>
+        }
+        @if (!isMukando && observerCount > 0) {
+          <div class="mukando-draft-preview">
+            <mat-icon>visibility</mat-icon>
+            <span>{{ participantCount }} participant{{ participantCount !== 1 ? 's' : '' }} · {{ observerCount }} observer{{ observerCount !== 1 ? 's' : '' }}</span>
           </div>
         }
         <div class="member-list">
@@ -1058,6 +1132,9 @@
                   <span class="member-name">{{ m.firstName }} {{ m.lastName }}</span>
                   @if (m.groupRole === 'GroupAdmin') {
                     <span class="group-admin-badge">Group Admin</span>
+                  }
+                  @if (m.cycleRole === 'Observer') {
+                    <span class="observer-badge">Observer</span>
                   }
                 </div>
                 <span class="member-email">{{ m.email }}</span>

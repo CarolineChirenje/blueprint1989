@@ -12,6 +12,47 @@
     <p class="current-time">{{ currentTime | date: 'fullDate' }} - {{ currentTime | date: 'shortTime' }}</p>
   </div>
 
+  <!-- ── Mukando banners ──────────────────────────────────────────────── -->
+  <ng-container *ngIf="mukandoDashboard">
+
+    <!-- Contribution due soon -->
+    <div *ngIf="mukandoDashboard.nextContribution"
+         class="mukando-banner mukando-banner--contribution"
+         role="button" tabindex="0"
+         (click)="goToCycle(mukandoDashboard.nextContribution!.cycleId, 'rounds')"
+         (keyup.enter)="goToCycle(mukandoDashboard.nextContribution!.cycleId, 'rounds')">
+      <div class="mukando-banner__icon">🔔</div>
+      <div class="mukando-banner__body">
+        <span class="mukando-banner__title">Contribution due - {{ mukandoDashboard.nextContribution.cycleName }}</span>
+        <span class="mukando-banner__sub">
+          Round {{ mukandoDashboard.nextContribution.roundNumber }}&nbsp;·&nbsp;
+          {{ mukandoDashboard.nextContribution.currencySymbol }}{{ mukandoDashboard.nextContribution.amount | number:'1.2-2' }}
+          due {{ mukandoDashboard.nextContribution.dueDate | date:'MMM d' }}
+          &nbsp;- {{ mukandoDashboard.nextContribution.recipientName }} receives
+        </span>
+      </div>
+      <div class="mukando-banner__cta">›</div>
+    </div>
+
+    <!-- Payout incoming -->
+    <div *ngIf="mukandoDashboard.payoutRound"
+         class="mukando-banner mukando-banner--payout"
+         role="button" tabindex="0"
+         (click)="goToCycle(mukandoDashboard.payoutRound!.cycleId, 'rounds')"
+         (keyup.enter)="goToCycle(mukandoDashboard.payoutRound!.cycleId, 'rounds')">
+      <div class="mukando-banner__icon">🎉</div>
+      <div class="mukando-banner__body">
+        <span class="mukando-banner__title">Your payout is coming — {{ mukandoDashboard.payoutRound.cycleName }}</span>
+        <span class="mukando-banner__sub">
+          Round {{ mukandoDashboard.payoutRound.roundNumber }}&nbsp;·&nbsp;
+          estimated {{ mukandoDashboard.payoutRound.estimatedDate | date:'MMM d' }}
+        </span>
+      </div>
+      <div class="mukando-banner__cta">›</div>
+    </div>
+
+  </ng-container>
+
   <div id="outstanding-balance-section" class="obligations-section">
     <h2>My Outstanding Balance</h2>
 
@@ -32,50 +73,137 @@
       <a class="hero-empty__link" (click)="navigateTo('/cycles')" tabindex="0">Go to Cycles</a>
     </div>
 
-    <!-- All settled -->
-    <div *ngIf="!summaryLoading && !summaryError && outstandingSummary?.totalOutstanding === 0"
-         class="hero-settled"
-         role="status">
-      <div class="hero-settled__icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-        </svg>
-      </div>
-      <div>
-        <p class="hero-settled__title">You are all settled up!</p>
-        <p class="hero-settled__sub">No outstanding balance across your active cycles.</p>
-      </div>
-    </div>
+    <ng-container *ngIf="!summaryLoading && !summaryError && outstandingSummary">
 
-    <!-- Hero card — has outstanding balance -->
-    <div *ngIf="!summaryLoading && !summaryError && outstandingSummary && outstandingSummary.totalOutstanding > 0"
-         class="hero-card"
-         role="button"
-         tabindex="0"
-         (click)="navigateTo('/cycles')"
-         (keyup.enter)="navigateTo('/cycles')">
+      <!-- Hero — static total (non-clickable summary) -->
+      <div class="hero-card hero-card--static"
+           [class.hero-card--settled]="outstandingSummary.totalOutstanding === 0"
+           role="status">
 
-      <div class="hero-card__icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
-        </svg>
+        <!-- Settled icon -->
+        <div *ngIf="outstandingSummary.totalOutstanding === 0" class="hero-settled__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+        </div>
+
+        <!-- Owe icon -->
+        <div *ngIf="outstandingSummary.totalOutstanding > 0" class="hero-card__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+          </svg>
+        </div>
+
+        <div class="hero-card__content">
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming === 0" class="hero-settled__title">You are all settled up!</span>
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming === 0" class="hero-settled__sub">No outstanding balance across your active cycles.</span>
+
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming > 0" class="hero-settled__title">No payments due</span>
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming > 0" class="hero-settled__sub">
+            {{ outstandingSummary.cycleCount }} active cycle{{ outstandingSummary.cycleCount !== 1 ? 's' : '' }}
+          </span>
+
+          <span *ngIf="outstandingSummary.totalOutstanding > 0" class="hero-card__label">Total Outstanding</span>
+          <span *ngIf="outstandingSummary.totalOutstanding > 0" class="hero-card__amount">
+            {{ outstandingSummary.totalOutstanding | currency:'USD':'symbol':'1.2-2' }}
+          </span>
+          <span *ngIf="outstandingSummary.totalOutstanding > 0" class="hero-card__meta">
+            across {{ outstandingSummary.cycleCount }} active cycle{{ outstandingSummary.cycleCount !== 1 ? 's' : '' }}
+          </span>
+
+          <!-- Incoming payout line (shown alongside outstanding or alone) -->
+          <span *ngIf="outstandingSummary.totalIncoming > 0" class="hero-card__incoming">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
+            Incoming {{ outstandingSummary.totalIncoming | currency:'USD':'symbol':'1.2-2' }}
+          </span>
+        </div>
       </div>
 
-      <div class="hero-card__content">
-        <span class="hero-card__label">You Owe</span>
-        <span class="hero-card__amount">{{ outstandingSummary.totalOutstanding | currency:'USD':'symbol':'1.2-2' }}</span>
-        <span class="hero-card__meta">
-          {{ outstandingSummary.cycleCount }} active cycle{{ outstandingSummary.cycleCount !== 1 ? 's' : '' }}
-        </span>
+      <!-- Empty state: user has no cycles at all -->
+      <div *ngIf="!hasCycles()" class="hero-empty">
+        <span class="hero-empty__icon">📋</span>
+        <span>You are not part of any cycles yet.</span>
+        <a class="hero-empty__link" (click)="navigateTo('/groups')" tabindex="0">Browse Groups</a>
       </div>
 
-      <div class="hero-card__cta">
-        <span>View Cycles</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
-        </svg>
-      </div>
+      <!-- ── Per-cycle list ─────────────────────────────────────────── -->
+      <ul *ngIf="hasCycles()" class="cycle-list" aria-label="Your cycles">
 
-    </div>
+        <li *ngFor="let c of outstandingSummary.cycles"
+            class="cycle-row"
+            [class.cycle-row--draft]="c.cycleStatus === 'Draft'"
+            role="button" tabindex="0"
+            (click)="goToCycle(c.cycleId, c.cycleStatus === 'Draft' ? 'agreements' : (c.cycleType === 'Mukando' ? 'rounds' : undefined))"
+            (keyup.enter)="goToCycle(c.cycleId, c.cycleStatus === 'Draft' ? 'agreements' : (c.cycleType === 'Mukando' ? 'rounds' : undefined))">
+
+          <!-- Left: cycle info -->
+          <div class="cycle-row__info">
+            <span class="cycle-row__name">{{ c.cycleName }}</span>
+            <span class="cycle-row__meta">{{ c.groupName }}</span>
+
+            <!-- Pending agreement warning -->
+            <span *ngIf="c.pendingAgreement" class="badge badge--warning">Agreement pending</span>
+
+            <!-- Draft cycle (no agreement needed yet) -->
+            <span *ngIf="c.cycleStatus === 'Draft' && !c.pendingAgreement" class="status-chip status-chip--draft">Setting up</span>
+
+            <!-- Mukando: contribution status chip -->
+            <ng-container *ngIf="c.cycleType === 'Mukando' && c.cycleStatus === 'Active'">
+              <span *ngIf="c.contributionStatus === 'Recipient'" class="badge badge--payout">You receive!</span>
+              <span *ngIf="c.contributionStatus === 'Confirmed'" class="status-chip status-chip--confirmed">Contributed ✓</span>
+              <span *ngIf="c.contributionStatus === 'AwaitingVerification'" class="status-chip status-chip--pending">Awaiting verification</span>
+              <span *ngIf="c.contributionStatus === 'Paid'" class="status-chip status-chip--pending">Submitted</span>
+              <span *ngIf="c.contributionStatus === 'Missed'" class="status-chip status-chip--overdue">Missed</span>
+              <span *ngIf="c.activeRoundNumber" class="cycle-row__meta">
+                Round {{ c.activeRoundNumber }}
+                <ng-container *ngIf="c.contributionDueDate">
+                  &nbsp;· due {{ c.contributionDueDate | date:'MMM d' }}
+                </ng-container>
+              </span>
+            </ng-container>
+
+            <!-- Mukando: no active round -->
+            <span *ngIf="c.cycleType === 'Mukando' && c.cycleStatus === 'Active' && !c.activeRoundNumber"
+                  class="status-chip status-chip--idle">Between rounds</span>
+          </div>
+
+          <!-- Right: amount / status -->
+          <div class="cycle-row__right">
+
+            <!-- Outstanding amount for Majana -->
+            <ng-container *ngIf="c.cycleType === 'Majana' && c.cycleStatus === 'Active'">
+              <span *ngIf="c.outstanding > 0" class="cycle-row__amount cycle-row__amount--owe">
+                {{ c.currencySymbol }}{{ c.outstanding | number:'1.2-2' }}
+              </span>
+              <span *ngIf="c.outstanding === 0" class="cycle-row__amount cycle-row__amount--settled">Settled</span>
+            </ng-container>
+
+            <!-- Outstanding amount for Mukando contributor -->
+            <ng-container *ngIf="c.cycleType === 'Mukando' && c.cycleStatus === 'Active' && c.contributionStatus !== 'Recipient'">
+              <span *ngIf="c.outstanding > 0" class="cycle-row__amount cycle-row__amount--owe">
+                {{ c.currencySymbol }}{{ c.outstanding | number:'1.2-2' }}
+              </span>
+              <span *ngIf="c.outstanding === 0" class="cycle-row__amount cycle-row__amount--settled">—</span>
+            </ng-container>
+
+            <!-- Mukando recipient: no amount shown — badge on the left is the indicator -->
+            <!-- Expected payout shown below cycle name -->
+            <ng-container *ngIf="c.cycleType === 'Mukando' && c.contributionStatus === 'Recipient' && c.expectedPayout">
+              <span class="cycle-row__amount cycle-row__amount--incoming">
+                {{ c.currencySymbol }}{{ c.expectedPayout | number:'1.2-2' }} incoming
+              </span>
+            </ng-container>
+
+            <!-- Arrow -->
+            <svg class="cycle-row__arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+            </svg>
+          </div>
+
+        </li>
+      </ul>
+
+    </ng-container>
   </div>
 </div>
+

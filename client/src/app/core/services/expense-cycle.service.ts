@@ -81,12 +81,12 @@ export class ExpenseCycleService {
     return this.http.delete<void>(`${this.url}/${id}`);
   }
 
-  addMember(cycleId: number, userId: number): Observable<void> {
-    return this.http.post<void>(`${this.url}/${cycleId}/members/${userId}`, {});
+  addMember(cycleId: number, userId: number, cycleRole: 'Participant' | 'Observer' = 'Participant'): Observable<void> {
+    return this.http.post<void>(`${this.url}/${cycleId}/members/${userId}?cycleRole=${cycleRole}`, {});
   }
 
-  addMembersBatch(cycleId: number, userIds: number[]): Observable<{ addedUserIds: number[] }> {
-    return this.http.post<{ addedUserIds: number[] }>(`${this.url}/${cycleId}/members/batch`, { userIds });
+  addMembersBatch(cycleId: number, userIds: number[], cycleRole: 'Participant' | 'Observer' = 'Participant'): Observable<{ addedUserIds: number[] }> {
+    return this.http.post<{ addedUserIds: number[] }>(`${this.url}/${cycleId}/members/batch`, { userIds, cycleRole });
   }
 
   removeMember(cycleId: number, userId: number): Observable<void> {

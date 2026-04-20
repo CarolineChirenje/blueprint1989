@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ExpenseCycleService } from '../../../core/services/expense-cycle.service';
-import { OutstandingSummaryDto } from '../../../shared/models/expense-cycle.model';
+import { OutstandingSummaryDto, MukandoDashboardDto } from '../../../shared/models/expense-cycle.model';
 import { Role } from '../../../shared/models/user.model';
 
 @Component({
@@ -20,6 +20,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   outstandingSummary: OutstandingSummaryDto | null = null;
   summaryLoading = true;
   summaryError = false;
+
+  mukandoDashboard: MukandoDashboardDto | null = null;
 
   constructor(
     private auth: AuthService,
@@ -47,6 +49,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+
+    this.cycleService.getMukandoDashboard().subscribe({
+      next: (data) => {
+        this.mukandoDashboard = data;
+        this.cdr.detectChanges();
+      },
+      error: () => { /* non-critical — dashboard still works without it */ }
+    });
   }
 
   ngOnDestroy(): void {
@@ -70,6 +80,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   canAccessTerms(): boolean {
     const roleId = this.auth.getUserRoleId();
     return roleId === Role.SuperAdmin || roleId === Role.Admin;
+  }
+
+  hasCycles(): boolean {
+    return (this.outstandingSummary?.cycles?.length ?? 0) > 0;
+  }
+
+  goToCycle(cycleId: number, tab?: string): void {
+    const extras = tab ? { queryParams: { tab } } : {};
+    this.router.navigate(['/cycles', cycleId], extras);
   }
 
   showDiabetes(): boolean {
@@ -102,3 +121,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.router.navigate([path]);
   }
 }
+

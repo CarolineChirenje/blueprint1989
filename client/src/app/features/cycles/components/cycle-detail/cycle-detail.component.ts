@@ -58,6 +58,14 @@ export class CycleDetailComponent implements OnInit {
   addableMembers: GroupMemberDto[] = [];
   selectedAddUserId: number | null = null;
   addingMember = false;
+  addAsObserver = false;
+
+  // Inline edit (name + dates, draft admin only)
+  editingHeader = false;
+  editSaving = false;
+  editName = '';
+  editStartDate = '';
+  editEndDate = '';
 
   // Mukando state
   rounds: MukandoRoundDto[] = [];
@@ -238,7 +246,11 @@ export class CycleDetailComponent implements OnInit {
       }
     });
     ref.afterClosed().subscribe(result => {
-      if (result) { this.loadExpenses(); this.loadContributionSummary(); }
+      if (result) {
+        this.loadExpenses();
+        this.loadContributionSummary();
+        if (this.isDraft()) this.loadAgreements();
+      }
     });
   }
 
@@ -365,6 +377,41 @@ export class CycleDetailComponent implements OnInit {
 
   back(): void { this.router.navigate(['/cycles']); }
 
+  openEditHeader(): void {
+    if (!this.cycle) return;
+    this.editName      = this.cycle.name;
+    this.editStartDate = this.cycle.startDate.substring(0, 10);
+    this.editEndDate   = this.cycle.endDate.substring(0, 10);
+    this.editingHeader = true;
+  }
+
+  cancelEditHeader(): void { this.editingHeader = false; }
+
+  saveEditHeader(): void {
+    if (!this.cycle || !this.editName.trim()) return;
+    if (this.editStartDate >= this.editEndDate) {
+      this.snackBar.open('End date must be after start date.', 'Dismiss', { duration: 4000 });
+      return;
+    }
+    this.editSaving = true;
+    this.cycleService.update(this.cycle.id, {
+      name:      this.editName.trim(),
+      startDate: new Date(this.editStartDate).toISOString(),
+      endDate:   new Date(this.editEndDate).toISOString()
+    }).subscribe({
+      next: () => {
+        this.editingHeader = false;
+        this.editSaving    = false;
+        this.snackBar.open('Cycle updated.', 'OK', { duration: 2000 });
+        this.loadAll(this.cycle!.id);
+      },
+      error: err => {
+        this.editSaving = false;
+        this.snackBar.open(err?.error?.message ?? 'Failed to update cycle.', 'Dismiss', { duration: 5000 });
+      }
+    });
+  }
+
   // ── Mukando helpers ─────────────────────────────────────────────────────
 
   get isMukando(): boolean { return this.cycle?.cycleType === 'Mukando'; }
@@ -372,11 +419,11 @@ export class CycleDetailComponent implements OnInit {
   get currencySymbol(): string { return this.cycle?.currencySymbol ?? '$'; }
 
   kycReadyMembersCount(): number {
-    return (this.cycle?.members ?? []).filter(m => m.kycStatus === KycStatus.Verified || m.kycStatus === KycStatus.AdminBypassed).length;
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole !== 'Observer' && (m.kycStatus === KycStatus.Verified || m.kycStatus === KycStatus.AdminBypassed)).length;
   }
 
   kycUnverifiedMembers() {
-    return (this.cycle?.members ?? []).filter(m => m.kycStatus !== KycStatus.Verified && m.kycStatus !== KycStatus.AdminBypassed);
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole !== 'Observer' && m.kycStatus !== KycStatus.Verified && m.kycStatus !== KycStatus.AdminBypassed);
   }
 
   allMukandoMembersKycReady(): boolean {
@@ -968,10 +1015,12 @@ export class CycleDetailComponent implements OnInit {
 
   addCycleMember(): void {
     if (!this.cycle || !this.selectedAddUserId) return;
+    const role = this.addAsObserver ? 'Observer' : 'Participant';
     this.addingMember = true;
-    this.cycleService.addMember(this.cycle.id, this.selectedAddUserId).subscribe({
+    this.cycleService.addMember(this.cycle.id, this.selectedAddUserId, role).subscribe({
       next: () => {
         this.selectedAddUserId = null;
+        this.addAsObserver = false;
         this.addingMember = false;
         this.loadAll(this.cycle!.id);
       },
@@ -1000,9 +1049,17 @@ export class CycleDetailComponent implements OnInit {
     });
   }
 
+  get participantCount(): number {
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole !== 'Observer').length;
+  }
+
+  get observerCount(): number {
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole === 'Observer').length;
+  }
+
   get poolPerRound(): number {
     if (!this.cycle) return 0;
-    return (this.cycle.contributionAmount ?? 0) * ((this.cycle.members?.length ?? 1) - 1);
+    return (this.cycle.contributionAmount ?? 0) * (this.participantCount - 1);
   }
 
   goToTab(tab: typeof this.activeTab): void {

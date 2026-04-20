@@ -1,5 +1,7 @@
 import { KycStatus } from './user.model';
 
+export type CycleRole = 'Participant' | 'Observer';
+
 export interface CycleMemberDto {
   userId: number;
   firstName: string;
@@ -7,6 +9,7 @@ export interface CycleMemberDto {
   email: string;
   groupRole: 'GroupAdmin' | 'GroupMember';
   kycStatus: KycStatus;
+  cycleRole: CycleRole;
 }
 
 export interface MemberBalanceDto {
@@ -149,6 +152,7 @@ export interface CycleContributionSummaryDto {
 
 export interface OutstandingSummaryDto {
   totalOutstanding: number;
+  totalIncoming: number;
   cycleCount: number;
   cycles: CycleOutstandingItemDto[];
 }
@@ -156,9 +160,19 @@ export interface OutstandingSummaryDto {
 export interface CycleOutstandingItemDto {
   cycleId: number;
   cycleName: string;
+  groupId: number;
+  groupName: string;
+  cycleType: 'Majana' | 'Mukando';
+  cycleStatus: 'Active' | 'Draft';
+  currencySymbol: string;
   outstanding: number;
-  sharePerMember: number;
-  totalPaid: number;
+  sharePerMember: number | null;
+  totalPaid: number | null;
+  activeRoundNumber: number | null;
+  contributionDueDate: string | null;
+  contributionStatus: 'Pending' | 'Paid' | 'Confirmed' | 'Missed' | 'AwaitingVerification' | 'Recipient' | null;
+  pendingAgreement: boolean;
+  expectedPayout: number | null;
 }
 
 // ── Disputes ──────────────────────────────────────────────────────────────────

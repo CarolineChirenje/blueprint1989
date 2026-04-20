@@ -111,6 +111,22 @@
   margin-top: 0.15rem;
 }
 
+.hero-card__incoming {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 0.35rem;
+}
+
+.hero-card__incoming svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .hero-card__due {
   display: flex;
   align-items: center;
@@ -449,3 +465,291 @@
     font-size: 1.3rem;
   }
 }
+
+/* ── Hero card — static variant (non-clickable total) ───────────────────────── */
+
+.hero-card--static {
+  cursor: default;
+}
+
+.hero-card--static:hover,
+.hero-card--static:focus-visible {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-card--settled {
+  border-left-color: var(--primary);
+}
+
+/* ── Mukando banners ─────────────────────────────────────────────────────────── */
+
+.mukando-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.mukando-banner:hover,
+.mukando-banner:focus-visible {
+  transform: translateX(3px);
+  box-shadow: var(--shadow-md);
+}
+
+.mukando-banner--contribution {
+  background: var(--warning-bg);
+  border-color: var(--warning-border);
+}
+
+.mukando-banner--payout {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.mukando-banner__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.mukando-banner__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.mukando-banner__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mukando-banner__sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mukando-banner__cta {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+/* ── Cycle list ──────────────────────────────────────────────────────────────── */
+
+.cycle-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cycle-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cycle-row:hover,
+.cycle-row:focus-visible {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.cycle-row--draft {
+  border-left: 3px solid var(--warning);
+  opacity: 0.9;
+}
+
+.cycle-row__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.cycle-row__name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cycle-row__meta {
+  font-size: 0.775rem;
+  color: var(--text-secondary);
+}
+
+.cycle-row__right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.cycle-row__amount {
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cycle-row__amount--owe {
+  color: var(--error);
+}
+
+.cycle-row__amount--settled {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.cycle-row__amount--recipient {
+  color: var(--primary);
+}
+
+.cycle-row__amount--incoming {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.cycle-row__arrow {
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.badge--warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
+}
+
+.badge--payout {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+/* ── Status chips ────────────────────────────────────────────────────────────── */
+
+.status-chip {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.status-chip--draft {
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+.status-chip--confirmed {
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+  color: var(--primary);
+}
+
+.status-chip--pending {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.status-chip--overdue {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.status-chip--idle {
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 540px) {
+  .cycle-row {
+    padding: 0.75rem 1rem;
+  }
+
+  .cycle-row__amount {
+    font-size: 0.9rem;
+  }
+
+  .mukando-banner {
+    padding: 0.85rem 1rem;
+  }
+
+  .mukando-banner__title {
+    white-space: normal;
+  }
+
+  .mukando-banner__sub {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 380px) {
+  /* Stack cycle row vertically on very small phones */
+  .cycle-row {
+    flex-wrap: wrap;
+  }
+
+  .cycle-row__right {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .hero-card {
+    padding: 1.25rem;
+  }
+}
+
