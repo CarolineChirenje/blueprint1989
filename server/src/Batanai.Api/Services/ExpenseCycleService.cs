@@ -461,8 +461,10 @@ public class ExpenseCycleService
         if (cycle == null) return (null, "Cycle not found.");
         if (cycle.Status != CycleStatus.Draft) return (null, "Only a Draft cycle can be started.");
 
-        var memberCount = await _context.CycleMembers.CountAsync(m => m.ExpenseCycleId == cycleId);
-        if (memberCount < 2) return (null, "A cycle requires at least 2 members before it can be started.");
+        // Observers have no financial role — a cycle needs at least 2 Participants to be meaningful
+        var participantCount = await _context.CycleMembers
+            .CountAsync(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant);
+        if (participantCount < 2) return (null, "A cycle requires at least 2 participants before it can be started.");
 
         // Block if any pending swap requests exist
         if (cycle.CycleType == CycleType.Mukando)
@@ -479,18 +481,19 @@ public class ExpenseCycleService
         if (pendingOptOuts)
             return (null, "All pending opt-out requests must be resolved before the cycle can be started.");
 
-        // Mukando KYC gate: every member must be verified or admin-bypassed before Draft → Active.
+        // Mukando KYC gate: every Participant must be verified or admin-bypassed before Draft → Active.
+        // Observers have no financial obligations so KYC is not required for them.
         if (cycle.CycleType == CycleType.Mukando)
         {
             var unverifiedMembers = await _context.CycleMembers
-                .Where(m => m.ExpenseCycleId == cycleId)
+                .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
                 .Join(_context.Users, m => m.UserId, u => u.Id, (m, u) => u)
                 .Where(u => u.KycStatus != KycStatus.Verified && u.KycStatus != KycStatus.AdminBypassed)
                 .Select(u => $"{u.FirstName} {u.LastName}")
                 .ToListAsync();
 
             if (unverifiedMembers.Count > 0)
-                return (null, $"Cannot start: the following members have not completed identity verification: {string.Join(", ", unverifiedMembers)}.");
+                return (null, $"Cannot start: the following participants have not completed identity verification: {string.Join(", ", unverifiedMembers)}.");
         }
 
         // Block if any unresolved disputes exist
@@ -558,6 +561,12 @@ public class ExpenseCycleService
         else
         {
             // Majana: re-calculate obligations for any expenses added during Draft
+            // Only Participants owe shares; Observers have no financial obligations
+            var participantIds = await _context.CycleMembers
+                .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
+                .Select(m => m.UserId)
+                .ToListAsync();
+
             var expenses = await _context.Expenses.Where(e => e.ExpenseCycleId == cycleId).ToListAsync();
             foreach (var expense in expenses)
             {
@@ -568,9 +577,9 @@ public class ExpenseCycleService
 
             foreach (var expense in expenses)
             {
-                if (memberIds.Count == 0) continue;
-                decimal share = Math.Round(expense.Amount / memberIds.Count, 2);
-                foreach (var uid in memberIds)
+                if (participantIds.Count == 0) continue;
+                decimal share = Math.Round(expense.Amount / participantIds.Count, 2);
+                foreach (var uid in participantIds)
                     _context.MemberObligations.Add(new MemberObligation
                     {
                         ExpenseId  = expense.Id,
@@ -584,7 +593,7 @@ public class ExpenseCycleService
 
             // Notify all members that the cycle has started
             var totalExpenses = expenses.Sum(e => e.Amount);
-            decimal sharePerMember = memberCount > 0 ? Math.Round(totalExpenses / memberCount, 2) : 0;
+            decimal sharePerMember = participantIds.Count > 0 ? Math.Round(totalExpenses / participantIds.Count, 2) : 0;
             var currency = await _context.Currencies.FindAsync(cycle.CurrencyId);
             var sym = currency?.Symbol ?? "$";
             await _push.SendToUsersAsync(
@@ -1094,8 +1103,10 @@ public class ExpenseCycleService
         var cycle = await _context.ExpenseCycles.FindAsync(cycleId);
         if (cycle == null) return null;
 
+        // Only Participants are included in expense splits; Observers have no financial obligations
         var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
+            .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
+            .Select(m => m.UserId).ToListAsync();
 
         var users = await _context.Users.Where(u => memberIds.Contains(u.Id)).ToListAsync();
 

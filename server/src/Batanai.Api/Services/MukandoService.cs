@@ -681,8 +681,11 @@ public class MukandoService
 
         var excludeSet = new HashSet<int>(excludeIds);
 
+        // Only Participants are eligible verifiers — Observers have no financial stake
         var candidates = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == round.ExpenseCycleId && !excludeSet.Contains(m.UserId))
+            .Where(m => m.ExpenseCycleId == round.ExpenseCycleId
+                     && m.CycleRole == CycleRole.Participant
+                     && !excludeSet.Contains(m.UserId))
             .Select(m => m.UserId)
             .ToListAsync();
 

@@ -373,11 +373,11 @@ export class CycleDetailComponent implements OnInit {
   get currencySymbol(): string { return this.cycle?.currencySymbol ?? '$'; }
 
   kycReadyMembersCount(): number {
-    return (this.cycle?.members ?? []).filter(m => m.kycStatus === KycStatus.Verified || m.kycStatus === KycStatus.AdminBypassed).length;
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole !== 'Observer' && (m.kycStatus === KycStatus.Verified || m.kycStatus === KycStatus.AdminBypassed)).length;
   }
 
   kycUnverifiedMembers() {
-    return (this.cycle?.members ?? []).filter(m => m.kycStatus !== KycStatus.Verified && m.kycStatus !== KycStatus.AdminBypassed);
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole !== 'Observer' && m.kycStatus !== KycStatus.Verified && m.kycStatus !== KycStatus.AdminBypassed);
   }
 
   allMukandoMembersKycReady(): boolean {

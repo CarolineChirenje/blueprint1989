@@ -23,7 +23,7 @@
         @if (canManageCycle() && isDraft()) {
           <button mat-raised-button color="primary" (click)="startCycle()"
             [disabled]="isMukando && !allMukandoMembersKycReady()"
-            [matTooltip]="pendingDisputeCount() > 0 ? 'Resolve all disputes before starting' : pendingOptOutCount() > 0 ? 'Resolve all opt-out requests before starting' : !allMembersAgreed() ? 'All members must agree before starting' : cycle.members.length < 2 ? 'Add at least 1 more member' : isMukando && !allMukandoMembersKycReady() ? 'All Mukando members must complete KYC verification before starting' : 'Start cycle and notify members'">
+            [matTooltip]="pendingDisputeCount() > 0 ? 'Resolve all disputes before starting' : pendingOptOutCount() > 0 ? 'Resolve all opt-out requests before starting' : !allMembersAgreed() ? 'All members must agree before starting' : participantCount < 2 ? 'Add at least 2 participants before starting' : isMukando && !allMukandoMembersKycReady() ? 'All Mukando participants must complete KYC verification before starting' : 'Start cycle and notify members'">
             <mat-icon>play_arrow</mat-icon> Start Cycle
           </button>
         }
@@ -50,10 +50,10 @@
     @if (isDraft() && canManageCycle()) {
       <div class="draft-checklist">
         <h3><mat-icon>checklist</mat-icon> Setup Checklist</h3>
-        <div class="check-item" [class.done]="cycle.members.length >= 2">
-          <mat-icon>{{ cycle.members.length >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-          <span>Add members ({{ cycle.members.length }}/2 minimum)</span>
-          @if (cycle.members.length < 2) {
+        <div class="check-item" [class.done]="participantCount >= 2">
+          <mat-icon>{{ participantCount >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          <span>Add participants ({{ participantCount }}/2 minimum)</span>
+          @if (participantCount < 2) {
             <button mat-stroked-button color="primary" (click)="goToTab('members')">Add</button>
           }
         </div>
@@ -79,7 +79,7 @@
             <mat-icon>{{ allMukandoMembersKycReady() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
             <span>
               All Mukando members KYC verified
-              <span class="checklist-count">({{ kycReadyMembersCount() }}/{{ cycle.members.length }})</span>
+              <span class="checklist-count">({{ kycReadyMembersCount() }}/{{ participantCount }})</span>
             </span>
             @if (!allMukandoMembersKycReady()) {
               <button mat-stroked-button color="primary" (click)="goToTab('members')">View</button>
