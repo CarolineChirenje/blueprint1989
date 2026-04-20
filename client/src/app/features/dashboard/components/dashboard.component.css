@@ -111,6 +111,22 @@
   margin-top: 0.15rem;
 }
 
+.hero-card__incoming {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 0.35rem;
+}
+
+.hero-card__incoming svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .hero-card__due {
   display: flex;
   align-items: center;
@@ -617,6 +633,12 @@
 
 .cycle-row__amount--recipient {
   color: var(--primary);
+}
+
+.cycle-row__amount--incoming {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .cycle-row__arrow {

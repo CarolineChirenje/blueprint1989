@@ -95,8 +95,13 @@
         </div>
 
         <div class="hero-card__content">
-          <span *ngIf="outstandingSummary.totalOutstanding === 0" class="hero-settled__title">You are all settled up!</span>
-          <span *ngIf="outstandingSummary.totalOutstanding === 0" class="hero-settled__sub">No outstanding balance across your active cycles.</span>
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming === 0" class="hero-settled__title">You are all settled up!</span>
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming === 0" class="hero-settled__sub">No outstanding balance across your active cycles.</span>
+
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming > 0" class="hero-settled__title">No payments due</span>
+          <span *ngIf="outstandingSummary.totalOutstanding === 0 && outstandingSummary.totalIncoming > 0" class="hero-settled__sub">
+            {{ outstandingSummary.cycleCount }} active cycle{{ outstandingSummary.cycleCount !== 1 ? 's' : '' }}
+          </span>
 
           <span *ngIf="outstandingSummary.totalOutstanding > 0" class="hero-card__label">Total Outstanding</span>
           <span *ngIf="outstandingSummary.totalOutstanding > 0" class="hero-card__amount">
@@ -104,6 +109,12 @@
           </span>
           <span *ngIf="outstandingSummary.totalOutstanding > 0" class="hero-card__meta">
             across {{ outstandingSummary.cycleCount }} active cycle{{ outstandingSummary.cycleCount !== 1 ? 's' : '' }}
+          </span>
+
+          <!-- Incoming payout line (shown alongside outstanding or alone) -->
+          <span *ngIf="outstandingSummary.totalIncoming > 0" class="hero-card__incoming">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
+            Incoming {{ outstandingSummary.totalIncoming | currency:'USD':'symbol':'1.2-2' }}
           </span>
         </div>
       </div>
@@ -176,7 +187,12 @@
             </ng-container>
 
             <!-- Mukando recipient: no amount shown — badge on the left is the indicator -->
-            <!-- (recipients owe $0 and the "You receive!" badge makes that clear) -->
+            <!-- Expected payout shown below cycle name -->
+            <ng-container *ngIf="c.cycleType === 'Mukando' && c.contributionStatus === 'Recipient' && c.expectedPayout">
+              <span class="cycle-row__amount cycle-row__amount--incoming">
+                {{ c.currencySymbol }}{{ c.expectedPayout | number:'1.2-2' }} incoming
+              </span>
+            </ng-container>
 
             <!-- Arrow -->
             <svg class="cycle-row__arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">

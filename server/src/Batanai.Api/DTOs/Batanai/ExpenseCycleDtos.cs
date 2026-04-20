@@ -124,6 +124,7 @@ public record CycleContributionSummaryDto(
 
 public record OutstandingSummaryDto(
     decimal TotalOutstanding,
+    decimal TotalIncoming,
     int CycleCount,
     List<CycleOutstandingItemDto> Cycles);
 
@@ -141,7 +142,9 @@ public record CycleOutstandingItemDto(
     int? ActiveRoundNumber,
     DateTime? ContributionDueDate,
     string? ContributionStatus,
-    bool PendingAgreement);
+    bool PendingAgreement,
+    /// <summary>Mukando recipient only: the expected pool payout for this round.</summary>
+    decimal? ExpectedPayout);
 
 // ── Currency ─────────────────────────────────────────────────────────────────
 

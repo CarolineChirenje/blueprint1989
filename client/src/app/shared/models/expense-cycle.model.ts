@@ -152,6 +152,7 @@ export interface CycleContributionSummaryDto {
 
 export interface OutstandingSummaryDto {
   totalOutstanding: number;
+  totalIncoming: number;
   cycleCount: number;
   cycles: CycleOutstandingItemDto[];
 }
@@ -171,6 +172,7 @@ export interface CycleOutstandingItemDto {
   contributionDueDate: string | null;
   contributionStatus: 'Pending' | 'Paid' | 'Confirmed' | 'Missed' | 'AwaitingVerification' | 'Recipient' | null;
   pendingAgreement: boolean;
+  expectedPayout: number | null;
 }
 
 // ── Disputes ──────────────────────────────────────────────────────────────────

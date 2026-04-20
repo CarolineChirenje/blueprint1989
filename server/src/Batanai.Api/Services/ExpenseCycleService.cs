@@ -1191,7 +1191,7 @@ public class ExpenseCycleService
         ).ToListAsync();
 
         if (userCycles.Count == 0)
-            return new OutstandingSummaryDto(0, 0, new List<CycleOutstandingItemDto>());
+            return new OutstandingSummaryDto(0, 0, 0, new List<CycleOutstandingItemDto>());
 
         var majanaCycleIds  = userCycles.Where(x => x.Cycle.CycleType == CycleType.Majana  && x.Cycle.Status == CycleStatus.Active).Select(x => x.Cycle.Id).ToList();
         var mukandoCycleIds = userCycles.Where(x => x.Cycle.CycleType == CycleType.Mukando && x.Cycle.Status == CycleStatus.Active).Select(x => x.Cycle.Id).ToList();
@@ -1273,7 +1273,8 @@ public class ExpenseCycleService
                     ActiveRoundNumber:   null,
                     ContributionDueDate: null,
                     ContributionStatus:  null,
-                    PendingAgreement:    !agreedCycleIds.Contains(cycle.Id)));
+                    PendingAgreement:    !agreedCycleIds.Contains(cycle.Id),
+                    ExpectedPayout:      null));
                 continue;
             }
 
@@ -1301,7 +1302,8 @@ public class ExpenseCycleService
                     ActiveRoundNumber:   null,
                     ContributionDueDate: null,
                     ContributionStatus:  null,
-                    PendingAgreement:    false));
+                    PendingAgreement:    false,
+                    ExpectedPayout:      null));
                 continue;
             }
 
@@ -1343,7 +1345,8 @@ public class ExpenseCycleService
                     ActiveRoundNumber:   round.RoundNumber,
                     ContributionDueDate: round.DueDate,
                     ContributionStatus:  contributionStatus,
-                    PendingAgreement:    false));
+                    PendingAgreement:    false,
+                    ExpectedPayout:      contributionStatus == "Recipient" ? round.ExpectedPool : null));
             }
             else
             {
@@ -1362,14 +1365,16 @@ public class ExpenseCycleService
                     ActiveRoundNumber:   null,
                     ContributionDueDate: null,
                     ContributionStatus:  null,
-                    PendingAgreement:    false));
+                    PendingAgreement:    false,
+                    ExpectedPayout:      null));
             }
         }
 
         var activeTotalOutstanding = Math.Round(items.Where(i => i.CycleStatus == "Active").Sum(i => i.Outstanding), 2);
+        var activeTotalIncoming     = Math.Round(items.Where(i => i.ExpectedPayout.HasValue).Sum(i => i.ExpectedPayout!.Value), 2);
         var activeCycleCount       = items.Count(i => i.CycleStatus == "Active");
 
-        return new OutstandingSummaryDto(activeTotalOutstanding, activeCycleCount, items);
+        return new OutstandingSummaryDto(activeTotalOutstanding, activeTotalIncoming, activeCycleCount, items);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
