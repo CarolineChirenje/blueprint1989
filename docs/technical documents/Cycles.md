@@ -2,9 +2,14 @@
 
 ## Overview
 
-An **ExpenseCycle** represents a bounded time period during which a group of members tracks and shares expenses. Each cycle has a start date, an end date, a list of members, and a status (`Active` or `Closed`). When an Admin closes a cycle, the system calculates each member's net balance and creates `MemberObligation` records showing who owes whom.
+An **ExpenseCycle** represents a bounded time period during which a group of members tracks and shares expenses. Each cycle has a start date, an end date, a list of members, and a status (`Draft`, `Active`, or `Closed`). Cycles begin in `Draft` while setup is in progress (members, agreements, Mukando configuration). An Admin starts the cycle once all readiness checks pass, moving it to `Active`. When an Admin closes a cycle, the system calculates each member's net balance and creates `MemberObligation` records showing who owes whom.
 
-Admins create and manage cycles through the Management console. Members can view their active cycle, add expenses, submit payments, and review their obligations.
+Batanai supports two cycle types:
+
+- **Majana** — shared expense tracking. Members add expenses; the system calculates each Participant's equal share; at close, obligations are generated and members settle up.
+- **Mukando** — rotating savings (stokvel). Members contribute a fixed amount each round; the full pool is paid to one recipient on rotation per the agreed payout order.
+
+Admins create and manage cycles through the Management console. Members can view their cycle, add expenses or contributions, submit payments, and review their obligations.
 
 ---
 
@@ -48,9 +53,14 @@ Base route: `/api/expense-cycle`
 |---|---|---|
 | `Id` | `int` | PK |
 | `Name` | `string` | e.g., `"January 2026"` |
+| `GroupId` | `int` | FK → Group |
+| `CurrencyId` | `int` | FK → Currency |
+| `CycleType` | `CycleType` | `Majana` or `Mukando` |
 | `StartDate` | `DateTime` | Cycle start |
 | `EndDate` | `DateTime` | Cycle end |
-| `Status` | `CycleStatus` | `Active` or `Closed` |
+| `Status` | `CycleStatus` | `Draft`, `Active`, or `Closed` |
+| `ContributionAmount` | `decimal?` | Mukando only — fixed amount per round |
+| `Frequency` | `CycleFrequency?` | Mukando only — `Weekly`, `Fortnightly`, `Monthly` |
 | `CreatedAt` | `DateTime` | |
 | `UpdatedAt` | `DateTime` | |
 | `CycleMembers` | `ICollection<CycleMember>` | Navigation — members of this cycle |
@@ -63,9 +73,10 @@ Base route: `/api/expense-cycle`
 
 | Field | Type | Notes |
 |---|---|---|
-| `CycleId` | `int` | PK (composite) — FK ? ExpenseCycle |
-| `UserId` | `int` | PK (composite) — FK ? User |
-| `JoinedAt` | `DateTime` | |
+| `ExpenseCycleId` | `int` | PK (composite) — FK → ExpenseCycle |
+| `UserId` | `int` | PK (composite) — FK → User |
+| `CycleRole` | `CycleRole` | `Participant` or `Observer` |
+| `AddedAt` | `DateTime` | When the member was added to the cycle |
 
 ---
 
@@ -500,3 +511,226 @@ The **Start Cycle** button tooltip now cycles through blocking conditions in pri
 ### Responsiveness
 
 All agreement and readiness UI components use `flex-wrap: wrap` and collapse to a single column at `max-width: 600px`, ensuring correct display on mobile, tablet, and desktop.
+
+---
+
+## Observer Members
+
+### What is an Observer?
+
+A cycle member can be added with the role `CycleRole.Observer` instead of the default `CycleRole.Participant`. Observers are full members of the cycle for visibility and notification purposes, but carry **no financial obligations**.
+
+### Observer Capabilities
+
+| Action | Observer | Participant |
+|---|---|---|
+| View cycle details and tabs | ✓ | ✓ |
+| Receive push notifications | ✓ | ✓ |
+| Raise disputes | ✓ | ✓ |
+| Submit opt-out requests | ✓ | ✓ |
+| Must sign agreement before cycle start | ✓ | ✓ |
+| Owes a share of expenses (Majana) | ✗ | ✓ |
+| Assigned a Mukando round slot | ✗ | ✓ |
+| Counted in per-member share calculation | ✗ | ✓ |
+
+### Adding an Observer
+
+Both single-member and batch-member add endpoints accept an optional `cycleRole` parameter:
+
+- `POST /api/cycles/{id}/members` — body: `{ "userId": 5, "cycleRole": "Observer" }`
+- `POST /api/cycles/{id}/members/batch` — body: `{ "userIds": [5, 6], "cycleRole": "Observer" }`
+
+When a member is added as an Observer, they receive a distinct push notification clarifying they have no financial obligations:
+
+> *"You have been added as an Observer to the {cycle.Name} cycle in {groupName}. You will receive notifications but have no financial obligations."*
+
+Observers cannot be added to an **Active** or **Closed** cycle (same restriction as Participants).
+
+### Observer Exclusion from Financial Logic
+
+Three service-level guards enforce the Observer boundary:
+
+1. **Share calculation** (`GetOutstandingSummaryAsync`) — the Majana per-member share query (`Q2`) only counts `CycleRole.Participant` members. This prevents the "diluted share" bug that occurred before the `CycleRole` column was introduced.
+2. **Mukando round generation** (`RegenerateRoundsAfterMemberChangeAsync`) — adding a Participant regenerates rounds; adding an Observer does not, because Observers are never assigned a payout slot.
+3. **Opt-out financial cleanup** (`RespondOptOutRequestAsync`) — when an Observer's opt-out is approved, the code checks `isObserver = member.CycleRole == CycleRole.Observer` and skips both `RecalculateAllObligationsAsync` (Majana) and `RegenerateRoundsAfterMemberChangeAsync` (Mukando), because the Observer had no financial records to clean up.
+
+### Agreements and Observers
+
+Observers **are** required to agree before a cycle can start. They appear in the Agreements tab alongside Participants and are included in the `{agreed}/{total}` count. The rationale is that an Observer is still a **cycle member** who should acknowledge the terms even without financial obligations.
+
+---
+
+## Cycle Lifecycle & Status Workflow
+
+### Status Values
+
+| Status | Meaning |
+|---|---|
+| `Draft` | Setup phase — members being added, agreements being collected, payout order being configured |
+| `Active` | Live — expenses (Majana) or contributions and rounds (Mukando) are in progress |
+| `Closed` | Finished — obligations calculated (Majana) or all rounds complete (Mukando) |
+
+### State Machine
+
+```
+Draft ──(StartAsync)──► Active ──(CloseAsync)──► Closed
+```
+
+A cycle cannot move backwards. There are no other transitions.
+
+### Draft Phase
+
+- Admin creates the cycle via `POST /api/cycles` — always starts `Draft`.
+- Admin adds members (Participant or Observer).
+- For Mukando: admin configures contribution amount, frequency, and payout order.
+- For Mukando: all members must complete KYC (`Verified` or `AdminBypassed`).
+- All members review the terms and record their agreement.
+- Admin uses the **Setup Checklist** on the cycle detail page to track readiness.
+
+### StartAsync — Validation Order
+
+`StartAsync` performs seven ordered checks and blocks with a descriptive error if any fail:
+
+| # | Check | Applies to |
+|---|---|---|
+| 1 | Cycle must be in `Draft` status | Both |
+| 2 | At least 2 members required | Both |
+| 3 | No pending swap requests | Mukando only |
+| 4 | No pending opt-out requests | Both |
+| 5 | No open disputes (`Pending` or `Reviewed`) | Both |
+| 6 | All members must have agreed | Both |
+| 7 | Rounds must exist (payout order set) | Mukando only |
+
+On success the cycle status is set to `Active` and a push notification is sent to all members.
+
+### Active Phase
+
+- **Majana**: members submit expenses; payments are recorded; disputes can be raised and resolved.
+- **Mukando**: rounds activate in sequence; members submit contributions; the round recipient is paid and a verifier confirms the payout; the next round begins automatically.
+- No new members can be added once a cycle is `Active`.
+
+### CloseAsync
+
+Closing is only possible while the cycle is `Active`.
+
+**Majana close:**
+1. Calculate each Participant's equal share of total expenses.
+2. Generate `MemberObligation` rows (minimised transfer set).
+3. Set status to `Closed`.
+4. Notify all members: "Cycle closed — view your obligations."
+
+**Mukando close:**
+Mukando cycles close automatically when the final round completes (last payout verified). Manual early close is also available for admins in exceptional circumstances.
+
+---
+
+## Dashboard — Outstanding Summary API
+
+### Endpoint
+
+`GET /api/cycles/outstanding-summary`
+
+No parameters. Returns a summary scoped to the **authenticated user's** active and draft cycles.
+
+### Response Shape
+
+```json
+{
+  "totalOutstanding": 45.00,
+  "totalIncoming":    120.00,
+  "cycleCount":       3,
+  "cycles": [
+    { ... }
+  ]
+}
+```
+
+**`OutstandingSummaryDto`**
+
+| Field | Type | Description |
+|---|---|---|
+| `totalOutstanding` | `decimal` | Sum of all `outstanding` values across cycles |
+| `totalIncoming` | `decimal` | Sum of all `expectedPayout` values (Mukando recipients only) |
+| `cycleCount` | `int` | Number of cycles included in the response |
+| `cycles` | `CycleOutstandingItemDto[]` | Per-cycle breakdown |
+
+**`CycleOutstandingItemDto`**
+
+| Field | Type | Description |
+|---|---|---|
+| `cycleId` | `int` | |
+| `cycleName` | `string` | |
+| `groupId` | `int` | |
+| `groupName` | `string` | |
+| `cycleType` | `string` | `"Majana"` or `"Mukando"` |
+| `cycleStatus` | `string` | `"Draft"`, `"Active"` |
+| `currencySymbol` | `string` | e.g. `"$"` |
+| `outstanding` | `decimal` | Amount user still owes; `0` for recipients and Observers |
+| `sharePerMember` | `decimal?` | Majana only — equal share of total expenses |
+| `totalPaid` | `decimal?` | Majana only — user's confirmed payments so far |
+| `activeRoundNumber` | `int?` | Mukando only — current active round number |
+| `contributionDueDate` | `DateTime?` | Mukando only — round end date |
+| `contributionStatus` | `string?` | Mukando only — `"Pending"`, `"Paid"`, `"AwaitingVerification"`, `"Confirmed"`, `"Recipient"` |
+| `pendingAgreement` | `bool` | `true` if this is a Draft cycle and the user has not yet agreed |
+| `expectedPayout` | `decimal?` | Mukando recipients only — `round.ExpectedPool` for the current round |
+
+### Recipient Rows
+
+When the authenticated user is the **round recipient** for the current active Mukando round:
+
+- `contributionStatus` = `"Recipient"`
+- `outstanding` = `0`
+- `expectedPayout` = `round.ExpectedPool` (the total pool amount they will receive)
+
+This value feeds the **Total Incoming** figure displayed on the dashboard hero card.
+
+### Observer Rows
+
+Observers appear in the summary with `outstanding = 0`. For Majana cycles, they are excluded from the participant count used in the share calculation, so the share shown to Participants is not diluted.
+
+### Performance
+
+The method uses **7 fixed database queries** regardless of how many cycles the user belongs to — replacing an earlier N+1 pattern where one query ran per cycle:
+
+| Query | Purpose |
+|---|---|
+| Q1 | All active/draft cycle memberships + group name + currency symbol |
+| Q2 | Participant counts per active Majana cycle (Observers excluded) |
+| Q3 | Total expenses per active Majana cycle |
+| Q4 | User's confirmed payments per active Majana cycle |
+| Q5 | Active rounds per active Mukando cycle |
+| Q6 | User's contributions in those active rounds |
+| Q7 | Draft cycles the user has already agreed to |
+
+### Dashboard UI States
+
+The dashboard hero card has three display states based on the summary:
+
+| State | Condition |
+|---|---|
+| Outstanding amounts shown | `totalOutstanding > 0` |
+| No payments due + incoming payout | `totalOutstanding = 0 && totalIncoming > 0` |
+| Fully settled | `totalOutstanding = 0 && totalIncoming = 0` |
+
+Draft cycles with a pending agreement surface a distinct badge on their cycle row regardless of the financial state.
+
+---
+
+## Push Notification Deep Links
+
+All cycle-related push notifications include a deep link that routes the user directly to the relevant tab in the cycle detail page, using the `?tab=` query parameter.
+
+| Event | Tab |
+|---|---|
+| Contribution due reminder | `?tab=rounds` |
+| Contribution confirmed / receipt issued | `?tab=rounds` |
+| Payout recorded | `?tab=rounds` |
+| Swap request created or responded to | `?tab=swaps` |
+| Opt-out request created or responded to | `?tab=optouts` |
+| Dispute raised or resolved | `?tab=disputes` |
+| Agreements reset | `?tab=agreements` |
+| All members agreed notification | `?tab=agreements` |
+
+The tab routing is handled by `cycle-detail.component.ts` which reads `route.queryParamMap.get('tab')` on load and selects the matching tab.
+
+Valid tab values: `expenses`, `payments`, `summary`, `disputes`, `members`, `rounds`, `stats`, `activity`, `swaps`, `optouts`, `order`, `agreements`.
