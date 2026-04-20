@@ -10,14 +10,56 @@
         <button mat-icon-button (click)="back()" aria-label="Back">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <div>
-          <h1>{{ cycle.name }}</h1>
-          <span class="date-range">{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
-          @if (isMukando) {
-            <span class="cycle-type-badge mukando">Mukando</span>
-          }
-        </div>
+
+        <!-- Read mode -->
+        @if (!editingHeader) {
+          <div class="header-title-group">
+            <div class="header-title-row">
+              <h1>{{ cycle.name }}</h1>
+              @if (canManageCycle() && isDraft()) {
+                <button mat-icon-button class="edit-header-btn" matTooltip="Edit name & dates" (click)="openEditHeader()">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              }
+            </div>
+            <span class="date-range">{{ cycle.startDate | date:'mediumDate' }} – {{ cycle.endDate | date:'mediumDate' }}</span>
+            @if (isMukando) {
+              <span class="cycle-type-badge mukando">Mukando</span>
+            }
+          </div>
+        }
+
+        <!-- Edit mode -->
+        @if (editingHeader) {
+          <div class="header-edit-form">
+            <mat-form-field appearance="outline" class="edit-name-field">
+              <mat-label>Cycle name</mat-label>
+              <input matInput [(ngModel)]="editName" maxlength="100" required>
+            </mat-form-field>
+            <div class="edit-dates-row">
+              <mat-form-field appearance="outline" class="edit-date-field">
+                <mat-label>Start date</mat-label>
+                <input matInput type="date" [(ngModel)]="editStartDate" required>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="edit-date-field">
+                <mat-label>End date</mat-label>
+                <input matInput type="date" [(ngModel)]="editEndDate" required>
+              </mat-form-field>
+            </div>
+            <div class="edit-actions">
+              <button mat-raised-button color="primary"
+                      [disabled]="editSaving || !editName.trim()"
+                      (click)="saveEditHeader()">
+                <mat-icon>check</mat-icon> {{ editSaving ? 'Saving…' : 'Save' }}
+              </button>
+              <button mat-stroked-button [disabled]="editSaving" (click)="cancelEditHeader()">
+                <mat-icon>close</mat-icon> Cancel
+              </button>
+            </div>
+          </div>
+        }
       </div>
+
       <div class="header-right">
         <span class="badge" [ngClass]="isDraft() ? 'badge-draft' : isActive() ? 'badge-active' : 'badge-closed'">{{ cycle.status }}</span>
         @if (canManageCycle() && isDraft()) {

@@ -60,6 +60,13 @@ export class CycleDetailComponent implements OnInit {
   addingMember = false;
   addAsObserver = false;
 
+  // Inline edit (name + dates, draft admin only)
+  editingHeader = false;
+  editSaving = false;
+  editName = '';
+  editStartDate = '';
+  editEndDate = '';
+
   // Mukando state
   rounds: MukandoRoundDto[] = [];
   selectedRound: MukandoRoundDto | null = null;
@@ -365,6 +372,41 @@ export class CycleDetailComponent implements OnInit {
   }
 
   back(): void { this.router.navigate(['/cycles']); }
+
+  openEditHeader(): void {
+    if (!this.cycle) return;
+    this.editName      = this.cycle.name;
+    this.editStartDate = this.cycle.startDate.substring(0, 10);
+    this.editEndDate   = this.cycle.endDate.substring(0, 10);
+    this.editingHeader = true;
+  }
+
+  cancelEditHeader(): void { this.editingHeader = false; }
+
+  saveEditHeader(): void {
+    if (!this.cycle || !this.editName.trim()) return;
+    if (this.editStartDate >= this.editEndDate) {
+      this.snackBar.open('End date must be after start date.', 'Dismiss', { duration: 4000 });
+      return;
+    }
+    this.editSaving = true;
+    this.cycleService.update(this.cycle.id, {
+      name:      this.editName.trim(),
+      startDate: new Date(this.editStartDate).toISOString(),
+      endDate:   new Date(this.editEndDate).toISOString()
+    }).subscribe({
+      next: () => {
+        this.editingHeader = false;
+        this.editSaving    = false;
+        this.snackBar.open('Cycle updated.', 'OK', { duration: 2000 });
+        this.loadAll(this.cycle!.id);
+      },
+      error: err => {
+        this.editSaving = false;
+        this.snackBar.open(err?.error?.message ?? 'Failed to update cycle.', 'Dismiss', { duration: 5000 });
+      }
+    });
+  }
 
   // ── Mukando helpers ─────────────────────────────────────────────────────
 

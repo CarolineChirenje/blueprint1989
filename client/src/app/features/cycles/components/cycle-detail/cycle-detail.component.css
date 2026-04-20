@@ -80,6 +80,34 @@
 /* Draft badge */
 .badge-draft { background: #fff3cd; color: #856404; }
 
+/* ── Inline header edit ── */
+.header-title-group { display: flex; flex-direction: column; gap: .15rem; }
+.header-title-row { display: flex; align-items: center; gap: .25rem; }
+.header-title-row h1 { margin: 0; }
+.edit-header-btn { width: 28px; height: 28px; line-height: 28px; flex-shrink: 0; opacity: .65; }
+.edit-header-btn:hover { opacity: 1; }
+.edit-header-btn mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+.header-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: .5rem .75rem .25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  max-width: 520px;
+  width: 100%;
+}
+.edit-name-field { width: 100%; }
+.edit-dates-row {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+.edit-date-field { flex: 1; min-width: 140px; }
+.edit-actions { display: flex; gap: .5rem; flex-wrap: wrap; padding-bottom: .25rem; }
+
 /* KYC readiness */
 .kyc-readiness-panel {
   margin: .75rem 0 1rem 2rem;
@@ -538,6 +566,12 @@
   .header-left h1 { font-size: 1.3rem; }
   .header-right { flex-wrap: wrap; justify-content: flex-start; gap: .4rem; }
 
+  /* Inline edit form — full width on mobile */
+  .header-edit-form { max-width: 100%; padding: .5rem .5rem .25rem; }
+  .edit-dates-row { flex-direction: column; gap: .4rem; }
+  .edit-date-field { min-width: unset; width: 100%; }
+  .edit-actions button { flex: 1; }
+
   /* Tabs */
   .tabs button { padding: .6rem .85rem; font-size: .82rem; }
 
@@ -649,4 +683,6 @@
   .strip-value { font-size: .95rem; }
   .badge { font-size: .7rem; padding: .2rem .5rem; }
   .draft-checklist { padding: .75rem .85rem; }
+  .edit-actions { flex-direction: column; }
+  .edit-actions button { width: 100%; }
 }
