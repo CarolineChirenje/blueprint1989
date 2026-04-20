@@ -96,6 +96,14 @@ public enum OptOutRequestStatus
     Rejected = 2
 }
 
+public enum CycleRole
+{
+    /// <summary>Full participant: contributes (Mukando) or owes expenses (Majana).</summary>
+    Participant = 1,
+    /// <summary>Watches the cycle, receives all notifications, can raise disputes and opt out, but has no financial obligations.</summary>
+    Observer = 2
+}
+
 public enum PaymentMethod
 {
     Cash          = 1,

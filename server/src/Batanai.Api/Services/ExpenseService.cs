@@ -170,8 +170,9 @@ public class ExpenseService
 
     private async Task RecalculateObligationsAsync(Expense expense)
     {
+        // Only Participants owe shares; Observers are excluded from financial obligations
         var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == expense.ExpenseCycleId)
+            .Where(m => m.ExpenseCycleId == expense.ExpenseCycleId && m.CycleRole == CycleRole.Participant)
             .Select(m => m.UserId)
             .ToListAsync();
 

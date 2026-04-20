@@ -58,6 +58,7 @@ export class CycleDetailComponent implements OnInit {
   addableMembers: GroupMemberDto[] = [];
   selectedAddUserId: number | null = null;
   addingMember = false;
+  addAsObserver = false;
 
   // Mukando state
   rounds: MukandoRoundDto[] = [];
@@ -968,10 +969,12 @@ export class CycleDetailComponent implements OnInit {
 
   addCycleMember(): void {
     if (!this.cycle || !this.selectedAddUserId) return;
+    const role = this.addAsObserver ? 'Observer' : 'Participant';
     this.addingMember = true;
-    this.cycleService.addMember(this.cycle.id, this.selectedAddUserId).subscribe({
+    this.cycleService.addMember(this.cycle.id, this.selectedAddUserId, role).subscribe({
       next: () => {
         this.selectedAddUserId = null;
+        this.addAsObserver = false;
         this.addingMember = false;
         this.loadAll(this.cycle!.id);
       },
@@ -1000,9 +1003,17 @@ export class CycleDetailComponent implements OnInit {
     });
   }
 
+  get participantCount(): number {
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole !== 'Observer').length;
+  }
+
+  get observerCount(): number {
+    return (this.cycle?.members ?? []).filter(m => m.cycleRole === 'Observer').length;
+  }
+
   get poolPerRound(): number {
     if (!this.cycle) return 0;
-    return (this.cycle.contributionAmount ?? 0) * ((this.cycle.members?.length ?? 1) - 1);
+    return (this.cycle.contributionAmount ?? 0) * (this.participantCount - 1);
   }
 
   goToTab(tab: typeof this.activeTab): void {

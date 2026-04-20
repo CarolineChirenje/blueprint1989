@@ -806,11 +806,16 @@ public class MukandoService
         if (!Enum.TryParse<CycleFrequency>(request.Frequency, true, out var freq))
             return "Invalid frequency.";
 
-        var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToHashSetAsync();
+        var allCycleMembers = await _context.CycleMembers
+            .Where(m => m.ExpenseCycleId == cycleId).ToListAsync();
+        var memberIds = allCycleMembers.Select(m => m.UserId).ToHashSet();
+        var participantIds = allCycleMembers
+            .Where(m => m.CycleRole == CycleRole.Participant)
+            .Select(m => m.UserId).ToHashSet();
         var payoutSet = new HashSet<int>(request.PayoutOrder);
-        if (!payoutSet.SetEquals(memberIds))
-            return "Payout order must match the current member list.";
+        // Payout order must exactly match Participants (Observers have no payout slot)
+        if (!payoutSet.SetEquals(participantIds))
+            return "Payout order must match the current Participant list (Observers are excluded).";
         if (request.PayoutOrder.Count != request.PayoutOrder.Distinct().Count())
             return "Payout order must not contain duplicates.";
 
@@ -830,8 +835,8 @@ public class MukandoService
         _context.MukandoRounds.RemoveRange(existingRounds);
         await _context.SaveChangesAsync();
 
-        // Regenerate rounds
-        int memberCount = memberIds.Count;
+        // Regenerate rounds — use Participant count only
+        int memberCount = participantIds.Count;
         decimal expectedPool = request.ContributionAmount * (memberCount - 1);
 
         for (int i = 0; i < request.PayoutOrder.Count; i++)
@@ -856,7 +861,8 @@ public class MukandoService
             _context.MukandoRounds.Add(round);
             await _context.SaveChangesAsync();
 
-            foreach (var uid in memberIds.Where(m => m != recipientId))
+            // Only Participants contribute — skip the recipient and any Observers
+            foreach (var uid in participantIds.Where(m => m != recipientId))
             {
                 _context.MukandoContributions.Add(new MukandoContribution
                 {
@@ -907,8 +913,10 @@ public class MukandoService
         if (!cycle.ContributionAmount.HasValue || !cycle.Frequency.HasValue)
             return;
 
+        // Only Participants receive rounds and make contributions; Observers are excluded
         var memberIds = await _context.CycleMembers
-            .Where(m => m.ExpenseCycleId == cycleId).Select(m => m.UserId).ToListAsync();
+            .Where(m => m.ExpenseCycleId == cycleId && m.CycleRole == CycleRole.Participant)
+            .Select(m => m.UserId).ToListAsync();
         if (memberIds.Count < 2) return;
 
         // Preserve existing payout order where possible

@@ -153,5 +153,10 @@ public enum NotificationType
 
     /// <summary>Periodic reminder sent to users in a Mukando Draft cycle who have not completed KYC.</summary>
     KycReminder = 46,
+
+    // -- Observer ------------------------------------------------------------
+
+    /// <summary>A user was added to a cycle as an Observer (no financial obligations).</summary>
+    CycleMemberObserverAdded = 47,
 }
 

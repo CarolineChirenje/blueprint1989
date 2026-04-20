@@ -33,7 +33,7 @@ public record UpdateMukandoSettingsRequest(
 
 public record DuplicateCycleRequest(DateTime NewStartDate);
 
-public record AddMembersBatchRequest(List<int> UserIds);
+public record AddMembersBatchRequest(List<int> UserIds, string? CycleRole = null);
 
 // ── Responses ─────────────────────────────────────────────────────────────────
 
@@ -83,7 +83,8 @@ public record CycleMemberDto(
     string LastName,
     string Email,
     string GroupRole,
-    KycStatus KycStatus);
+    KycStatus KycStatus,
+    string CycleRole);
 
 public record CycleBalanceDto(
     int CycleId,

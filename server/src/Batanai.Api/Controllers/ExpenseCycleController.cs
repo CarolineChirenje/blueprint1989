@@ -194,27 +194,35 @@ public class ExpenseCycleController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Adds a user to a cycle. Admin/SuperAdmin or GroupAdmin of the cycle's group.</summary>
+    /// <summary>Adds a user to a cycle. Admin/SuperAdmin or GroupAdmin of the cycle's group. Pass cycleRole=Observer to add as Observer.</summary>
     [HttpPost("{id:int}/members/{userId:int}")]
-    public async Task<IActionResult> AddMember(int id, int userId)
+    public async Task<IActionResult> AddMember(int id, int userId, [FromQuery] string? cycleRole = null)
     {
         if (!await CanManageCycleAsync(id)) return Forbid();
 
-        var error = await _cycleService.AddMemberAsync(id, userId);
+        var role = Enum.TryParse<CycleRole>(cycleRole, ignoreCase: true, out var parsed)
+            ? parsed
+            : CycleRole.Participant;
+
+        var error = await _cycleService.AddMemberAsync(id, userId, role);
         if (error != null)
             return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
 
         return NoContent();
     }
 
-    /// <summary>Adds multiple users to a cycle in a single operation.</summary>
+    /// <summary>Adds multiple users to a cycle in a single operation. Pass cycleRole=Observer to add all as Observers.</summary>
     [HttpPost("{id:int}/members/batch")]
     public async Task<IActionResult> AddMembersBatch(int id, [FromBody] AddMembersBatchRequest request)
     {
         if (!await CanManageCycleAsync(id)) return Forbid();
 
         var userId = GetCurrentUserId();
-        var (addedUserIds, error) = await _cycleService.AddMembersBatchAsync(id, request.UserIds, userId ?? 0);
+        var role = Enum.TryParse<CycleRole>(request.CycleRole, ignoreCase: true, out var parsed)
+            ? parsed
+            : CycleRole.Participant;
+
+        var (addedUserIds, error) = await _cycleService.AddMembersBatchAsync(id, request.UserIds, userId ?? 0, role);
         if (error != null)
             return error.Contains("not found") ? NotFound(new { message = error }) : BadRequest(new { message = error });
 

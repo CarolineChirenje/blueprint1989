@@ -1,5 +1,7 @@
 import { KycStatus } from './user.model';
 
+export type CycleRole = 'Participant' | 'Observer';
+
 export interface CycleMemberDto {
   userId: number;
   firstName: string;
@@ -7,6 +9,7 @@ export interface CycleMemberDto {
   email: string;
   groupRole: 'GroupAdmin' | 'GroupMember';
   kycStatus: KycStatus;
+  cycleRole: CycleRole;
 }
 
 export interface MemberBalanceDto {
