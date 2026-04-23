@@ -40,11 +40,11 @@ export class EditUserDialogComponent implements OnInit {
       ? [
           { value: 'SuperAdmin', label: 'Super Admin' },
           { value: 'Admin', label: 'Admin' },
-          { value: 'Member', label: 'Member' }
+          { value: 'User', label: 'User' }
         ]
       : [
           { value: 'Admin', label: 'Admin' },
-          { value: 'Member', label: 'Member' }
+          { value: 'User', label: 'User' }
         ];
   }
 

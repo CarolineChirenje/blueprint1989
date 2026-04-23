@@ -13,37 +13,37 @@ const routes: Routes = [
     path: '',
     component: ProfileComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
+    data: { roles: ['SuperAdmin', 'Admin', 'User'] }
   },
   {
     path: 'security',
     component: MfaSetupComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
+    data: { roles: ['SuperAdmin', 'Admin', 'User'] }
   },
   {
     path: 'biometric',
     component: BiometricSetupComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
+    data: { roles: ['SuperAdmin', 'Admin', 'User'] }
   },
   {
     path: 'devices',
     component: LinkedDevicesComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
+    data: { roles: ['SuperAdmin', 'Admin', 'User'] }
   },
   {
     path: 'notifications',
     component: NotificationPreferencesComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
+    data: { roles: ['SuperAdmin', 'Admin', 'User'] }
   },
   {
     path: 'my-reports',
     component: MyReportsComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['SuperAdmin', 'Admin', 'Member'] }
+    data: { roles: ['SuperAdmin', 'Admin', 'User'] }
   }
 ];
 

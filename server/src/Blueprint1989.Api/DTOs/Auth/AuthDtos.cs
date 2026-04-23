@@ -54,7 +54,7 @@ public class RegisterRequest
     public string Password { get; set; } = string.Empty;
 
     [Required]
-    public Role Role { get; set; } = Role.Member;
+    public Role Role { get; set; } = Role.User;
 }
 
 public class AuthResponse
@@ -64,7 +64,7 @@ public class AuthResponse
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
-    public Role Role { get; set; } = Role.Member;
+    public Role Role { get; set; } = Role.User;
     public string Token { get; set; } = string.Empty;
     public DateTime? TokenExpiresAt { get; set; }
     public bool IsMfaRequired { get; set; } = false;

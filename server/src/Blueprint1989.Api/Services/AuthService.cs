@@ -143,7 +143,7 @@ namespace Blueprint1989.Api.Services
             return (user, token, expiresAt, user.IsMfaEnabled, passwordExpired, false);
         }
 
-        public async Task<(User? user, string? error)> RegisterAsync(string email, string password, Role role = Role.Member)
+        public async Task<(User? user, string? error)> RegisterAsync(string email, string password, Role role = Role.User)
         {
             var normalizedEmail = email.Trim().ToLowerInvariant();
             if (await _context.Users.AnyAsync(u => u.Email == normalizedEmail))

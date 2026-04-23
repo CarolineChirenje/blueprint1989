@@ -186,7 +186,7 @@ export class AppComponent implements OnInit, OnDestroy {
         const navEnd = event as NavigationEnd;
         if (navEnd.urlAfterRedirects === '/dashboard' && !this.tourService.isTourCompleted()) {
           setTimeout(() => {
-            const role = this.auth.getUserRole() || 'Member';
+            const role = this.auth.getUserRole() || 'User';
             this.tourService.startTour(role);
           }, 600);
         }
@@ -890,7 +890,7 @@ export class AppComponent implements OnInit, OnDestroy {
   /** Called from the Help → Take a Tour menu item. Always relaunches, ignoring completion flag. */
   startTour(): void {
     this.helpDropdownOpen = false;
-    const role = this.auth.getUserRole() || 'Member';
+    const role = this.auth.getUserRole() || 'User';
     this.tourService.startTour(role);
   }
 

@@ -148,7 +148,7 @@ export class AuthService {
         switch (role) {
           case 'SuperAdmin': return Role.SuperAdmin;
           case 'Admin': return Role.Admin;
-          case 'Member': return Role.Member;
+          case 'User': return Role.User;
           default: return null;
         }
       }

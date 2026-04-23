@@ -139,7 +139,7 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("SuperAdminOnly", p => p.RequireRole("SuperAdmin"));
     options.AddPolicy("AdminOrAbove",   p => p.RequireRole("SuperAdmin", "Admin"));
-    options.AddPolicy("MemberOrAbove",  p => p.RequireRole("SuperAdmin", "Admin", "Member"));
+    options.AddPolicy("UserOrAbove",     p => p.RequireRole("SuperAdmin", "Admin", "User"));
 });
 
 // Environment-specific CORS configuration

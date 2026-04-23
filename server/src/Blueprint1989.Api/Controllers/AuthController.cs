@@ -39,7 +39,7 @@ namespace Blueprint1989.Api.Controllers
             }
 
             // Only allow self-registration for these roles
-            var allowedRoles = new[] { Models.Role.Admin, Models.Role.Member };
+            var allowedRoles = new[] { Models.Role.Admin, Models.Role.User };
             if (!allowedRoles.Contains(request.Role))
             {
                 return BadRequest(new { message = "Invalid role selection" });
@@ -146,7 +146,7 @@ namespace Blueprint1989.Api.Controllers
                 FirstName = authenticatedUser?.FirstName ?? "",
                 LastName = authenticatedUser?.LastName ?? "",
                 PhoneNumber = authenticatedUser?.PhoneNumber,
-                Role = authenticatedUser?.Role ?? Models.Role.Member,
+                Role = authenticatedUser?.Role ?? Models.Role.User,
                 IsMfaEnabled = authenticatedUser?.IsMfaEnabled ?? false,
                 MfaEnabledAt = _timeZoneService.ConvertFromUtc(authenticatedUser?.MfaEnabledAt),
                 Token = token ?? string.Empty,
@@ -365,7 +365,7 @@ namespace Blueprint1989.Api.Controllers
         {
             Role.SuperAdmin => "Super Admin",
             Role.Admin      => "Admin",
-            Role.Member     => "Member",
+            Role.User       => "User",
             _ => "Unknown"
         };
 

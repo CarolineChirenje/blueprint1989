@@ -76,35 +76,8 @@
     } @else {
       <form [formGroup]="signupForm" (ngSubmit)="submit()" autocomplete="off">
 
-        <!-- Step 1: Role Selection -->
+        <!-- Common fields -->
         <div class="form-section">
-          <label class="section-label">I am a... <span class="required">*</span></label>
-          <div class="role-picker">
-            @for (opt of roleOptions; track opt.value) {
-              <label
-                class="role-card"
-                [class.selected]="selectedRole === opt.value"
-              >
-                <input
-                  type="radio"
-                  formControlName="role"
-                  [value]="opt.value"
-                  class="sr-only"
-                />
-                <span class="role-card-icon material-icons" [style.color]="opt.color" aria-hidden="true">{{ opt.icon }}</span>
-                <span class="role-card-title">{{ opt.label }}</span>
-                <span class="role-card-desc">{{ opt.description }}</span>
-              </label>
-            }
-          </div>
-          @if (signupForm.get('role')?.invalid && signupForm.get('role')?.touched) {
-            <div class="error">Please select a role</div>
-          }
-        </div>
-
-        @if (selectedRole !== null) {
-          <!-- Common fields -->
-          <div class="form-section">
             <label>First Name <span class="required">*</span></label>
             <input type="text" formControlName="firstName" placeholder="First name" autocomplete="given-name" />
             @if (signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched) {
@@ -171,7 +144,6 @@
           >
             {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
           </button>
-        }
 
       </form>
       <a routerLink="/login">Already have an account? Login</a>

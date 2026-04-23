@@ -11,7 +11,8 @@ import { VerifyEmailComponent } from './auth/verify-email.component';
 const routes: Routes = [
   // Auth routes - explicit to avoid wildcard matching
   { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
+  { path: 'signup', component: SignupComponent, data: { isAdmin: false } },
+  { path: 'signup/admin', component: SignupComponent, data: { isAdmin: true } },
   { path: 'change-expired-password', component: ChangeExpiredPasswordComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },

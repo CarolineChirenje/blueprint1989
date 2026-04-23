@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { Role } from '../shared/models/user.model';
 
@@ -25,13 +25,9 @@ export class SignupComponent implements OnInit, OnDestroy {
   private cooldownInterval: ReturnType<typeof setInterval> | null = null;
 
   readonly Role = Role;
+  isAdminRoute = false;
 
-  roleOptions = [
-    { value: Role.Admin,  label: 'Admin',  description: 'System administrator', icon: 'admin_panel_settings', color: '#F57C00' },
-    { value: Role.Member, label: 'Member', description: 'Group member',     icon: 'person',               color: '#237A49' }
-  ];
-
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {
     this.signupForm = this.fb.group({
       role:            [null, Validators.required],
       email:           ['', [Validators.required, Validators.email]],
@@ -50,17 +46,14 @@ export class SignupComponent implements OnInit, OnDestroy {
     if (this.auth.getToken()) {
       this.router.navigate(['/dashboard']);
     }
-    this.signupForm.get('role')!.valueChanges.subscribe(() => {
-      this.updateConditionalValidators();
-    });
-  }
-
-  get selectedRole(): Role | null {
-    return this.signupForm.get('role')!.value;
+    this.isAdminRoute = !!this.route.snapshot.data['isAdmin'];
+    const role = this.isAdminRoute ? Role.Admin : Role.User;
+    this.signupForm.get('role')!.setValue(role);
+    this.updateConditionalValidators();
   }
 
   get isAdmin(): boolean {
-    return this.selectedRole === Role.Admin;
+    return this.isAdminRoute;
   }
 
   passwordMatchValidator(form: AbstractControl): ValidationErrors | null {

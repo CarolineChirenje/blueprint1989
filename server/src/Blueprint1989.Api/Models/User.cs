@@ -8,7 +8,7 @@ public enum Role
 {
     SuperAdmin = 1,
     Admin      = 2,
-    Member     = 3
+    User       = 3
 }
 
 public class User
@@ -36,7 +36,7 @@ public class User
     public DateTime? PasswordLastChanged { get; set; }
     
     [Required]
-    public Role Role { get; set; } = Role.Member;
+    public Role Role { get; set; } = Role.User;
     
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

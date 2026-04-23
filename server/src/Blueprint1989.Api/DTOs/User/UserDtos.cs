@@ -10,7 +10,7 @@ public class UserManagementDto
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string FullName { get; set; } = string.Empty;
-    public Role Role { get; set; } = Role.Member;
+    public Role Role { get; set; } = Role.User;
     public string RoleName { get; set; } = string.Empty;
     public bool IsActive { get; set; }
     public string ActiveStatus { get; set; } = string.Empty;
