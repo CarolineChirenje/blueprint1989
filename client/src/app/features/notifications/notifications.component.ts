@@ -288,36 +288,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   getNotificationIcon(type: NotificationType): string {
     switch (type) {
-      case NotificationType.PaymentDue:
-        return '💳';
-      case NotificationType.PaymentReceived:
-        return '✅';
-      case NotificationType.CycleCreated:
-        return '🔄';
+     
       case NotificationType.SystemRestart:
         return '🔧';
-      case NotificationType.GroupInviteReceived:
-        return '👥';
-      case NotificationType.CycleStarted:
-        return '🚀';
-      case NotificationType.CyclePaymentMade:
-        return '💸';
-      case NotificationType.CycleMidReminder:
-        return '⏳';
-      case NotificationType.CycleClosingSoon:
-        return '⚠️';
-      case NotificationType.CycleClosed:
-        return '🔒';
-      case NotificationType.DisputeRaised:
-        return '🚨';
-      case NotificationType.DisputeUpdated:
-        return '📋';
-      case NotificationType.ManualReminder:
-        return '📣';
-      case NotificationType.MemberLeftGroup:
-        return '👋';
-      case NotificationType.MemberJoinedGroup:
-        return '🎉';
       default:
         return '🔔';
     }
@@ -325,35 +298,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   getNotificationTone(type: NotificationType): 'alert' | 'warning' | 'success' | 'info' | 'neutral' {
     switch (type) {
-      case NotificationType.PaymentDue:
-        return 'warning';
-      case NotificationType.PaymentReceived:
-        return 'success';
-      case NotificationType.CycleCreated:
-        return 'info';
+    
       case NotificationType.SystemRestart:
-        return 'info';
-      case NotificationType.GroupInviteReceived:
-        return 'info';
-      case NotificationType.CycleStarted:
-        return 'info';
-      case NotificationType.CyclePaymentMade:
-        return 'success';
-      case NotificationType.CycleMidReminder:
-        return 'info';
-      case NotificationType.CycleClosingSoon:
-        return 'warning';
-      case NotificationType.CycleClosed:
-        return 'neutral';
-      case NotificationType.DisputeRaised:
-        return 'alert';
-      case NotificationType.DisputeUpdated:
-        return 'info';
-      case NotificationType.ManualReminder:
-        return 'warning';
-      case NotificationType.MemberLeftGroup:
-        return 'info';
-      case NotificationType.MemberJoinedGroup:
         return 'info';
       default:
         return 'neutral';

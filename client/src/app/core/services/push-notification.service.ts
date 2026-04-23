@@ -27,25 +27,8 @@ export interface TestEmailRequest {
 
 /** Enum mirroring server-side NotificationType — kept in sync with the server enum values. */
 export enum NotificationType {
-  General              = 1,
-  PaymentDue           = 2,
-  PaymentReceived      = 3,
-  CycleCreated         = 4,
-  SystemRestart        = 5,
-  GroupInviteReceived  = 6,
-  CycleStarted         = 7,
-  CyclePaymentMade     = 8,
-  CycleMidReminder     = 9,
-  CycleClosingSoon     = 10,
-  CycleClosed          = 11,
-  DisputeRaised        = 12,
-  DisputeUpdated       = 13,
-  ManualReminder       = 14,
-  MemberLeftGroup      = 15,
-  MemberJoinedGroup    = 16,
-  JoinRequestReceived  = 33,
-  JoinRequestApproved  = 34,
-  JoinRequestDeclined  = 35,
+  SystemRestart        = 1,
+  General             = 2,
 }
 
 @Injectable({ providedIn: 'root' })

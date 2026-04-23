@@ -1,7 +1,7 @@
 # Blueprint1989 Deployment Guide
 
-**Frontend:** `https://blueprint1989.elroitec.com` (port 4300)  
-**Backend API:** `https://blueprint1989api.elroitec.com` (port 1954)  
+**Frontend:** `https://blueprint1989.elroitec.com` (port 4400)  
+**Backend API:** `https://blueprint1989api.elroitec.com` (port 1989)  
 **Stack:** .NET 10 � PostgreSQL � Angular 21 PWA � Nginx � Let's Encrypt � Ubuntu 22.04
 
 ---
@@ -10,8 +10,8 @@
 
 | What | Port | Domain | Served by |
 |------|------|--------|-----------|
-| Angular PWA (frontend) | 4300 | `blueprint1989.elroitec.com` | Nginx ? static files |
-| .NET API (backend) | 1954 | `blueprint1989api.elroitec.com` | Nginx ? Kestrel |
+| Angular PWA (frontend) | 4400 | `blueprint1989.elroitec.com` | Nginx ? static files |
+| .NET API (backend) | 1989 | `blueprint1989api.elroitec.com` | Nginx ? Kestrel |
 | PostgreSQL | 5432 | localhost only | PostgreSQL 15+ |
 
 ---
@@ -106,12 +106,12 @@ sudo mkdir -p /home/elroitecProjects/Blueprint1989/api
 sudo chown -R ubuntu:ubuntu /home/elroitecProjects/Blueprint1989
 ```
 
-### 2.9 Configure firewall (open ports 4300 and 1954)
+### 2.9 Configure firewall (open ports 4400 and 1989)
 ```bash
 sudo ufw allow OpenSSH
 sudo ufw allow 'Nginx Full'
-sudo ufw allow 4300/tcp
-sudo ufw allow 1954/tcp
+sudo ufw allow 4400/tcp
+sudo ufw allow 1989/tcp
 sudo ufw enable
 sudo ufw status
 ```
@@ -122,8 +122,8 @@ sudo ufw status numbered
 ```
 Expected output includes:
 ```
-4300/tcp    ALLOW IN    Anywhere
-1954/tcp    ALLOW IN    Anywhere
+4400/tcp    ALLOW IN    Anywhere
+1989/tcp    ALLOW IN    Anywhere
 80/tcp      ALLOW IN    Anywhere
 443/tcp     ALLOW IN    Anywhere
 ```
@@ -297,7 +297,7 @@ KillSignal=SIGINT
 SyslogIdentifier=Blueprint1989-api
 User=ubuntu
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=ASPNETCORE_URLS=http://0.0.0.0:1954
+Environment=ASPNETCORE_URLS=http://0.0.0.0:1989
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 Environment=Infisical__ClientSecret=YOUR_SECRET_HERE
 
@@ -315,7 +315,7 @@ sudo systemctl status Blueprint1989-api
 
 Verify:
 ```bash
-curl -s http://localhost:1954/api/health
+curl -s http://localhost:1989/api/health
 ```
 
 ---
@@ -336,7 +336,7 @@ server {
 
     # API proxy to .NET backend
     location /api/ {
-        proxy_pass http://127.0.0.1:1954/api/;
+        proxy_pass http://127.0.0.1:1989/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection keep-alive;
@@ -378,7 +378,7 @@ server {
 }
 ```
 
-### 8.2 Backend (`blueprint1989api.elroitec.com` on port 1954)
+### 8.2 Backend (`blueprint1989api.elroitec.com` on port 1989)
 ```bash
 sudo nano /etc/nginx/sites-available/Blueprint1989api
 ```
@@ -388,7 +388,7 @@ server {
     server_name blueprint1989api.elroitec.com;
 
     location / {
-        proxy_pass         http://127.0.0.1:1954;
+        proxy_pass         http://127.0.0.1:1989;
         proxy_http_version 1.1;
         proxy_set_header   Upgrade $http_upgrade;
         proxy_set_header   Connection keep-alive;
@@ -437,10 +437,10 @@ sudo systemctl status Blueprint1989-api
 sudo systemctl status nginx
 
 # API on localhost
-curl -s http://localhost:1954/api/health
+curl -s http://localhost:1989/api/health
 
 # Frontend
-curl -s -o /dev/null -w "%{http_code}" https://blueprint1989.elroitec.com:4300/
+curl -s -o /dev/null -w "%{http_code}" https://blueprint1989.elroitec.com:4400/
 
 # API HTTPS
 curl -s -o /dev/null -w "%{http_code}" https://blueprint1989api.elroitec.com/api/health
@@ -453,7 +453,7 @@ sudo journalctl -u Blueprint1989-api -f
 ```
 
 Open in browser:
-- `https://blueprint1989.elroitec.com:4300` ? Angular login screen
+- `https://blueprint1989.elroitec.com:4400` ? Angular login screen
 - `https://blueprint1989api.elroitec.com/api/swagger` ? Swagger UI
 
 ---
@@ -508,7 +508,7 @@ Copy output into `appsettings.Production.json` (`Vapid` section) **and** `enviro
 | DB connection error | Wrong credentials | Check `ConnectionStrings` in `appsettings.Production.json` |
 | SSL certificate error | Cert expired | `sudo certbot certificates` then `sudo certbot renew` |
 | API not starting | Missing runtime | `sudo journalctl -u Blueprint1989-api -n 100 --no-pager` and `dotnet --version` |
-| Port not reachable | Firewall blocking | `sudo ufw allow 4300/tcp` and `sudo ufw allow 1954/tcp` |
+| Port not reachable | Firewall blocking | `sudo ufw allow 4400/tcp` and `sudo ufw allow 1989/tcp` |
 
 ### Useful debug commands
 ```bash
@@ -517,7 +517,7 @@ dotnet /home/elroitecProjects/Blueprint1989/api/Blueprint1989.Api.dll
 dotnet --info
 sudo cat /etc/systemd/system/Blueprint1989-api.service
 sudo ufw status numbered
-sudo ss -tlnp | grep -E '4300|1954'
+sudo ss -tlnp | grep -E '4400|1989'
 ```
 
 

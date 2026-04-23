@@ -1,6 +1,6 @@
 {
   "/api/files": {
-    "target": "http://localhost:1954",
+    "target": "http://localhost:1989",
     "secure": false
   }
 }

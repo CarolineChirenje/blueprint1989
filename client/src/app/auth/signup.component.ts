@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { Role } from '../shared/models/user.model';
 
@@ -27,7 +27,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   readonly Role = Role;
   isAdminRoute = false;
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     this.signupForm = this.fb.group({
       role:            [null, Validators.required],
       email:           ['', [Validators.required, Validators.email]],
@@ -46,7 +46,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     if (this.auth.getToken()) {
       this.router.navigate(['/dashboard']);
     }
-    this.isAdminRoute = !!this.route.snapshot.data['isAdmin'];
+    this.isAdminRoute = this.router.url.startsWith('/signup/admin');
     const role = this.isAdminRoute ? Role.Admin : Role.User;
     this.signupForm.get('role')!.setValue(role);
     this.updateConditionalValidators();

@@ -41,10 +41,6 @@ export class PushTestComponent implements OnInit {
   loading = false;
 
   readonly notificationTypes: NotificationTypeOption[] = [
-    { value: NotificationType.General,         label: 'General' },
-    { value: NotificationType.PaymentDue,      label: 'Payment Due' },
-    { value: NotificationType.PaymentReceived, label: 'Payment Received' },
-    { value: NotificationType.CycleCreated,    label: 'Cycle Created' },
     { value: NotificationType.SystemRestart,   label: 'System Restart' },
   ];
 

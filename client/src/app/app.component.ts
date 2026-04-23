@@ -537,29 +537,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private getNotificationSummaryLabel(type: NotificationType): string {
     switch (type) {
-      case NotificationType.PaymentDue:
-        return 'payment reminder';
-      case NotificationType.PaymentReceived:
-        return 'payment received';
-      case NotificationType.CycleCreated:
-      case NotificationType.CycleStarted:
-      case NotificationType.CycleMidReminder:
-      case NotificationType.CycleClosingSoon:
-      case NotificationType.CycleClosed:
-        return 'cycle update';
-      case NotificationType.CyclePaymentMade:
-        return 'payment received';
       case NotificationType.SystemRestart:
         return 'system update';
-      case NotificationType.GroupInviteReceived:
-      case NotificationType.MemberLeftGroup:
-      case NotificationType.MemberJoinedGroup:
-        return 'group update';
-      case NotificationType.DisputeRaised:
-      case NotificationType.DisputeUpdated:
-        return 'dispute update';
-      case NotificationType.ManualReminder:
-        return 'payment reminder';
       default:
         return 'notification';
     }
@@ -567,36 +546,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   getNotificationIcon(type: NotificationType): string {
     switch (type) {
-      case NotificationType.PaymentDue:
-        return '💰';
-      case NotificationType.PaymentReceived:
-        return '✅';
-      case NotificationType.CycleCreated:
-        return '🔄';
-      case NotificationType.CycleStarted:
-        return '🚀';
-      case NotificationType.CyclePaymentMade:
-        return '💸';
-      case NotificationType.CycleMidReminder:
-        return '⏳';
-      case NotificationType.CycleClosingSoon:
-        return '⚠️';
-      case NotificationType.CycleClosed:
-        return '🔒';
       case NotificationType.SystemRestart:
-        return '🔧';
-      case NotificationType.GroupInviteReceived:
-        return '👥';
-      case NotificationType.DisputeRaised:
-        return '🚨';
-      case NotificationType.DisputeUpdated:
-        return '📋';
-      case NotificationType.ManualReminder:
-        return '📣';
-      case NotificationType.MemberLeftGroup:
-        return '👋';
-      case NotificationType.MemberJoinedGroup:
-        return '🎉';
+        return '🔧'
       default:
         return '🔔';
     }
@@ -604,26 +555,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   getNotificationTone(type: NotificationType): 'alert' | 'warning' | 'success' | 'info' | 'neutral' {
     switch (type) {
-      case NotificationType.PaymentDue:
-        return 'warning';
-      case NotificationType.PaymentReceived:
-      case NotificationType.CyclePaymentMade:
-        return 'success';
-      case NotificationType.CycleCreated:
-      case NotificationType.CycleStarted:
-      case NotificationType.CycleMidReminder:
-      case NotificationType.CycleClosed:
       case NotificationType.SystemRestart:
-      case NotificationType.GroupInviteReceived:
-      case NotificationType.DisputeUpdated:
-      case NotificationType.MemberLeftGroup:
-      case NotificationType.MemberJoinedGroup:
-        return 'info';
-      case NotificationType.CycleClosingSoon:
-      case NotificationType.ManualReminder:
-        return 'warning';
-      case NotificationType.DisputeRaised:
-        return 'alert';
       default:
         return 'neutral';
     }
@@ -691,9 +623,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.auth.getUserDisplayName();
   }
   
-  isSupportWorker(): boolean {
-    return false;
-  }
   
   isAdmin(): boolean {
     return this.auth.isAdmin();
@@ -707,57 +636,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.auth.isAdminOrAbove();
   }
 
-  isCareRecipient(): boolean {
-    return false;
-  }
-
-  canSeeDiabetesMenu(): boolean {
-    return false;
-  }
-
-  canSeeIncidentsMenu(): boolean {
-    return false;
-  }
-
-  canSeeBloodPressureMenu(): boolean {
-    return false;
-  }
-
-  canSeeSuppliesMenu(): boolean {
-    return false;
-  }
-
-  isDiabetesCareRecipient(): boolean {
-    return false;
-  }
-
-  isDiabetesCarer(): boolean {
-    return false;
-  }
-
-  isDiabetesHealthCareProvider(): boolean {
-    return false;
-  }
-
-  isDiabetesSupportWorker(): boolean {
-    return false;
-  }
-
-  isDiabetesAligned(): boolean {
-    return false;
-  }
-
-  canAccessMealAndBolus(): boolean {
-    return false;
-  }
-
-  canViewCareRecipients(): boolean {
-    return false;
-  }
-
-  navigateToMyConditions(): void {
-    this.closeDropdown();
-  }
 
   navigateToMyReports(): void {
     this.closeDropdown();
@@ -774,26 +652,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.notificationDropdownOpen = false;
   }
 
-  closeDiabetesDropdown(): void {
-    this.diabetesDropdownOpen = false;
-  }
-
-  navigateToAssessment(): void {
-    this.router.navigate(['/dashboard']);
-  }
-
-  navigateToIncidents(): void {
-    this.router.navigate(['/dashboard']);
-  }
-
-  navigateToMealEntry(): void {
-    this.router.navigate(['/dashboard']);
-  }
-
-  navigateToBloodPressure(): void {
-    this.router.navigate(['/dashboard']);
-  }
-
+ 
   isAdminOrSuperAdmin(): boolean {
     return this.auth.isAdminOrAbove();
   }

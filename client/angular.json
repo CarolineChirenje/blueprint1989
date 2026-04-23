@@ -62,7 +62,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "buildTarget": "Blueprint1989:build",
-            "port": 4300,
+            "port": 4400,
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
