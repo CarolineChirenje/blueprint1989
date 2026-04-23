@@ -12,9 +12,6 @@ export interface ScheduledNotification {
   providedIn: 'root'
 })
 export class ServiceWorkerNotificationService {
-  readonly HYPO_KEY = 'bgl-hypo-timer';
-  readonly KETONE_KEY = 'bgl-ketone-timer';
-
   private swRegistration: ServiceWorkerRegistration | null = null;
   // Observable-friendly promise resolved after registration (used by PushNotificationService)
   private _registrationPromise: Promise<ServiceWorkerRegistration | null>;
@@ -47,15 +44,6 @@ export class ServiceWorkerNotificationService {
 
       this.swRegistration = registration;
       this._resolveRegistration(registration);
-
-      // Listen for messages from service worker
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data.type === 'NOTIFICATION_SENT') {
-          // Clear timer state from localStorage — try both keys
-          this.clearTimerState(event.data.notificationId, this.HYPO_KEY);
-          this.clearTimerState(event.data.notificationId, this.KETONE_KEY);
-        }
-      });
 
       // Request notification permission
       await this.requestNotificationPermission();
@@ -103,12 +91,11 @@ export class ServiceWorkerNotificationService {
       notificationId
     });
 
-    // Remove from localStorage
-    this.clearTimerState(notificationId);
   }
 
   // Save timer state to localStorage
   private saveTimerState(notification: ScheduledNotification, key?: string) {
+    if (!key) return;
     try {
       const timerState = {
         notificationId: notification.id,
@@ -116,7 +103,7 @@ export class ServiceWorkerNotificationService {
         startTime: Date.now(),
         data: notification.data
       };
-      localStorage.setItem(key ?? this.KETONE_KEY, JSON.stringify(timerState));
+      localStorage.setItem(key, JSON.stringify(timerState));
     } catch (error) {
       console.error('Error saving timer state:', error);
     }
@@ -124,8 +111,9 @@ export class ServiceWorkerNotificationService {
 
   // Get timer state from localStorage
   getTimerState(key?: string): any {
+    if (!key) return null;
     try {
-      const state = localStorage.getItem(key ?? this.KETONE_KEY);
+      const state = localStorage.getItem(key);
       return state ? JSON.parse(state) : null;
     } catch (error) {
       console.error('Error getting timer state:', error);
@@ -134,12 +122,12 @@ export class ServiceWorkerNotificationService {
   }
 
   // Clear timer state from localStorage
-  clearTimerState(notificationId?: string, key?: string) {
+  clearTimerState(key?: string, notificationId?: string) {
+    if (!key) return;
     try {
-      const storageKey = key ?? this.KETONE_KEY;
-      const currentState = this.getTimerState(storageKey);
+      const currentState = this.getTimerState(key);
       if (!notificationId || (currentState && currentState.notificationId === notificationId)) {
-        localStorage.removeItem(storageKey);
+        localStorage.removeItem(key);
       }
     } catch (error) {
       console.error('Error clearing timer state:', error);

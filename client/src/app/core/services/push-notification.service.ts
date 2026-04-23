@@ -13,7 +13,7 @@ export interface PushSubscribeRequest {
 }
 
 export interface TestPushRequest {
-  type: number;
+  type: string;
   title: string;
   body: string;
   deepLinkUrl?: string;
@@ -27,8 +27,9 @@ export interface TestEmailRequest {
 
 /** Enum mirroring server-side NotificationType — kept in sync with the server enum values. */
 export enum NotificationType {
-  General             = 1,
-  SystemRestart        = 2, 
+  General                  = 1,
+  SystemRestart            = 2,
+  FeatureBugReportResolved = 3,
 }
 
 @Injectable({ providedIn: 'root' })
@@ -170,25 +171,6 @@ export class PushNotificationService implements OnDestroy {
 
   sendTestEmail(req: TestEmailRequest) {
     return this.http.post<{ message: string }>(`${this.apiUrl}/test-email`, req);
-  }
-
-  /**
-   * Schedules a server-side BGL recheck reminder.
-   * @param careRecipientId The ID of the care recipient for the reminder.
-   * @param delayMinutes Delay before the push is sent (default 120 = 2 hours).
-   */
-  scheduleBgTimer(careRecipientId: number, delayMinutes = 120) {
-    return this.http.post<{ reminderId: number; scheduledAt: string; delayMinutes: number }>(
-      `${this.apiUrl}/bg-timer/schedule`,
-      { careRecipientId, delayMinutes }
-    );
-  }
-
-  /** Cancels a pending BG timer reminder for the specified care recipient. */
-  cancelBgTimer(careRecipientId: number) {
-    return this.http.delete(`${this.apiUrl}/bg-timer/cancel`, {
-      params: { careRecipientId: careRecipientId.toString() }
-    });
   }
 
   ngOnDestroy(): void {

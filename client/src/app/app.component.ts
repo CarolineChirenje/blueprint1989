@@ -655,16 +655,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.dropdownOpen = false;
   }
   
-  toggleVitalsDropdown(): void {
-   
-    this.dropdownOpen = false;
-    this.managementDropdownOpen = false;
-    this.systemDropdownOpen = false;
-    this.helpDropdownOpen = false;
-    this.notificationDropdownOpen = false;
-  }
 
-  
   toggleManagementDropdown(): void {
     this.managementDropdownOpen = !this.managementDropdownOpen;
     this.dropdownOpen = false
@@ -718,15 +709,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.router.navigate(['/management/users']);
   }
   
-  navigateToGroups(): void {
-    this.mobileNavOpen = false;
-    this.router.navigate(['/groups']);
-  }
-
-  navigateToCycles(): void {
-    this.closeManagementDropdown();
-    this.router.navigate(['/cycles']);
-  }
 
   navigateToAppConfig(): void {
     this.closeManagementDropdown();

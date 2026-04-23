@@ -64,20 +64,12 @@ export class OfflineQueueComponent implements OnInit, OnDestroy {
 
   typeLabel(type: string): string {
     switch (type) {
-      case 'assessment':  return 'BGL Assessment';
-      case 'incident':    return 'Incident';
-      case 'meal-entry':  return 'Meal Entry';
-      case 'blood-pressure': return 'Blood Pressure';
       default:            return type;
     }
   }
 
   typeBadgeClass(type: string): string {
     switch (type) {
-      case 'assessment': return 'badge-assessment';
-      case 'incident':   return 'badge-incident';
-      case 'meal-entry': return 'badge-meal';
-      case 'blood-pressure': return 'badge-bp';
       default:           return 'badge-default';
     }
   }

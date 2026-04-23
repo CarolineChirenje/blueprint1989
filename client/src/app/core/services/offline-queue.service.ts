@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-export type OfflineQueueItemType = 'assessment' | 'incident' | 'meal-entry' | 'blood-pressure' | 'bp-incident';
+export type OfflineQueueItemType = 'expense' | 'payment';
 
 export interface OfflineQueueItem {
   id: string;

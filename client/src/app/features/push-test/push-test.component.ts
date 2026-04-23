@@ -41,7 +41,9 @@ export class PushTestComponent implements OnInit {
   loading = false;
 
   readonly notificationTypes: NotificationTypeOption[] = [
-    { value: NotificationType.SystemRestart,   label: 'System Restart' },
+    { value: NotificationType.General,                label: 'General' },
+    { value: NotificationType.SystemRestart,           label: 'System Restart' },
+    { value: NotificationType.FeatureBugReportResolved, label: 'Feature/Bug Report Resolved' },
   ];
 
   constructor(private pushService: PushNotificationService, private cdr: ChangeDetectorRef) {}
@@ -79,7 +81,7 @@ export class PushTestComponent implements OnInit {
       return;
     }
     const req: TestPushRequest = {
-      type: Number(this.selectedType) as NotificationType, // guard against HTML select coercing to string
+      type: NotificationType[Number(this.selectedType)], // send enum name string (server uses JsonStringEnumConverter)
       title: this.testTitle,
       body: this.testBody,
       deepLinkUrl: this.testDeepLink || undefined

@@ -33,10 +33,7 @@ public record PushSubscribeRequest(
 
 public record VapidPublicKeyResponse(string PublicKey);
 
-// BG timer DTOs
-public record ScheduleBgTimerRequest(int CareRecipientId, int DelayMinutes = 120);
-
-// Dev test DTO — uses init properties (not positional constructor) so System.Text.Json
+// Dev test DTO â€” uses init properties (not positional constructor) so System.Text.Json
 // can deserialize the NotificationType enum from an integer value sent by the client.
 public class TestPushRequest
 {

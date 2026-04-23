@@ -144,12 +144,20 @@ public class PushController : ControllerBase
         var userId = GetUserId();
         if (userId == null) return Unauthorized();
 
-        await _pushSender.SendToUserAsync(
-            userId: userId.Value,
-            type: request.Type,
-            title: request.Title,
-            body: request.Body,
-            deepLinkUrl: request.DeepLinkUrl);
+        try
+        {
+            await _pushSender.SendToUserAsync(
+                userId: userId.Value,
+                type: request.Type,
+                title: request.Title,
+                body: request.Body,
+                deepLinkUrl: request.DeepLinkUrl);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "SendTestPush failed for user {UserId}", userId);
+            return StatusCode(500, new { message = "Push delivery failed. Check server logs for details." });
+        }
 
         return Ok(new { message = "Test push dispatched." });
     }
@@ -189,14 +197,6 @@ public class PushController : ControllerBase
         return Ok(new { message = $"Test email dispatched to {request.To}." });
     }
 
-    // -- BG Timer scheduling -------------------------------------------------
-
-    /// <summary>
-    /// POST /api/push/bg-timer/schedule
-    /// Schedules a server-side BGL recheck reminder for the specified care recipient.
-    /// Default delay is 120 minutes (2 hours). Replaces any existing pending reminder
-    /// for the same user + care recipient.
-    /// </summary>
     // -- Helpers --------------------------------------------------------------
 
     private int? GetUserId()
