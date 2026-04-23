@@ -56,34 +56,39 @@ dotnet restore
 ```typescript
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:1954/api',
+  apiUrl: 'http://localhost:1989/api',
   vapidPublicKey: '',
   version: '1.0.0',
-  docsUrl: 'https://batanai-docs.pages.dev'
+  docsUrl: 'https://blueprint1989-docs.pages.dev'
 };
 ```
 
 **Server** — uses `appsettings.Development.json` by default. Ensure PostgreSQL is running and the connection string matches your local setup.
 
-### 3. Run locally (4 terminals)
+### 3. Run locally
 
 ```bash
-# Terminal 1 — API
+# Terminal 1 — API (runs on http://localhost:1989)
 cd server/src/Blueprint1989.Api
 dotnet run
 
-# Terminal 2 — Build & serve client
+# Terminal 2 — Angular dev server with Service Worker support (runs on http://localhost:4400)
 cd client
-npx ng build
-http-server ./dist/Blueprint1989/browser -p 80 -c-1
-
-# Terminal 3 — ngrok tunnel for client HTTPS
-ngrok http 80
-
-# Terminal 4 — Forward API port 5000 via VS Code Ports panel (set to Public)
+npx ng serve --port 4400
 ```
 
-> When tunnel URLs change, update CORS in `Program.cs` and `apiUrl` in `environment.ts`, then rebuild.
+> The custom Service Worker (`custom-sw.js`) loads gracefully in `ng serve` dev mode — `ngsw-worker.js` is skipped if absent, so push notifications can be tested without a production build.
+
+#### Testing push notifications locally (HTTPS required)
+
+Push notifications require a secure origin. Use ngrok to expose the dev server over HTTPS:
+
+```bash
+# Terminal 3 — ngrok HTTPS tunnel for client
+ngrok http 4400
+```
+
+> When the ngrok URL changes, update `apiUrl` in `client/src/environments/environment.ts` and the allowed origins in `Program.cs`, then restart both servers.
 
 See [docs/local-testing-setup.md](docs/local-testing-setup.md) for full details.
 
