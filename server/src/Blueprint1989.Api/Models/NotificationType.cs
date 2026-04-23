@@ -10,9 +10,9 @@ public enum NotificationType
     General = 1,
 
     /// <summary>The API service is about to restart; all users are notified before shutdown.</summary>
-    SystemRestart = 5,
+    SystemRestart = 2,
 
     /// <summary>A feature/bug report status has been updated by an admin.</summary>
-    FeatureBugReportResolved = 19,
+    FeatureBugReportResolved = 3,
 }
 

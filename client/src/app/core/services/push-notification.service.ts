@@ -27,8 +27,8 @@ export interface TestEmailRequest {
 
 /** Enum mirroring server-side NotificationType — kept in sync with the server enum values. */
 export enum NotificationType {
-  SystemRestart        = 1,
-  General             = 2,
+  General             = 1,
+  SystemRestart        = 2, 
 }
 
 @Injectable({ providedIn: 'root' })

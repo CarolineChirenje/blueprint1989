@@ -35,8 +35,8 @@ public static class DatabaseSeeder
         var expected = new[]
         {
             new NotificationTypeEntity { Id =  1, Name = "General",              Description = "General or test notification",                    IsAdminControlled = false },
-            new NotificationTypeEntity { Id =  5, Name = "SystemRestart",        Description = "System is restarting",                            IsAdminControlled = true  },
-            new NotificationTypeEntity { Id = 19, Name = "FeatureBugReportResolved", Description = "A feature/bug report has been resolved",       IsAdminControlled = false },
+            new NotificationTypeEntity { Id =  2, Name = "SystemRestart",        Description = "System is restarting",                            IsAdminControlled = true  },
+            new NotificationTypeEntity { Id = 3, Name = "FeatureBugReportResolved", Description = "A feature/bug report has been resolved",       IsAdminControlled = false },
         };
 
         foreach (var e in expected)
@@ -161,8 +161,6 @@ public static class DatabaseSeeder
             new() { Key = AppConfigKeys.EmailVerificationTokenValidityHours, Value = "24",                            DataType = "int",    Category = "Email", DisplayName = "Email Verification Token Validity (hours)", Description = "How long an email verification token remains valid.",            IsReadOnly = false, RequiresRestart = false },
             new() { Key = AppConfigKeys.EmailVerificationResendLimitPerHour, Value = "3",                             DataType = "int",    Category = "Email", DisplayName = "Email Verification Resend Limit Per Hour", Description = "Max resend requests per email per hour.",                        IsReadOnly = false, RequiresRestart = false },
             new() { Key = AppConfigKeys.EmailBccAddress,                    Value = "",                               DataType = "string", Category = "Email", DisplayName = "Email BCC Address",                        Description = "If set, all outbound emails will be BCC'd to this address.",     IsReadOnly = false, RequiresRestart = false },
-
-            // (Ledger and Reminders config removed - not needed for blueprint)
         };
 
         var existingKeys = await context.AppConfigEntries.Select(e => e.Key).ToHashSetAsync();

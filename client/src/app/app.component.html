@@ -13,7 +13,7 @@
   @if (shouldShowNavigation()) {
     <header>
       <h1>Blueprint1989</h1>
-      <p>Bambanani!</p>
+      <p>Blueprint1989!</p>
     </header>
 
     <nav [class.nav-open]="mobileNavOpen">
@@ -30,12 +30,6 @@
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
           </svg>
           Dashboard
-        </a>
-           <a id="nav-groups" routerLink="/groups" routerLinkActive="active" (click)="mobileNavOpen=false">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;">
-            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-          </svg>
-          Groups
         </a>
          <!-- Offline Queue hidden for now
          <a id="nav-offline-queue" routerLink="/offline-queue" routerLinkActive="active" (click)="mobileNavOpen=false">
@@ -82,7 +76,7 @@
             }
           </div>
 
-         @if (canManageGroupsOrAdmin()) {
+         @if (isAdminOrSuperAdmin()) {
            <div id="nav-management" class="nav-dropdown">
             <a id="nav-management-link" class="nav-link" (click)="toggleManagementDropdown()">
               Management
