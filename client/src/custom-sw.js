@@ -2,14 +2,21 @@
 // Delegates caching/fetch to the Angular ngsw-worker.js runtime.
 // This file owns: push notifications, scheduled local notifications,
 //                 IndexedDB storage and notification-click routing.
-importScripts('/ngsw-worker.js');
+
+// ngsw-worker.js is only present in production builds; skip gracefully in dev
+// so push notifications can still be tested with `ng serve`.
+try {
+  importScripts('/ngsw-worker.js');
+} catch (e) {
+  console.warn('Service Worker: ngsw-worker.js not available (dev mode), skipping Angular SW delegation.', e);
+}
 
 // Custom Service Worker for Batanai
 // Handles:
 //   1. Scheduled local notifications (ketone recheck timer)
 //   2. Server-sent push notifications (VAPID-signed)
 
-const CACHE_NAME = 'batanai-v2';
+const CACHE_NAME = 'blueprint1989-v1';
 const NOTIFICATION_CHECK_INTERVAL = 60000; // Check every minute
 
 // Default app icon
@@ -186,7 +193,7 @@ self.addEventListener('push', (event) => {
     body: payload.body,
     icon: payload.icon || ICON,
     badge: BADGE,
-    tag: `push-${payload.type}-${Date.now()}`,`
+    tag: `push-${payload.type}-${Date.now()}`,
     requireInteraction: isPriorityType(payload.type),
     data: { url: payload.url, source: 'push', type: payload.type },
     actions: [
