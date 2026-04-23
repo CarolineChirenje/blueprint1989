@@ -37,7 +37,7 @@ Connectivity restored
 
 ### IndexedDB Store
 
-- **Database name:** `BatanaiDb`.
+- **Database name:** `Blueprint1989Db`.
 - **Store name:** `offlineQueue`.
 - **Key:** auto-increment integer.
 

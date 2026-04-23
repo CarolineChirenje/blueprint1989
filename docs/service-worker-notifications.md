@@ -2,7 +2,7 @@
 
 ## Overview
 
-Batanai uses a **custom Service Worker** (`custom-sw.js`) layered on top of Angular's generated `ngsw-worker.js` to handle push notification display and deep-link navigation. The service worker runs in the background and processes push events sent from the Batanai API via the Web Push Protocol.
+Blueprint1989 uses a **custom Service Worker** (`custom-sw.js`) layered on top of Angular's generated `ngsw-worker.js` to handle push notification display and deep-link navigation. The service worker runs in the background and processes push events sent from the Blueprint1989 API via the Web Push Protocol.
 
 ---
 
@@ -21,7 +21,7 @@ Batanai uses a **custom Service Worker** (`custom-sw.js`) layered on top of Angu
 ## 1. Architecture
 
 ```
-Batanai API (batanaiapi.elroitec.com)
+Blueprint1989 API (blueprint1989api.elroitec.com)
     ¦
     ¦  Web Push Protocol (RFC 8030)
     ¦  VAPID-authenticated POST to push endpoint
@@ -164,7 +164,7 @@ self.addEventListener('pushsubscriptionchange', event => {
 
 ## 5. IndexedDB Usage
 
-The Batanai service worker does **not** use IndexedDB for notification scheduling. Push notifications are server-initiated — the API triggers them when business events occur (payment recorded, cycle created, etc.). There is no client-side timer or local notification queue.
+The Blueprint1989 service worker does **not** use IndexedDB for notification scheduling. Push notifications are server-initiated — the API triggers them when business events occur (payment recorded, cycle created, etc.). There is no client-side timer or local notification queue.
 
 Angular NGSW uses its own internal IndexedDB (`ngsw`) for caching; this is managed automatically and does not require manual intervention.
 
@@ -174,12 +174,12 @@ Angular NGSW uses its own internal IndexedDB (`ngsw`) for caching; this is manag
 
 ### Using the Dev Push Test Page
 
-Navigate to `/dev/push-test` in the Batanai app (available in development builds). Enter a notification type and message, then click **Send Test Push** to trigger a push via `POST /api/push/test`.
+Navigate to `/dev/push-test` in the Blueprint1989 app (available in development builds). Enter a notification type and message, then click **Send Test Push** to trigger a push via `POST /api/push/test`.
 
 ### Using curl / Postman
 
 ```http
-POST https://batanaiapi.elroitec.com/api/push/test
+POST https://blueprint1989api.elroitec.com/api/push/test
 Authorization: Bearer <token>
 Content-Type: application/json
 

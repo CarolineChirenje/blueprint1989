@@ -1,8 +1,8 @@
-# Batanai â€” System Architecture
+# Blueprint1989 â€” System Architecture
 
 ## Overview
 
-Batanai is a Progressive Web Application (PWA) for shared expense management, built with an Angular 21 frontend and a .NET 10 REST API backend, backed by PostgreSQL and hosted on Ubuntu 22.04.
+Blueprint1989 is a Progressive Web Application (PWA) for shared expense management, built with an Angular 21 frontend and a .NET 10 REST API backend, backed by PostgreSQL and hosted on Ubuntu 22.04.
 
 ---
 
@@ -20,21 +20,21 @@ graph TB
 
     subgraph CF["â˜ï¸ Cloudflare"]
         CFCDN[Cloudflare CDN\nDDoS + WAF]
-        CFPAGES[Cloudflare Pages\nbatanai-docs.pages.dev]
+        CFPAGES[Cloudflare Pages\nblueprint1989-docs.pages.dev]
         CFZT[Cloudflare Zero Trust\nOptional SSO gate on docs]
     end
 
     subgraph Server["ðŸ–¥ï¸ Ubuntu 22.04 VPS"]
         NGINX[Nginx Reverse Proxy\nTLS â€” Let's Encrypt]
 
-        subgraph Frontend["Angular 21 PWA â€” batanai.elroitec.com"]
+        subgraph Frontend["Angular 21 PWA â€” blueprint1989.elroitec.com"]
             FE_PWA[PWA Shell\nService Worker + Offline Queue]
             FE_AUTH[Auth Module\nLogin Â· Signup Â· MFA Â· Biometric]
             FE_FEAT[Feature Modules\nDashboard Â· Cycles Â· Expenses\nPayments Â· Profile Â· Management]
             FE_CORE[Core Services\nHTTP Interceptor Â· Push Â· Sync\nNotifications]
         end
 
-        subgraph API[".NET 10 API â€” batanaiapi.elroitec.com"]
+        subgraph API[".NET 10 API â€” blueprint1989api.elroitec.com"]
             KESTREL[Kestrel :5000]
             CTRL[REST Controllers\nAuth Â· ExpenseCycle Â· Expense\nPayment Â· Notifications Â· Push]
             SVC[Domain Services\nExpenseCycle Â· Expense Â· Payment\nPush Â· MFA Â· WebAuthn\nEmail Â· AppConfig]
@@ -105,7 +105,7 @@ graph TB
 | **PWA** | Custom service worker (`custom-sw.js`), `ngsw-config.json`, `manifest.webmanifest` |
 | **Offline** | Offline queue service â€” defers mutations when offline |
 | **Auth** | JWT interceptor (`AuthInterceptor`), TOTP MFA, WebAuthn biometric |
-| **Hosting** | Nginx serving static build at `batanai.elroitec.com` |
+| **Hosting** | Nginx serving static build at `blueprint1989.elroitec.com` |
 
 **Feature Modules**
 
@@ -135,7 +135,7 @@ graph TB
 | **MFA** | TOTP via `MfaService` + `QRCoder` v1.7.0 |
 | **Biometric** | FIDO2/WebAuthn via `Fido2NetLib` v3.0.1 |
 | **Documentation** | Swagger / OpenAPI via `Swashbuckle.AspNetCore` v10.1.4 |
-| **Hosting** | Nginx reverse proxy â†’ Kestrel at `batanaiapi.elroitec.com` |
+| **Hosting** | Nginx reverse proxy â†’ Kestrel at `blueprint1989api.elroitec.com` |
 
 **Controller Groups**
 
@@ -174,7 +174,7 @@ graph TB
 
 #### Google Drive API v3
 
-Not used in Batanai.
+Not used in Blueprint1989.
 
 #### Web Push (VAPID)
 
@@ -192,7 +192,7 @@ Not used in Batanai.
 |---|---|
 | **CDN / WAF** | Cloudflare proxies all traffic to the VPS â€” DDoS protection, caching |
 | **DNS** | Domain registered at Namesilo; Cloudflare nameservers manage `elroitec.com` |
-| **Pages** | Hosts MkDocs documentation site at `batanai-docs.pages.dev` |
+| **Pages** | Hosts MkDocs documentation site at `blueprint1989-docs.pages.dev` |
 | **Zero Trust** | Optional Google Workspace / GitHub IdP SSO gate on the docs site |
 
 ---
@@ -234,7 +234,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[Batanai event\ne.g. Payment due / Cycle created] --> B[Domain Service\nExpenseCycleService etc.]
+    A[Blueprint1989 event\ne.g. Payment due / Cycle created] --> B[Domain Service\nExpenseCycleService etc.]
     B --> C{Check UserNotificationPreference}
     C -->|IsEnabled = true| D[PushNotificationSender]
     C -->|IsEnabled = false| E[In-app bell only]
@@ -277,9 +277,9 @@ flowchart TD
                                 â”‚       â”‚
                     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜       â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
                     â”‚                                  â”‚
-          batanai.elroitec.com              batanaiapi.elroitec.com
+          blueprint1989.elroitec.com              blueprint1989api.elroitec.com
           Angular 21 static build         Kestrel :5000 (.NET 10)
-          /var/www/Batanai                 systemd service
+          /var/www/Blueprint1989                 systemd service
                                                â”‚
                                          PostgreSQL 15
                                          (localhost:5432)

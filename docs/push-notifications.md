@@ -1,6 +1,6 @@
 # Push Notifications
 
-Batanai uses the **Web Push Protocol** (RFC 8030) with **VAPID authentication** to deliver real-time push notifications from the server to any browser where a user is subscribed — even when the app is not open.
+Blueprint1989 uses the **Web Push Protocol** (RFC 8030) with **VAPID authentication** to deliver real-time push notifications from the server to any browser where a user is subscribed — even when the app is not open.
 
 ---
 
@@ -187,7 +187,7 @@ Set in `appsettings.Development.json`:
 
 ```json
 "Vapid": {
-  "Subject": "mailto:dev@Batanai.local",
+  "Subject": "mailto:dev@Blueprint1989.local",
   "PublicKey": "BMHIw8zld_obcwRmht3TiYhm10cXYpoiM24K8uqafdaIRMG8jc0d9Cb3BxdV1SCNi4An_Fhqut-AdyurBDYRNnI",
   "PrivateKey": "l1i0nQU5lvhatuTrDcze-jCD9FNFaq5RECn42Zm8nIM"
 }
@@ -199,7 +199,7 @@ Set in `appsettings.Development.json`:
 
 ```json
 "Vapid": {
-  "Subject": "mailto:admin@Batanai.com",
+  "Subject": "mailto:admin@Blueprint1989.com",
   "PublicKey": "REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY",
   "PrivateKey": "REPLACE_WITH_YOUR_VAPID_PRIVATE_KEY"
 }
@@ -219,12 +219,12 @@ A developer-only test panel is available at **`/dev/push-test`** (blocked by `De
 
 > **Important:** `ng serve` bypasses the Angular service worker entirely. Push notifications require the SW to be active, so you must use `ng build` + a static file server instead.
 
-1. Start the API: `dotnet run` in `server/src/Batanai.Api/`
+1. Start the API: `dotnet run` in `server/src/Blueprint1989.Api/`
 2. Build and serve the client:
    ```powershell
    cd client
    npx ng build
-   http-server dist/Batanai/browser -p 4200 -c-1
+   http-server dist/Blueprint1989/browser -p 4200 -c-1
    ```
 3. Navigate to `http://localhost:4200/dev/push-test`
 4. **Step 1 — Permission:** Click *Request Permission* ? allow in the browser prompt.
@@ -255,7 +255,7 @@ The system is designed so that adding a new notification type is a small, well-c
 
 ### Step 1 — Add the enum value (server)
 
-Open `server/src/Batanai.Api/Models/NotificationType.cs` and add the new value with the next sequential integer:
+Open `server/src/Blueprint1989.Api/Models/NotificationType.cs` and add the new value with the next sequential integer:
 
 ```csharp
 /// <summary>Member expense summary reminder.</summary>
@@ -274,7 +274,7 @@ ExpenseSummary = 6,
 
 ### Step 3 — Seed the lookup table row
 
-Open `server/src/Batanai.Api/Data/ApplicationDbContext.cs`, find `ConfigureNotificationTypeEntity()`, and add a seed row:
+Open `server/src/Blueprint1989.Api/Data/ApplicationDbContext.cs`, find `ConfigureNotificationTypeEntity()`, and add a seed row:
 
 ```csharp
 new NotificationTypeEntity { Id = 6, Name = "ExpenseSummary", Description = "Member expense summary reminder" }
@@ -283,7 +283,7 @@ new NotificationTypeEntity { Id = 6, Name = "ExpenseSummary", Description = "Mem
 ### Step 4 — Create an EF migration
 
 ```powershell
-cd server/src/Batanai.Api
+cd server/src/Blueprint1989.Api
 dotnet ef migrations add AddExpenseSummaryNotificationType
 dotnet ef database update
 ```

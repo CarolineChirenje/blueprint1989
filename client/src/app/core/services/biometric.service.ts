@@ -13,7 +13,7 @@ export interface WebAuthnCredentialDto {
 
 /**
  * BiometricService — wraps the browser WebAuthn (FIDO2) API to provide
- * fingerprint / Face ID / Windows Hello login for the Batanai PWA.
+ * fingerprint / Face ID / Windows Hello login for the Blueprint1989 PWA.
  *
  * How it works:
  *  - Registration: Server generates a challenge → browser invokes platform authenticator

@@ -1,9 +1,9 @@
 {
-  "name": "batanai-icon-scripts",
+  "name": "blueprint1989-icon-scripts",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Icon generation scripts for Batanai PWA",
+  "description": "Icon generation scripts for Blueprint1989 PWA",
   "dependencies": {
     "png-to-ico": "^2.1.8",
     "sharp": "^0.33.5"

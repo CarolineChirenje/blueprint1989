@@ -2,7 +2,7 @@
 
 ## Overview
 
-Batanai uses a dual-channel notification system: an in-app notification inbox (the bell icon in the navigation bar) and browser Web Push notifications. Every notification is always persisted to the in-app inbox first; a push is sent additionally if the user has a registered subscription and has not opted out of that notification type. Users can configure which types of push notifications they receive from Profile â†’ Notifications.
+Blueprint1989 uses a dual-channel notification system: an in-app notification inbox (the bell icon in the navigation bar) and browser Web Push notifications. Every notification is always persisted to the in-app inbox first; a push is sent additionally if the user has a registered subscription and has not opted out of that notification type. Users can configure which types of push notifications they receive from Profile â†’ Notifications.
 
 ---
 
@@ -69,7 +69,7 @@ Finds existing `PushSubscription` by `endpoint` or creates a new one. Updates th
 
 ### Service: `NotificationService`
 
-**File:** `server/src/Batanai.Api/Services/NotificationService.cs`
+**File:** `server/src/Blueprint1989.Api/Services/NotificationService.cs`
 
 **Dependencies:** `ApplicationDbContext`
 
@@ -81,7 +81,7 @@ Operations:
 
 ### Service: `PushNotificationSender`
 
-**File:** `server/src/Batanai.Api/Services/PushNotificationSender.cs`
+**File:** `server/src/Blueprint1989.Api/Services/PushNotificationSender.cs`
 
 **Dependencies:** `ApplicationDbContext`, `NotificationService`, VAPID settings, `HttpClient`
 
@@ -97,7 +97,7 @@ Operations:
 
 ### Service: `NotificationPreferenceService`
 
-**File:** `server/src/Batanai.Api/Services/NotificationPreferenceService.cs`
+**File:** `server/src/Blueprint1989.Api/Services/NotificationPreferenceService.cs`
 
 **`GetPreferencesAsync(userId)`**
 - Loads all 5 `NotificationTypeEntity` rows.
@@ -203,7 +203,7 @@ When a new user registers (`AuthService.SignupAsync`), all 5 `UserNotificationPr
 
 - `unlock(ctx: AudioContext)` â€” call on user gesture to unblock iOS Safari. Plays a silent 1-sample buffer.
 - `playAlarm()` â€” resumes the stored context, schedules 3 beeps, then returns. No-ops if muted or context is unavailable.
-- `isMuted() / setMuted(val)` â€” reads/writes `localStorage` key `Batanai-alarm-muted`.
+- `isMuted() / setMuted(val)` â€” reads/writes `localStorage` key `Blueprint1989-alarm-muted`.
 
 **`WakeLockService`** â€” `client/src/app/core/services/wake-lock.service.ts`
 
@@ -237,7 +237,7 @@ The BP rest timer has the same alarm/vibration/wake lock experience but has no s
 When the browser receives a push event, the service worker (`client/src/custom-sw.js`) processes it:
 1. Parses the push data payload (JSON: `{ title, body, deepLinkUrl?, type }`).
 2. Calls `self.registration.showNotification(title, { body, data: { deepLinkUrl } })`.
-3. On `notificationclick` event: focuses an existing Batanai window if open, or opens a new one, navigating to `deepLinkUrl` if provided.
+3. On `notificationclick` event: focuses an existing Blueprint1989 window if open, or opens a new one, navigating to `deepLinkUrl` if provided.
 
 ---
 

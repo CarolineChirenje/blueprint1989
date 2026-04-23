@@ -4,14 +4,6 @@ export enum Role {
     Member = 3
 }
 
-export enum KycStatus {
-    NotStarted = 'NotStarted',
-    PendingReview = 'PendingReview',
-    Verified = 'Verified',
-    Rejected = 'Rejected',
-    AdminBypassed = 'AdminBypassed'
-}
-
 export interface User {
     id?: number;
     email?: string;
@@ -22,7 +14,6 @@ export interface User {
     roleName?: string;
     isActive?: boolean;
     tourCompleted?: boolean;
-    kycStatus?: KycStatus;
 }
 
 export interface UserManagementDto {
@@ -38,11 +29,4 @@ export interface UserManagementDto {
     isMfaEnabled: boolean;
     isEmailVerified: boolean;
     createdAt: string;
-    kycStatus: KycStatus;
-}
-
-export interface UserGroupMembershipDto {
-    groupId: number;
-    groupName: string;
-    groupRole: 'GroupAdmin' | 'GroupMember';
 }

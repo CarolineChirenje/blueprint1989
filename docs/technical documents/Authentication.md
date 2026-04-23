@@ -2,7 +2,7 @@
 
 ## Overview
 
-The authentication feature handles all aspects of user identity in Batanai, including account registration, email/password login, multi-factor authentication (TOTP), password expiry enforcement, forgot/reset password flows, and JWT issuance. Every request to a protected API endpoint is authorised via a JWT Bearer token. The JWT embeds the user's `id`, `email`, `role`, `firstName`, and `lastName` claims.
+The authentication feature handles all aspects of user identity in Blueprint1989, including account registration, email/password login, multi-factor authentication (TOTP), password expiry enforcement, forgot/reset password flows, and JWT issuance. Every request to a protected API endpoint is authorised via a JWT Bearer token. The JWT embeds the user's `id`, `email`, `role`, `firstName`, and `lastName` claims.
 
 ---
 

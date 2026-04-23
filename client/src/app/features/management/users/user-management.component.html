@@ -44,23 +44,11 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let u" class="actions-cell" data-label="">
-          <button mat-icon-button matTooltip="Manage group roles" (click)="openGroupRolesDialog(u)">
-            <mat-icon>manage_accounts</mat-icon>
-          </button>
           <button *ngIf="isAdminOrAbove && !u.isEmailVerified"
                   mat-icon-button
                   matTooltip="Verify email"
                   (click)="verifyEmail(u)">
             <mat-icon>mark_email_read</mat-icon>
-          </button>
-          <button *ngIf="isAdminOrAbove"
-                  mat-icon-button
-                  [matTooltip]="kycTooltip(u)"
-                  [class.kyc-pending]="u.kycStatus === KycStatus.PendingReview"
-                  [class.kyc-verified]="u.kycStatus === KycStatus.Verified || u.kycStatus === KycStatus.AdminBypassed"
-                  [class.kyc-rejected]="u.kycStatus === KycStatus.Rejected"
-                  (click)="openKycDialog(u)">
-            <mat-icon>verified_user</mat-icon>
           </button>
           <button *ngIf="isAdminOrAbove"
                   mat-icon-button

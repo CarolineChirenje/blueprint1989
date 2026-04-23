@@ -1,6 +1,6 @@
-site_name: Batanai Technical Docs
-site_description: Technical documentation for the Batanai expense-sharing platform
-site_author: Batanai Team
+site_name: Blueprint1989 Technical Docs
+site_description: Technical documentation for the Blueprint1989 platform
+site_author: Blueprint1989 Team
 docs_dir: "docs/technical documents"
 site_dir: site
 
@@ -26,7 +26,6 @@ nav:
     - Biometric Authentication: Biometric-Authentication.md
   - Core Features:
     - Dashboard: Dashboard.md
-    - Cycles: Cycles.md
     - Profile: Profile.md
     - Notifications: Notifications.md
     - Offline Queue: Offline-Queue.md
@@ -36,9 +35,6 @@ nav:
     - App Configuration: App-Configuration.md
   - Infrastructure:
     - Push Notifications: Push-Notifications.md
-    - Cloudflare Wiki: Cloudflare-Wiki.md
-  - Business:
-    - Business Overview: Business-Overview.md
 
 plugins:
   - search

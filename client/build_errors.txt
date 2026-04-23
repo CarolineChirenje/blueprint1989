@@ -1,0 +1,1112 @@
+﻿[33mÔØ»[39m Building...
+[32mÔ£ö[39m Building...
+Application bundle generation failed. [4.700 seconds] - 2026-04-23T04:06:33.546Z
+
+node.exe : [1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2451: 
+Cannot redeclare block-scoped variable 'memberTourSteps'.[0m [1m[35m[plugin 
+angular-compiler][0m
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([1m[31m[31mX...r-compiler][0m 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+    src/app/core/services/tour-steps.ts:19:13:
+[37m      19 Ôöé export const [32mmemberTourSteps[37m: TourStepDef[] = [];
+         ÔòÁ              [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2451: Cannot redeclare 
+block-scoped variable 'adminTourSteps'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/core/services/tour-steps.ts:20:13:
+[37m      20 Ôöé export const [32madminTourSteps[37m: TourStepDef[] = [];
+         ÔòÁ              [32m~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2451: Cannot redeclare 
+block-scoped variable 'superAdminTourSteps'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/core/services/tour-steps.ts:21:13:
+[37m      21 Ôöé export const [32msuperAdminTourSteps[37m: TourStepDef[] = 
+[];
+         ÔòÁ              [32m~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2451: Cannot redeclare 
+block-scoped variable 'memberTourSteps'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/core/services/tour-steps.ts:61:13:
+[37m      61 Ôöé export const [32mmemberTourSteps[37m: TourStepDef[] = [
+         ÔòÁ              [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2451: Cannot redeclare 
+block-scoped variable 'adminTourSteps'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/core/services/tour-steps.ts:162:13:
+[37m      162 Ôöé export const [32madminTourSteps[37m: TourStepDef[] = [
+          ÔòÁ              [32m~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2451: Cannot redeclare 
+block-scoped variable 'superAdminTourSteps'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/core/services/tour-steps.ts:177:13:
+[37m      177 Ôöé export const [32msuperAdminTourSteps[37m: TourStepDef[] = 
+adminTourSteps;
+          ÔòÁ              [32m~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'../../../core/services/expense-cycle.service' or its corresponding type 
+declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/components/dashboard.component.ts:4:36:
+[37m      4 Ôöé ...CycleService } from 
+[32m'../../../core/services/expense-cycle.service'[37m;
+        ÔòÁ                        
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'../../../shared/models/expense-cycle.model' or its corresponding type 
+declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/components/dashboard.component.ts:5:59:
+[37m      5 Ôöé ...doDashboardDto } from 
+[32m'../../../shared/models/expense-cycle.model'[37m;
+        ÔòÁ                          
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2003: No suitable injection 
+token for parameter 'cycleService' of class 'DashboardComponent'.
+  Consider using the @Inject decorator to specify an injection token.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/components/dashboard.component.ts:29:12:
+[37m      29 Ôöé     private [32mcycleService[37m: ExpenseCycleService,
+         ÔòÁ             [32m~~~~~~~~~~~~[0m
+
+  This type does not have a value, so it cannot be used as injection token.
+
+    src/app/features/dashboard/components/dashboard.component.ts:29:26:
+[37m      29 Ôöé     private cycleService: [32mExpenseCycleService[37m,
+         ÔòÁ                           [32m~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'summary' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/components/dashboard.component.ts:41:13:
+[37m      41 Ôöé       next: ([32msummary[37m) => {
+         ÔòÁ              [32m~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'data' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/components/dashboard.component.ts:54:13:
+[37m      54 Ôöé       next: ([32mdata[37m) => {
+         ÔòÁ              [32m~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6001: The class 
+'DashboardComponent' is listed in the declarations of the NgModule 
+'DashboardModule', but is not a directive, a component, or a pipe. Either 
+remove it from the NgModule's declarations, or add an appropriate Angular 
+decorator.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/dashboard.module.ts:9:4:
+[37m      9 Ôöé     [32mDashboardComponent[37m,
+        ÔòÁ     [32m~~~~~~~~~~~~~~~~~~[0m
+
+  'DashboardComponent' is declared here.
+
+    src/app/features/dashboard/components/dashboard.component.ts:14:13:
+[37m      14 Ôöé export class [32mDashboardComponent[37m implements OnInit, 
+OnDestroy {
+         ÔòÁ              [32m~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' 
+since it isn't a known property of 'select'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/feature-bug-reports/feature-bug-reports.compone
+nt.html:11:34:
+[37m      11 Ôöé ...ss="filter-select" [32m[(ngModel)]="statusFilter"[37m 
+(change)="onStatu...
+         ÔòÁ                       [32m~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component FeatureBugReportsComponent.
+
+    src/app/features/management/feature-bug-reports/feature-bug-reports.compone
+nt.ts:12:15:
+[37m      12 Ôöé   templateUrl: 
+[32m'./feature-bug-reports.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' 
+since it isn't a known property of 'select'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/feature-bug-reports/feature-bug-reports.compone
+nt.html:16:34:
+[37m      16 Ôöé ...ass="filter-select" [32m[(ngModel)]="typeFilter"[37m 
+(change)="onTypeFi...
+         ÔòÁ                        [32m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component FeatureBugReportsComponent.
+
+    src/app/features/management/feature-bug-reports/feature-bug-reports.compone
+nt.ts:12:15:
+[37m      12 Ôöé   templateUrl: 
+[32m'./feature-bug-reports.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 'ngModel' 
+since it isn't a known property of 'select'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/feature-bug-reports/feature-bug-reports.compone
+nt.html:21:34:
+[37m      21 Ôöé ...s="filter-select" [32m[(ngModel)]="priorityFilter"[37m 
+(change)="onPrio...
+         ÔòÁ                      [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component FeatureBugReportsComponent.
+
+    src/app/features/management/feature-bug-reports/feature-bug-reports.compone
+nt.ts:12:15:
+[37m      12 Ôöé   templateUrl: 
+[32m'./feature-bug-reports.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'../../../core/services/kyc.service' or its corresponding type 
+declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:3:54:
+[37m      3 Ôöé ...DocumentDto, KycIdType } from 
+[32m'../../../core/services/kyc.service'[37m;
+        ÔòÁ                                  
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2305: Module 
+'"../../../shared/models/user.model"' has no exported member 'KycStatus'.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:4:9:
+[37m      4 Ôöé import { [32mKycStatus[37m } from 
+'../../../shared/models/user.model';
+        ÔòÁ          [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2003: No suitable injection 
+token for parameter 'kycService' of class 'KycReviewComponent'.
+  Consider using the @Inject decorator to specify an injection token.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:38:12:
+[37m      38 Ôöé     private [32mkycService[37m: KycService,
+         ÔòÁ             [32m~~~~~~~~~~[0m
+
+  This type does not have a value, so it cannot be used as injection token.
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:38:24:
+[37m      38 Ôöé     private kycService: [32mKycService[37m,
+         ÔòÁ                         [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'url' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:74:14:
+[37m      74 Ôöé         next: [32murl[37m => { this.docObjectUrl = url; 
+pending.doc = fals...
+         ÔòÁ               [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'url' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:81:14:
+[37m      81 Ôöé         next: [32murl[37m => { this.selfieObjectUrl = url; 
+pending.selfie ...
+         ÔòÁ               [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'items' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:92:12:
+[37m      92 Ôöé       next: [32mitems[37m => {
+         ÔòÁ             [32m~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'i' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:96:41:
+[37m      96 Ôöé ... (this.selected && !items.find([32mi[37m => i.id === 
+this.selected!.id)) {
+         ÔòÁ                                   [32m^[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'err' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:148:14:
+[37m      148 Ôöé       error: ([32merr[37m) => {
+          ÔòÁ               [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'err' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:171:14:
+[37m      171 Ôöé       error: ([32merr[37m) => {
+          ÔòÁ               [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'err' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:194:14:
+[37m      194 Ôöé       error: ([32merr[37m) => {
+          ÔòÁ               [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'./users/kyc-review-dialog/kyc-review-dialog.component' or its corresponding 
+type declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/management.module.ts:12:41:
+[37m      12 Ôöé ...nt } from 
+[32m'./users/kyc-review-dialog/kyc-review-dialog.component'[37m;
+         ÔòÁ              
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG1010: Value at position 7 in 
+the NgModule.declarations of ManagementModule is not a reference
+  Value could not be determined statically.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/management.module.ts:16:16:
+[37m      16 Ôöé   declarations: [32m[[37m
+         ÔòÁ                 [32m^[0m
+
+  Unknown reference.
+
+    src/app/features/management/management.module.ts:24:4:
+[37m      24 Ôöé     [32mKycReviewDialogComponent[37m
+         ÔòÁ     [32m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-dialog-content' is 
+not a known element:
+1. If 'mat-dialog-content' is an Angular component, then verify that it is 
+part of this module.
+2. If 'mat-dialog-content' is a Web Component then add 
+'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to 
+suppress this message.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.html:3:0:
+[37m      3 Ôöé [32m<mat-dialog-content>[37m
+        ÔòÁ [32m~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component AdminResetPasswordDialogComponent.
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.ts:14:15:
+[37m      14 Ôöé   templateUrl: 
+[32m'./admin-reset-password-dialog.component.html'[37m,
+         ÔòÁ                
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 
+'formGroup' since it isn't a known property of 'form'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.html:8:8:
+[37m      8 Ôöé   <form [32m[formGroup]="form"[37m>
+        ÔòÁ         [32m~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component AdminResetPasswordDialogComponent.
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.ts:14:15:
+[37m      14 Ôöé   templateUrl: 
+[32m'./admin-reset-password-dialog.component.html'[37m,
+         ÔòÁ                
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-form-field' is not 
+a known element:
+1. If 'mat-form-field' is an Angular component, then verify that it is part of 
+this module.
+2. If 'mat-form-field' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to 
+the '@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.html:9:4:
+[37m      9 Ôöé     [32m<mat-form-field appearance="outline" 
+class="full-width">[37m
+        ÔòÁ     
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component AdminResetPasswordDialogComponent.
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.ts:14:15:
+[37m      14 Ôöé   templateUrl: 
+[32m'./admin-reset-password-dialog.component.html'[37m,
+         ÔòÁ                
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-label' is not a 
+known element:
+1. If 'mat-label' is an Angular component, then verify that it is part of this 
+module.
+2. If 'mat-label' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the 
+'@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.html:10:6:
+[37m      10 Ôöé       [32m<mat-label>[37mNew Password</mat-label>
+         ÔòÁ       [32m~~~~~~~~~~~[0m
+
+  Error occurs in the template of component AdminResetPasswordDialogComponent.
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.ts:14:15:
+[37m      14 Ôöé   templateUrl: 
+[32m'./admin-reset-password-dialog.component.html'[37m,
+         ÔòÁ                
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-form-field' is not 
+a known element:
+1. If 'mat-form-field' is an Angular component, then verify that it is part of 
+this module.
+2. If 'mat-form-field' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to 
+the '@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.html:18:4:
+[37m      18 Ôöé     [32m<mat-form-field appearance="outline" 
+class="full-width">[37m
+         ÔòÁ     
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component AdminResetPasswordDialogComponent.
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.ts:14:15:
+[37m      14 Ôöé   templateUrl: 
+[32m'./admin-reset-password-dialog.component.html'[37m,
+         ÔòÁ                
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-label' is not a 
+known element:
+1. If 'mat-label' is an Angular component, then verify that it is part of this 
+module.
+2. If 'mat-label' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the 
+'@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.html:19:6:
+[37m      19 Ôöé       [32m<mat-label>[37mConfirm Password</mat-label>
+         ÔòÁ       [32m~~~~~~~~~~~[0m
+
+  Error occurs in the template of component AdminResetPasswordDialogComponent.
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.ts:14:15:
+[37m      14 Ôöé   templateUrl: 
+[32m'./admin-reset-password-dialog.component.html'[37m,
+         ÔòÁ                
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-dialog-actions' is 
+not a known element:
+1. If 'mat-dialog-actions' is an Angular component, then verify that it is 
+part of this module.
+2. If 'mat-dialog-actions' is a Web Component then add 
+'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to 
+suppress this message.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.html:28:0:
+[37m      28 Ôöé [32m<mat-dialog-actions align="end">[37m
+         ÔòÁ [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component AdminResetPasswordDialogComponent.
+
+    src/app/features/management/users/admin-reset-password-dialog/admin-reset-p
+assword-dialog.component.ts:14:15:
+[37m      14 Ôöé   templateUrl: 
+[32m'./admin-reset-password-dialog.component.html'[37m,
+         ÔòÁ                
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-dialog-content' is 
+not a known element:
+1. If 'mat-dialog-content' is an Angular component, then verify that it is 
+part of this module.
+2. If 'mat-dialog-content' is a Web Component then add 
+'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to 
+suppress this message.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:3:0:
+[37m      3 Ôöé [32m<mat-dialog-content>[37m
+        ÔòÁ [32m~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8002: Can't bind to 
+'formGroup' since it isn't a known property of 'form'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:6:8:
+[37m      6 Ôöé   <form [32m[formGroup]="form"[37m>
+        ÔòÁ         [32m~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-form-field' is not 
+a known element:
+1. If 'mat-form-field' is an Angular component, then verify that it is part of 
+this module.
+2. If 'mat-form-field' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to 
+the '@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:7:4:
+[37m      7 Ôöé     [32m<mat-form-field appearance="outline" 
+class="full-width">[37m
+        ÔòÁ     
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-label' is not a 
+known element:
+1. If 'mat-label' is an Angular component, then verify that it is part of this 
+module.
+2. If 'mat-label' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the 
+'@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:8:6:
+[37m      8 Ôöé       [32m<mat-label>[37mFirst Name</mat-label>
+        ÔòÁ       [32m~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-form-field' is not 
+a known element:
+1. If 'mat-form-field' is an Angular component, then verify that it is part of 
+this module.
+2. If 'mat-form-field' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to 
+the '@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:13:4:
+[37m      13 Ôöé     [32m<mat-form-field appearance="outline" 
+class="full-width">[37m
+         ÔòÁ     
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-label' is not a 
+known element:
+1. If 'mat-label' is an Angular component, then verify that it is part of this 
+module.
+2. If 'mat-label' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the 
+'@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:14:6:
+[37m      14 Ôöé       [32m<mat-label>[37mLast Name</mat-label>
+         ÔòÁ       [32m~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-form-field' is not 
+a known element:
+1. If 'mat-form-field' is an Angular component, then verify that it is part of 
+this module.
+2. If 'mat-form-field' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to 
+the '@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:19:4:
+[37m      19 Ôöé     [32m<mat-form-field appearance="outline" 
+class="full-width">[37m
+         ÔòÁ     
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-label' is not a 
+known element:
+1. If 'mat-label' is an Angular component, then verify that it is part of this 
+module.
+2. If 'mat-label' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the 
+'@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:20:6:
+[37m      20 Ôöé       [32m<mat-label>[37mEmail</mat-label>
+         ÔòÁ       [32m~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-form-field' is not 
+a known element:
+1. If 'mat-form-field' is an Angular component, then verify that it is part of 
+this module.
+2. If 'mat-form-field' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to 
+the '@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:26:4:
+[37m      26 Ôöé     [32m<mat-form-field appearance="outline" 
+class="full-width">[37m
+         ÔòÁ     
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-label' is not a 
+known element:
+1. If 'mat-label' is an Angular component, then verify that it is part of this 
+module.
+2. If 'mat-label' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the 
+'@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:27:6:
+[37m      27 Ôöé       [32m<mat-label>[37mRole</mat-label>
+         ÔòÁ       [32m~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-select' is not a 
+known element:
+1. If 'mat-select' is an Angular component, then verify that it is part of 
+this module.
+2. If 'mat-select' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the 
+'@NgModule.schemas' of this component to suppress this message.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:28:6:
+[37m      28 Ôöé       [32m<mat-select formControlName="role">[37m
+         ÔòÁ       [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG8001: 'mat-dialog-actions' is 
+not a known element:
+1. If 'mat-dialog-actions' is an Angular component, then verify that it is 
+part of this module.
+2. If 'mat-dialog-actions' is a Web Component then add 
+'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to 
+suppress this message.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.html:35:0:
+[37m      35 Ôöé [32m<mat-dialog-actions align="end">[37m
+         ÔòÁ [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component EditUserDialogComponent.
+
+    src/app/features/management/users/edit-user-dialog/edit-user-dialog.compone
+nt.ts:20:15:
+[37m      20 Ôöé   templateUrl: [32m'./edit-user-dialog.component.html'[37m,
+         ÔòÁ                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'../../../../core/services/group.service' or its corresponding type 
+declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/user-group-roles-dialog/user-group-roles-
+dialog.component.ts:4:29:
+[37m      4 Ôöé ...rt { GroupService } from 
+[32m'../../../../core/services/group.service'[37m;
+        ÔòÁ                             
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2305: Module 
+'"../../../../shared/models/user.model"' has no exported member 
+'UserGroupMembershipDto'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/user-group-roles-dialog/user-group-roles-
+dialog.component.ts:5:9:
+[37m      5 Ôöé import { [32mUserGroupMembershipDto[37m } from 
+'../../../../shared/models/u...
+        ÔòÁ          [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2003: No suitable injection 
+token for parameter 'groupService' of class 'UserGroupRolesDialogComponent'.
+  Consider using the @Inject decorator to specify an injection token.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/user-group-roles-dialog/user-group-roles-
+dialog.component.ts:25:12:
+[37m      25 Ôöé     private [32mgroupService[37m: GroupService,
+         ÔòÁ             [32m~~~~~~~~~~~~[0m
+
+  This type does not have a value, so it cannot be used as injection token.
+
+    src/app/features/management/users/user-group-roles-dialog/user-group-roles-
+dialog.component.ts:25:26:
+[37m      25 Ôöé     private groupService: [32mGroupService[37m,
+         ÔòÁ                           [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'err' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/user-group-roles-dialog/user-group-roles-
+dialog.component.ts:54:13:
+[37m      54 Ôöé       error: [32merr[37m => {
+         ÔòÁ              [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2305: Module 
+'"../../../shared/models/user.model"' has no exported member 'KycStatus'.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/user-management.component.ts:5:28:
+[37m      5 Ôöé import { UserManagementDto, [32mKycStatus[37m } from 
+'../../../shared/model...
+        ÔòÁ                             [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'./kyc-review-dialog/kyc-review-dialog.component' or its corresponding type 
+declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/management/users/user-management.component.ts:11:41:
+[37m      11 Ôöé ...omponent } from 
+[32m'./kyc-review-dialog/kyc-review-dialog.component'[37m;
+         ÔòÁ                    
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'kycStatus' 
+does not exist on type 'UserManagementDto'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/users/user-management.component.ts:160:17:
+[37m      160 Ôöé     switch (user.[32mkycStatus[37m) {
+          ÔòÁ                  [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'kycStatus' 
+does not exist on type 'UserManagementDto'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/users/user-management.component.ts:178:13:
+[37m      178 Ôöé         user.[32mkycStatus[37m = KycStatus.Verified;
+          ÔòÁ              [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'kycStatus' 
+does not exist on type 'UserManagementDto'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/users/user-management.component.ts:181:13:
+[37m      181 Ôöé         user.[32mkycStatus[37m = KycStatus.Rejected;
+          ÔòÁ              [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'kycStatus' 
+does not exist on type 'UserManagementDto'.[0m [1m[35m[plugin 
+angular-compiler][0m
+
+    src/app/features/management/users/user-management.component.ts:184:13:
+[37m      184 Ôöé         user.[32mkycStatus[37m = KycStatus.AdminBypassed;
+          ÔòÁ              [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'../../core/services/group.service' or its corresponding type 
+declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.component.ts:9:29:
+[37m      9 Ôöé import { GroupService } from 
+[32m'../../core/services/group.service'[37m;
+        ÔòÁ                              
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'../../shared/models/group.model' or its corresponding type declarations.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.component.ts:11:59:
+[37m      11 Ôöé ...minPendingJoinRequestDto } from 
+[32m'../../shared/models/group.model'[37m;
+         ÔòÁ                                    
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2003: No suitable injection 
+token for parameter 'groupService' of class 'NotificationsComponent'.
+  Consider using the @Inject decorator to specify an injection token.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.component.ts:52:12:
+[37m      52 Ôöé     private [32mgroupService[37m: GroupService,
+         ÔòÁ             [32m~~~~~~~~~~~~[0m
+
+  This type does not have a value, so it cannot be used as injection token.
+
+    src/app/features/notifications/notifications.component.ts:52:26:
+[37m      52 Ôöé     private groupService: [32mGroupService[37m,
+         ÔòÁ                           [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'invites' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.component.ts:80:12:
+[37m      80 Ôöé       next: [32minvites[37m => { this.pendingInvites = 
+invites; this.cdr.d...
+         ÔòÁ             [32m~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'err' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.component.ts:90:13:
+[37m      90 Ôöé       error: [32merr[37m => { this.inviteError = 
+err.error?.message || 'Fa...
+         ÔòÁ              [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'requests' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.component.ts:96:12:
+[37m      96 Ôöé       next: [32mrequests[37m => { this.pendingJoinRequests 
+= requests; thi...
+         ÔòÁ             [32m~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'err' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.component.ts:106:13:
+[37m      106 Ôöé       error: [32merr[37m => { this.joinRequestError = 
+err.error?.message ...
+          ÔòÁ              [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6001: The class 
+'NotificationsComponent' is listed in the declarations of the NgModule 
+'NotificationsModule', but is not a directive, a component, or a pipe. Either 
+remove it from the NgModule's declarations, or add an appropriate Angular 
+decorator.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/notifications/notifications.module.ts:12:17:
+[37m      12 Ôöé   declarations: [[32mNotificationsComponent[37m],
+         ÔòÁ                  [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  'NotificationsComponent' is declared here.
+
+    src/app/features/notifications/notifications.component.ts:26:13:
+[37m      26 Ôöé export class [32mNotificationsComponent[37m implements 
+OnInit, OnDestroy {
+         ÔòÁ              [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2307: Cannot find module 
+'../../../core/services/kyc.service' or its corresponding type 
+declarations.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/profile/components/profile.component.ts:6:52:
+[37m      6 Ôöé ...ycIdType, KycStatusDto } from 
+[32m'../../../core/services/kyc.service'[37m;
+        ÔòÁ                                  
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2305: Module 
+'"../../../shared/models/user.model"' has no exported member 'KycStatus'.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/profile/components/profile.component.ts:7:9:
+[37m      7 Ôöé import { [32mKycStatus[37m } from 
+'../../../shared/models/user.model';
+        ÔòÁ          [32m~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2003: No suitable injection 
+token for parameter 'kycService' of class 'ProfileComponent'.
+  Consider using the @Inject decorator to specify an injection token.[0m 
+[1m[35m[plugin angular-compiler][0m
+
+    src/app/features/profile/components/profile.component.ts:36:12:
+[37m      36 Ôöé     private [32mkycService[37m: KycService,
+         ÔòÁ             [32m~~~~~~~~~~[0m
+
+  This type does not have a value, so it cannot be used as injection token.
+
+    src/app/features/profile/components/profile.component.ts:36:24:
+[37m      36 Ôöé     private kycService: [32mKycService[37m,
+         ÔòÁ                         [32m~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'status' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/profile/components/profile.component.ts:83:12:
+[37m      83 Ôöé       next: [32mstatus[37m => {
+         ÔòÁ             [32m~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS7006: Parameter 'err' 
+implicitly has an 'any' type.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/profile/components/profile.component.ts:207:17:
+[37m      207 Ôöé           error: [32merr[37m => {
+          ÔòÁ                  [32m~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG6001: The class 
+'ProfileComponent' is listed in the declarations of the NgModule 
+'ProfileModule', but is not a directive, a component, or a pipe. Either remove 
+it from the NgModule's declarations, or add an appropriate Angular 
+decorator.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/profile/profile.module.ts:16:4:
+[37m      16 Ôöé     [32mProfileComponent[37m,
+         ÔòÁ     [32m~~~~~~~~~~~~~~~~[0m
+
+  'ProfileComponent' is declared here.
+
+    src/app/features/profile/components/profile.component.ts:16:13:
+[37m      16 Ôöé export class [32mProfileComponent[37m implements OnInit {
+         ÔòÁ              [32m~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m 
+[1mC:\DEV\batanai\client\src\app\core\services\tour-steps.ts: Identifier 
+'memberTourSteps' has already been declared. (40:13)
+
+[0m [90m 38 |[31m }
+ [90m 39 |[31m [90m// ÔöÇÔöÇÔöÇ Member Tour ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö
+ÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ[31m
+[31m[1m>[22m[1m[31m[90m 40 |[31m [36mexport[31m [36mconst[31m 
+memberTourSteps [33m=[31m [
+ [90m    |[31m              [31m[1m^[22m[1m[31m
+ [90m 41 |[31m     {
+ [90m 42 |[31m         id[33m:[31m [32m'welcome'[31m[33m,[31m
+ [90m 43 |[31m         title[33m:[31m [32m`${APP_NAME} - 
+${TAGLINE}`[31m[33m,[31m[0m[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/core/services/tour.service.ts:8:69:
+[37m      8 Ôöé ...urSteps, adminTourSteps, superAdminTourSteps } from 
+[32m'./tour-steps'[37m;
+        ÔòÁ                                                        
+[32m~~~~~~~~~~~~~~[0m
+
+  This error came from the "onLoad" callback registered here:
+
+    node_modules/@angular/build/src/tools/esbuild/angular/compiler-plugin.js:32
+5:18:
+[37m      325 Ôöé             build.[32monLoad[37m({ filter: 
+/\.[cm]?[jt]sx?$/ }, async (ar...
+          ÔòÁ                   [32m~~~~~~[0m
+
+    at setup (C:\DEV\batanai\client\node_modules\@angular\build\src\tools\esbui
+ld\angular\compiler-plugin.js:325:19)
+    at async handlePlugins 
+(C:\DEV\batanai\client\node_modules\esbuild\lib\main.js:1185:20)
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve 
+"../../../core/services/expense-cycle.service"[0m
+
+    src/app/features/dashboard/components/dashboard.component.ts:15:36:
+[37m      15 Ôöé ...ycleService } from 
+[32m'../../../core/services/expense-cycle.service'[37m;
+         ÔòÁ                       
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve 
+"../../../core/services/kyc.service"[0m
+
+    src/app/features/management/kyc-review/kyc-review.component.ts:14:38:
+[37m      14 Ôöé ...KycService, KycIdType } from 
+[32m'../../../core/services/kyc.service'[37m;
+         ÔòÁ                                 
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve 
+"./users/kyc-review-dialog/kyc-review-dialog.component"[0m
+
+    src/app/features/management/management.module.ts:19:41:
+[37m      19 Ôöé ...nt } from 
+[32m'./users/kyc-review-dialog/kyc-review-dialog.component'[37m;
+         ÔòÁ              
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve 
+"../../../../core/services/group.service"[0m
+
+    src/app/features/management/users/user-group-roles-dialog/user-group-roles-
+dialog.component.ts:20:29:
+[37m      20 Ôöé ...t { GroupService } from 
+[32m'../../../../core/services/group.service'[37m;
+         ÔòÁ                            
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve 
+"./kyc-review-dialog/kyc-review-dialog.component"[0m
+
+    src/app/features/management/users/user-management.component.ts:11:41:
+[37m      11 Ôöé ...omponent } from 
+[32m'./kyc-review-dialog/kyc-review-dialog.component'[37m;
+         ÔòÁ                    
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve 
+"../../core/services/group.service"[0m
+
+    src/app/features/notifications/notifications.component.ts:19:29:
+[37m      19 Ôöé import { GroupService } from 
+[32m'../../core/services/group.service'[37m;
+         ÔòÁ                              
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not resolve 
+"../../../core/services/kyc.service"[0m
+
+    src/app/features/profile/components/profile.component.ts:17:38:
+[37m      17 Ôöé ...KycService, KycIdType } from 
+[32m'../../../core/services/kyc.service'[37m;
+         ÔòÁ                                 
+[32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

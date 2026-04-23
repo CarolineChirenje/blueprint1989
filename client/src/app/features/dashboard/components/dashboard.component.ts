@@ -1,8 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { ExpenseCycleService } from '../../../core/services/expense-cycle.service';
-import { OutstandingSummaryDto, MukandoDashboardDto } from '../../../shared/models/expense-cycle.model';
 import { Role } from '../../../shared/models/user.model';
 
 @Component({
@@ -14,19 +12,11 @@ import { Role } from '../../../shared/models/user.model';
 export class DashboardComponent implements OnInit, OnDestroy {
   userName: string = '';
   currentTime: Date = new Date();
-  showRecordPicker: boolean = false;
   private clockInterval: ReturnType<typeof setInterval> | null = null;
-
-  outstandingSummary: OutstandingSummaryDto | null = null;
-  summaryLoading = true;
-  summaryError = false;
-
-  mukandoDashboard: MukandoDashboardDto | null = null;
 
   constructor(
     private auth: AuthService,
     private router: Router,
-    private cycleService: ExpenseCycleService,
     private cdr: ChangeDetectorRef
   ) {}
   
@@ -36,27 +26,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.clockInterval = setInterval(() => {
       this.currentTime = new Date();
     }, 1000);
-
-    this.cycleService.getOutstandingSummary().subscribe({
-      next: (summary) => {
-        this.outstandingSummary = summary;
-        this.summaryLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.summaryError = true;
-        this.summaryLoading = false;
-        this.cdr.detectChanges();
-      }
-    });
-
-    this.cycleService.getMukandoDashboard().subscribe({
-      next: (data) => {
-        this.mukandoDashboard = data;
-        this.cdr.detectChanges();
-      },
-      error: () => { /* non-critical — dashboard still works without it */ }
-    });
   }
 
   ngOnDestroy(): void {
@@ -76,49 +45,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const roleId = this.auth.getUserRoleId();
     return roleId === Role.SuperAdmin || roleId === Role.Admin;
   }
-
-  canAccessTerms(): boolean {
-    const roleId = this.auth.getUserRoleId();
-    return roleId === Role.SuperAdmin || roleId === Role.Admin;
-  }
-
-  hasCycles(): boolean {
-    return (this.outstandingSummary?.cycles?.length ?? 0) > 0;
-  }
-
-  goToCycle(cycleId: number, tab?: string): void {
-    const extras = tab ? { queryParams: { tab } } : {};
-    this.router.navigate(['/cycles', cycleId], extras);
-  }
-
-  showDiabetes(): boolean {
-    return false;
-  }
-
-  showIncidentsCard(): boolean {
-    return false;
-  }
-
-  showBloodPressureCard(): boolean {
-    return false;
-  }
-
-  showRecordCard(): boolean {
-    return false;
-  }
-
-  openRecordCard(): void {}
-
-  onRecordTypeSelected(type: 'diabetes' | 'bp'): void {
-    this.showRecordPicker = false;
-  }
-
-  onRecordPickerCancelled(): void {
-    this.showRecordPicker = false;
-  }
-
-  navigateTo(path: string): void {
-    this.router.navigate([path]);
-  }
 }
-

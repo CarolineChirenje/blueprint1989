@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-const MUTE_KEY = 'batanai-alarm-muted';
+const MUTE_KEY = 'blueprint1989-alarm-muted';
 
 export type AlarmSound = 'chime' | 'pulse' | 'ding';
 

@@ -1,4 +1,4 @@
-.batanai-chart-card {
+.blueprint1989-chart-card {
   background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -8,7 +8,7 @@
   margin-bottom: 1.5rem;
 }
 
-.batanai-chart-header {
+.blueprint1989-chart-header {
   background: var(--primary);
   color: #fff;
   padding: 0.65rem 1rem;
@@ -16,13 +16,13 @@
   align-items: center;
 }
 
-.batanai-chart-title {
+.blueprint1989-chart-title {
   font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-.batanai-chart-body {
+.blueprint1989-chart-body {
   padding: 1rem;
   height: 350px;
   position: relative;
@@ -30,7 +30,7 @@
 
 /* Mobile */
 @media (max-width: 760px) {
-  .batanai-chart-body {
+  .blueprint1989-chart-body {
     height: 250px;
     padding: 0.75rem;
   }

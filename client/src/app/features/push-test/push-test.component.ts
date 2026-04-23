@@ -25,14 +25,14 @@ export class PushTestComponent implements OnInit {
 
   // Test form
   selectedType: NotificationType = NotificationType.General;
-  testTitle = 'Batanai Test';
+  testTitle = 'Blueprint1989 Test';
   testBody = 'This is a test push notification.';
   testDeepLink = '/dashboard';
 
   // Email test form
   testEmailTo = 'elroitec@gmail.com';
-  testEmailSubject = 'Batanai Test Email';
-  testEmailBody = 'This is a test email from Batanai.';
+  testEmailSubject = 'Blueprint1989 Test Email';
+  testEmailBody = 'This is a test email from Blueprint1989.';
   emailLoading = false;
 
   // UI state

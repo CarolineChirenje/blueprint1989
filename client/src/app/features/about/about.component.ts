@@ -20,7 +20,7 @@ interface AppVersionDto {
   standalone: false
 })
 export class AboutComponent implements OnInit {
-  readonly appName = 'Batanai';
+  readonly appName = 'Blueprint1989';
   readonly currentYear = 2026;
   readonly contactEmail = 'carochire@gmail.com';
   readonly companyName = 'elroitec';

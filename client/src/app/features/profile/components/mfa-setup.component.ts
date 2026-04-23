@@ -116,7 +116,7 @@ export class MfaSetupComponent implements OnInit {
   }
 
   downloadBackupCodes() {
-    const text = 'Batanai - Backup Codes\n\n' +
+    const text = 'Blueprint1989 - Backup Codes\n\n' +
       'Save these codes in a secure place. Each code can only be used once.\n\n' +
       this.backupCodes.join('\n');
     
@@ -124,7 +124,7 @@ export class MfaSetupComponent implements OnInit {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'batanai-backup-codes.txt';
+    a.download = 'blueprint1989-backup-codes.txt';
     a.click();
     window.URL.revokeObjectURL(url);
   }

@@ -1,4 +1,4 @@
-# Batanai Push Notifications Reference
+# Blueprint1989 Push Notifications Reference
 
 All push notifications fall into two delivery types:
 
@@ -58,7 +58,7 @@ Each server-sent notification also creates an **in-app Notification row** in the
 | **Trigger** | An Admin triggers a system restart via `POST /api/system/restart` |
 | **Sent to** | All users |
 | **Title** | `System Restart` |
-| **Body** | `Batanai will restart shortly for maintenance. Please save your work.` |
+| **Body** | `Blueprint1989 will restart shortly for maintenance. Please save your work.` |
 | **Deep link** | (none) |
 | **Source** | `SystemController.cs` ? `POST /api/system/restart` |
 | **NotificationType** | `SystemRestart (5)` |
@@ -70,7 +70,7 @@ Each server-sent notification also creates an **in-app Notification row** in the
 |-------|-------|
 | **Trigger** | Any ad-hoc notification sent by the system or admin |
 | **Sent to** | Targeted user(s) |
-| **Title** | `Batanai` |
+| **Title** | `Blueprint1989` |
 | **Body** | Custom message |
 | **Deep link** | Optional |
 | **Source** | `NotificationService.CreateAsync` called directly |

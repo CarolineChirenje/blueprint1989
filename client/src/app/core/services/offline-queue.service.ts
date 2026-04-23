@@ -15,7 +15,7 @@ export interface OfflineQueueItem {
   label: string;        // human-readable description
 }
 
-const DB_NAME = 'BatanaiNotifications';
+const DB_NAME = 'Blueprint1989Notifications';
 const DB_VERSION = 2;
 const STORE = 'offlineQueue';
 const TTL_MS = 24 * 60 * 60 * 1000; // 24 hours

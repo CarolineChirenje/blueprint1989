@@ -1,6 +1,6 @@
-# Batanai Client Application
+# Blueprint1989 Client Application
 
-This is the client-side application for the Batanai project, built using Angular and TypeScript. Batanai is a shared expense management PWA that helps groups track, split, and settle expenses across billing cycles.
+This is the client-side application for the Blueprint1989 project, built using Angular and TypeScript. Blueprint1989 is a shared expense management PWA that helps groups track, split, and settle expenses across billing cycles.
 
 ## Features
 
@@ -18,14 +18,14 @@ This is the client-side application for the Batanai project, built using Angular
 
 - Node.js (version 18 or later)
 - Angular CLI (install via npm: `npm install -g @angular/cli`)
-- The Batanai API running at `http://localhost:5000` (see `server/` for setup)
+- The Blueprint1989 API running at `http://localhost:5000` (see `server/` for setup)
 
 ### Installation
 
 1. Clone the repository:
    ```   
    git clone <repository-url>
-   cd batanai/client
+   cd blueprint1989/client
    ```
 
 2. Install dependencies:

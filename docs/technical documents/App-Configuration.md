@@ -20,7 +20,7 @@ App Configuration provides a runtime key-value store for application settings th
 
 ### Controller â€” `AppConfigController`
 
-**File:** `server/src/Batanai.Api/Controllers/AppConfigController.cs`
+**File:** `server/src/Blueprint1989.Api/Controllers/AppConfigController.cs`
 
 Base route: `/api/app-config`
 
@@ -49,7 +49,7 @@ Processes each in a single transaction. Returns the count of updated keys.
 
 ### Model â€” `AppConfigEntry`
 
-**File:** `server/src/Batanai.Api/Models/AppConfigEntry.cs`
+**File:** `server/src/Blueprint1989.Api/Models/AppConfigEntry.cs`
 
 | Field | Type | Notes |
 |---|---|---|
@@ -69,7 +69,7 @@ Processes each in a single transaction. Returns the count of updated keys.
 
 ### Service â€” `AppConfigService`
 
-**File:** `server/src/Batanai.Api/Services/AppConfigService.cs`
+**File:** `server/src/Blueprint1989.Api/Services/AppConfigService.cs`
 
 #### Key Methods
 

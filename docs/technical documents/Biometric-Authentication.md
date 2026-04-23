@@ -2,7 +2,7 @@
 
 ## Overview
 
-Batanai supports passwordless login via the Web Authentication API (WebAuthn), enabling users on compatible devices to authenticate with biometrics such as Touch ID, Face ID, or Windows Hello. Once a credential is registered, the user can log in by typing their email address and tapping a biometric button â€” no password is entered and MFA is bypassed. Credentials are stored server-side as FIDO2 `WebAuthnCredential` records and managed from the Profile â†’ Security (Biometric) page.
+Blueprint1989 supports passwordless login via the Web Authentication API (WebAuthn), enabling users on compatible devices to authenticate with biometrics such as Touch ID, Face ID, or Windows Hello. Once a credential is registered, the user can log in by typing their email address and tapping a biometric button â€” no password is entered and MFA is bypassed. Credentials are stored server-side as FIDO2 `WebAuthnCredential` records and managed from the Profile â†’ Security (Biometric) page.
 
 ---
 

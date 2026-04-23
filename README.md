@@ -1,19 +1,16 @@
-# Batanai
+# Blueprint1989
 
-A cloud-hosted, mobile-first **Progressive Web App (PWA)** for shared expense management — built for flatmates, families, and travel groups.
+A cloud-hosted, mobile-first **Progressive Web App (PWA)** — a generic, extensible blueprint for building feature-rich web applications.
 
-**Live:** [batanai.elroitec.com](https://batanai.elroitec.com) · **Docs:** [batanai-docs.pages.dev](https://batanai-docs.pages.dev)
+**Live:** [blueprint1989.elroitec.com](https://blueprint1989.elroitec.com) · **Docs:** [blueprint1989-docs.pages.dev](https://blueprint1989-docs.pages.dev)
 
 ## Features
 
-- **Expense Cycles** — create billing periods, track member balances, auto-calculate minimum payment transfers on cycle close
-- **Payment Workflow** — members submit payments; admins confirm or reject
-- **Push Notifications** — real-time browser notifications via VAPID (payment due, received, cycle created)
+- **Push Notifications** — real-time browser notifications via VAPID
 - **Offline Support** — IndexedDB queue with 24-hour TTL, auto-syncs on reconnect
 - **Biometric Login** — WebAuthn/FIDO2 passwordless authentication (fingerprint, Face ID)
 - **MFA** — optional TOTP two-factor authentication with QR code setup
-- **Admin Hub** — manage users, cycles, reports, and app-wide configuration
-- **Reporting** — Chart.js dashboards and Excel export
+- **Admin Hub** — manage users, reports, and app-wide configuration
 - **Role-Based Access** — SuperAdmin → Admin → Member
 
 ## Tech Stack
@@ -41,14 +38,14 @@ A cloud-hosted, mobile-first **Progressive Web App (PWA)** for shared expense ma
 
 ```bash
 git clone <repo-url>
-cd Batanai
+cd Blueprint1989
 
 # Client
 cd client
 npm install
 
 # Server
-cd ../server/src/Batanai.Api
+cd ../server/src/Blueprint1989.Api
 dotnet restore
 ```
 
@@ -72,13 +69,13 @@ export const environment = {
 
 ```bash
 # Terminal 1 — API
-cd server/src/Batanai.Api
+cd server/src/Blueprint1989.Api
 dotnet run
 
 # Terminal 2 — Build & serve client
 cd client
 npx ng build
-http-server ./dist/Batanai/browser -p 80 -c-1
+http-server ./dist/Blueprint1989/browser -p 80 -c-1
 
 # Terminal 3 — ngrok tunnel for client HTTPS
 ngrok http 80

@@ -13,14 +13,14 @@ Chart.register(
   CategoryScale, Title, Tooltip, Legend, Filler
 );
 
-export interface BatanaiChartDataset {
+export interface Blueprint1989ChartDataset {
   label: string;
   data: (number | null)[];
   color: string;
   fill?: boolean;
 }
 
-export interface BatanaiReferenceBand {
+export interface Blueprint1989ReferenceBand {
   /** Y value where the dashed line is drawn */
   y: number;
   label: string;
@@ -28,19 +28,19 @@ export interface BatanaiReferenceBand {
 }
 
 @Component({
-  selector: 'app-batanai-chart',
+  selector: 'app-blueprint1989-chart',
   templateUrl: './vitara-chart.component.html',
   styleUrls: ['./vitara-chart.component.css'],
   standalone: false
 })
-export class BatanaiChartComponent implements AfterViewInit, OnChanges, OnDestroy {
+export class Blueprint1989ChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   @ViewChild('chartCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   @Input() title = '';
   @Input() labels: string[] = [];
-  @Input() datasets: BatanaiChartDataset[] = [];
+  @Input() datasets: Blueprint1989ChartDataset[] = [];
   @Input() yAxisLabel = '';
-  @Input() referenceBands: BatanaiReferenceBand[] = [];
+  @Input() referenceBands: Blueprint1989ReferenceBand[] = [];
 
   private chart: Chart | null = null;
   private viewReady = false;
@@ -74,7 +74,7 @@ export class BatanaiChartComponent implements AfterViewInit, OnChanges, OnDestro
     if (!this.labels?.length || !this.datasets?.length) return;
 
     const refLinePlugin: Plugin<'line'> = {
-      id: 'batanaiRefLines',
+      id: 'blueprint1989RefLines',
       afterDraw: (chartInstance) => {
         if (!this.referenceBands?.length) return;
         const { ctx, chartArea, scales } = chartInstance as any;

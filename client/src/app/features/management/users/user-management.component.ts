@@ -2,13 +2,11 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
-import { UserManagementDto, KycStatus } from '../../../shared/models/user.model';
-import { UserGroupRolesDialogComponent } from './user-group-roles-dialog/user-group-roles-dialog.component';
+import { UserManagementDto } from '../../../shared/models/user.model';
 import { EditUserDialogComponent } from './edit-user-dialog/edit-user-dialog.component';
 import { AdminResetPasswordDialogComponent } from './admin-reset-password-dialog/admin-reset-password-dialog.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { KycReviewDialogComponent } from './kyc-review-dialog/kyc-review-dialog.component';
 
 @Component({
   selector: 'app-user-management',
@@ -21,7 +19,6 @@ export class UserManagementComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   displayedColumns = ['fullName', 'email', 'role', 'status', 'actions'];
-  readonly KycStatus = KycStatus;
 
   get isSuperAdmin(): boolean { return this.authService.isSuperAdmin(); }
   get isAdminOrAbove(): boolean { return this.authService.isAdminOrAbove(); }
@@ -44,13 +41,6 @@ export class UserManagementComponent implements OnInit {
     this.http.get<UserManagementDto[]>(`${environment.apiUrl}/auth/users`).subscribe({
       next: users => { this.users = users; this.isLoading = false; this.cdr.detectChanges(); },
       error: () => { this.errorMessage = 'Failed to load users.'; this.isLoading = false; this.cdr.detectChanges(); }
-    });
-  }
-
-  openGroupRolesDialog(user: UserManagementDto): void {
-    this.dialog.open(UserGroupRolesDialogComponent, {
-      width: '560px',
-      data: { userId: user.id, userName: user.fullName }
     });
   }
 
@@ -156,34 +146,4 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  kycTooltip(user: UserManagementDto): string {
-    switch (user.kycStatus) {
-      case KycStatus.PendingReview:  return 'KYC: Pending review  click to review';
-      case KycStatus.Verified:       return 'KYC: Verified  click to view';
-      case KycStatus.Rejected:       return 'KYC: Rejected  click to view';
-      case KycStatus.AdminBypassed:  return 'KYC: Admin bypassed  click to view';
-      case KycStatus.NotStarted:     return 'KYC: Not started  click to bypass';
-      default:                       return 'KYC: View / review';
-    }
-  }
-
-  openKycDialog(user: UserManagementDto): void {
-    const ref = this.dialog.open(KycReviewDialogComponent, {
-      width: '660px',
-      maxWidth: '95vw',
-      data: { userId: user.id, userName: user.fullName }
-    });
-    ref.afterClosed().subscribe(result => {
-      if (result === 'approved') {
-        user.kycStatus = KycStatus.Verified;
-        this.cdr.detectChanges();
-      } else if (result === 'rejected') {
-        user.kycStatus = KycStatus.Rejected;
-        this.cdr.detectChanges();
-      } else if (result === 'bypassed') {
-        user.kycStatus = KycStatus.AdminBypassed;
-        this.cdr.detectChanges();
-      }
-    });
-  }
 }

@@ -16,7 +16,6 @@ import { OfflineQueueService } from './core/services/offline-queue.service';
 import { SyncService } from './core/services/sync.service';
 import { SystemService } from './shared/services/system.service';
 import { DialogService } from './shared/services/dialog.service';
-import { GroupService } from './core/services/group.service';
 import { TourService } from './core/services/tour.service';
 
 type BellNotificationItem = {
@@ -49,7 +48,7 @@ type NotificationGroup = {
 })
 
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'Batanai';
+  title = 'Blueprint1989';
   version = '';
   dropdownOpen = false;
   bglDropdownOpen = false;
@@ -87,7 +86,6 @@ export class AppComponent implements OnInit, OnDestroy {
   showUpdatePrompt = false;
   isBreakingUpdate = false;
   year = new Date().getFullYear();
-  canManageGroups = false;
 
   private notifSub?: Subscription;
   private pollSub?: Subscription;
@@ -104,7 +102,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private systemService: SystemService,
     private dialogService: DialogService,
-    private groupService: GroupService,
     private tourService: TourService
   ) {}
   
@@ -169,7 +166,6 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn()) {
       this.initPush();
       this.registerDevice();
-      this.loadGroupAccess();
     }
 
     // Samsung Internet detection: show appropriate guidance banner
@@ -185,7 +181,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.loadNotifications();
         this.initPush();
         this.registerDevice();
-        this.loadGroupAccess();
 
         // Auto-start onboarding tour on first login (dashboard only)
         const navEnd = event as NavigationEnd;
@@ -803,20 +798,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.auth.isAdminOrAbove();
   }
 
-  canManageGroupsOrAdmin(): boolean {
-    return this.auth.isAdminOrAbove() || this.canManageGroups;
-  }
-
-  private loadGroupAccess(): void {
-    if (this.auth.isAdminOrAbove()) { this.canManageGroups = true; return; }
-    this.groupService.getGroups().subscribe({
-      next: groups => { this.canManageGroups = groups.some(g => g.canManage); },
-      error: () => {}
-    });
-  }
-
-
-  
   toggleDropdown(): void {
     this.dropdownOpen = !this.dropdownOpen;
     this.bglDropdownOpen = false;

@@ -1,6 +1,6 @@
-# Batanai â€” Technical Documentation
+# Blueprint1989 â€” Technical Documentation
 
-This folder contains detailed technical documentation for every feature in the Batanai expense-sharing platform. Each document covers both the backend (.NET 10 API) and frontend (Angular 21 PWA) implementation for its respective feature.
+This folder contains detailed technical documentation for every feature in the Blueprint1989 expense-sharing platform. Each document covers both the backend (.NET 10 API) and frontend (Angular 21 PWA) implementation for its respective feature.
 
 ---
 
@@ -99,7 +99,7 @@ This folder contains detailed technical documentation for every feature in the B
 If this repository is hosted on GitHub, the built-in Wiki can host these files directly:
 
 1. Enable the Wiki tab on the repository settings page.
-2. Clone the wiki repo: `git clone https://github.com/CarolineChirenje/Batanai.wiki.git`
+2. Clone the wiki repo: `git clone https://github.com/CarolineChirenje/Blueprint1989.wiki.git`
 3. Copy all `.md` files from this folder into the wiki repo root.
 4. Rename `README.md` â†’ `Home.md` (GitHub Wiki uses `Home.md` as the landing page).
 5. Push and the wiki is live at `https://github.com/<org>/<repo>/wiki`.
@@ -112,7 +112,7 @@ Produces a fully searchable static site from these markdown files.
 
 ```yaml
 # mkdocs.yml (place in project root)
-site_name: Batanai Technical Docs
+site_name: Blueprint1989 Technical Docs
 docs_dir: docs/technical documents
 nav:
   - Home: README.md

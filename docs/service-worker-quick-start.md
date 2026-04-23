@@ -28,10 +28,10 @@ npx ng build
 npx ng build --configuration production
 ```
 
-The output lands in `dist/Batanai/browser/`. Verify the SW files are present:
+The output lands in `dist/Blueprint1989/browser/`. Verify the SW files are present:
 
 ```powershell
-Get-ChildItem dist/Batanai/browser | Where-Object { $_.Name -match 'ngsw|custom-sw|manifest' }
+Get-ChildItem dist/Blueprint1989/browser | Where-Object { $_.Name -match 'ngsw|custom-sw|manifest' }
 # Expected: custom-sw.js  ngsw-worker.js  ngsw.json  manifest.webmanifest
 ```
 
@@ -39,7 +39,7 @@ Get-ChildItem dist/Batanai/browser | Where-Object { $_.Name -match 'ngsw|custom-
 
 ```powershell
 # -c-1 disables caching so you always get fresh files during development
-http-server dist/Batanai/browser -p 8080 -c-1
+http-server dist/Blueprint1989/browser -p 8080 -c-1
 ```
 
 Open **`http://localhost:8080`** in Chrome.
@@ -68,7 +68,7 @@ Android requires an **HTTPS** URL. Use ngrok to expose the local server:
 
 ```powershell
 # Terminal 1 — serve
-http-server dist/Batanai/browser -p 8080 -c-1
+http-server dist/Blueprint1989/browser -p 8080 -c-1
 
 # Terminal 2 — tunnel (creates a public HTTPS URL)
 ngrok http 8080
@@ -76,7 +76,7 @@ ngrok http 8080
 
 1. Copy the `https://xxxx.ngrok.io` URL from the ngrok output.
 2. Open that URL in **Chrome on Android**.
-3. After ~30 seconds Chrome shows an **"Add Batanai to Home Screen"** banner at the bottom of the screen. Tap it, then tap **Add**.
+3. After ~30 seconds Chrome shows an **"Add Blueprint1989 to Home Screen"** banner at the bottom of the screen. Tap it, then tap **Add**.
    - Alternatively: tap the **? menu ? Add to Home screen**.
 4. Launch the app from the home screen — it opens in **standalone mode** (no browser chrome), confirming `"display": "standalone"` in the manifest is working.
 5. The home screen icon will be the 192 × 192 PNG you see in `assets/icons/icon-192x192.png`.

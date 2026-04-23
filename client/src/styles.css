@@ -26,7 +26,7 @@ app-signup, app-login, app-signup *, app-login * {
   touch-action: manipulation;
 }
 
-/* ── Shepherd.js Tour Theme (batanaiBlue) ───────────────────────────────── */
+/* ── Shepherd.js Tour Theme (appTheme) ───────────────────────────────── */
 .shepherd-has-cancel-icon .shepherd-cancel-icon {
   color: #666;
 }
@@ -345,7 +345,7 @@ app-signup, app-login, app-signup *, app-login * {
     padding: 1.25rem;
   }
 }
-/* Design Tokens — Batanai Green Theme */
+/* Design Tokens — Blueprint1989 Theme */
 :root {
   color-scheme: light;
 
