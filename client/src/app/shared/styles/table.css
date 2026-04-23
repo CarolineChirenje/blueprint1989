@@ -480,27 +480,6 @@ td.actions-cell {
   mat-card-header, .mat-mdc-card-header { padding: 0.5rem 0 !important; }
 }
 
-/* --- Diabetes Type Badges -------------------------------------------- */
-.diabetes-type-badge {
-  display: inline-block;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  vertical-align: middle;
-  margin-right: 4px;
-  line-height: 1.5;
-}
-.diabetes-type-badge.t1d {
-  background-color: var(--info);
-  color: #ffffff;
-}
-.diabetes-type-badge.t2d {
-  background-color: #00695C;
-  color: #ffffff;
-}
-
 /* Optional field label */
 .optional-label {
   font-size: 0.8rem;

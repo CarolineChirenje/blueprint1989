@@ -530,24 +530,6 @@
 }
 
 
-/* Radio option groups in signup (diabetes medication delivery route) */
-.radio-options {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin: 0.4rem 0 0.8rem;
-}
-.radio-label {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-.radio-label input[type="radio"] {
-  width: auto;
-  margin: 0;
-}
 
 /* ─── Email verification flow (success screen) ─────────────────────────── */
 

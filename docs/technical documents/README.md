@@ -118,22 +118,13 @@ nav:
   - Home: README.md
   - Authentication: Authentication.md
   - Biometric Auth: Biometric-Authentication.md
-  - BGL Assessment: BGL-Assessment.md
-  - Blood Pressure: Blood-Pressure-Monitoring.md
-  - Incidents (Diabetes): Incidents-Diabetes.md
-  - Incidents (BP): Incidents-Blood-Pressure.md
-  - Meal Entry: Meal-Entry.md
   - Dashboard: Dashboard.md
   - Profile: Profile.md
-  - Care Recipients: Care-Recipients.md
-  - Notifications: Notifications.md
-  - Supplies: Supplies.md
+  - Notifications: Notifications.m
   - Management: Management.md
   - Export & Reports: Export-Reports.md
   - Offline Queue: Offline-Queue.md
   - Push Notifications: Push-Notifications.md
-  - Classification: Classification-Management.md
-  - Cycles & Terms: Cycles-Terms.md
   - Feature & Bug Reports: Feature-Bug-Reports.md
   - App Configuration: App-Configuration.md
 theme:

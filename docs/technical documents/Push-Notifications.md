@@ -278,20 +278,6 @@ The `notificationclick` handler opens the app and navigates to the `url` embedde
 
 | Notification Type | Trigger | Recipients |
 |---|---|---|
-| `LinkedAsCarer` | Carer successfully linked to CR | Carer + CR |
-| `LinkedAsCareRecipient` | Same event | Both users |
-| `DelinkRequestSubmitted` | CR submits delink request | Admin + CR |
-| `DelinkRequestApproved` | Admin approves delink | Carer + CR |
-| `DelinkRequestRejected` | Admin rejects delink | CR |
-| `DiabetesIncidentRecorded` | Incident created | Admin + CR |
-| `BpIncidentRecorded` | BP incident created | Admin + CR |
-| `LowBglAlert` | Hypo classification on incident | Admin + CR |
-| `HighBglAlert` | Hyper classification on incident | Admin + CR |
-| `BpHypotensionAlert` | Hypotension on BP incident | Admin + CR |
-| `BpHighAlert` | Stage 2 or Crisis BP | Admin + CR |
-| `BgTimerReminder` | Scheduled timer fires | Requesting user |
-| `FeatureBugReportSubmitted` | User submits report | SuperAdmin |
-| `SupplyStockLow` | Weekly report finds supplies running low | Admin |
 
 ---
 

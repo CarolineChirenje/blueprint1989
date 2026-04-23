@@ -51,14 +51,12 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'Blueprint1989';
   version = '';
   dropdownOpen = false;
-  bglDropdownOpen = false;
+ 
   managementDropdownOpen = false;
   managementSubGroupOpen: string | null = null;
   helpDropdownOpen = false;
   systemDropdownOpen = false;
   notificationDropdownOpen = false;
-  diabetesDropdownOpen = false;
-  vitalsDropdownOpen = false;
   mobileNavOpen = false;
   isAuthPage = false;
 
@@ -574,8 +572,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.managementDropdownOpen = false;
     this.systemDropdownOpen = false;
     this.helpDropdownOpen = false;
-    this.vitalsDropdownOpen = false;
-    this.diabetesDropdownOpen = false;
     if (this.notificationDropdownOpen) {
       this.loadNotifications();
     }
@@ -642,16 +638,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.router.navigate(['/profile/my-reports']);
   }
 
-  toggleDiabetesDropdown(): void {
-    this.diabetesDropdownOpen = !this.diabetesDropdownOpen;
-    this.dropdownOpen = false;
-    this.bglDropdownOpen = false;
-    this.managementDropdownOpen = false;
-    this.systemDropdownOpen = false;
-    this.helpDropdownOpen = false;
-    this.notificationDropdownOpen = false;
-  }
-
  
   isAdminOrSuperAdmin(): boolean {
     return this.auth.isAdminOrAbove();
@@ -659,7 +645,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleDropdown(): void {
     this.dropdownOpen = !this.dropdownOpen;
-    this.bglDropdownOpen = false;
     this.managementDropdownOpen = false;
     this.systemDropdownOpen = false;
     this.helpDropdownOpen = false;
@@ -671,38 +656,18 @@ export class AppComponent implements OnInit, OnDestroy {
   }
   
   toggleVitalsDropdown(): void {
-    this.vitalsDropdownOpen = !this.vitalsDropdownOpen;
+   
     this.dropdownOpen = false;
-    this.bglDropdownOpen = false;
     this.managementDropdownOpen = false;
     this.systemDropdownOpen = false;
     this.helpDropdownOpen = false;
     this.notificationDropdownOpen = false;
   }
 
-  closeVitalsDropdown(): void {
-    this.vitalsDropdownOpen = false;
-  }
-
-  toggleBglDropdown(): void {
-    this.bglDropdownOpen = !this.bglDropdownOpen;
-    this.dropdownOpen = false;
-    this.vitalsDropdownOpen = false;
-    this.managementDropdownOpen = false;
-    this.systemDropdownOpen = false;
-    this.helpDropdownOpen = false;
-    this.notificationDropdownOpen = false;
-  }
-  
-  closeBglDropdown(): void {
-    this.bglDropdownOpen = false;
-  }
   
   toggleManagementDropdown(): void {
     this.managementDropdownOpen = !this.managementDropdownOpen;
-    this.dropdownOpen = false;
-    this.bglDropdownOpen = false;
-    this.vitalsDropdownOpen = false;
+    this.dropdownOpen = false
     this.systemDropdownOpen = false;
     this.helpDropdownOpen = false;
     this.notificationDropdownOpen = false;
@@ -720,8 +685,6 @@ export class AppComponent implements OnInit, OnDestroy {
   toggleSystemDropdown(): void {
     this.systemDropdownOpen = !this.systemDropdownOpen;
     this.dropdownOpen = false;
-    this.bglDropdownOpen = false;
-    this.vitalsDropdownOpen = false;
     this.managementDropdownOpen = false;
     this.helpDropdownOpen = false;
     this.notificationDropdownOpen = false;
@@ -733,10 +696,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleHelpDropdown(): void {
     this.helpDropdownOpen = !this.helpDropdownOpen;
-    this.dropdownOpen = false;
-    this.bglDropdownOpen = false;
-    this.vitalsDropdownOpen = false;
-    this.diabetesDropdownOpen = false;
+    this.dropdownOpen = false;;
     this.managementDropdownOpen = false;
     this.systemDropdownOpen = false;
     this.notificationDropdownOpen = false;
@@ -753,16 +713,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.tourService.startTour(role);
   }
 
-  navigateToBglReading(): void {
-    this.closeBglDropdown();
-    this.router.navigate(['/dashboard']);
-  }
-  
-  navigateToBglHistory(): void {
-    this.closeBglDropdown();
-    this.router.navigate(['/dashboard']);
-  }
-  
   navigateToUsers(): void {
     this.closeManagementDropdown();
     this.router.navigate(['/management/users']);
